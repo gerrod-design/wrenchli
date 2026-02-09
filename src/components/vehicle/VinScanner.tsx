@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { sanitizeVin, isValidVin, decodeVin } from "@/lib/vinDecoder";
 import type { DecodedVehicle } from "@/lib/vinDecoder";
 import { useIsMobile } from "@/hooks/use-mobile";
+import VinPrivacyNotice from "./VinPrivacyNotice";
 
 interface Props {
   onDecoded: (vehicle: DecodedVehicle) => void;
@@ -94,7 +95,7 @@ export default function VinScanner({ onDecoded, onSwitchToVin, onSwitchToDropdow
     // Auto-timeout after 30s
     setTimeout(() => {
       if (scannerRef.current) {
-        setError("Having trouble scanning? Try improving lighting or enter the VIN manually.");
+        setError("Having trouble scanning? The VIN barcode can be hard to read if it's worn, dirty, or in low light. Try entering the VIN manually or use the dropdown.");
       }
     }, 30000);
   };
@@ -157,6 +158,7 @@ export default function VinScanner({ onDecoded, onSwitchToVin, onSwitchToDropdow
           <div id="vin-file-scanner" className="hidden" />
         </div>
         {error && <p className="text-sm text-destructive font-medium">{error}</p>}
+        <VinPrivacyNotice />
       </div>
     );
   }

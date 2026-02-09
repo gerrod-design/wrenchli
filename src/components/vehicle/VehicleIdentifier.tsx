@@ -1,11 +1,13 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Car, Keyboard, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DecodedVehicle } from "@/lib/vinDecoder";
+import { decodeVin } from "@/lib/vinDecoder";
 import DropdownSelector from "./DropdownSelector";
 import VinInput from "./VinInput";
 import VinScanner from "./VinScanner";
 import VehicleConfirmationBar from "./VehicleConfirmationBar";
+import { useVehicleSession, type StoredVehicle } from "@/hooks/useVehicleSession";
 
 type TabId = "dropdown" | "vin" | "scan";
 
@@ -32,6 +34,8 @@ interface Props {
   initialYear?: string;
   initialMake?: string;
   initialModel?: string;
+  /** If provided, auto-decode this VIN on mount */
+  initialVin?: string;
   compact?: boolean;
 }
 
@@ -40,32 +44,72 @@ export default function VehicleIdentifier({
   initialYear = "",
   initialMake = "",
   initialModel = "",
+  initialVin,
   compact = false,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<TabId>("dropdown");
-  const [confirmed, setConfirmed] = useState<DecodedVehicle | null>(null);
+  const { vehicle: storedVehicle, setVehicle: storeVehicle, clear: clearStored } = useVehicleSession();
 
-  // Dropdown state
-  const [year, setYear] = useState(initialYear);
-  const [make, setMake] = useState(initialMake);
-  const [model, setModel] = useState(initialModel);
+  const [activeTab, setActiveTab] = useState<TabId>("dropdown");
+  const [confirmed, setConfirmed] = useState<DecodedVehicle | null>(
+    storedVehicle?.decoded || null
+  );
+  const [vinDecoding, setVinDecoding] = useState(false);
+
+  // Dropdown state — prefer URL params, then session, then empty
+  const [year, setYear] = useState(initialYear || storedVehicle?.year || "");
+  const [make, setMake] = useState(initialMake || storedVehicle?.make || "");
+  const [model, setModel] = useState(initialModel || storedVehicle?.model || "");
+
+  // On mount: if session has a confirmed vehicle, fire onVehicleChange
+  useEffect(() => {
+    if (storedVehicle && storedVehicle.year && storedVehicle.make && storedVehicle.model) {
+      onVehicleChange(storedVehicle);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-decode VIN from URL param on mount
+  useEffect(() => {
+    if (!initialVin || confirmed) return;
+    let cancelled = false;
+    setVinDecoding(true);
+    decodeVin(initialVin)
+      .then((vehicle) => {
+        if (cancelled) return;
+        handleDecoded(vehicle);
+      })
+      .catch(() => {
+        // silently fall back to manual entry
+      })
+      .finally(() => {
+        if (!cancelled) setVinDecoding(false);
+      });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialVin]);
 
   // Sync dropdown changes upward
   const handleYearChange = (v: string) => {
     setYear(v);
     setMake("");
     setModel("");
-    onVehicleChange(v ? { year: v, make: "", model: "" } : null);
+    const data = v ? { year: v, make: "", model: "" } : null;
+    onVehicleChange(data);
+    if (data) storeVehicle(data); else clearStored();
   };
   const handleMakeChange = (v: string) => {
     setMake(v);
     setModel("");
-    onVehicleChange(year ? { year, make: v, model: "" } : null);
+    const data = year ? { year, make: v, model: "" } : null;
+    onVehicleChange(data);
+    if (data) storeVehicle(data); else clearStored();
   };
   const handleModelChange = (v: string) => {
     setModel(v);
     if (year && make && v) {
-      onVehicleChange({ year, make, model: v });
+      const data: StoredVehicle = { year, make, model: v };
+      onVehicleChange(data);
+      storeVehicle(data);
     }
   };
 
@@ -75,7 +119,7 @@ export default function VehicleIdentifier({
       setYear(vehicle.year);
       setMake(vehicle.make);
       setModel(vehicle.model);
-      onVehicleChange({
+      const data: StoredVehicle = {
         year: vehicle.year,
         make: vehicle.make,
         model: vehicle.model,
@@ -84,9 +128,12 @@ export default function VehicleIdentifier({
         transmission: vehicle.transmission,
         driveType: vehicle.driveType,
         fuelType: vehicle.fuelType,
-      });
+        decoded: vehicle,
+      };
+      onVehicleChange(data);
+      storeVehicle(data);
     },
-    [onVehicleChange]
+    [onVehicleChange, storeVehicle]
   );
 
   const handleClear = () => {
@@ -95,6 +142,7 @@ export default function VehicleIdentifier({
     setMake("");
     setModel("");
     onVehicleChange(null);
+    clearStored();
     setActiveTab("dropdown");
   };
 

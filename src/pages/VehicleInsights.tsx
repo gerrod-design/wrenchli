@@ -61,6 +61,7 @@ export default function VehicleInsights() {
   const [searchParams] = useSearchParams();
   const hasUrlCode = Boolean(searchParams.get("code"));
   const hasUrlSymptom = Boolean(searchParams.get("symptom"));
+  const urlVin = searchParams.get("vin") || undefined;
   const [symptom, setSymptom] = useState(() => searchParams.get("symptom") || "");
   const [dtcInput, setDtcInput] = useState(() => searchParams.get("code") || "");
   const [vehicle, setVehicle] = useState<VehicleData | null>(() => {
@@ -221,6 +222,7 @@ export default function VehicleInsights() {
                   initialYear={searchParams.get("year") || ""}
                   initialMake={searchParams.get("make") || ""}
                   initialModel={searchParams.get("model") || ""}
+                  initialVin={urlVin}
                 />
                 <Button onClick={handleDiagnose} className="w-full h-12 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-semibold px-6 whitespace-nowrap">
                   Get Your Diagnosis
