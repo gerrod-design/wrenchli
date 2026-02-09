@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
+import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 
 const valueProps = [
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
@@ -135,6 +136,8 @@ export default function Index() {
 
       {/* Recommend a Shop */}
       <RecommendShopSection onOpenModal={() => setRecommendOpen(true)} />
+
+      <TestimonialsCarousel />
 
       {/* Final CTA */}
       <section className="section-padding bg-primary text-primary-foreground">
