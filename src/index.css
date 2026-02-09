@@ -102,4 +102,34 @@
   .container-wrenchli {
     @apply mx-auto w-full max-w-[1280px] px-4 md:px-8;
   }
+
+  .hero-height {
+    height: 80vh;
+  }
+
+  @media (min-width: 768px) {
+    .hero-height {
+      height: 100vh;
+      max-height: 900px;
+    }
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      180deg,
+      hsla(var(--primary), 0.85) 0%,
+      hsla(var(--primary), 0.70) 40%,
+      hsla(var(--primary), 0.80) 70%,
+      hsla(var(--primary), 0.95) 100%
+    );
+  }
+}
+
+@keyframes subtleZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+.animate-subtle-zoom {
+  animation: subtleZoom 20s ease-in-out infinite alternate;
 }
