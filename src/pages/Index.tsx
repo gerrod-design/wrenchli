@@ -30,6 +30,22 @@ const howItWorks = [
 export default function Index() {
   const [issueText, setIssueText] = useState("");
   const [dtcCode, setDtcCode] = useState("");
+  const [selectedMake, setSelectedMake] = useState("");
+
+  const modelsByMake: Record<string, string[]> = {
+    Ford: ["F-150", "Escape", "Explorer", "Mustang", "Edge", "Bronco", "Ranger", "Expedition", "Fusion", "Focus"],
+    Chevrolet: ["Silverado", "Equinox", "Malibu", "Traverse", "Camaro", "Tahoe", "Suburban", "Colorado", "Blazer", "Trax"],
+    Toyota: ["Camry", "Corolla", "RAV4", "Highlander", "Tacoma", "Tundra", "4Runner", "Prius", "Sienna", "Supra"],
+    Honda: ["Civic", "Accord", "CR-V", "Pilot", "HR-V", "Odyssey", "Ridgeline", "Passport", "Fit", "Insight"],
+    Chrysler: ["300", "Pacifica", "Voyager"],
+    Jeep: ["Wrangler", "Grand Cherokee", "Cherokee", "Compass", "Renegade", "Gladiator"],
+    GMC: ["Sierra", "Terrain", "Acadia", "Yukon", "Canyon", "Hummer EV"],
+    Hyundai: ["Elantra", "Sonata", "Tucson", "Santa Fe", "Kona", "Palisade", "Venue", "Ioniq 5"],
+    Kia: ["Forte", "K5", "Sportage", "Sorento", "Telluride", "Soul", "Seltos", "EV6"],
+    Nissan: ["Altima", "Sentra", "Rogue", "Pathfinder", "Frontier", "Murano", "Kicks", "Versa"],
+    BMW: ["3 Series", "5 Series", "X3", "X5", "X1", "4 Series", "7 Series", "iX"],
+    Mercedes: ["C-Class", "E-Class", "GLC", "GLE", "A-Class", "S-Class", "GLA", "GLB"],
+  };
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -89,7 +105,11 @@ export default function Index() {
                   <option key={y} value={y}>{y}</option>
                 ))}
               </select>
-              <select className="flex h-12 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <select
+                value={selectedMake}
+                onChange={(e) => setSelectedMake(e.target.value)}
+                className="flex h-12 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
                 <option value="">Make</option>
                 {["Ford", "Chevrolet", "Toyota", "Honda", "Chrysler", "Jeep", "GMC", "Hyundai", "Kia", "Nissan", "BMW", "Mercedes", "Other"].map((m) => (
                   <option key={m} value={m}>{m}</option>
@@ -97,6 +117,9 @@ export default function Index() {
               </select>
               <select className="flex h-12 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option value="">Model</option>
+                {(modelsByMake[selectedMake] || []).map((model) => (
+                  <option key={model} value={model}>{model}</option>
+                ))}
               </select>
               <Button className="h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-6 whitespace-nowrap">
                 Get Quotes
