@@ -12,7 +12,7 @@ import type { Diagnosis, DiagnosisResultProps } from "./diagnosis/types";
 
 const DIAGNOSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/diagnose`;
 
-export default function DiagnosisResult({ codes, symptom, year, make, model }: DiagnosisResultProps) {
+export default function DiagnosisResult({ codes, symptom, year, make, model, onSwitchToDtc }: DiagnosisResultProps) {
   const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasRun, setHasRun] = useState(false);
@@ -93,7 +93,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model }: D
               <div className="space-y-6 mb-8">
                 <DisclaimerBanner />
                 <VehicleContextBar vehicleStr={vehicleStr} onChangeVehicle={handleChangeVehicle} />
-                <SymptomMatchResults matches={symptomMatches} vehicle={vehicleStr} />
+                <SymptomMatchResults matches={symptomMatches} vehicle={vehicleStr} onSwitchToDtc={onSwitchToDtc} />
 
                 {symptomMatches.length > 1 && (
                   <p className="text-center text-sm text-muted-foreground italic">
