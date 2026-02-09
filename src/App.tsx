@@ -18,6 +18,7 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import Garage from "./pages/Garage";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ function AnimatedRoutes() {
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/garage" element={<Garage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
