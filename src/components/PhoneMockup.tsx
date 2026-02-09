@@ -4,6 +4,7 @@ import {
   Search, ClipboardList, Wrench, Car, ShieldCheck,
   ScanLine, CheckCircle, ArrowRight,
 } from "lucide-react";
+import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
 /** Each "screen" matches a step in the walkthrough. */
 const screens = [
@@ -14,7 +15,7 @@ const screens = [
       <div className="flex h-full flex-col bg-background">
         {/* Fake nav */}
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
-          <div className="h-4 w-4 rounded bg-accent" />
+          <img src={wrenchliLogo} alt="Wrenchli" className="h-4 w-4 rounded object-cover" />
           <span className="text-[10px] font-bold text-primary-foreground">Wrenchli</span>
         </div>
         {/* Quick action bar area */}
