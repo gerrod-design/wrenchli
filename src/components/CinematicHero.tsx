@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import BrandVideoModal from "@/components/BrandVideoModal";
 import heroVideo from "@/assets/hero-video.mp4";
 import heroPoster from "@/assets/hero-poster.jpg";
 import heroHome from "@/assets/hero-home.jpg";
@@ -34,6 +35,7 @@ export default function CinematicHero() {
   const prefersReducedMotion = useReducedMotion();
   const isSaveData = useIsSaveData();
   const [isMobile, setIsMobile] = useState(false);
+  const [showBrandVideo, setShowBrandVideo] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -149,6 +151,16 @@ export default function CinematicHero() {
           <span className="mx-1.5 text-white/30">•</span> No account required
         </motion.p>
 
+        {/* Watch Our Story */}
+        <motion.button
+          {...fadeUp(2.4)}
+          onClick={() => setShowBrandVideo(true)}
+          className="mt-4 inline-flex items-center gap-2 text-sm text-white/70 hover:text-white hover:underline transition-colors"
+        >
+          <Play className="h-3 w-3 fill-current" />
+          Watch Our 30-Second Story
+        </motion.button>
+
         {/* Scroll indicator */}
         <motion.button
           initial={{ opacity: 0 }}
@@ -161,6 +173,9 @@ export default function CinematicHero() {
           <ChevronDown className="h-8 w-8 animate-bounce" />
         </motion.button>
       </div>
+
+      {/* Brand Video Modal */}
+      <BrandVideoModal isOpen={showBrandVideo} onClose={() => setShowBrandVideo(false)} />
     </section>
   );
 }
