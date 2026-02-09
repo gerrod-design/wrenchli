@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { Cpu, Loader2, AlertCircle, Zap } from "lucide-react";
+import { Cpu, AlertCircle, Zap, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DisclaimerBanner from "./diagnosis/DisclaimerBanner";
@@ -151,11 +151,19 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
           </>
         )}
 
-        {/* Loading state */}
+        {/* Branded loading state */}
         {isLoading && (
-          <div className="mt-8 flex flex-col items-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-wrenchli-teal" />
-            <p className="text-sm text-muted-foreground">Analyzing your vehicle issue...</p>
+          <div className="mt-8 flex flex-col items-center gap-4 py-8">
+            <div className="relative">
+              <div className="h-14 w-14 rounded-full border-2 border-wrenchli-teal/20 flex items-center justify-center">
+                <Wrench className="h-7 w-7 text-wrenchli-teal animate-spin" style={{ animationDuration: "2s" }} />
+              </div>
+              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-wrenchli-teal animate-spin" />
+            </div>
+            <p className="text-sm font-medium text-foreground">
+              {codes ? `Looking up ${codes}...` : "Analyzing your vehicle issue..."}
+            </p>
+            <p className="text-xs text-muted-foreground">This usually takes a few seconds</p>
           </div>
         )}
 

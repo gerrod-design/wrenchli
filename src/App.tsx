@@ -2,8 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomBar from "@/components/MobileBottomBar";
@@ -20,6 +21,32 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0.95, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0.95 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+      >
+        <Routes location={location}>
+          <Route path="/" element={<Index />} />
+          <Route path="/for-car-owners" element={<ForCarOwners />} />
+          <Route path="/for-shops" element={<ForShops />} />
+          <Route path="/vehicle-insights" element={<VehicleInsights />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
@@ -28,16 +55,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Navbar />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/for-car-owners" element={<ForCarOwners />} />
-            <Route path="/for-shops" element={<ForShops />} />
-            <Route path="/vehicle-insights" element={<VehicleInsights />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AnimatedRoutes />
           <Footer />
           <MobileBottomBar />
           <BackToTop />
