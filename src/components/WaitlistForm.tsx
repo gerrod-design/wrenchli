@@ -37,7 +37,7 @@ export default function WaitlistForm({ userType = "consumer", source = "home", c
     <form onSubmit={handleSubmit} className={`flex flex-col gap-3 sm:flex-row sm:items-end ${className}`}>
       <Input
         type="text"
-        placeholder="Your name (optional)"
+        placeholder="Your name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         className="h-12 text-base bg-card"
