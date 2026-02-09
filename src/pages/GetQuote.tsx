@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   MapPin, DollarSign, Wrench, Clock, Shield, ArrowRight,
-  CheckCircle, Loader2, AlertCircle, Car,
+  CheckCircle, Loader2, AlertCircle, Car, CreditCard,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -53,6 +54,7 @@ export default function GetQuote() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [financingInterested, setFinancingInterested] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [quoteId, setQuoteId] = useState<string | null>(null);
@@ -113,6 +115,7 @@ export default function GetQuote() {
           estimated_cost_low: data.cost_low,
           estimated_cost_high: data.cost_high,
           cost_estimate_details: data as any,
+          financing_interested: financingInterested,
         } as any)
         .select("id")
         .single();
@@ -147,6 +150,7 @@ export default function GetQuote() {
             customer_email: email,
             customer_phone: phone || null,
             customer_notes: notes || null,
+            financing_interested: financingInterested,
             status: "referral_requested",
             referral_requested_at: new Date().toISOString(),
           } as any)
@@ -170,6 +174,7 @@ export default function GetQuote() {
           customer_email: email,
           customer_phone: phone || null,
           customer_notes: notes || null,
+          financing_interested: financingInterested,
           status: "referral_requested",
           referral_requested_at: new Date().toISOString(),
         });
@@ -367,6 +372,25 @@ export default function GetQuote() {
                   <Shield className="inline h-3.5 w-3.5 mr-1 text-accent" />
                   This estimate is transparent — any shop you're referred to will see these same numbers.
                 </div>
+
+                {/* Financing interest — post-estimate */}
+                <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 flex items-start gap-3">
+                  <Checkbox
+                    id="financing-estimate"
+                    checked={financingInterested}
+                    onCheckedChange={(checked) => setFinancingInterested(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <label htmlFor="financing-estimate" className="cursor-pointer space-y-1">
+                    <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                      <CreditCard className="h-4 w-4 text-accent" />
+                      I'm interested in financing this repair
+                    </span>
+                    <p className="text-xs text-muted-foreground">
+                      We're building flexible payment options. Check this box and we'll notify you when financing is available in your area.
+                    </p>
+                  </label>
+                </div>
               </div>
             </SectionReveal>
 
@@ -406,6 +430,19 @@ export default function GetQuote() {
                     onChange={(e) => setNotes(e.target.value)}
                     className="text-base min-h-[80px]"
                   />
+
+                  {/* Financing interest — referral stage */}
+                  <div className="rounded-lg border border-border bg-muted/30 p-3 flex items-start gap-3">
+                    <Checkbox
+                      id="financing-referral"
+                      checked={financingInterested}
+                      onCheckedChange={(checked) => setFinancingInterested(checked === true)}
+                      className="mt-0.5"
+                    />
+                    <label htmlFor="financing-referral" className="cursor-pointer text-sm text-muted-foreground">
+                      <CreditCard className="inline h-3.5 w-3.5 mr-0.5 text-accent" /> I'm interested in financing options for this repair
+                    </label>
+                  </div>
                 </div>
 
                 <Button
