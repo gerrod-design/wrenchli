@@ -2,6 +2,7 @@ import {
   Search, Wrench, Car, ShieldCheck,
   ScanLine, CheckCircle, ArrowRight,
   Play, Star, Calendar, CreditCard,
+  MapPin, DollarSign, Scale, Clock,
 } from "lucide-react";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
@@ -278,118 +279,190 @@ export const desktopDiyScreens = [
 /* ─── Desktop Shop Screens ─── */
 
 export const desktopShopScreens = [
+  /* ZIP Code Entry */
   {
     step: 3,
     duration: 2000,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
-          <span className="text-sm font-bold text-primary-foreground">Shop Quotes</span>
+          <span className="text-sm font-bold text-primary-foreground">Get Your Repair Estimate</span>
         </div>
-        <div className="flex-1 px-8 py-5 space-y-3">
-          {[
-            { name: "Mike's Auto", price: "$175", dist: "1.2 mi", rating: "4.7" },
-            { name: "Detroit Auto Care", price: "$210", dist: "2.8 mi", rating: "4.5" },
-            { name: "Metro Brake & Tire", price: "$195", dist: "0.5 mi", rating: "4.8" },
-          ].map((shop) => (
-            <div key={shop.name} className="flex items-center justify-between rounded-xl border border-border bg-card p-3 shadow-sm">
-              <div>
-                <span className="text-xs font-bold text-foreground">{shop.name}</span>
-                <div className="flex items-center gap-3 mt-0.5">
-                  <span className="text-[10px] text-muted-foreground">{shop.dist}</span>
-                  <span className="text-[10px] text-yellow-600">{shop.rating} ★</span>
+        <div className="flex-1 px-8 py-5 flex flex-col items-center justify-center">
+          <div className="w-full max-w-sm space-y-4">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
+                  <MapPin className="h-5 w-5 text-accent" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-foreground">Enter Your ZIP Code</p>
+                  <p className="text-[10px] text-muted-foreground">We'll estimate costs for shops in your area</p>
                 </div>
               </div>
-              <span className="text-sm font-bold text-accent">{shop.price}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  {
-    step: 3,
-    duration: 2000,
-    render: () => (
-      <div className="flex h-full flex-col bg-background">
-        <div className="flex items-center gap-3 bg-primary px-6 py-3">
-          <span className="text-sm font-bold text-primary-foreground">Mike's Auto</span>
-        </div>
-        <div className="flex-1 px-8 py-5">
-          <div className="max-w-lg mx-auto space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-                <ShieldCheck className="h-6 w-6 text-accent" />
+              <div className="rounded-lg bg-muted px-4 py-3 text-center">
+                <span className="text-lg font-mono font-bold tracking-widest text-foreground">48201</span>
               </div>
-              <div>
-                <p className="text-sm font-bold text-foreground">Mike's Auto</p>
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                  <span className="text-xs text-foreground">4.7</span>
-                  <span className="text-[10px] text-muted-foreground">(124 reviews)</span>
-                </div>
+              <div className="rounded-lg bg-accent px-4 py-3 text-center text-xs font-bold text-accent-foreground">
+                <DollarSign className="inline h-3.5 w-3.5 mr-1" /> Get Cost Estimate
               </div>
-            </div>
-            <div className="flex gap-2">
-              <span className="rounded-full bg-wrenchli-green/10 px-3 py-1 text-[10px] font-medium text-wrenchli-green">ASE Certified</span>
-              <span className="rounded-full bg-wrenchli-trust-blue/10 px-3 py-1 text-[10px] font-medium text-wrenchli-trust-blue">Verified</span>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-3">
-              <p className="text-xs font-bold text-foreground mb-1">Recent Reviews</p>
-              <p className="text-[10px] text-muted-foreground italic">"Great brake work, fair price, done same day." ★★★★★</p>
-            </div>
-            <div className="rounded-lg bg-accent px-4 py-2 text-center text-xs font-bold text-accent-foreground">
-              Finance This Repair
             </div>
           </div>
         </div>
       </div>
     ),
   },
+  /* AI Cost Estimate Results */
+  {
+    step: 3,
+    duration: 2500,
+    render: () => (
+      <div className="flex h-full flex-col bg-background">
+        <div className="flex items-center gap-3 bg-primary px-6 py-3">
+          <span className="text-sm font-bold text-primary-foreground">Cost Estimate</span>
+        </div>
+        <div className="flex-1 px-8 py-4 overflow-hidden">
+          <div className="max-w-lg mx-auto space-y-3">
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+              <MapPin className="h-3 w-3" /> Detroit Metro Area
+            </div>
+            <div className="text-center py-2">
+              <p className="text-[10px] text-muted-foreground mb-0.5">Estimated Repair Cost</p>
+              <p className="text-3xl font-extrabold text-accent">$350 – $800</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-lg bg-muted/50 p-2 text-center">
+                <Wrench className="h-3.5 w-3.5 text-muted-foreground mx-auto mb-0.5" />
+                <p className="text-[9px] text-muted-foreground">Parts</p>
+                <p className="text-[10px] font-semibold">$120–$350</p>
+              </div>
+              <div className="rounded-lg bg-muted/50 p-2 text-center">
+                <DollarSign className="h-3.5 w-3.5 text-muted-foreground mx-auto mb-0.5" />
+                <p className="text-[9px] text-muted-foreground">Labor</p>
+                <p className="text-[10px] font-semibold">$230–$450</p>
+              </div>
+              <div className="rounded-lg bg-muted/50 p-2 text-center">
+                <Clock className="h-3.5 w-3.5 text-muted-foreground mx-auto mb-0.5" />
+                <p className="text-[9px] text-muted-foreground">Est. Time</p>
+                <p className="text-[10px] font-semibold">2–3 hours</p>
+              </div>
+            </div>
+            <div className="rounded-lg bg-accent/5 border border-accent/20 p-2 flex items-start gap-2">
+              <CreditCard className="h-3.5 w-3.5 text-accent mt-0.5 shrink-0" />
+              <div>
+                <p className="text-[10px] font-semibold text-foreground">☑ I'm interested in financing this repair</p>
+                <p className="text-[9px] text-muted-foreground">We'll notify you when financing is available</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  /* Repair vs. Replace Comparison */
+  {
+    step: 4,
+    duration: 2500,
+    render: () => (
+      <div className="flex h-full flex-col bg-background">
+        <div className="flex items-center gap-3 bg-primary px-6 py-3">
+          <span className="text-sm font-bold text-primary-foreground">Repair vs. Replace</span>
+        </div>
+        <div className="flex-1 px-8 py-4 overflow-hidden">
+          <div className="max-w-lg mx-auto space-y-3">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Scale className="h-4 w-4 text-accent" />
+              <span className="text-sm font-bold text-foreground">Cost of Ownership Comparison</span>
+            </div>
+            <div className="rounded-lg bg-wrenchli-teal/10 border border-wrenchli-teal/30 p-2 text-center">
+              <p className="text-xs font-bold text-foreground flex items-center justify-center gap-1">
+                <Wrench className="h-3.5 w-3.5 text-wrenchli-teal" /> Repairing is cheaper
+              </p>
+              <p className="text-[9px] text-muted-foreground">Save approximately <strong className="text-foreground">$8,200</strong> over 3 years</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-lg border border-wrenchli-teal/40 bg-wrenchli-teal/5 p-3 space-y-1.5">
+                <p className="text-[10px] font-bold text-foreground">🔧 Repair & Keep</p>
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-wrenchli-teal/15 px-1.5 py-0.5 text-[8px] font-bold text-wrenchli-teal">Better Value</span>
+                <div className="space-y-0.5 text-[9px]">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Upfront</span><span className="font-medium">$575</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Insurance/yr</span><span className="font-medium">$1,200</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Maint. 3yr</span><span className="font-medium">$2,400</span></div>
+                  <div className="h-px bg-border my-0.5" />
+                  <div className="flex justify-between font-bold text-[10px]"><span>3-Year Total</span><span>$6,575</span></div>
+                </div>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5">
+                <p className="text-[10px] font-bold text-foreground">🚗 Buy 2023 Camry</p>
+                <div className="space-y-0.5 text-[9px]">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Upfront</span><span className="font-medium">$5,600</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Monthly</span><span className="font-medium">$425/mo</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Insurance/yr</span><span className="font-medium">$1,800</span></div>
+                  <div className="h-px bg-border my-0.5" />
+                  <div className="flex justify-between font-bold text-[10px]"><span>3-Year Total</span><span>$14,775</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  /* Shop Referral Form */
   {
     step: 4,
     duration: 2000,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
-          <span className="text-sm font-bold text-primary-foreground">Financing & Booking</span>
+          <span className="text-sm font-bold text-primary-foreground">Connect with a Shop</span>
         </div>
         <div className="flex-1 px-8 py-5">
-          <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
-            <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-              <p className="text-xs font-bold text-foreground mb-2">Mike's Auto — $195</p>
-              <div className="space-y-2">
-                <div className="rounded-lg bg-muted px-3 py-2 flex justify-between">
-                  <span className="text-[10px] text-muted-foreground">Pay in full</span>
-                  <span className="text-xs font-bold text-foreground">$195</span>
-                </div>
-                <div className="rounded-lg bg-accent/10 px-3 py-2 flex justify-between border border-accent/30">
-                  <span className="text-[10px] text-accent font-medium">3 × monthly</span>
-                  <span className="text-xs font-bold text-accent">$65/mo</span>
-                </div>
-              </div>
-              <div className="mt-2 rounded-full bg-wrenchli-green/10 px-3 py-1 text-center">
-                <span className="text-[10px] font-bold text-wrenchli-green">✅ Pre-Approved!</span>
-              </div>
+          <div className="max-w-sm mx-auto space-y-3">
+            <p className="text-sm font-bold text-foreground">Ready to Connect with a Shop?</p>
+            <p className="text-[10px] text-muted-foreground">Share your info and we'll connect you with a vetted local shop. They'll see your diagnosis and cost estimate — no surprises.</p>
+            <div className="space-y-2">
+              <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-foreground">John Doe</div>
+              <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-foreground">john@email.com</div>
+              <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-muted-foreground">(313) 555-1234</div>
             </div>
-            <div className="rounded-xl border border-border bg-card p-4">
-              <p className="text-xs font-bold text-foreground mb-2">
-                <Calendar className="inline h-4 w-4 mr-1" />Pick a time:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {["Tue 9am", "Wed 2pm", "Thu 10am"].map((t) => (
-                  <span key={t} className="rounded-lg bg-muted px-3 py-1.5 text-[10px] text-foreground">{t}</span>
-                ))}
-              </div>
-              <div className="mt-3 rounded-lg bg-accent px-3 py-2 text-center text-xs font-bold text-accent-foreground">
-                📅 Book Appointment
-              </div>
+            <div className="rounded-lg bg-accent px-4 py-3 text-center text-xs font-bold text-accent-foreground">
+              <ArrowRight className="inline h-3 w-3 mr-1" /> Request Shop Referral
             </div>
           </div>
         </div>
       </div>
     ),
   },
+  /* Confirmation */
+  {
+    step: 5,
+    duration: 2000,
+    render: () => (
+      <div className="flex h-full flex-col bg-background">
+        <div className="flex items-center gap-3 bg-primary px-6 py-3">
+          <span className="text-sm font-bold text-primary-foreground">You're All Set!</span>
+        </div>
+        <div className="flex-1 px-8 py-5 flex flex-col items-center justify-center">
+          <div className="max-w-sm mx-auto text-center space-y-3">
+            <CheckCircle className="h-10 w-10 text-wrenchli-green mx-auto" />
+            <p className="text-lg font-bold text-foreground">You're All Set!</p>
+            <p className="text-xs text-muted-foreground">A trusted shop in the Detroit Metro area will reach out soon with a final quote.</p>
+            <div className="rounded-lg bg-accent/5 border border-accent/20 p-3 text-left space-y-1.5">
+              <p className="text-xs font-semibold text-foreground">What happens next:</p>
+              {["A vetted shop will review your diagnosis", "They'll contact you within 24 hours", "No obligation — you decide if the price is right"].map((item, i) => (
+                <div key={i} className="flex items-start gap-1.5">
+                  <CheckCircle className="h-3 w-3 text-accent shrink-0 mt-0.5" />
+                  <span className="text-[10px] text-muted-foreground">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  /* Garage with status */
   {
     step: 5,
     duration: 2000,
@@ -401,8 +474,8 @@ export const desktopShopScreens = [
         <div className="flex-1 px-8 py-5">
           <div className="max-w-lg mx-auto space-y-3">
             <div className="rounded-xl border border-border bg-card p-3 shadow-sm">
-              <p className="text-xs font-bold text-foreground mb-2">Repair Status</p>
-              {["In Progress", "Inspection Complete", "Repair Started", "Ready for Pickup!"].map((s, i) => (
+              <p className="text-xs font-bold text-foreground mb-2">Quote Status</p>
+              {["Estimate Generated — $350–$800", "Referral Sent to Local Shop", "Shop Reviewing Your Diagnosis", "Quote Received — $425!"].map((s, i) => (
                 <div key={s} className="flex items-center gap-2 mb-1">
                   <CheckCircle className="h-3 w-3 text-wrenchli-green" />
                   <span className="text-[10px] text-foreground font-medium">{s}</span>
@@ -421,7 +494,7 @@ export const desktopShopScreens = [
               </div>
               <div className="flex items-center gap-2 rounded-lg bg-wrenchli-green/10 px-3 py-2">
                 <CheckCircle className="h-4 w-4 text-wrenchli-green" />
-                <span className="text-xs font-medium text-wrenchli-green">Feb 12: Brake Pads — 🔧 Fixed at Mike's Auto</span>
+                <span className="text-xs font-medium text-wrenchli-green">Feb 12: Cylinder Misfire — 🔧 Fixed at Mike's Auto</span>
               </div>
             </div>
           </div>
