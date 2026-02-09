@@ -31,7 +31,6 @@ serve(async (req) => {
       );
     }
 
-    // Sanitize inputs
     const safeYear = (year || "").slice(0, 4);
     const safeMake = (make || "").slice(0, 30);
     const safeModel = (model || "").slice(0, 30);
@@ -63,41 +62,49 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are Wrenchli's expert automotive diagnostics AI. Given a DTC code or symptom description, provide a structured diagnosis. Format your response EXACTLY as follows using these section headers on their own lines:
-
-**DIAGNOSIS TITLE**
-[One-line title of the most likely issue]
-
-**WHAT'S HAPPENING**
-[2-3 sentence plain-English explanation of the problem]
-
-**COMMON CAUSES**
-- [Cause 1]
-- [Cause 2]
-- [Cause 3]
-
-**URGENCY**
-[One word: Low, Medium, or High]
-
-**DIY DIFFICULTY**
-[One word: Easy, Moderate, or Advanced]
-
-**ESTIMATED DIY COST**
-[Range like $50–$150]
-
-**ESTIMATED SHOP COST**
-[Range like $200–$500]
-
-**RECOMMENDED NEXT STEPS**
-1. [Step 1]
-2. [Step 2]
-3. [Step 3]
-
-Be specific to the vehicle when provided. Be honest about when a professional is needed. Keep it concise and actionable.`,
+              content: `You are Wrenchli's expert automotive diagnostics AI. Given a DTC code or symptom description, return one or more structured diagnoses using the provide_diagnoses tool. Each diagnosis should be specific to the vehicle when provided. Be honest about when a professional is needed. Provide realistic cost ranges. If the input could indicate multiple issues, return multiple diagnoses (up to 3).`,
             },
             { role: "user", content: userPrompt },
           ],
-          stream: true,
+          tools: [
+            {
+              type: "function",
+              function: {
+                name: "provide_diagnoses",
+                description: "Return structured vehicle diagnosis results",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    diagnoses: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          title: { type: "string", description: "Short diagnosis title, e.g. 'Worn Brake Pads'" },
+                          code: { type: "string", description: "The DTC code if applicable, e.g. 'P0420'. Empty string if from symptom." },
+                          urgency: { type: "string", enum: ["low", "medium", "high"], description: "Urgency level" },
+                          whats_happening: { type: "string", description: "2-3 sentence plain-language explanation. No jargon. Written for someone who knows nothing about cars." },
+                          common_causes: {
+                            type: "array",
+                            items: { type: "string" },
+                            description: "2-4 most common causes"
+                          },
+                          diy_feasibility: { type: "string", enum: ["easy", "moderate", "advanced"], description: "DIY difficulty rating" },
+                          diy_cost: { type: "string", description: "DIY parts-only cost range, e.g. '$25–$60'" },
+                          shop_cost: { type: "string", description: "Professional repair cost range, e.g. '$150–$350'" },
+                        },
+                        required: ["title", "code", "urgency", "whats_happening", "common_causes", "diy_feasibility", "diy_cost", "shop_cost"],
+                        additionalProperties: false,
+                      },
+                    },
+                  },
+                  required: ["diagnoses"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          ],
+          tool_choice: { type: "function", function: { name: "provide_diagnoses" } },
         }),
       }
     );
@@ -123,8 +130,18 @@ Be specific to the vehicle when provided. Be honest about when a professional is
       );
     }
 
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    const data = await response.json();
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    if (!toolCall || toolCall.function.name !== "provide_diagnoses") {
+      return new Response(
+        JSON.stringify({ error: "Unexpected AI response format" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const diagnoses = JSON.parse(toolCall.function.arguments);
+    return new Response(JSON.stringify(diagnoses), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("diagnose error:", e);
