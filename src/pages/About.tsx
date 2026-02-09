@@ -1,9 +1,13 @@
-import { MapPin, Target, Eye, Rocket, Users, Building, Award, Briefcase } from "lucide-react";
+import { useState } from "react";
+import { MapPin, Target, Eye, Rocket, Users, Building, Award, Briefcase, Play } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import SEO from "@/components/SEO";
 import heroAbout from "@/assets/hero-about.jpg";
+import BrandVideoModal from "@/components/BrandVideoModal";
 
 export default function About() {
+  const [showBrandVideo, setShowBrandVideo] = useState(false);
+
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
@@ -46,10 +50,19 @@ export default function About() {
               <p className="text-foreground font-medium">
                 Based in Detroit — the heart of America's automotive industry — Wrenchli is where technology meets the trades.
               </p>
+              <button
+                onClick={() => setShowBrandVideo(true)}
+                className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent/80 hover:underline transition-colors"
+              >
+                <Play className="h-3.5 w-3.5 fill-current" />
+                Watch Our 30-Second Story
+              </button>
             </div>
           </SectionReveal>
         </div>
       </section>
+
+      <BrandVideoModal isOpen={showBrandVideo} onClose={() => setShowBrandVideo(false)} />
 
       {/* Mission & Vision */}
       <section className="section-padding bg-secondary">
