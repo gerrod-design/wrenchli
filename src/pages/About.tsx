@@ -1,6 +1,7 @@
 import { MapPin, Target, Eye, Rocket, Users, Building, Award, Briefcase } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import SEO from "@/components/SEO";
+import heroAbout from "@/assets/hero-about.jpg";
 
 export default function About() {
   return (
@@ -11,8 +12,10 @@ export default function About() {
         path="/about"
       />
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground section-padding">
-        <div className="container-wrenchli text-center">
+      <section className="relative bg-primary text-primary-foreground section-padding overflow-hidden">
+        <img src={heroAbout} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/60" />
+        <div className="container-wrenchli text-center relative">
           <SectionReveal>
             <h1 className="font-heading text-3xl font-extrabold md:text-5xl lg:text-6xl">About Wrenchli</h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">

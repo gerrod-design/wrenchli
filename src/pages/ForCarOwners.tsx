@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
+import heroCarOwners from "@/assets/hero-car-owners.jpg";
 import {
   ShieldCheck, DollarSign, Star, CreditCard, Calendar, Bell,
   Car, Search, BarChart3, CheckCircle, ArrowRight, MessageSquare
@@ -45,8 +46,10 @@ export default function ForCarOwners() {
         path="/for-car-owners"
       />
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground section-padding">
-        <div className="container-wrenchli text-center">
+      <section className="relative bg-primary text-primary-foreground section-padding overflow-hidden">
+        <img src={heroCarOwners} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/60" />
+        <div className="container-wrenchli text-center relative">
           <SectionReveal>
             <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-wrenchli-green/20 px-4 py-1 text-sm font-medium text-wrenchli-green">
               <Car className="h-4 w-4" /> For Car Owners
