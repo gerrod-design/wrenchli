@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SEO from "@/components/SEO";
 import { MapPin, Mail, Phone, Car, Store } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,11 @@ export default function Contact() {
 
   return (
     <main className="pb-[60px] md:pb-0">
+      <SEO
+        title="Contact Us"
+        description="Get in touch with Wrenchli. Questions about auto repair quotes, shop partnerships, or anything else — we're here to help. Detroit, MI."
+        path="/contact"
+      />
       {/* Hero */}
       <section className="bg-primary text-primary-foreground section-padding">
         <div className="container-wrenchli text-center">

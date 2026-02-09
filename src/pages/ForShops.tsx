@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SEO from "@/components/SEO";
 import {
   Store, ArrowRight, TrendingUp, DollarSign, Wrench, Star,
   CreditCard, BarChart3, Users, CheckCircle, Shield, Calendar,
@@ -90,6 +91,11 @@ export default function ForShops() {
 
   return (
     <main className="pb-[60px] md:pb-0">
+      <SEO
+        title="For Repair Shops"
+        description="Grow your shop with pre-qualified leads, modern software, and embedded financing. $299/mo all-in-one platform for independent repair shops."
+        path="/for-shops"
+      />
       {/* Hero */}
       <section className="bg-primary text-primary-foreground section-padding">
         <div className="container-wrenchli text-center">

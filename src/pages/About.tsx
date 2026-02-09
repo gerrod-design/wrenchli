@@ -1,9 +1,15 @@
 import { MapPin, Target, Eye, Rocket, Users, Building, Award, Briefcase } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
+import SEO from "@/components/SEO";
 
 export default function About() {
   return (
     <main className="pb-[60px] md:pb-0">
+      <SEO
+        title="About Wrenchli"
+        description="Meet the team fixing the broken auto repair experience. Based in Detroit, Wrenchli brings transparency, trust, and accessibility to a $288B industry."
+        path="/about"
+      />
       {/* Hero */}
       <section className="bg-primary text-primary-foreground section-padding">
         <div className="container-wrenchli text-center">

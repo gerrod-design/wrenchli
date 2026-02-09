@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import {
   CarFront, Search, Cpu, ArrowRight, Video, ShoppingCart, Wrench,
   Volume2, Wind, AlertTriangle, Gauge, CheckCircle, Settings,
@@ -73,6 +74,11 @@ export default function VehicleInsights() {
 
   return (
     <main className="pb-[60px] md:pb-0">
+      <SEO
+        title="Vehicle Insights — DIY Diagnostics"
+        description="Understand your car before visiting the shop. AI-powered diagnostics, OBD2 code lookup, symptom checker, and maintenance schedules."
+        path="/vehicle-insights"
+      />
       {/* Hero */}
       <section className="bg-primary text-primary-foreground section-padding">
         <div className="container-wrenchli text-center">
