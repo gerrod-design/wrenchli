@@ -128,14 +128,6 @@ export default function CinematicHero() {
           >
             <Link to="/#quote">Get Your Free Diagnosis</Link>
           </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="h-14 px-10 bg-transparent border-2 border-white/30 text-white hover:bg-white hover:text-primary font-semibold text-base md:text-lg"
-          >
-            <Link to="/for-shops#apply">Join as a Partner Shop</Link>
-          </Button>
         </motion.div>
 
 
