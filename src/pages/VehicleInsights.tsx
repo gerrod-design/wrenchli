@@ -131,7 +131,7 @@ export default function VehicleInsights() {
           </SectionReveal>
 
           <SectionReveal>
-            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mt-10">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-10">
               <TabsList className="grid w-full grid-cols-2 h-12">
                 <TabsTrigger value="symptom" className="text-sm font-semibold h-10">
                   <Search className="mr-2 h-4 w-4" /> Describe Symptoms
@@ -248,6 +248,10 @@ export default function VehicleInsights() {
         year={selectedYear}
         make={selectedMake}
         model={selectedModel}
+        onSwitchToDtc={() => {
+          setActiveTab("dtc");
+          document.getElementById("diagnosis-input")?.scrollIntoView({ behavior: "smooth" });
+        }}
       />
 
       {/* Common Symptoms Browser */}

@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowRight, Info } from "lucide-react";
+import { AlertTriangle, ArrowRight, Info, Plug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import type { SymptomMatch } from "@/data/symptomLibrary";
@@ -8,6 +8,7 @@ import type { Diagnosis } from "./types";
 interface SymptomMatchResultsProps {
   matches: SymptomMatch[];
   vehicle: string;
+  onSwitchToDtc?: () => void;
 }
 
 function entryToDiagnosis(entry: SymptomMatch["entry"]): Diagnosis {
@@ -23,20 +24,76 @@ function entryToDiagnosis(entry: SymptomMatch["entry"]): Diagnosis {
   };
 }
 
-export default function SymptomMatchResults({ matches, vehicle }: SymptomMatchResultsProps) {
+function SpecialNote({ text }: { text: string }) {
+  return (
+    <div
+      className="flex gap-3 rounded-lg border-l-4 p-4 text-sm"
+      style={{ backgroundColor: "hsl(213 100% 96%)", borderLeftColor: "hsl(217 91% 60%)" }}
+    >
+      <Info className="h-4 w-4 shrink-0 mt-0.5" style={{ color: "hsl(217 91% 60%)" }} />
+      <p className="text-foreground">
+        <span className="font-bold">Note: </span>{text}
+      </p>
+    </div>
+  );
+}
+
+function OBD2ScannerRecommendation({ onSwitchToDtc }: { onSwitchToDtc?: () => void }) {
+  return (
+    <div
+      className="rounded-lg border-l-4 p-4 md:p-5 space-y-3"
+      style={{ backgroundColor: "hsl(170 76% 96%)", borderLeftColor: "hsl(170 73% 36%)" }}
+    >
+      <div className="flex items-start gap-3">
+        <Plug className="h-5 w-5 shrink-0 mt-0.5 text-wrenchli-teal" />
+        <div className="space-y-2">
+          <h4 className="font-heading text-sm font-bold">Get a more accurate diagnosis with an OBD2 scanner</h4>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            An OBD2 scanner reads the specific diagnostic code stored in your vehicle's computer, giving you a much more targeted diagnosis. Many auto parts stores (AutoZone, O'Reilly, Advance Auto) will scan your vehicle for free. Or you can purchase a scanner for home use:
+          </p>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {["FIXD", "BlueDriver", "Innova"].map((brand) => (
+              <span key={brand} className="rounded-md border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+                {brand}
+              </span>
+            ))}
+          </div>
+          {onSwitchToDtc && (
+            <p className="text-sm">
+              Already have a code?{" "}
+              <button
+                onClick={onSwitchToDtc}
+                className="text-wrenchli-teal font-semibold hover:underline"
+              >
+                Enter it here →
+              </button>
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SymptomMatchResults({ matches, vehicle, onSwitchToDtc }: SymptomMatchResultsProps) {
+  const hasAmbiguousDiagnosis = matches.some(
+    (m) =>
+      m.entry.diagnosis.includes("Multiple Possible Causes") ||
+      m.entry.diagnosis.includes("Check Engine Light")
+  );
+
   return (
     <div className="space-y-4">
       {matches.map((match, i) => (
-        <div key={i} className="space-y-2">
+        <div key={i} className="space-y-3">
           <DiagnosisCard diagnosis={entryToDiagnosis(match.entry)} vehicle={vehicle} />
-          {match.entry.specialNote && (
-            <div className="flex gap-2 rounded-lg border border-wrenchli-teal/20 bg-wrenchli-teal/5 p-3 text-sm">
-              <Info className="h-4 w-4 text-wrenchli-teal shrink-0 mt-0.5" />
-              <p className="text-muted-foreground">{match.entry.specialNote}</p>
-            </div>
-          )}
+          {match.entry.specialNote && <SpecialNote text={match.entry.specialNote} />}
         </div>
       ))}
+
+      {hasAmbiguousDiagnosis && (
+        <OBD2ScannerRecommendation onSwitchToDtc={onSwitchToDtc} />
+      )}
     </div>
   );
 }

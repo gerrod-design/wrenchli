@@ -15,4 +15,5 @@ export interface DiagnosisResultProps {
   year?: string;
   make?: string;
   model?: string;
+  onSwitchToDtc?: () => void;
 }
