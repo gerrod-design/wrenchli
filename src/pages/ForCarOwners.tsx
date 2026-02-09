@@ -5,8 +5,9 @@ import SEO from "@/components/SEO";
 import heroCarOwners from "@/assets/hero-car-owners.jpg";
 import {
   ShieldCheck, DollarSign, Star, CreditCard, Calendar, Bell,
-  Car, Search, ClipboardList, GitFork, Wrench, CheckCircle, ArrowRight, MessageSquare
+  Car, Search, ClipboardList, GitFork, Wrench, CheckCircle, ArrowRight, MessageSquare, Tv
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -40,28 +41,75 @@ const faqs = [
   { q: "When is Wrenchli launching?", a: "We're launching in Detroit, Michigan first. Join the waitlist to be notified as soon as we go live in your area. We're onboarding shops now and aiming to launch soon." },
 ];
 
+/* ─── Tabbed Walkthrough for Car Owners ─── */
+
 function CarOwnersWalkthrough() {
+  const [activeTab, setActiveTab] = useState<"diy" | "shop">("diy");
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
-  const [selectedPath, setSelectedPath] = useState<WalkthroughPath>(null);
+  const [selectedPath, setSelectedPath] = useState<WalkthroughPath>("diy");
 
   const handleStepChange = useCallback((step: number) => {
     setActiveStep(step);
   }, []);
 
+  const handleTabSwitch = useCallback((tab: "diy" | "shop") => {
+    setActiveTab(tab);
+    setSelectedPath(tab);
+    setActiveStep(null);
+    setIsPlaying(false);
+  }, []);
+
+  const handlePathSelect = useCallback((path: "diy" | "shop") => {
+    setSelectedPath(path);
+    setActiveTab(path);
+  }, []);
+
   return (
-    <section className="section-padding bg-secondary" role="region" aria-label="Product walkthrough showing how to use Wrenchli in 5 steps">
+    <section className="section-padding bg-secondary" role="region" aria-label="Product walkthrough showing how to use Wrenchli">
       <div className="container-wrenchli">
         <SectionReveal>
           <p className="text-center text-xs font-semibold uppercase tracking-[3px] text-muted-foreground">
-            How Wrenchli Works For You
+            See How It Works
           </p>
           <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
             Watch a real diagnosis from start to finish.
           </h2>
         </SectionReveal>
 
-        <div className="mt-10 mx-auto max-w-[800px]">
+        {/* Tab toggle */}
+        <div className="mt-8 flex items-center justify-center gap-2">
+          <button
+            onClick={() => handleTabSwitch("diy")}
+            className={cn(
+              "rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 border-2",
+              activeTab === "diy"
+                ? "bg-wrenchli-teal text-white border-wrenchli-teal"
+                : "bg-transparent text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground"
+            )}
+          >
+            🔧 DIY Experience
+          </button>
+          <button
+            onClick={() => handleTabSwitch("shop")}
+            className={cn(
+              "rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 border-2",
+              activeTab === "shop"
+                ? "bg-accent text-accent-foreground border-accent"
+                : "bg-transparent text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground"
+            )}
+          >
+            👨‍🔧 Shop Experience
+          </button>
+        </div>
+
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          {activeTab === "diy"
+            ? "See the full DIY experience — diagnose, learn, order parts, and fix it yourself."
+            : "See the full shop experience — diagnose, compare quotes, finance, and book."}
+        </p>
+
+        <div className="mt-6 mx-auto max-w-[800px]">
           <SectionReveal>
             <PhoneMockup
               activeStep={activeStep}
@@ -70,7 +118,7 @@ function CarOwnersWalkthrough() {
               onPlayingChange={setIsPlaying}
               onComplete={() => {}}
               selectedPath={selectedPath}
-              onPathSelect={setSelectedPath}
+              onPathSelect={handlePathSelect}
             />
           </SectionReveal>
         </div>
@@ -121,7 +169,7 @@ export default function ForCarOwners() {
         </div>
       </section>
 
-      {/* How Wrenchli Works For You — Video Walkthrough */}
+      {/* How Wrenchli Works — Tabbed Walkthrough */}
       <CarOwnersWalkthrough />
 
       {/* How It Works — 5 Step Cards */}
