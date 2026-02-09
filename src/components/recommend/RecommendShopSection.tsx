@@ -1,7 +1,7 @@
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SectionReveal from "@/components/SectionReveal";
-import StatCounter from "@/components/StatCounter";
+
 
 interface RecommendShopSectionProps {
   onOpenModal: () => void;
@@ -15,11 +15,6 @@ export default function RecommendShopSection({ onOpenModal }: RecommendShopSecti
           <h2 className="font-heading text-2xl font-bold md:text-4xl text-foreground">
             Know a Great Mechanic?
           </h2>
-          <div className="mt-4">
-            <p className="text-wrenchli-teal font-heading font-semibold text-lg">
-              <StatCounter end={127} label="" /> shops recommended by car owners like you.
-            </p>
-          </div>
           <p className="mt-4 text-muted-foreground max-w-[600px] mx-auto leading-relaxed">
             Great mechanics don't always have great marketing. Know a hidden gem? Tell us about the shop you trust.
           </p>
