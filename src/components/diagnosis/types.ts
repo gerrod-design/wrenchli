@@ -1,3 +1,6 @@
+import type { DtcCategory } from "@/data/dtcCodes";
+import type { ToolItem } from "@/data/toolsLibrary";
+
 export interface Diagnosis {
   title: string;
   code: string;
@@ -7,6 +10,8 @@ export interface Diagnosis {
   diy_feasibility: "easy" | "moderate" | "advanced";
   diy_cost: string;
   shop_cost: string;
+  category?: DtcCategory;
+  tools_required?: ToolItem[];
 }
 
 export interface DiagnosisResultProps {

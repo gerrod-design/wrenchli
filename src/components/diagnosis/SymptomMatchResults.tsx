@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import type { SymptomMatch } from "@/data/symptomLibrary";
 import DiagnosisCard from "./DiagnosisCard";
 import type { Diagnosis } from "./types";
+import { getToolsForDiagnosis } from "@/data/toolsLibrary";
 
 interface SymptomMatchResultsProps {
   matches: SymptomMatch[];
@@ -21,6 +22,7 @@ function entryToDiagnosis(entry: SymptomMatch["entry"]): Diagnosis {
     diy_feasibility: entry.diyFeasibility,
     diy_cost: entry.costRange.diy,
     shop_cost: entry.costRange.professional,
+    tools_required: getToolsForDiagnosis(undefined, entry.diyFeasibility),
   };
 }
 
