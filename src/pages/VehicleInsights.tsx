@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroVehicleInsights from "@/assets/hero-vehicle-insights.jpg";
 import {
@@ -65,10 +65,20 @@ function CyclingPlaceholder() {
 }
 
 export default function VehicleInsights() {
-  const [symptom, setSymptom] = useState("");
-  const [dtcInput, setDtcInput] = useState("");
+  const [searchParams] = useSearchParams();
+  const [symptom, setSymptom] = useState(() => searchParams.get("symptom") || "");
+  const [dtcInput, setDtcInput] = useState(() => searchParams.get("code") || "");
+  const [selectedYear, setSelectedYear] = useState(() => searchParams.get("year") || "");
+  const [selectedMake, setSelectedMake] = useState(() => searchParams.get("make") || "");
+  const [selectedModel, setSelectedModel] = useState(() => searchParams.get("model") || "");
   const [expandedCat, setExpandedCat] = useState<string | null>(null);
   const placeholder = CyclingPlaceholder();
+
+  const hasUrlCode = Boolean(searchParams.get("code"));
+  const hasUrlSymptom = Boolean(searchParams.get("symptom"));
+
+  // Auto-select the right tab based on URL params
+  const defaultTab = hasUrlCode ? "dtc" : "symptom";
 
   const dtcCodes = dtcInput.toUpperCase().split(",").map((c) => c.trim()).filter(Boolean);
   const dtcDescriptions = dtcCodes.map((code) => ({ code, desc: dtcLookup[code] || null }));
@@ -115,7 +125,7 @@ export default function VehicleInsights() {
           </SectionReveal>
 
           <SectionReveal>
-            <Tabs defaultValue="symptom" className="mt-10">
+            <Tabs defaultValue={defaultTab} className="mt-10">
               <TabsList className="grid w-full grid-cols-2 h-12">
                 <TabsTrigger value="symptom" className="text-sm font-semibold h-10">
                   <Search className="mr-2 h-4 w-4" /> Describe Symptoms
@@ -158,19 +168,31 @@ export default function VehicleInsights() {
 
               {/* Vehicle selector + submit */}
               <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
-                <select className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   <option value="">Year</option>
                   {Array.from({ length: 30 }, (_, i) => 2025 - i).map((y) => (
                     <option key={y} value={y}>{y}</option>
                   ))}
                 </select>
-                <select className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <select
+                  value={selectedMake}
+                  onChange={(e) => { setSelectedMake(e.target.value); setSelectedModel(""); }}
+                  className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   <option value="">Make</option>
                   {["Ford", "Chevrolet", "Toyota", "Honda", "Chrysler", "Jeep", "GMC", "Hyundai", "Kia", "Nissan", "BMW", "Mercedes", "Other"].map((m) => (
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
-                <select className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   <option value="">Model</option>
                 </select>
                 <Button className="h-12 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-semibold px-6 whitespace-nowrap">
