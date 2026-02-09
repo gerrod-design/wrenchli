@@ -45,7 +45,10 @@ export default function Footer() {
               Wrenchli
             </Link>
             <p className="mb-5 text-sm leading-relaxed text-primary-foreground/60">
-              Fixing the broken auto repair experience. Coming soon to Detroit.
+              Fixing the broken auto repair experience.
+              <br className="md:hidden" />
+              <span className="hidden md:inline"> </span>
+              Coming soon to Detroit.
             </p>
             <a
               href="https://linkedin.com/company/wrenchli"
