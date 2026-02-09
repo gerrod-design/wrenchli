@@ -122,7 +122,7 @@ export default function QuickActionBar() {
 
           {/* Issue description */}
           <Input
-            placeholder="Describe your issue or enter a code..."
+            placeholder="Describe your issue or enter a DTC code..."
             value={issueText}
             onChange={(e) => {
               setIssueText(e.target.value);
