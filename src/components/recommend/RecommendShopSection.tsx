@@ -15,7 +15,7 @@ export default function RecommendShopSection({ onOpenModal }: RecommendShopSecti
           <h2 className="font-heading text-2xl font-bold md:text-4xl text-foreground">
             Know a Great Mechanic?
           </h2>
-          <p className="mt-4 text-muted-foreground max-w-[600px] mx-auto leading-relaxed">
+          <p className="mt-4 text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Great mechanics don't always have great marketing. Know a hidden gem? Tell us about the shop you trust.
           </p>
           <Button
