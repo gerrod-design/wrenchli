@@ -11,6 +11,8 @@ import DiagnosisCard from "./diagnosis/DiagnosisCard";
 import StillNotSure from "./diagnosis/StillNotSure";
 import SymptomMatchResults, { NoMatchFallback } from "./diagnosis/SymptomMatchResults";
 import { matchSymptoms } from "@/data/symptomLibrary";
+import { getDtcEntry } from "@/data/dtcCodes";
+import { getToolsForDiagnosis } from "@/data/toolsLibrary";
 import type { Diagnosis, DiagnosisResultProps } from "./diagnosis/types";
 import { useGarage } from "@/hooks/useGarage";
 
@@ -74,7 +76,18 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
       }
 
       const data = await resp.json();
-      setDiagnoses(data.diagnoses || []);
+      const enriched = (data.diagnoses || []).map((diag: Diagnosis) => {
+        if (!diag.tools_required || diag.tools_required.length === 0) {
+          const dtcEntry = diag.code ? getDtcEntry(diag.code) : null;
+          diag.tools_required = getToolsForDiagnosis(
+            dtcEntry?.category,
+            diag.diy_feasibility
+          );
+          if (dtcEntry) diag.category = dtcEntry.category;
+        }
+        return diag;
+      });
+      setDiagnoses(enriched);
     } catch (e) {
       console.error("Diagnosis error:", e);
       setError("Failed to connect to diagnosis service. Please try again.");

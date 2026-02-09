@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown } from "lucide-react";
+import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UrgencyBadge from "./UrgencyBadge";
@@ -49,6 +49,8 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
   const isAdvanced = diagnosis.diy_feasibility === "advanced";
   const [showTutorials, setShowTutorials] = useState(false);
   const [showParts, setShowParts] = useState(false);
+  const [showTools, setShowTools] = useState(false);
+  const tools = diagnosis.tools_required || [];
 
   return (
     <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
@@ -140,6 +142,47 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               <span className="font-semibold">{diy.badge}</span>
             </div>
           </div>
+
+          {/* Tools Required */}
+          {tools.length > 0 && (
+            <div className="mb-4">
+              <button
+                onClick={() => setShowTools(!showTools)}
+                className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <HardHat className="h-3.5 w-3.5" />
+                Tools Needed ({tools.filter(t => !t.optional).length})
+                <ChevronDown className={cn("h-3 w-3 transition-transform duration-200", showTools && "rotate-180")} />
+              </button>
+              <div
+                className={cn(
+                  "overflow-hidden transition-all duration-300 ease-in-out",
+                  showTools ? "max-h-[300px] opacity-100 mt-2" : "max-h-0 opacity-0"
+                )}
+              >
+                <div className="rounded-md border border-border bg-muted/50 p-3 space-y-1.5">
+                  {tools.filter(t => !t.optional).map((tool, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs">
+                      <span>{tool.icon}</span>
+                      <span className="font-medium">{tool.name}</span>
+                    </div>
+                  ))}
+                  {tools.some(t => t.optional) && (
+                    <>
+                      <div className="h-px bg-border my-1.5" />
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Optional</p>
+                      {tools.filter(t => t.optional).map((tool, i) => (
+                        <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{tool.icon}</span>
+                          <span>{tool.name}</span>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {isAdvanced && (
             <div className="rounded-md bg-amber-500/10 border border-amber-500/20 p-2.5 mb-4 text-xs text-foreground">
