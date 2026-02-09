@@ -1,7 +1,9 @@
-import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star } from "lucide-react";
+import { useState } from "react";
+import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UrgencyBadge from "./UrgencyBadge";
+import YouTubeTutorials from "./YouTubeTutorials";
 import type { Diagnosis } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -43,8 +45,8 @@ interface DiagnosisCardProps {
 export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps) {
   const diy = diyConfig[diagnosis.diy_feasibility];
   const DiyIcon = diy.icon;
-  const searchQuery = encodeURIComponent(`${diagnosis.title} ${vehicle} repair`);
   const isAdvanced = diagnosis.diy_feasibility === "advanced";
+  const [showTutorials, setShowTutorials] = useState(false);
 
   return (
     <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
@@ -155,12 +157,22 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               variant="outline"
               size="sm"
               className="w-full text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
-              asChild
+              onClick={() => setShowTutorials(!showTutorials)}
             >
-              <a href={`https://www.youtube.com/results?search_query=${searchQuery}`} target="_blank" rel="noopener noreferrer">
-                <Video className="mr-1.5 h-3.5 w-3.5" /> Watch Tutorial
-              </a>
+              <Video className="mr-1.5 h-3.5 w-3.5" /> Watch Tutorial
+              <ChevronDown className={cn("ml-auto h-3.5 w-3.5 transition-transform duration-200", showTutorials && "rotate-180")} />
             </Button>
+
+            <div
+              className={cn(
+                "overflow-hidden transition-all duration-300 ease-in-out",
+                showTutorials ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+              )}
+            >
+              <div className="pt-2">
+                <YouTubeTutorials diagnosisTitle={diagnosis.title} vehicle={vehicle} />
+              </div>
+            </div>
             <Button
               variant="outline"
               size="sm"
