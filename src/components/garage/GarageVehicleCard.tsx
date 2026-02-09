@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MoreHorizontal, Trash2, Edit2, Search, Palette } from "lucide-react";
+import { MoreHorizontal, Trash2, Edit2, Search, Palette, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,14 +27,20 @@ function timeAgo(iso: string): string {
   return `${days}d ago`;
 }
 
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
 export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRename, onColorChange }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const [changingColor, setChangingColor] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [nickname, setNickname] = useState(vehicle.nickname);
 
   const displayName = [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ");
   const details = [vehicle.engine, vehicle.transmission].filter(Boolean).join(" • ");
+  const history = vehicle.diagnosticHistory || [];
 
   const diagParams = new URLSearchParams({
     year: vehicle.year,
@@ -146,7 +152,56 @@ export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRenam
             Get Quotes
           </Link>
         </Button>
+        {history.length > 0 && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 text-xs text-muted-foreground ml-auto"
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            <Clock className="mr-1 h-3 w-3" />
+            {history.length} past {history.length === 1 ? "lookup" : "lookups"}
+            {showHistory ? <ChevronUp className="ml-1 h-3 w-3" /> : <ChevronDown className="ml-1 h-3 w-3" />}
+          </Button>
+        )}
       </div>
+
+      {/* Diagnostic history */}
+      {showHistory && history.length > 0 && (
+        <div className="border-t border-border pt-3 space-y-2">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Diagnostic History</p>
+          {history.slice(0, 10).map((entry) => (
+            <div key={entry.id} className="rounded-lg bg-muted/50 p-2.5 space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-mono font-semibold text-accent">
+                  {entry.type === "code" ? `Code: ${entry.input}` : "Symptom"}
+                </span>
+                <span className="text-[10px] text-muted-foreground">{formatDate(entry.date)}</span>
+              </div>
+              {entry.type === "symptom" && (
+                <p className="text-[11px] text-muted-foreground italic truncate">&ldquo;{entry.input}&rdquo;</p>
+              )}
+              {entry.results.length > 0 && (
+                <ul className="space-y-0.5">
+                  {entry.results.map((r, i) => (
+                    <li key={i} className="text-[11px] text-foreground/80 flex items-start gap-1.5">
+                      <span className="text-wrenchli-teal mt-0.5">•</span>
+                      <span className="truncate">{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {/* Re-run link */}
+              <Link
+                to={`/vehicle-insights?${diagParams.toString()}&${entry.type === "code" ? `code=${encodeURIComponent(entry.input)}` : `symptom=${encodeURIComponent(entry.input)}`}`}
+                className="text-[10px] text-wrenchli-teal hover:underline font-medium"
+              >
+                Run again →
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
