@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import {
   ShieldCheck, Zap, CreditCard,
-  Car, Store, ArrowRight,
+  Car, ArrowRight,
   Smartphone, MessageCircle,
 } from "lucide-react";
-import StatCounter from "@/components/StatCounter";
+
 import SectionReveal from "@/components/SectionReveal";
 import QuickActionBar from "@/components/QuickActionBar";
 import CinematicHero from "@/components/CinematicHero";
@@ -63,11 +63,11 @@ export default function Index() {
 
       {/* How It Works moved above QuickActionBar */}
 
-      {/* Dual-Audience Split */}
+      {/* For Car Owners */}
       <section className="section-padding bg-secondary">
-        <div className="container-wrenchli grid gap-8 md:grid-cols-2">
+        <div className="container-wrenchli max-w-2xl mx-auto">
           <SectionReveal>
-            <div className="rounded-2xl border border-border bg-card p-8 md:p-10 h-full flex flex-col">
+            <div className="rounded-2xl border border-border bg-card p-8 md:p-10 flex flex-col">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-wrenchli-green/10 px-3 py-1 text-sm font-medium text-wrenchli-green w-fit">
                 <Car className="h-4 w-4" /> For Car Owners
               </div>
@@ -80,24 +80,6 @@ export default function Index() {
               <Button asChild className="mt-6 h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold w-fit px-8">
                 <Link to="/#quote">
                   Get Your Free Quote <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </SectionReveal>
-          <SectionReveal delay={150}>
-            <div className="rounded-2xl border border-border bg-card p-8 md:p-10 h-full flex flex-col">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-wrenchli-trust-blue/10 px-3 py-1 text-sm font-medium text-wrenchli-trust-blue w-fit">
-                <Store className="h-4 w-4" /> For Repair Shops
-              </div>
-              <h3 className="font-heading text-2xl font-bold md:text-3xl">
-                More Customers. Higher Tickets. Less Hassle.
-              </h3>
-              <p className="mt-3 text-muted-foreground leading-relaxed flex-1">
-                Pre-qualified leads, modern software ($299/mo), and embedded financing that increases average ticket size and customer approval rates.
-              </p>
-              <Button asChild variant="outline" className="mt-6 h-12 border-wrenchli-trust-blue text-wrenchli-trust-blue hover:bg-wrenchli-trust-blue/10 font-semibold w-fit px-8">
-                <Link to="/for-shops#apply">
-                  Apply to Partner <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -150,32 +132,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Social Proof Placeholder */}
-      <section className="section-padding bg-secondary">
-        <div className="container-wrenchli text-center">
-          <SectionReveal>
-            <h2 className="font-heading text-2xl font-bold md:text-4xl">What People Are Saying</h2>
-            <p className="mt-3 text-muted-foreground">We're building something people genuinely want.</p>
-          </SectionReveal>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {[
-              { stat: "500+", label: "Survey Respondents" },
-              { stat: "78%", label: "Strong Interest from Consumers" },
-              { stat: "30+", label: "Warm Shop Relationships in Detroit" },
-            ].map((item, i) => (
-              <SectionReveal key={item.label} delay={i * 120}>
-                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                  <div className="font-stats text-3xl font-bold text-accent md:text-4xl">{item.stat}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{item.label}</p>
-                </div>
-              </SectionReveal>
-            ))}
-          </div>
-          <p className="mt-6 text-xs text-muted-foreground">
-            Real data from our pre-launch research. Testimonials coming when we have real users.
-          </p>
-        </div>
-      </section>
 
       {/* Recommend a Shop */}
       <RecommendShopSection onOpenModal={() => setRecommendOpen(true)} />

@@ -243,6 +243,58 @@ export default function ForShops() {
         </div>
       </section>
 
+      {/* Partner Program — Social Proof */}
+      <section className="section-padding bg-secondary">
+        <div className="container-wrenchli text-center">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl">What People Are Saying</h2>
+            <p className="mt-3 text-muted-foreground">We're building something people genuinely want.</p>
+          </SectionReveal>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {[
+              { stat: "500+", label: "Survey Respondents" },
+              { stat: "78%", label: "Strong Interest from Consumers" },
+              { stat: "30+", label: "Warm Shop Relationships in Detroit" },
+            ].map((item, i) => (
+              <SectionReveal key={item.label} delay={i * 120}>
+                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                  <div className="font-stats text-3xl font-bold text-accent md:text-4xl">{item.stat}</div>
+                  <p className="mt-2 text-sm text-muted-foreground">{item.label}</p>
+                </div>
+              </SectionReveal>
+            ))}
+          </div>
+          <p className="mt-6 text-xs text-muted-foreground">
+            Real data from our pre-launch research. Testimonials coming when we have real users.
+          </p>
+        </div>
+      </section>
+
+      {/* Partner Program — For Repair Shops CTA */}
+      <section className="section-padding bg-background">
+        <div className="container-wrenchli max-w-2xl mx-auto">
+          <SectionReveal>
+            <div className="rounded-2xl border border-border bg-card p-8 md:p-10 flex flex-col text-center items-center">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-wrenchli-trust-blue/10 px-3 py-1 text-sm font-medium text-wrenchli-trust-blue w-fit">
+                <Store className="h-4 w-4" /> For Repair Shops
+              </div>
+              <h3 className="font-heading text-2xl font-bold md:text-3xl">
+                More Customers. Higher Tickets. Less Hassle.
+              </h3>
+              <p className="mt-3 text-muted-foreground leading-relaxed">
+                Pre-qualified leads, modern software ($299/mo), and embedded financing that increases average ticket size and customer approval rates.
+              </p>
+              <Button
+                className="mt-6 h-12 border-wrenchli-trust-blue bg-wrenchli-trust-blue text-white hover:bg-wrenchli-trust-blue/90 font-semibold w-fit px-8"
+                onClick={() => document.getElementById("apply")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                Apply to Partner <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
+
       {/* Application Form */}
       <section id="apply" className="section-padding bg-primary text-primary-foreground">
         <div className="container-wrenchli max-w-lg">
