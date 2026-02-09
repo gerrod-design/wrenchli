@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Linkedin } from "lucide-react";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
+import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 
 const footerLinks = {
   Company: [
@@ -12,6 +14,7 @@ const footerLinks = {
   "For Car Owners": [
     { label: "How It Works", to: "/for-car-owners" },
     { label: "Get a Quote", to: "/#quote" },
+    { label: "💬 Recommend a Shop", to: "__recommend__" },
     { label: "Find a Shop", to: "/#quote", badge: "Coming Soon" },
     { label: "Financing Options", to: "/for-car-owners#financing" },
   ],
@@ -29,6 +32,7 @@ const footerLinks = {
 };
 
 export default function Footer() {
+  const [recommendOpen, setRecommendOpen] = useState(false);
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-wrenchli py-12 pb-24 md:py-16 md:pb-16">
@@ -62,7 +66,14 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label} className="flex items-center gap-2">
-                    {link.to.includes("#") ? (
+                    {link.to === "__recommend__" ? (
+                      <button
+                        onClick={() => setRecommendOpen(true)}
+                        className="text-sm text-primary-foreground/60 transition-colors hover:text-accent text-left"
+                      >
+                        {link.label}
+                      </button>
+                    ) : link.to.includes("#") ? (
                       <a
                         href={link.to}
                         className="text-sm text-primary-foreground/60 transition-colors hover:text-accent"
@@ -94,6 +105,7 @@ export default function Footer() {
           <p className="text-primary-foreground/30 text-[11px]">Built in Detroit. Driven by trust.</p>
         </div>
       </div>
+      <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
     </footer>
   );
 }

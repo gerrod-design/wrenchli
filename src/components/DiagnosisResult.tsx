@@ -1,5 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { Cpu, AlertCircle } from "lucide-react";
+import RecommendShopPrompt from "./recommend/RecommendShopPrompt";
+import RecommendShopModal from "./recommend/RecommendShopModal";
 import VehicleScanLoader from "./diagnosis/VehicleScanLoader";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -19,6 +21,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
   const [isLoading, setIsLoading] = useState(false);
   const [hasRun, setHasRun] = useState(false);
   const [error, setError] = useState("");
+  const [recommendOpen, setRecommendOpen] = useState(false);
 
   const vehicleStr = [year, make, model].filter(Boolean).join(" ");
   const { findVehicle, addDiagnosticEntry } = useGarage();
@@ -224,8 +227,11 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
             )}
 
             <StillNotSure vehicle={vehicleStr} />
+            <RecommendShopPrompt onOpenModal={() => setRecommendOpen(true)} />
           </div>
         )}
+
+        <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
       </div>
     </section>
   );

@@ -77,6 +77,39 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_recommendations: {
+        Row: {
+          created_at: string
+          id: string
+          recommendation_reason: string | null
+          recommender_email: string | null
+          recommender_name: string | null
+          shop_location: string
+          shop_name: string
+          specializations: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recommendation_reason?: string | null
+          recommender_email?: string | null
+          recommender_name?: string | null
+          shop_location: string
+          shop_name: string
+          specializations?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recommendation_reason?: string | null
+          recommender_email?: string | null
+          recommender_name?: string | null
+          shop_location?: string
+          shop_name?: string
+          specializations?: string[] | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

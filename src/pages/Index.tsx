@@ -13,6 +13,8 @@ import CinematicHero from "@/components/CinematicHero";
 import HowItWorksVideo from "@/components/HowItWorksVideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import RecommendShopSection from "@/components/recommend/RecommendShopSection";
+import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 
 const valueProps = [
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
@@ -23,6 +25,7 @@ const valueProps = [
 
 export default function Index() {
   const [dtcCode, setDtcCode] = useState("");
+  const [recommendOpen, setRecommendOpen] = useState(false);
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -187,6 +190,9 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Recommend a Shop */}
+      <RecommendShopSection onOpenModal={() => setRecommendOpen(true)} />
+
       {/* Final CTA */}
       <section className="section-padding bg-primary text-primary-foreground">
         <div className="container-wrenchli text-center">
@@ -217,6 +223,8 @@ export default function Index() {
           <MessageCircle className="h-6 w-6" />
         </button>
       </div>
+
+      <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
     </main>
   );
 }

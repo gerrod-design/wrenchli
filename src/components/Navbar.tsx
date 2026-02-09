@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Car } from "lucide-react";
+import { Menu, X, ChevronDown, Car, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 import GarageDropdown from "@/components/garage/GarageDropdown";
 import GarageBadge from "@/components/vehicle/GarageBadge";
 import { useGarage } from "@/hooks/useGarage";
+import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 
 interface DropdownItem {
   label: string;
@@ -35,13 +36,14 @@ const navItems: NavItem[] = [
       { label: "Partner Program", to: "/for-shops" },
       { label: "Shop Software", to: "/for-shops#features" },
       { label: "Apply Now", to: "/for-shops#apply" },
+      { label: "💬 Recommend a Shop You Trust", to: "__recommend__" },
     ],
   },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
 
-function DesktopDropdown({ item }: { item: NavItem }) {
+function DesktopDropdown({ item, onRecommendClick }: { item: NavItem; onRecommendClick?: () => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const timeout = useRef<NodeJS.Timeout>();
@@ -71,18 +73,29 @@ function DesktopDropdown({ item }: { item: NavItem }) {
         <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </Link>
       {open && item.dropdown && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-48 rounded-lg border border-border bg-card shadow-lg">
+        <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg">
           <ul className="py-1.5">
-            {item.dropdown.map((sub) => (
-              <li key={sub.to}>
-                <Link
-                  to={sub.to}
-                  className="block px-4 py-2.5 text-sm text-card-foreground transition-colors hover:bg-accent/10 hover:text-accent"
-                >
-                  {sub.label}
-                </Link>
-              </li>
-            ))}
+            {item.dropdown.map((sub) =>
+              sub.to === "__recommend__" ? (
+                <li key={sub.label}>
+                  <button
+                    onClick={() => { setOpen(false); onRecommendClick?.(); }}
+                    className="block w-full text-left px-4 py-2.5 text-sm text-wrenchli-teal font-medium transition-colors hover:bg-accent/10"
+                  >
+                    {sub.label}
+                  </button>
+                </li>
+              ) : (
+                <li key={sub.to}>
+                  <Link
+                    to={sub.to}
+                    className="block px-4 py-2.5 text-sm text-card-foreground transition-colors hover:bg-accent/10 hover:text-accent"
+                  >
+                    {sub.label}
+                  </Link>
+                </li>
+              )
+            )}
           </ul>
         </div>
       )}
@@ -93,6 +106,7 @@ function DesktopDropdown({ item }: { item: NavItem }) {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [recommendOpen, setRecommendOpen] = useState(false);
   const location = useLocation();
   const { vehicles } = useGarage();
 
@@ -126,7 +140,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-7 lg:flex">
           {navItems.map((item) =>
             item.dropdown ? (
-              <DesktopDropdown key={item.to} item={item} />
+              <DesktopDropdown key={item.to} item={item} onRecommendClick={() => setRecommendOpen(true)} />
             ) : (
               <Link
                 key={item.to}
@@ -178,16 +192,26 @@ export default function Navbar() {
                   </button>
                   {mobileExpanded === item.label && (
                     <div className="pb-3 pl-4 space-y-1">
-                      {item.dropdown.map((sub) => (
-                        <Link
-                          key={sub.to}
-                          to={sub.to}
-                          onClick={() => setOpen(false)}
-                          className="block py-2.5 text-base text-primary-foreground/60 hover:text-accent"
-                        >
-                          {sub.label}
-                        </Link>
-                      ))}
+                      {item.dropdown.map((sub) =>
+                        sub.to === "__recommend__" ? (
+                          <button
+                            key={sub.label}
+                            onClick={() => { setOpen(false); setRecommendOpen(true); }}
+                            className="block w-full text-left py-2.5 text-base text-wrenchli-teal font-medium hover:underline"
+                          >
+                            💬 Recommend a Shop
+                          </button>
+                        ) : (
+                          <Link
+                            key={sub.to}
+                            to={sub.to}
+                            onClick={() => setOpen(false)}
+                            className="block py-2.5 text-base text-primary-foreground/60 hover:text-accent"
+                          >
+                            {sub.label}
+                          </Link>
+                        )
+                      )}
                     </div>
                   )}
                 </>
@@ -241,6 +265,7 @@ export default function Navbar() {
           </div>
         </div>
       )}
+      <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
     </nav>
   );
 }
