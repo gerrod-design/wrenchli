@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import SectionReveal from "@/components/SectionReveal";
 import PhoneMockup, { type WalkthroughPath } from "@/components/PhoneMockup";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 /* ─── Step definitions ─── */
 
@@ -81,6 +82,7 @@ export default function HowItWorksVideo() {
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [hasPlayed, setHasPlayed] = useState(false);
   const [selectedPath, setSelectedPath] = useState<WalkthroughPath>(null);
+  const isMobile = useIsMobile();
 
   const pathSteps = selectedPath === "diy" ? diySteps : selectedPath === "shop" ? shopSteps : defaultSteps;
   const steps = [...sharedSteps, ...pathSteps];
@@ -262,7 +264,9 @@ export default function HowItWorksVideo() {
         <SectionReveal>
           <div className="mt-10 text-center space-y-3">
             <p className="font-heading text-lg font-bold text-foreground md:text-2xl">
-              Ready to try it yourself?
+              {isMobile
+                ? "Ready to try it? Tap below — takes about 60 seconds."
+                : "Ready to try it? Your first diagnosis takes about 60 seconds."}
             </p>
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
@@ -282,7 +286,7 @@ export default function HowItWorksVideo() {
               )}
             </div>
             <p className="text-sm text-muted-foreground">
-              Takes about 60 seconds. No account required.
+              No account required.
             </p>
           </div>
         </SectionReveal>

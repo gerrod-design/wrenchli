@@ -614,7 +614,7 @@ export default function PhoneMockup({
 
   return (
     <div role="region" aria-label="Interactive branching walkthrough showing how to use Wrenchli">
-      <DeviceFrame>
+      <DeviceFrame isPlaying={isPlaying || phase !== "idle"}>
         <div className="absolute inset-0">{renderScreen()}</div>
 
         {/* Play overlay */}
