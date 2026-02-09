@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { Cpu, AlertCircle } from "lucide-react";
 import VehicleScanLoader from "./diagnosis/VehicleScanLoader";
 import { Button } from "@/components/ui/button";
@@ -21,14 +21,27 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
   const [error, setError] = useState("");
 
   const vehicleStr = [year, make, model].filter(Boolean).join(" ");
-  const { findVehicle } = useGarage();
+  const { findVehicle, addDiagnosticEntry } = useGarage();
   const garageVehicle = findVehicle(year, make, model);
+  const savedToHistory = useRef(false);
 
   // Instant client-side symptom matching
   const symptomMatches = useMemo(() => {
     if (!symptom) return [];
     return matchSymptoms(symptom);
   }, [symptom]);
+  // Save diagnosis to garage history when results arrive
+  useEffect(() => {
+    if (diagnoses.length === 0 || savedToHistory.current || !garageVehicle) return;
+    savedToHistory.current = true;
+
+    const resultSummaries = diagnoses.map((d) => d.title || "Unknown");
+    addDiagnosticEntry(garageVehicle.garageId, {
+      type: codes ? "code" : "symptom",
+      input: codes || symptom || "",
+      results: resultSummaries,
+    });
+  }, [diagnoses, garageVehicle, codes, symptom, addDiagnosticEntry]);
 
   const runDiagnosis = useCallback(async () => {
     setIsLoading(true);
