@@ -221,11 +221,11 @@ export default function PhoneMockup({
   }, [onStepChange, onPlayingChange]);
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center" role="region" aria-label="Interactive product walkthrough showing how to use Wrenchli in 5 steps">
       {/* Phone frame */}
       <div className="relative w-[260px] rounded-[32px] border-[3px] border-foreground/20 bg-foreground/5 p-2.5 shadow-xl sm:w-[280px]">
         {/* Notch */}
-        <div className="absolute left-1/2 top-0 z-10 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-foreground/20" />
+        <div className="absolute left-1/2 top-0 z-10 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-foreground/20" aria-hidden="true" />
 
         {/* Screen */}
         <div className="relative aspect-[9/19.5] w-full overflow-hidden rounded-[20px] bg-background">
@@ -233,21 +233,23 @@ export default function PhoneMockup({
             <div
               key={screen.step}
               className={cn(
-                "absolute inset-0 transition-opacity duration-500",
+                "absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none",
                 i === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
               )}
+              aria-hidden={i !== currentIndex}
             >
               {screen.render()}
             </div>
           ))}
 
-          {/* Play overlay when not playing and at start */}
+          {/* Play overlay when not playing */}
           {!isPlaying && (
             <button
               onClick={handlePlay}
               className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-primary/80 transition-all hover:bg-primary/70"
+              aria-label="Play walkthrough animation"
             >
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg transition-transform hover:scale-110">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg transition-transform hover:scale-110 motion-reduce:transition-none">
                 <ArrowRight className="h-6 w-6 text-primary ml-0.5" />
               </div>
               <p className="text-[11px] font-medium text-primary-foreground">

@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroCarOwners from "@/assets/hero-car-owners.jpg";
@@ -8,6 +9,7 @@ import {
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import PhoneMockup from "@/components/PhoneMockup";
 
 const steps = [
   { step: 1, icon: MessageSquare, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner. No mechanic-speak required." },
@@ -36,6 +38,52 @@ const faqs = [
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program that will include dispute resolution and quality assurance. Details will be announced before launch." },
   { q: "When is Wrenchli launching?", a: "We're launching in Detroit, Michigan first. Join the waitlist to be notified as soon as we go live in your area. We're onboarding shops now and aiming to launch soon." },
 ];
+
+function CarOwnersWalkthrough() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeStep, setActiveStep] = useState<number | null>(null);
+
+  const handleStepChange = useCallback((step: number) => {
+    setActiveStep(step);
+  }, []);
+
+  return (
+    <section className="section-padding bg-secondary" role="region" aria-label="Product walkthrough showing how to use Wrenchli in 5 steps">
+      <div className="container-wrenchli">
+        <SectionReveal>
+          <p className="text-center text-xs font-semibold uppercase tracking-[3px] text-muted-foreground">
+            How Wrenchli Works For You
+          </p>
+          <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
+            Watch a real diagnosis from start to finish.
+          </h2>
+        </SectionReveal>
+
+        <div className="mt-10 mx-auto max-w-[800px]">
+          <SectionReveal>
+            <PhoneMockup
+              activeStep={activeStep}
+              onStepChange={handleStepChange}
+              isPlaying={isPlaying}
+              onPlayingChange={setIsPlaying}
+              onComplete={() => {}}
+            />
+          </SectionReveal>
+        </div>
+
+        <SectionReveal>
+          <div className="mt-8 text-center">
+            <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
+              <Link to="/vehicle-insights">
+                Get Your Free Diagnosis <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+        </SectionReveal>
+      </div>
+    </section>
+  );
+}
 
 export default function ForCarOwners() {
   return (
@@ -69,11 +117,14 @@ export default function ForCarOwners() {
         </div>
       </section>
 
+      {/* How Wrenchli Works For You — Video Walkthrough */}
+      <CarOwnersWalkthrough />
+
       {/* How It Works — 5 Step Cards */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">How It Works</h2>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">The 5 Steps in Detail</h2>
             <p className="mt-3 text-center text-muted-foreground md:text-lg">From problem to solution in five simple steps.</p>
           </SectionReveal>
 
