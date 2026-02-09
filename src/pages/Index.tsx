@@ -5,7 +5,8 @@ import SEO from "@/components/SEO";
 import {
   ShieldCheck, Zap, CreditCard,
   Car, Store, ArrowRight,
-  Smartphone, MessageCircle
+  Smartphone, MessageCircle,
+  Search, ClipboardList, GitFork, Wrench, CheckCircle
 } from "lucide-react";
 import StatCounter from "@/components/StatCounter";
 import SectionReveal from "@/components/SectionReveal";
@@ -20,11 +21,11 @@ const valueProps = [
 ];
 
 const howItWorks = [
-  { step: 1, title: "Tell Us What's Wrong", desc: "Describe your issue or enter a diagnostic code" },
-  { step: 2, title: "Get Instant Quotes", desc: "Competitive quotes from verified local shops" },
-  { step: 3, title: "Compare & Choose", desc: "Ratings, prices, availability side by side" },
-  { step: 4, title: "Book & Pay Your Way", desc: "Schedule online, finance if needed" },
-  { step: 5, title: "Get Back on the Road", desc: "Real-time status updates until pickup" },
+  { step: 1, icon: Search, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner" },
+  { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and what it might cost" },
+  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Watch a DIY tutorial and order parts, or get quotes from vetted local shops" },
+  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing" },
+  { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control" },
 ];
 
 export default function Index() {
@@ -49,7 +50,7 @@ export default function Index() {
             className="animate-fade-in-up mt-6 max-w-2xl text-lg text-primary-foreground/70 md:text-xl leading-relaxed"
             style={{ animationDelay: "200ms" }}
           >
-            Get instant quotes from trusted local shops. Compare prices. Book with confidence. Finance if you need to.
+            Find out what's wrong with your car, learn how to fix it yourself, or get instant quotes from trusted local shops. Your car, your choice.
           </p>
           <div
             className="animate-fade-in-up mt-8 flex flex-col gap-3 sm:flex-row"
@@ -66,12 +67,17 @@ export default function Index() {
             className="animate-fade-in-up mt-4 text-sm text-primary-foreground/50"
             style={{ animationDelay: "500ms" }}
           >
-            No account required • Free for car owners
+            Free diagnosis • DIY tutorials • Shop quotes • No account required
           </p>
         </div>
       </section>
 
       <QuickActionBar />
+      <div className="text-center mt-4 mb-2">
+        <p className="text-sm text-muted-foreground">
+          Free diagnosis • DIY tutorials • Shop quotes • No account required
+        </p>
+      </div>
 
       {/* Value Proposition Cards */}
       <section className="section-padding bg-background">
@@ -125,8 +131,9 @@ export default function Index() {
                   {i < howItWorks.length - 1 && (
                     <div className="absolute top-6 left-[calc(50%+24px)] w-[calc(100%-48px)] h-0.5 bg-border" />
                   )}
-                  <h3 className="mt-4 font-heading text-sm font-semibold">{s.title}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground max-w-[140px]">{s.desc}</p>
+                  <s.icon className="mt-3 h-5 w-5 text-wrenchli-teal" />
+                  <h3 className="mt-2 font-heading text-sm font-semibold">{s.title}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground max-w-[160px]">{s.desc}</p>
                 </>
               </SectionReveal>
             ))}
@@ -141,7 +148,10 @@ export default function Index() {
                     {s.step}
                   </div>
                   <div>
-                    <h3 className="font-heading text-base font-semibold">{s.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-heading text-base font-semibold">{s.title}</h3>
+                      <s.icon className="h-4 w-4 text-wrenchli-teal" />
+                    </div>
                     <p className="mt-0.5 text-sm text-muted-foreground">{s.desc}</p>
                   </div>
                 </div>
