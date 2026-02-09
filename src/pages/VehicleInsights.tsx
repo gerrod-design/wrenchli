@@ -109,7 +109,7 @@ export default function VehicleInsights() {
               Know What's Wrong. Fix It <span className="text-wrenchli-teal">Your Way.</span>
             </h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              Self-service diagnostics, DIY tutorials, and parts ordering — all in one place. Understand your car before you visit the shop, or fix it yourself.
+              Not every car problem needs a trip to the shop. Wrenchli Vehicle Insights helps you understand what might be wrong with your car and gives you real choices — watch a step-by-step video tutorial and order the parts to fix it yourself, or get quotes from trusted local shops if you'd rather leave it to a professional. Either way, you're in control.
             </p>
             <Button
               size="lg"
@@ -361,6 +361,56 @@ export default function VehicleInsights() {
               When you purchase parts through our partner links, Wrenchli may receive a small referral fee at no additional cost to you.
             </p>
           </SectionReveal>
+        </div>
+      </section>
+
+      {/* DIY Success Stories */}
+      <section className="section-padding bg-wrenchli-teal/5">
+        <div className="container-wrenchli">
+          <SectionReveal>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">
+              Thousands of Car Owners Fix It Themselves Every Day
+            </h2>
+            <p className="mt-3 text-center text-muted-foreground md:text-lg max-w-2xl mx-auto">
+              These common repairs are done at home by regular people — no mechanic certification required.
+            </p>
+          </SectionReveal>
+
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+            {[
+              { emoji: "🔧", title: "Brake Pad Replacement", difficulty: "Easy", saves: "$100–$250", time: "1–2 hours" },
+              { emoji: "💡", title: "Headlight Bulb Replacement", difficulty: "Easy", saves: "$50–$150", time: "15–30 min" },
+              { emoji: "🔋", title: "Battery Replacement", difficulty: "Easy", saves: "$50–$100", time: "20–30 min" },
+            ].map((card, i) => (
+              <SectionReveal key={card.title} delay={i * 120}>
+                <div className="rounded-xl border border-border bg-card p-6 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                  <span className="text-4xl">{card.emoji}</span>
+                  <h3 className="mt-3 font-heading text-base font-semibold">{card.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Difficulty: <span className="font-semibold text-wrenchli-green">{card.difficulty}</span> • Saves: <span className="font-semibold">{card.saves}</span> vs. shop • Time: <span className="font-semibold">{card.time}</span>
+                  </p>
+                </div>
+              </SectionReveal>
+            ))}
+          </div>
+
+          <SectionReveal>
+            <p className="mt-8 text-center text-muted-foreground max-w-xl mx-auto">
+              Not every repair needs a professional. We'll help you figure out which ones you can tackle — and which ones are better left to the pros.
+            </p>
+          </SectionReveal>
+        </div>
+      </section>
+
+      {/* DIY Safety Disclaimer */}
+      <section className="bg-amber-500/5 border-t border-amber-500/20">
+        <div className="container-wrenchli py-6">
+          <div className="flex gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
+            <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+            <div className="text-xs text-foreground leading-relaxed">
+              <span className="font-bold">DIY Safety Disclaimer:</span> Automotive repair involves inherent risks including personal injury and vehicle damage. Always follow proper safety procedures: use jack stands (never work under a vehicle supported only by a jack), wear appropriate protective equipment, and work in a well-ventilated area. If at any point you feel uncomfortable or unsure, stop and consult a qualified technician. Wrenchli provides informational resources only and is not responsible for any injury, damage, or loss resulting from DIY repair attempts.
+            </div>
+          </div>
         </div>
       </section>
 
