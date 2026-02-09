@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroVehicleInsights from "@/assets/hero-vehicle-insights.jpg";
@@ -13,6 +13,7 @@ import DiagnosisResult from "@/components/DiagnosisResult";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import VehicleIdentifier, { type VehicleData } from "@/components/vehicle/VehicleIdentifier";
 
 const placeholders = [
   "My brakes are squeaking",
@@ -62,15 +63,26 @@ export default function VehicleInsights() {
   const hasUrlSymptom = Boolean(searchParams.get("symptom"));
   const [symptom, setSymptom] = useState(() => searchParams.get("symptom") || "");
   const [dtcInput, setDtcInput] = useState(() => searchParams.get("code") || "");
-  const [selectedYear, setSelectedYear] = useState(() => searchParams.get("year") || "");
-  const [selectedMake, setSelectedMake] = useState(() => searchParams.get("make") || "");
-  const [selectedModel, setSelectedModel] = useState(() => searchParams.get("model") || "");
+  const [vehicle, setVehicle] = useState<VehicleData | null>(() => {
+    const y = searchParams.get("year");
+    const mk = searchParams.get("make");
+    const md = searchParams.get("model");
+    return y && mk && md ? { year: y, make: mk, model: md, trim: searchParams.get("trim") || undefined, engine: searchParams.get("engine") || undefined } : null;
+  });
   const [expandedCat, setExpandedCat] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(hasUrlCode ? "dtc" : "symptom");
   const [diagnosisKey, setDiagnosisKey] = useState(0);
   const [diagCodes, setDiagCodes] = useState<string | undefined>(hasUrlCode ? searchParams.get("code") || undefined : undefined);
   const [diagSymptom, setDiagSymptom] = useState<string | undefined>(hasUrlSymptom ? searchParams.get("symptom") || undefined : undefined);
   const placeholder = CyclingPlaceholder();
+
+  const selectedYear = vehicle?.year || "";
+  const selectedMake = vehicle?.make || "";
+  const selectedModel = vehicle?.model || "";
+
+  const handleVehicleChange = useCallback((data: VehicleData | null) => {
+    setVehicle(data);
+  }, []);
 
   const dtcCodes = dtcInput.toUpperCase().split(",").map((c) => c.trim()).filter(Boolean);
   const dtcDescriptions = dtcCodes.map((code) => {
@@ -202,36 +214,15 @@ export default function VehicleInsights() {
                 )}
               </TabsContent>
 
-              {/* Vehicle selector + submit */}
-              <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <option value="">Year</option>
-                  {Array.from({ length: 30 }, (_, i) => 2025 - i).map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-                <select
-                  value={selectedMake}
-                  onChange={(e) => { setSelectedMake(e.target.value); setSelectedModel(""); }}
-                  className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <option value="">Make</option>
-                  {["Ford", "Chevrolet", "Toyota", "Honda", "Chrysler", "Jeep", "GMC", "Hyundai", "Kia", "Nissan", "BMW", "Mercedes", "Other"].map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  className="flex h-12 rounded-md border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <option value="">Model</option>
-                </select>
-                <Button onClick={handleDiagnose} className="h-12 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-semibold px-6 whitespace-nowrap">
+              {/* Vehicle identifier + submit */}
+              <div className="mt-6 space-y-4">
+                <VehicleIdentifier
+                  onVehicleChange={handleVehicleChange}
+                  initialYear={searchParams.get("year") || ""}
+                  initialMake={searchParams.get("make") || ""}
+                  initialModel={searchParams.get("model") || ""}
+                />
+                <Button onClick={handleDiagnose} className="w-full h-12 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-semibold px-6 whitespace-nowrap">
                   Get Your Diagnosis
                 </Button>
               </div>
