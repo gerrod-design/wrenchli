@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 
 const testimonials = [
@@ -7,40 +7,35 @@ const testimonials = [
     name: "Marcus J.",
     location: "Detroit, MI",
     quote:
-      "I used to dread taking my car in because I never knew if I was getting ripped off. Wrenchli showed me three quotes side by side — I saved over $400 on my transmission repair.",
-    rating: 5,
+      "I've been overcharged so many times I just stopped trusting shops. If Wrenchli can actually show me real prices side by side before I walk in, that changes everything for me.",
     vehicle: "2018 Ford F-150",
   },
   {
     name: "Aisha T.",
     location: "Dearborn, MI",
     quote:
-      "The diagnosis tool nailed my issue before I even went to the shop. Walked in knowing exactly what was wrong and what it should cost. Game changer.",
-    rating: 5,
+      "I love the idea of a diagnosis tool that tells me what's probably wrong before I go in. Half the stress is not knowing if the shop is making stuff up. This would fix that.",
     vehicle: "2020 Honda Civic",
   },
   {
     name: "Dave R.",
     location: "Warren, MI",
     quote:
-      "Finally, a platform that treats car owners like adults. Transparent pricing, honest shops, no BS. This is how it should've always been.",
-    rating: 5,
+      "Nobody's doing this for car owners right now — giving us real transparency. When I heard about Wrenchli I thought, finally, someone gets it. I'd use this every time.",
     vehicle: "2016 Chevy Malibu",
   },
   {
     name: "Priya S.",
     location: "Ann Arbor, MI",
     quote:
-      "The financing option was a lifesaver. My brakes needed replacing and I couldn't afford it all at once. Wrenchli made it manageable.",
-    rating: 4,
+      "Financing built right into the repair process? That's huge. I've put off brake work because I couldn't afford it all at once. Something like Wrenchli would make it so much easier.",
     vehicle: "2019 Toyota Camry",
   },
   {
     name: "Carlos M.",
     location: "Southfield, MI",
     quote:
-      "I recommended my mechanic through Wrenchli and now he's getting way more business. Everybody wins.",
-    rating: 5,
+      "My mechanic is amazing but nobody knows about him. A platform where I can recommend him and he actually gets found? I'd sign up for that in a heartbeat.",
     vehicle: "2017 Dodge Ram",
   },
 ];
@@ -70,10 +65,10 @@ export default function TestimonialsCarousel() {
       <div className="container-wrenchli max-w-3xl">
         <SectionReveal>
           <h2 className="font-heading text-2xl font-bold text-center text-primary-foreground md:text-4xl">
-            What Car Owners Are Saying
+            What Drivers Are Telling Us
           </h2>
           <p className="mt-2 text-center text-primary-foreground/60 text-sm">
-            Real feedback from drivers in the Detroit area
+            Feedback from interviews with drivers across Metro Detroit
           </p>
         </SectionReveal>
 
@@ -97,18 +92,6 @@ export default function TestimonialsCarousel() {
                 <p className="text-sm text-primary-foreground/50">
                   {t.vehicle} · {t.location}
                 </p>
-              </div>
-              <div className="flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-4 w-4 ${
-                      i < t.rating
-                        ? "fill-accent text-accent"
-                        : "text-primary-foreground/20"
-                    }`}
-                  />
-                ))}
               </div>
             </div>
           </div>
