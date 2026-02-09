@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Car, Keyboard, Camera } from "lucide-react";
+import { Car, Keyboard, Camera, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DecodedVehicle } from "@/lib/vinDecoder";
 import { decodeVin } from "@/lib/vinDecoder";
@@ -7,15 +7,11 @@ import DropdownSelector from "./DropdownSelector";
 import VinInput from "./VinInput";
 import VinScanner from "./VinScanner";
 import VehicleConfirmationBar from "./VehicleConfirmationBar";
+import GarageSelector from "./GarageSelector";
 import { useVehicleSession, type StoredVehicle } from "@/hooks/useVehicleSession";
+import { useGarage, type GarageVehicle } from "@/hooks/useGarage";
 
-type TabId = "dropdown" | "vin" | "scan";
-
-const tabs: { id: TabId; label: string; shortLabel: string; icon: typeof Car }[] = [
-  { id: "dropdown", label: "Drop-Down", shortLabel: "Drop-Down", icon: Car },
-  { id: "vin", label: "Enter VIN", shortLabel: "Type VIN", icon: Keyboard },
-  { id: "scan", label: "📷 Scan VIN", shortLabel: "Scan VIN", icon: Camera },
-];
+type TabId = "garage" | "dropdown" | "vin" | "scan";
 
 export interface VehicleData {
   year: string;
@@ -30,11 +26,9 @@ export interface VehicleData {
 
 interface Props {
   onVehicleChange: (data: VehicleData | null) => void;
-  /** External initial values (e.g. from URL params) */
   initialYear?: string;
   initialMake?: string;
   initialModel?: string;
-  /** If provided, auto-decode this VIN on mount */
   initialVin?: string;
   compact?: boolean;
 }
@@ -48,19 +42,31 @@ export default function VehicleIdentifier({
   compact = false,
 }: Props) {
   const { vehicle: storedVehicle, setVehicle: storeVehicle, clear: clearStored } = useVehicleSession();
+  const { vehicles: garageVehicles, updateLastUsed } = useGarage();
+  const hasGarageVehicles = garageVehicles.length > 0;
 
-  const [activeTab, setActiveTab] = useState<TabId>("dropdown");
+  const baseTabs: { id: TabId; label: string; shortLabel: string; icon: typeof Car }[] = [
+    { id: "dropdown", label: "Drop-Down", shortLabel: "Drop-Down", icon: Car },
+    { id: "vin", label: "Enter VIN", shortLabel: "Type VIN", icon: Keyboard },
+    { id: "scan", label: "📷 Scan VIN", shortLabel: "Scan VIN", icon: Camera },
+  ];
+
+  const tabs = hasGarageVehicles
+    ? [{ id: "garage" as TabId, label: "My Garage ✓", shortLabel: "Garage", icon: Bookmark }, ...baseTabs]
+    : baseTabs;
+
+  const defaultTab: TabId = hasGarageVehicles ? "garage" : "dropdown";
+
+  const [activeTab, setActiveTab] = useState<TabId>(defaultTab);
   const [confirmed, setConfirmed] = useState<DecodedVehicle | null>(
     storedVehicle?.decoded || null
   );
   const [vinDecoding, setVinDecoding] = useState(false);
 
-  // Dropdown state — prefer URL params, then session, then empty
   const [year, setYear] = useState(initialYear || storedVehicle?.year || "");
   const [make, setMake] = useState(initialMake || storedVehicle?.make || "");
   const [model, setModel] = useState(initialModel || storedVehicle?.model || "");
 
-  // On mount: if session has a confirmed vehicle, fire onVehicleChange
   useEffect(() => {
     if (storedVehicle && storedVehicle.year && storedVehicle.make && storedVehicle.model) {
       onVehicleChange(storedVehicle);
@@ -68,7 +74,6 @@ export default function VehicleIdentifier({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-decode VIN from URL param on mount
   useEffect(() => {
     if (!initialVin || confirmed) return;
     let cancelled = false;
@@ -78,9 +83,7 @@ export default function VehicleIdentifier({
         if (cancelled) return;
         handleDecoded(vehicle);
       })
-      .catch(() => {
-        // silently fall back to manual entry
-      })
+      .catch(() => {})
       .finally(() => {
         if (!cancelled) setVinDecoding(false);
       });
@@ -88,7 +91,6 @@ export default function VehicleIdentifier({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialVin]);
 
-  // Sync dropdown changes upward
   const handleYearChange = (v: string) => {
     setYear(v);
     setMake("");
@@ -136,6 +138,48 @@ export default function VehicleIdentifier({
     [onVehicleChange, storeVehicle]
   );
 
+  const handleGarageSelect = useCallback(
+    (gv: GarageVehicle) => {
+      updateLastUsed(gv.garageId);
+      setYear(gv.year);
+      setMake(gv.make);
+      setModel(gv.model);
+
+      const data: StoredVehicle = {
+        year: gv.year,
+        make: gv.make,
+        model: gv.model,
+        trim: gv.trim,
+        engine: gv.engine,
+        transmission: gv.transmission,
+        driveType: gv.driveType,
+        fuelType: gv.fuelType,
+      };
+
+      // If we have enough detail to create a DecodedVehicle-like confirmation
+      if (gv.trim || gv.engine) {
+        const decoded: DecodedVehicle = {
+          year: gv.year,
+          make: gv.make,
+          model: gv.model,
+          trim: gv.trim || "",
+          engine: gv.engine || "",
+          cylinders: "",
+          transmission: gv.transmission || "",
+          fuelType: gv.fuelType || "",
+          driveType: gv.driveType || "",
+          bodyClass: "",
+        };
+        setConfirmed(decoded);
+        data.decoded = decoded;
+      }
+
+      onVehicleChange(data);
+      storeVehicle(data);
+    },
+    [onVehicleChange, storeVehicle, updateLastUsed]
+  );
+
   const handleClear = () => {
     setConfirmed(null);
     setYear("");
@@ -143,15 +187,13 @@ export default function VehicleIdentifier({
     setModel("");
     onVehicleChange(null);
     clearStored();
-    setActiveTab("dropdown");
+    setActiveTab(hasGarageVehicles ? "garage" : "dropdown");
   };
 
-  // If vehicle is confirmed via VIN, show confirmation bar
   if (confirmed) {
     return <VehicleConfirmationBar vehicle={confirmed} onClear={handleClear} />;
   }
 
-  // If dropdown selections are complete, show a simple confirmation
   const dropdownComplete = activeTab === "dropdown" && year && make && model;
 
   return (
@@ -176,6 +218,14 @@ export default function VehicleIdentifier({
       </div>
 
       {/* Tab content */}
+      {activeTab === "garage" && (
+        <GarageSelector
+          vehicles={garageVehicles}
+          onSelect={handleGarageSelect}
+          onAddNew={() => setActiveTab("dropdown")}
+        />
+      )}
+
       {activeTab === "dropdown" && (
         <DropdownSelector
           year={year}

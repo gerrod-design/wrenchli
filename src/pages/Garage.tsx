@@ -3,10 +3,13 @@ import { Car, Plus } from "lucide-react";
 import SEO from "@/components/SEO";
 import { useGarage } from "@/hooks/useGarage";
 import GarageVehicleCard from "@/components/garage/GarageVehicleCard";
+import GaragePrivacyNotice from "@/components/garage/GaragePrivacyNotice";
+import GarageClearDialog from "@/components/garage/GarageClearDialog";
+import GarageSyncTeaser from "@/components/garage/GarageSyncTeaser";
 import { Button } from "@/components/ui/button";
 
 export default function Garage() {
-  const { vehicles, removeVehicle, updateNickname } = useGarage();
+  const { vehicles, removeVehicle, updateNickname, clearAll } = useGarage();
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -52,9 +55,16 @@ export default function Garage() {
                 </Button>
               )}
 
-              <p className="text-center text-[11px] text-muted-foreground mt-6">
-                Vehicles saved in this browser. Account sync coming soon.
-              </p>
+              {/* Sync teaser */}
+              <div className="rounded-lg border border-border bg-card p-4">
+                <GarageSyncTeaser />
+              </div>
+
+              {/* Privacy + Clear */}
+              <div className="space-y-3 pt-2">
+                <GaragePrivacyNotice />
+                <GarageClearDialog onClear={clearAll} />
+              </div>
             </div>
           )}
         </div>
