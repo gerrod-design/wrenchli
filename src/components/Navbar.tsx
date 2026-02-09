@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
+import GarageDropdown from "@/components/garage/GarageDropdown";
+import GarageBadge from "@/components/vehicle/GarageBadge";
+import { useGarage } from "@/hooks/useGarage";
 
 interface DropdownItem {
   label: string;
@@ -91,6 +94,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const location = useLocation();
+  const { vehicles } = useGarage();
 
   useEffect(() => {
     setOpen(false);
@@ -127,6 +131,7 @@ export default function Navbar() {
 
         {/* Desktop CTAs - right */}
         <div className="hidden items-center gap-3 lg:flex">
+          <GarageDropdown />
           <Button asChild variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
             <Link to="/for-shops#apply">Partner With Us</Link>
           </Button>
@@ -187,6 +192,25 @@ export default function Navbar() {
               )}
             </div>
           ))}
+
+          {/* My Garage in mobile menu */}
+          <div className="border-b border-primary-foreground/10">
+            <Link
+              to="/garage"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 py-4 text-lg font-medium text-primary-foreground/80"
+            >
+              <Car className="h-5 w-5" />
+              My Garage
+              {vehicles.length > 0 && (
+                <span className="text-sm text-primary-foreground/50">
+                  ({vehicles.length} vehicle{vehicles.length !== 1 ? "s" : ""} saved)
+                </span>
+              )}
+              {vehicles.length > 0 && <GarageBadge />}
+            </Link>
+          </div>
+
           <div className="mt-6 flex flex-col gap-3">
             <Button asChild variant="outline" className="h-12 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground text-base" onClick={() => setOpen(false)}>
               <Link to="/for-shops#apply">Partner With Us</Link>
