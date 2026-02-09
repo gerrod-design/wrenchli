@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileBottomBar from "@/components/MobileBottomBar";
 import BackToTop from "@/components/BackToTop";
+import ChatBot from "@/components/ChatBot";
 import Index from "./pages/Index";
 import ForCarOwners from "./pages/ForCarOwners";
 import ForShops from "./pages/ForShops";
@@ -40,6 +41,7 @@ const App = () => (
           <Footer />
           <MobileBottomBar />
           <BackToTop />
+          <ChatBot />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
