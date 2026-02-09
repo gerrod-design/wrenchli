@@ -1,5 +1,7 @@
-import { ExternalLink, Wrench, Lightbulb } from "lucide-react";
+import { useState } from "react";
+import { ExternalLink, Wrench, Lightbulb, AlertTriangle, ChevronDown } from "lucide-react";
 import { getPartsForDiagnosis, buildRetailerUrl } from "@/data/partsLibrary";
+import { cn } from "@/lib/utils";
 
 const retailers = [
   { id: "autozone" as const, label: "AutoZone", bg: "hsl(0 72% 51%)", text: "white" },
@@ -14,6 +16,7 @@ interface OrderPartsProps {
 
 export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps) {
   const info = getPartsForDiagnosis(diagnosisTitle);
+  const [showTools, setShowTools] = useState(false);
 
   if (!info) {
     return (
@@ -81,20 +84,44 @@ export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps)
         ))}
       </div>
 
-      {/* Tools needed */}
+      {/* Tools needed — collapsible */}
       {info.tools.length > 0 && (
-        <div className="rounded-lg border border-border bg-muted/30 p-3">
-          <h6 className="flex items-center gap-1.5 text-xs font-semibold text-foreground mb-1.5">
-            <Wrench className="h-3 w-3 text-wrenchli-teal" /> Tools You'll Need
-          </h6>
-          <ul className="space-y-0.5">
-            {info.tools.map((tool, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
-                <span className="mt-0.5 shrink-0">•</span>
-                <span>{tool}</span>
-              </li>
-            ))}
-          </ul>
+        <div className="rounded-lg border border-border bg-muted/30 overflow-hidden">
+          <button
+            onClick={() => setShowTools(!showTools)}
+            className="flex w-full items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors"
+          >
+            <span className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+              <Wrench className="h-3 w-3 text-wrenchli-teal" /> 🔧 Tools You'll Need
+            </span>
+            <ChevronDown className={cn("h-3.5 w-3.5 text-muted-foreground transition-transform duration-200", showTools && "rotate-180")} />
+          </button>
+
+          <div
+            className={cn(
+              "overflow-hidden transition-all duration-300 ease-in-out",
+              showTools ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
+            )}
+          >
+            <div className="px-3 pb-3 space-y-2.5">
+              <ul className="space-y-0.5">
+                {info.tools.map((tool, i) => (
+                  <li key={i} className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                    <span className="mt-0.5 shrink-0">•</span>
+                    <span>{tool}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Safety note */}
+              <div className="flex gap-2 rounded-md border border-amber-500/20 bg-amber-500/5 p-2.5">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-500 mt-0.5" />
+                <p className="text-[11px] text-foreground">
+                  <span className="font-semibold">⚠️ Safety note:</span> Always use jack stands when working under a vehicle. Never rely on a jack alone. Work on a flat, level surface.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

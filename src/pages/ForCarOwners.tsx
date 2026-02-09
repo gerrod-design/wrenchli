@@ -3,18 +3,18 @@ import SEO from "@/components/SEO";
 import heroCarOwners from "@/assets/hero-car-owners.jpg";
 import {
   ShieldCheck, DollarSign, Star, CreditCard, Calendar, Bell,
-  Car, Search, BarChart3, CheckCircle, ArrowRight, MessageSquare
+  Car, Search, ClipboardList, GitFork, Wrench, CheckCircle, ArrowRight, MessageSquare
 } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const steps = [
-  { step: 1, icon: MessageSquare, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic trouble code. No mechanic-speak required — just tell us what's happening with your car." },
-  { step: 2, icon: Search, title: "Get Instant Quotes", desc: "Receive full price breakdowns from verified local shops — parts, labor, and fees all itemized. No surprises, no hidden costs." },
-  { step: 3, icon: BarChart3, title: "Compare & Choose", desc: "See ratings, reviews, prices, and availability side by side. Choose the shop that fits your needs and budget." },
-  { step: 4, icon: Calendar, title: "Book & Pay Your Way", desc: "Schedule your repair online and pay how you want — upfront, or finance it with flexible payment plans for all credit profiles." },
-  { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Receive real-time status updates via text and email. Rate your experience and help other car owners make better decisions." },
+  { step: 1, icon: MessageSquare, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner. No mechanic-speak required." },
+  { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and what it might cost — with plain-English explanations." },
+  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Choose your path: watch a DIY tutorial and order parts, or get quotes from vetted local shops." },
+  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing if you need it." },
+  { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control. Rate your experience and help others." },
 ];
 
 const benefits = [
