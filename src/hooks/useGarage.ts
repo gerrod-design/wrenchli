@@ -21,6 +21,8 @@ export interface GarageVehicle {
   driveType?: string;
   fuelType?: string;
   vin?: string;
+  color?: string; // hex color
+  bodyType?: string; // sedan, suv, truck, etc.
   savedAt: string;
   lastUsed: string;
   diagnosticHistory: DiagnosticHistoryEntry[];
@@ -123,6 +125,8 @@ export function useGarage() {
         driveType: v.driveType,
         fuelType: v.fuelType,
         vin: v.vin,
+        color: v.color,
+        bodyType: v.bodyType,
         savedAt: now,
         lastUsed: now,
         diagnosticHistory: [],
@@ -152,6 +156,11 @@ export function useGarage() {
   const updateNickname = useCallback((garageId: string, nickname: string) => {
     const current = readGarage();
     writeGarage(current.map((v) => (v.garageId === garageId ? { ...v, nickname } : v)));
+  }, []);
+
+  const updateColor = useCallback((garageId: string, color: string) => {
+    const current = readGarage();
+    writeGarage(current.map((v) => (v.garageId === garageId ? { ...v, color } : v)));
   }, []);
 
   const addDiagnosticEntry = useCallback(
@@ -205,6 +214,7 @@ export function useGarage() {
     clearAll,
     updateLastUsed,
     updateNickname,
+    updateColor,
     addDiagnosticEntry,
     findVehicle,
     getActiveVehicle,

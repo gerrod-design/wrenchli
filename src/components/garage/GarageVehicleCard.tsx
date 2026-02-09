@@ -1,15 +1,18 @@
 import { Link } from "react-router-dom";
-import { MoreHorizontal, Trash2, Edit2, Search, CarFront } from "lucide-react";
+import { MoreHorizontal, Trash2, Edit2, Search, Palette } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { GarageVehicle } from "@/hooks/useGarage";
+import VehicleSilhouette, { DEFAULT_COLOR } from "@/components/vehicle/VehicleSilhouette";
+import VehicleColorPicker from "@/components/vehicle/VehicleColorPicker";
 
 interface Props {
   vehicle: GarageVehicle;
   isActive?: boolean;
   onRemove: (garageId: string) => void;
   onRename: (garageId: string, nickname: string) => void;
+  onColorChange?: (garageId: string, color: string) => void;
 }
 
 function timeAgo(iso: string): string {
@@ -24,9 +27,10 @@ function timeAgo(iso: string): string {
   return `${days}d ago`;
 }
 
-export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRename }: Props) {
+export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRename, onColorChange }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [changingColor, setChangingColor] = useState(false);
   const [nickname, setNickname] = useState(vehicle.nickname);
 
   const displayName = [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ");
@@ -48,56 +52,88 @@ export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRenam
 
   return (
     <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <CarFront className="h-4 w-4 text-wrenchli-teal shrink-0" />
-          {editing ? (
-            <div className="flex items-center gap-1.5">
-              <Input
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value.slice(0, 20))}
-                maxLength={20}
-                className="h-7 text-sm w-32"
-                autoFocus
-                onKeyDown={(e) => e.key === "Enter" && handleSaveNickname()}
-              />
-              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleSaveNickname}>
-                ✓
-              </Button>
+      <div className="flex items-start gap-3">
+        {/* Vehicle silhouette */}
+        <VehicleSilhouette
+          bodyType={vehicle.bodyType || "sedan"}
+          color={vehicle.color || DEFAULT_COLOR.hex}
+          className="w-24 h-12 shrink-0"
+        />
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              {editing ? (
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value.slice(0, 20))}
+                    maxLength={20}
+                    className="h-7 text-sm w-32"
+                    autoFocus
+                    onKeyDown={(e) => e.key === "Enter" && handleSaveNickname()}
+                  />
+                  <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleSaveNickname}>
+                    ✓
+                  </Button>
+                </div>
+              ) : (
+                <span className="font-heading text-sm font-bold truncate block">
+                  {isActive && <span className="text-wrenchli-green mr-1">●</span>}
+                  {vehicle.nickname}
+                </span>
+              )}
+              <p className="text-xs text-muted-foreground truncate">{displayName}</p>
+              {details && <p className="text-[11px] text-muted-foreground truncate">{details}</p>}
+              <p className="text-[11px] text-muted-foreground/60 mt-0.5">Last used: {timeAgo(vehicle.lastUsed)}</p>
             </div>
-          ) : (
-            <span className="font-heading text-sm font-bold truncate">
-              {isActive && <span className="text-wrenchli-green mr-1">●</span>}
-              {vehicle.nickname}
-            </span>
-          )}
-        </div>
-        <div className="relative shrink-0">
-          <button onClick={() => setShowMenu(!showMenu)} className="p-1 text-muted-foreground hover:text-foreground rounded">
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-          {showMenu && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-border bg-card shadow-lg py-1">
-              <button
-                onClick={() => { setEditing(true); setShowMenu(false); }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-muted transition-colors"
-              >
-                <Edit2 className="h-3 w-3" /> Rename
+
+            {/* Menu */}
+            <div className="relative shrink-0">
+              <button onClick={() => setShowMenu(!showMenu)} className="p-1 text-muted-foreground hover:text-foreground rounded">
+                <MoreHorizontal className="h-4 w-4" />
               </button>
-              <button
-                onClick={() => { onRemove(vehicle.garageId); setShowMenu(false); }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
-              >
-                <Trash2 className="h-3 w-3" /> Remove
-              </button>
+              {showMenu && (
+                <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg border border-border bg-card shadow-lg py-1">
+                  <button
+                    onClick={() => { setEditing(true); setShowMenu(false); }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-muted transition-colors"
+                  >
+                    <Edit2 className="h-3 w-3" /> Rename
+                  </button>
+                  {onColorChange && (
+                    <button
+                      onClick={() => { setChangingColor(!changingColor); setShowMenu(false); }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-xs text-card-foreground hover:bg-muted transition-colors"
+                    >
+                      <Palette className="h-3 w-3" /> Change Color
+                    </button>
+                  )}
+                  <button
+                    onClick={() => { onRemove(vehicle.garageId); setShowMenu(false); }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <Trash2 className="h-3 w-3" /> Remove
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground">{displayName}</p>
-      {details && <p className="text-xs text-muted-foreground">{details}</p>}
-      <p className="text-xs text-muted-foreground">Last used: {timeAgo(vehicle.lastUsed)}</p>
+      {/* Color picker (inline) */}
+      {changingColor && onColorChange && (
+        <div className="pt-2 border-t border-border">
+          <VehicleColorPicker
+            selected={vehicle.color || DEFAULT_COLOR.hex}
+            onSelect={(c) => {
+              onColorChange(vehicle.garageId, c.hex);
+              setChangingColor(false);
+            }}
+          />
+        </div>
+      )}
 
       <div className="flex items-center gap-2 pt-1">
         <Button asChild size="sm" className="h-8 text-xs bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90">

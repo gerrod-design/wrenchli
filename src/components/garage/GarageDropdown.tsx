@@ -9,7 +9,7 @@ import GarageClearDialog from "./GarageClearDialog";
 import GarageSyncTeaser from "./GarageSyncTeaser";
 
 export default function GarageDropdown() {
-  const { vehicles, removeVehicle, updateNickname, clearAll } = useGarage();
+  const { vehicles, removeVehicle, updateNickname, updateColor, clearAll } = useGarage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -64,6 +64,7 @@ export default function GarageDropdown() {
                   isActive={i === 0}
                   onRemove={removeVehicle}
                   onRename={updateNickname}
+                  onColorChange={updateColor}
                 />
               ))}
             </div>
@@ -81,14 +82,12 @@ export default function GarageDropdown() {
             </div>
           )}
 
-          {/* Account sync teaser */}
           {!isEmpty && (
             <div className="border-t border-border px-4 py-3">
               <GarageSyncTeaser />
             </div>
           )}
 
-          {/* Privacy + Clear */}
           <div className="border-t border-border px-4 py-3 bg-muted/50 space-y-2">
             <GaragePrivacyNotice />
             {!isEmpty && <GarageClearDialog onClear={clearAll} />}

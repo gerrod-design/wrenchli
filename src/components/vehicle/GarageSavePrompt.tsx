@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useGarage, isDismissedForSession, dismissForSession, vehicleKey } from "@/hooks/useGarage";
 import type { DecodedVehicle } from "@/lib/vinDecoder";
+import VehicleSilhouette, { DEFAULT_COLOR, mapBodyClass, type VehicleColor } from "./VehicleSilhouette";
+import VehicleColorPicker from "./VehicleColorPicker";
 
 interface Props {
   vehicle: DecodedVehicle;
@@ -20,17 +22,23 @@ export default function GarageSavePrompt({ vehicle, vin }: Props) {
   const [nickname, setNickname] = useState(`My ${vehicle.model}`);
   const [showForm, setShowForm] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR.hex);
+
+  const bodyType = mapBodyClass(vehicle.bodyClass || "");
 
   if (alreadySaved && !justSaved) return null;
   if (dismissed) return null;
 
   if (justSaved) {
     return (
-      <div className="mt-3 flex items-center gap-2 rounded-lg border border-wrenchli-green/30 bg-wrenchli-green/5 px-4 py-3">
-        <Lock className="h-3.5 w-3.5 text-wrenchli-green shrink-0" />
-        <p className="text-xs text-muted-foreground">
-          Saved! 🔒 Your vehicle is stored in this browser. Account sync coming soon.
-        </p>
+      <div className="mt-3 flex items-center gap-3 rounded-lg border border-wrenchli-green/30 bg-wrenchli-green/5 px-4 py-3">
+        <VehicleSilhouette bodyType={bodyType} color={selectedColor} className="w-16 h-8 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <Lock className="inline h-3.5 w-3.5 text-wrenchli-green mr-1" />
+          <span className="text-xs text-muted-foreground">
+            Saved! 🔒 Your vehicle is stored in this browser. Account sync coming soon.
+          </span>
+        </div>
       </div>
     );
   }
@@ -47,6 +55,8 @@ export default function GarageSavePrompt({ vehicle, vin }: Props) {
       driveType: vehicle.driveType,
       fuelType: vehicle.fuelType,
       vin,
+      color: selectedColor,
+      bodyType,
     });
 
     if (success) {
@@ -87,21 +97,39 @@ export default function GarageSavePrompt({ vehicle, vin }: Props) {
     );
   }
 
+  const vehicleName = [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ");
+
   return (
-    <div className="mt-3 rounded-lg border border-wrenchli-teal/30 bg-wrenchli-teal/5 p-4 space-y-3">
+    <div className="mt-3 rounded-lg border border-wrenchli-teal/30 bg-wrenchli-teal/5 p-4 space-y-4">
       <div className="flex items-center gap-2">
         <Save className="h-4 w-4 text-wrenchli-teal shrink-0" />
         <p className="text-sm font-semibold text-foreground">Save to My Garage</p>
       </div>
-      <p className="text-xs text-muted-foreground">Skip re-entering your vehicle info next time.</p>
-      <Input
-        placeholder={`My ${vehicle.model}`}
-        value={nickname}
-        onChange={(e) => setNickname(e.target.value.slice(0, 20))}
-        maxLength={20}
-        className="h-9 text-sm"
+
+      {/* Live preview */}
+      <div className="flex flex-col items-center gap-1 py-2">
+        <VehicleSilhouette bodyType={bodyType} color={selectedColor} className="w-40 h-20 md:w-48 md:h-24" />
+        <p className="text-xs font-medium text-muted-foreground">{vehicleName}</p>
+      </div>
+
+      {/* Color picker */}
+      <VehicleColorPicker
+        selected={selectedColor}
+        onSelect={(c) => setSelectedColor(c.hex)}
       />
-      <p className="text-xs text-muted-foreground">Nickname (optional) • max 20 characters</p>
+
+      {/* Nickname */}
+      <div className="space-y-1">
+        <Input
+          placeholder={`My ${vehicle.model}`}
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value.slice(0, 20))}
+          maxLength={20}
+          className="h-9 text-sm"
+        />
+        <p className="text-xs text-muted-foreground">Nickname (optional) • max 20 characters</p>
+      </div>
+
       <div className="flex gap-2">
         <Button onClick={handleSave} size="sm" className="bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 text-xs">
           Save Vehicle
