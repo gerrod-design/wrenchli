@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.estimate-repair]
 verify_jwt = false
+
+[functions.compare-ownership]
+verify_jwt = false

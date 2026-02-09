@@ -12,6 +12,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import CostOfOwnership from "@/components/quote/CostOfOwnership";
 
 const ESTIMATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-repair`;
 
@@ -392,6 +393,16 @@ export default function GetQuote() {
                   </label>
                 </div>
               </div>
+            </SectionReveal>
+
+            {/* Cost of Ownership comparison */}
+            <SectionReveal delay={150}>
+              <CostOfOwnership
+                currentVehicle={vehicleStr}
+                repairCostLow={estimate.cost_low}
+                repairCostHigh={estimate.cost_high}
+                zipCode={zipCode.replace(/\D/g, "").slice(0, 5)}
+              />
             </SectionReveal>
 
             {/* Step 3: Request referral */}
