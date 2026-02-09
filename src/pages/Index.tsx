@@ -92,12 +92,12 @@ export default function Index() {
       <section id="quote" className="relative -mt-8 z-10">
         <div className="container-wrenchli">
           <div className="rounded-2xl border border-border bg-card p-6 shadow-xl md:p-8">
-            <div className="grid gap-4 md:grid-cols-[1fr_auto_auto_auto_auto]">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_auto_auto_auto_auto]">
               <Input
                 placeholder="Describe your car issue or enter a diagnostic code..."
                 value={issueText}
                 onChange={(e) => setIssueText(e.target.value)}
-                className="h-12 text-base"
+                className="h-12 text-base sm:col-span-2 md:col-span-1 min-w-0"
               />
               <select className="flex h-12 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <option value="">Year</option>
