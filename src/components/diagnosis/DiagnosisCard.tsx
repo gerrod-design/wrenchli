@@ -1,4 +1,4 @@
-import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UrgencyBadge from "./UrgencyBadge";
@@ -6,9 +6,33 @@ import type { Diagnosis } from "./types";
 import { cn } from "@/lib/utils";
 
 const diyConfig = {
-  easy: { icon: CheckCircle, label: "Easy", desc: "Most people can do this", className: "text-wrenchli-green" },
-  moderate: { icon: AlertTriangle, label: "Moderate", desc: "Some mechanical experience needed", className: "text-amber-500" },
-  advanced: { icon: XCircle, label: "Advanced", desc: "Professional recommended", className: "text-destructive" },
+  easy: {
+    icon: CheckCircle,
+    label: "Easy",
+    badge: "🟢 Easy",
+    subtitle: "Most car owners can handle this repair",
+    className: "text-wrenchli-green",
+    cardBg: "hsl(170 76% 96%)",
+    cardBorder: "hsl(170 73% 36%)",
+  },
+  moderate: {
+    icon: AlertTriangle,
+    label: "Moderate",
+    badge: "🟡 Moderate",
+    subtitle: "Doable if you have basic tools and some experience",
+    className: "text-amber-500",
+    cardBg: "hsl(170 76% 96%)",
+    cardBorder: "hsl(170 73% 36%)",
+  },
+  advanced: {
+    icon: XCircle,
+    label: "Advanced",
+    badge: "🔴 Advanced",
+    subtitle: "This repair requires specialized tools and experience",
+    className: "text-destructive",
+    cardBg: "hsl(45 100% 97%)",
+    cardBorder: "hsl(38 92% 50%)",
+  },
 } as const;
 
 interface DiagnosisCardProps {
@@ -20,6 +44,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
   const diy = diyConfig[diagnosis.diy_feasibility];
   const DiyIcon = diy.icon;
   const searchQuery = encodeURIComponent(`${diagnosis.title} ${vehicle} repair`);
+  const isAdvanced = diagnosis.diy_feasibility === "advanced";
 
   return (
     <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
@@ -61,7 +86,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             <DiyIcon className={cn("h-4 w-4", diy.className)} />
             <span className={cn("text-sm font-semibold", diy.className)}>{diy.label}</span>
           </div>
-          <p className="text-xs text-muted-foreground">{diy.desc}</p>
+          <p className="text-xs text-muted-foreground">{diy.subtitle}</p>
         </div>
 
         <div className="space-y-1.5">
@@ -80,34 +105,139 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
         </div>
       </div>
 
-      {/* Footer - 3 action buttons */}
-      <div className="grid grid-cols-3 gap-3 border-t border-border p-4 md:p-5 bg-muted/30">
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
-          asChild
+      {/* YOUR OPTIONS divider */}
+      <div className="flex items-center gap-4 px-5 md:px-6 pt-2 pb-4">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Your Options</span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
+      {/* Dual-path cards */}
+      <div className="grid gap-4 px-5 md:px-6 pb-5 md:pb-6 sm:grid-cols-2">
+        {/* DIY Path */}
+        <div
+          className="rounded-xl border p-5 flex flex-col"
+          style={{ backgroundColor: diy.cardBg, borderColor: diy.cardBorder }}
         >
-          <a href={`https://www.youtube.com/results?search_query=${searchQuery}`} target="_blank" rel="noopener noreferrer">
-            <Video className="mr-1 h-3.5 w-3.5" /> Watch DIY Tutorial
-          </a>
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
+          <div className="mb-3">
+            <h4 className="font-heading text-base font-bold" style={{ color: isAdvanced ? "hsl(38 92% 40%)" : "hsl(170 73% 36%)" }}>
+              🔧 Fix It Yourself
+            </h4>
+            <p className="text-xs text-muted-foreground mt-0.5">{diy.subtitle}</p>
+          </div>
+
+          <div className="space-y-2 text-sm mb-4">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Estimated cost:</span>
+              <span className="font-semibold">{diagnosis.diy_cost}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Difficulty:</span>
+              <span className="font-semibold">{diy.badge}</span>
+            </div>
+          </div>
+
+          {isAdvanced && (
+            <div className="rounded-md bg-amber-500/10 border border-amber-500/20 p-2.5 mb-4 text-xs text-foreground">
+              <span className="font-semibold">⚠️ We recommend professional repair for this issue.</span>{" "}
+              Incorrect repair could cause additional damage or safety risk.
+            </div>
+          )}
+
+          {diagnosis.diy_feasibility === "moderate" && (
+            <p className="text-xs text-muted-foreground mb-4 italic">
+              Not comfortable? That's okay — <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&vehicle=${encodeURIComponent(vehicle)}`} className="text-wrenchli-teal font-semibold hover:underline">get a professional quote instead →</Link>
+            </p>
+          )}
+
+          <div className="space-y-2 mt-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
+              asChild
+            >
+              <a href={`https://www.youtube.com/results?search_query=${searchQuery}`} target="_blank" rel="noopener noreferrer">
+                <Video className="mr-1.5 h-3.5 w-3.5" /> Watch Tutorial
+              </a>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
+            >
+              <ShoppingCart className="mr-1.5 h-3.5 w-3.5" /> Order Parts
+            </Button>
+            <Button
+              size="sm"
+              className={cn(
+                "w-full text-xs font-semibold",
+                isAdvanced
+                  ? "bg-transparent border border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
+                  : "bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90"
+              )}
+            >
+              Start DIY Guide <ArrowRight className="ml-1.5 h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Professional Path */}
+        <div
+          className="rounded-xl border p-5 flex flex-col relative"
+          style={{ backgroundColor: "hsl(206 100% 97%)", borderColor: "hsl(204 64% 44%)" }}
         >
-          <ShoppingCart className="mr-1 h-3.5 w-3.5" /> Order Parts
-        </Button>
-        <Button
-          size="sm"
-          className="text-xs bg-accent text-accent-foreground hover:bg-accent/90"
-          asChild
-        >
-          <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&vehicle=${encodeURIComponent(vehicle)}`}>
-            <Wrench className="mr-1 h-3.5 w-3.5" /> Get Shop Quotes <ArrowRight className="ml-1 h-3 w-3" />
-          </Link>
-        </Button>
+          {isAdvanced && (
+            <div className="absolute -top-2.5 right-4 inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold text-accent-foreground">
+              <Star className="h-3 w-3" /> Recommended
+            </div>
+          )}
+
+          <div className="mb-3">
+            <h4 className="font-heading text-base font-bold" style={{ color: "hsl(204 64% 44%)" }}>
+              👨‍🔧 Get It Fixed Professionally
+            </h4>
+          </div>
+
+          <div className="space-y-2 text-sm mb-4">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Estimated cost:</span>
+              <span className="font-semibold">{diagnosis.shop_cost}</span>
+            </div>
+          </div>
+
+          <ul className="space-y-2 text-sm mb-4 flex-1">
+            <li className="flex items-center gap-2">
+              <CheckCircle className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(204 64% 44%)" }} />
+              <span>Quotes from vetted local shops</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(204 64% 44%)" }} />
+              <span>Financing available</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(204 64% 44%)" }} />
+              <span>Guaranteed pricing</span>
+            </li>
+          </ul>
+
+          <Button
+            size="sm"
+            className="w-full text-xs bg-accent text-accent-foreground hover:bg-accent/90 font-semibold mt-auto"
+            asChild
+          >
+            <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&vehicle=${encodeURIComponent(vehicle)}`}>
+              <Wrench className="mr-1.5 h-3.5 w-3.5" /> Get Shop Quotes <ArrowRight className="ml-1.5 h-3 w-3" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Disclaimer reminder */}
+      <div className="px-5 md:px-6 pb-4 md:pb-5">
+        <p className="text-[11px] text-muted-foreground text-center italic">
+          Estimates are for informational purposes only. Actual costs and repair complexity may vary.
+        </p>
       </div>
     </div>
   );
