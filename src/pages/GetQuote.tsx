@@ -143,43 +143,29 @@ export default function GetQuote() {
     setIsSubmitting(true);
 
     try {
-      if (quoteId) {
-        await supabase
-          .from("quote_requests" as any)
-          .update({
-            customer_name: name || null,
-            customer_email: email,
-            customer_phone: phone || null,
-            customer_notes: notes || null,
-            financing_interested: financingInterested,
-            status: "referral_requested",
-            referral_requested_at: new Date().toISOString(),
-          } as any)
-          .eq("id", quoteId);
-      } else {
-        await supabase.from("quote_requests" as any).insert({
-          diagnosis_title: diagnosis,
-          diagnosis_code: code || null,
-          diagnosis_urgency: urgency || null,
-          diagnosis_diy_feasibility: diyFeasibility || null,
-          vehicle_year: year || null,
-          vehicle_make: make || null,
-          vehicle_model: model || null,
-          vehicle_trim: trim || null,
-          zip_code: zipCode.replace(/\D/g, "").slice(0, 5),
-          metro_area: estimate?.metro_area || null,
-          estimated_cost_low: estimate?.cost_low || null,
-          estimated_cost_high: estimate?.cost_high || null,
-          cost_estimate_details: (estimate as any) || {},
-          customer_name: name || null,
-          customer_email: email,
-          customer_phone: phone || null,
-          customer_notes: notes || null,
-          financing_interested: financingInterested,
-          status: "referral_requested",
-          referral_requested_at: new Date().toISOString(),
-        });
-      }
+      // Always insert a complete row with contact info (no anonymous updates)
+      await supabase.from("quote_requests" as any).insert({
+        diagnosis_title: diagnosis,
+        diagnosis_code: code || null,
+        diagnosis_urgency: urgency || null,
+        diagnosis_diy_feasibility: diyFeasibility || null,
+        vehicle_year: year || null,
+        vehicle_make: make || null,
+        vehicle_model: model || null,
+        vehicle_trim: trim || null,
+        zip_code: zipCode.replace(/\D/g, "").slice(0, 5),
+        metro_area: estimate?.metro_area || null,
+        estimated_cost_low: estimate?.cost_low || null,
+        estimated_cost_high: estimate?.cost_high || null,
+        cost_estimate_details: (estimate as any) || {},
+        customer_name: name || null,
+        customer_email: email,
+        customer_phone: phone || null,
+        customer_notes: notes || null,
+        financing_interested: financingInterested,
+        status: "referral_requested",
+        referral_requested_at: new Date().toISOString(),
+      });
 
       setSubmitted(true);
       toast.success("Your quote request has been submitted!");
