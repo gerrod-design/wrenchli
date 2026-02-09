@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
+import heroVehicleInsights from "@/assets/hero-vehicle-insights.jpg";
 import {
   CarFront, Search, Cpu, ArrowRight, Video, ShoppingCart, Wrench,
   Volume2, Wind, AlertTriangle, Gauge, CheckCircle, Settings,
@@ -80,8 +81,10 @@ export default function VehicleInsights() {
         path="/vehicle-insights"
       />
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground section-padding">
-        <div className="container-wrenchli text-center">
+      <section className="relative bg-primary text-primary-foreground section-padding overflow-hidden">
+        <img src={heroVehicleInsights} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/60" />
+        <div className="container-wrenchli text-center relative">
           <SectionReveal>
             <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-wrenchli-teal/20 px-4 py-1 text-sm font-medium text-wrenchli-teal">
               <CarFront className="h-4 w-4" /> Vehicle Insights

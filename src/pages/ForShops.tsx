@@ -1,5 +1,6 @@
 import { useState } from "react";
 import SEO from "@/components/SEO";
+import heroShops from "@/assets/hero-shops.jpg";
 import {
   Store, ArrowRight, TrendingUp, DollarSign, Wrench, Star,
   CreditCard, BarChart3, Users, CheckCircle, Shield, Calendar,
@@ -97,8 +98,10 @@ export default function ForShops() {
         path="/for-shops"
       />
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground section-padding">
-        <div className="container-wrenchli text-center">
+      <section className="relative bg-primary text-primary-foreground section-padding overflow-hidden">
+        <img src={heroShops} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/60" />
+        <div className="container-wrenchli text-center relative">
           <SectionReveal>
             <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-wrenchli-trust-blue/20 px-4 py-1 text-sm font-medium text-wrenchli-trust-blue">
               <Store className="h-4 w-4" /> For Repair Shops

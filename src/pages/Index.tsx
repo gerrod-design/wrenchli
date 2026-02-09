@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import heroHome from "@/assets/hero-home.jpg";
 import SEO from "@/components/SEO";
 import {
   Search, ShieldCheck, DollarSign, Zap, CreditCard, Clock,
@@ -39,7 +40,8 @@ export default function Index() {
       />
       {/* Hero */}
       <section className="relative bg-primary text-primary-foreground overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-wrenchli-trust-blue/30 opacity-90" />
+        <img src={heroHome} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/80 to-wrenchli-trust-blue/60" />
         <div className="container-wrenchli relative flex min-h-[80vh] flex-col items-center justify-center py-20 text-center md:py-28">
           <h1 className="animate-fade-in max-w-4xl font-heading text-4xl font-extrabold leading-[1.1] md:text-6xl lg:text-7xl">
             Car Repair, Finally <span className="text-accent">Fixed.</span>
