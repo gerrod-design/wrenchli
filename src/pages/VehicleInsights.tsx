@@ -8,6 +8,7 @@ import {
   Smartphone, ChevronDown, ChevronUp
 } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
+import DiagnosisResult from "@/components/DiagnosisResult";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -66,22 +67,33 @@ function CyclingPlaceholder() {
 
 export default function VehicleInsights() {
   const [searchParams] = useSearchParams();
+  const hasUrlCode = Boolean(searchParams.get("code"));
+  const hasUrlSymptom = Boolean(searchParams.get("symptom"));
   const [symptom, setSymptom] = useState(() => searchParams.get("symptom") || "");
   const [dtcInput, setDtcInput] = useState(() => searchParams.get("code") || "");
   const [selectedYear, setSelectedYear] = useState(() => searchParams.get("year") || "");
   const [selectedMake, setSelectedMake] = useState(() => searchParams.get("make") || "");
   const [selectedModel, setSelectedModel] = useState(() => searchParams.get("model") || "");
   const [expandedCat, setExpandedCat] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState(hasUrlCode ? "dtc" : "symptom");
+  const [diagnosisKey, setDiagnosisKey] = useState(0);
+  const [diagCodes, setDiagCodes] = useState<string | undefined>(hasUrlCode ? searchParams.get("code") || undefined : undefined);
+  const [diagSymptom, setDiagSymptom] = useState<string | undefined>(hasUrlSymptom ? searchParams.get("symptom") || undefined : undefined);
   const placeholder = CyclingPlaceholder();
-
-  const hasUrlCode = Boolean(searchParams.get("code"));
-  const hasUrlSymptom = Boolean(searchParams.get("symptom"));
-
-  // Auto-select the right tab based on URL params
-  const defaultTab = hasUrlCode ? "dtc" : "symptom";
 
   const dtcCodes = dtcInput.toUpperCase().split(",").map((c) => c.trim()).filter(Boolean);
   const dtcDescriptions = dtcCodes.map((code) => ({ code, desc: dtcLookup[code] || null }));
+
+  const handleDiagnose = () => {
+    if (activeTab === "dtc" && dtcInput.trim()) {
+      setDiagCodes(dtcInput.trim());
+      setDiagSymptom(undefined);
+    } else if (activeTab === "symptom" && symptom.trim()) {
+      setDiagSymptom(symptom.trim());
+      setDiagCodes(undefined);
+    }
+    setDiagnosisKey((k) => k + 1);
+  };
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -125,7 +137,7 @@ export default function VehicleInsights() {
           </SectionReveal>
 
           <SectionReveal>
-            <Tabs defaultValue={defaultTab} className="mt-10">
+            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mt-10">
               <TabsList className="grid w-full grid-cols-2 h-12">
                 <TabsTrigger value="symptom" className="text-sm font-semibold h-10">
                   <Search className="mr-2 h-4 w-4" /> Describe Symptoms
@@ -195,7 +207,7 @@ export default function VehicleInsights() {
                 >
                   <option value="">Model</option>
                 </select>
-                <Button className="h-12 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-semibold px-6 whitespace-nowrap">
+                <Button onClick={handleDiagnose} className="h-12 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-semibold px-6 whitespace-nowrap">
                   Get Your Diagnosis
                 </Button>
               </div>
@@ -204,80 +216,15 @@ export default function VehicleInsights() {
         </div>
       </section>
 
-      {/* Sample Diagnosis Result */}
-      <section className="section-padding bg-secondary">
-        <div className="container-wrenchli max-w-3xl">
-          <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Sample Diagnosis Result</h2>
-            <p className="mt-3 text-center text-muted-foreground">Here's what a diagnosis looks like. Try it yourself above!</p>
-          </SectionReveal>
-
-          <SectionReveal>
-            <div className="mt-10 rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm">
-              <div className="flex items-center gap-2 text-xs font-mono text-wrenchli-teal mb-4">
-                <Cpu className="h-4 w-4" /> P0420
-              </div>
-              <h3 className="font-heading text-lg font-bold">Most Likely Cause: Catalytic Converter Efficiency</h3>
-              <div className="mt-4 space-y-3">
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">What's Happening</span>
-                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                    Your catalytic converter isn't cleaning exhaust gases as efficiently as it should. This is often caused by a worn converter, but can also be triggered by faulty O2 sensors or engine misfires.
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Urgency:</span>
-                    <span className="rounded-full bg-amber-100 px-3 py-0.5 text-xs font-semibold text-amber-700">Medium</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">DIY Difficulty:</span>
-                    <span className="rounded-full bg-red-100 px-3 py-0.5 text-xs font-semibold text-red-700">Advanced</span>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-6 mt-2">
-                  <div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">DIY Cost (Parts Only)</span>
-                    <p className="font-stats text-xl font-bold text-wrenchli-teal">$150–$400</p>
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Shop Cost (Parts + Labor)</span>
-                    <p className="font-stats text-xl font-bold text-accent">$400–$1,200</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3 Action Cards */}
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-xl border border-border bg-background p-4 text-center">
-                  <Video className="mx-auto h-6 w-6 text-wrenchli-teal mb-2" />
-                  <h4 className="font-heading text-sm font-semibold">Watch & Learn</h4>
-                  <p className="mt-1 text-xs text-muted-foreground">Tutorials for your specific vehicle</p>
-                  <Button size="sm" variant="outline" className="mt-3 text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10">
-                    Watch How-To Video
-                  </Button>
-                </div>
-                <div className="rounded-xl border border-border bg-background p-4 text-center">
-                  <ShoppingCart className="mx-auto h-6 w-6 text-wrenchli-teal mb-2" />
-                  <h4 className="font-heading text-sm font-semibold">Order Parts</h4>
-                  <p className="mt-1 text-xs text-muted-foreground">Right part, ship or local pickup</p>
-                  <Button size="sm" variant="outline" className="mt-3 text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10">
-                    Shop Parts
-                  </Button>
-                </div>
-                <div className="rounded-xl border border-border bg-background p-4 text-center">
-                  <Wrench className="mx-auto h-6 w-6 text-accent mb-2" />
-                  <h4 className="font-heading text-sm font-semibold">Get It Fixed</h4>
-                  <p className="mt-1 text-xs text-muted-foreground">Quotes from vetted local shops</p>
-                  <Button size="sm" className="mt-3 text-xs bg-accent text-accent-foreground hover:bg-accent/90">
-                    Get Shop Quotes
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </SectionReveal>
-        </div>
-      </section>
+      {/* AI Diagnosis Result */}
+      <DiagnosisResult
+        key={diagnosisKey}
+        codes={diagCodes}
+        symptom={diagSymptom}
+        year={selectedYear}
+        make={selectedMake}
+        model={selectedModel}
+      />
 
       {/* Common Symptoms Browser */}
       <section className="section-padding bg-background">
