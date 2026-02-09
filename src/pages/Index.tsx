@@ -94,7 +94,7 @@ export default function Index() {
           <div className="rounded-2xl border border-border bg-card p-6 shadow-xl md:p-8">
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_auto_auto_auto_auto]">
               <Input
-                placeholder="Describe your car issue or enter a diagnostic code..."
+                placeholder="Describe your issue or enter a code..."
                 value={issueText}
                 onChange={(e) => setIssueText(e.target.value)}
                 className="h-12 text-base sm:col-span-2 md:col-span-1 min-w-0"
