@@ -2,15 +2,28 @@ import { Link } from "react-router-dom";
 import { Wrench, Linkedin } from "lucide-react";
 
 const footerLinks = {
-  Platform: [
-    { label: "For Car Owners", to: "/for-car-owners" },
-    { label: "For Shop Owners", to: "/for-shops" },
-    { label: "Vehicle Insights", to: "/vehicle-insights" },
-  ],
   Company: [
     { label: "About Us", to: "/about" },
-    { label: "FAQ", to: "/faq" },
+    { label: "Leadership", to: "/about#leadership" },
+    { label: "Careers", to: "/about", badge: "Coming Soon" },
     { label: "Contact", to: "/contact" },
+  ],
+  "For Car Owners": [
+    { label: "How It Works", to: "/for-car-owners" },
+    { label: "Get a Quote", to: "/#quote" },
+    { label: "Find a Shop", to: "/#quote", badge: "Coming Soon" },
+    { label: "Financing Options", to: "/for-car-owners#financing" },
+  ],
+  "For Repair Shops": [
+    { label: "Partner Program", to: "/for-shops" },
+    { label: "How It Works", to: "/for-shops#how-it-works" },
+    { label: "Shop Software", to: "/for-shops#features" },
+    { label: "Apply Now", to: "/for-shops#apply" },
+  ],
+  Legal: [
+    { label: "Privacy Policy", to: "/privacy", badge: "Coming Soon" },
+    { label: "Terms of Service", to: "/terms", badge: "Coming Soon" },
+    { label: "Accessibility", to: "/accessibility", badge: "Coming Soon" },
   ],
 };
 
@@ -18,15 +31,15 @@ export default function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-wrenchli py-12 md:py-16">
-        <div className="grid gap-8 md:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="lg:col-span-1">
             <Link to="/" className="mb-4 flex items-center gap-2 font-heading text-xl font-bold">
               <Wrench className="h-6 w-6 text-accent" />
               Wrenchli
             </Link>
-            <p className="mb-4 max-w-sm text-sm leading-relaxed text-primary-foreground/70">
-              Fixing the broken auto repair experience. Transparent pricing, vetted shops, and financing — coming soon to Detroit.
+            <p className="mb-5 text-sm leading-relaxed text-primary-foreground/60">
+              Fixing the broken auto repair experience. Coming soon to Detroit.
             </p>
             <a
               href="https://linkedin.com/company/wrenchli"
@@ -39,21 +52,26 @@ export default function Footer() {
             </a>
           </div>
 
-          {/* Links */}
+          {/* Link columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="mb-3 font-heading text-sm font-semibold uppercase tracking-wider text-primary-foreground/50">
+              <h4 className="mb-3 font-heading text-xs font-semibold uppercase tracking-widest text-primary-foreground/40">
                 {category}
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {links.map((link) => (
-                  <li key={link.to}>
+                  <li key={link.label} className="flex items-center gap-2">
                     <Link
                       to={link.to}
-                      className="text-sm text-primary-foreground/70 transition-colors hover:text-accent"
+                      className="text-sm text-primary-foreground/60 transition-colors hover:text-accent"
                     >
                       {link.label}
                     </Link>
+                    {link.badge && (
+                      <span className="rounded bg-primary-foreground/10 px-1.5 py-0.5 text-[10px] text-primary-foreground/40">
+                        {link.badge}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -61,8 +79,8 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 border-t border-primary-foreground/10 pt-6 text-center text-xs text-primary-foreground/50">
-          © {new Date().getFullYear()} Wrenchli, Inc. All rights reserved. Delaware C Corporation.
+        <div className="mt-12 border-t border-primary-foreground/10 pt-6 flex flex-col items-center gap-2 text-xs text-primary-foreground/40">
+          <p>© {new Date().getFullYear()} Wrenchli, Inc. | Delaware Corporation | All Rights Reserved</p>
         </div>
       </div>
     </footer>
