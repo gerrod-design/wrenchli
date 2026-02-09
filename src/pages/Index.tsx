@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import heroHome from "@/assets/hero-home.jpg";
 import SEO from "@/components/SEO";
 import {
   ShieldCheck, Zap, CreditCard,
@@ -11,6 +10,7 @@ import {
 import StatCounter from "@/components/StatCounter";
 import SectionReveal from "@/components/SectionReveal";
 import QuickActionBar from "@/components/QuickActionBar";
+import CinematicHero from "@/components/CinematicHero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -38,39 +38,8 @@ export default function Index() {
         description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Detroit."
         path="/"
       />
-      {/* Hero */}
-      <section className="relative bg-primary text-primary-foreground overflow-hidden">
-        <img src={heroHome} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/80 to-wrenchli-trust-blue/60" />
-        <div className="container-wrenchli relative flex min-h-[80vh] flex-col items-center justify-center py-20 text-center md:py-28">
-          <h1 className="animate-fade-in max-w-4xl font-heading text-4xl font-extrabold leading-[1.1] md:text-6xl lg:text-7xl">
-            Car Repair, Finally <span className="text-accent">Fixed.</span>
-          </h1>
-          <p
-            className="animate-fade-in-up mt-6 max-w-2xl text-lg text-primary-foreground/70 md:text-xl leading-relaxed"
-            style={{ animationDelay: "200ms" }}
-          >
-            Find out what's wrong with your car, learn how to fix it yourself, or get instant quotes from trusted local shops. Your car, your choice.
-          </p>
-          <div
-            className="animate-fade-in-up mt-8 flex flex-col gap-3 sm:flex-row"
-            style={{ animationDelay: "400ms" }}
-          >
-            <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
-              <Link to="/#quote">Get Your Free Quote</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="h-14 px-10 bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold text-lg">
-              <Link to="/for-shops#apply">Join as a Partner Shop</Link>
-            </Button>
-          </div>
-          <p
-            className="animate-fade-in-up mt-4 text-sm text-primary-foreground/50"
-            style={{ animationDelay: "500ms" }}
-          >
-            Free diagnosis • DIY tutorials • Shop quotes • No account required
-          </p>
-        </div>
-      </section>
+      {/* Cinematic Hero */}
+      <CinematicHero />
 
       <QuickActionBar />
       <div className="text-center mt-4 mb-2">
