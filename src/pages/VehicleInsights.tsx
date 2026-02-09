@@ -7,6 +7,7 @@ import {
   Volume2, Wind, AlertTriangle, Gauge, CheckCircle, Settings,
   Smartphone, ChevronDown, ChevronUp
 } from "lucide-react";
+import { getDtcEntry, isValidDtcPattern } from "@/data/dtcCodes";
 import SectionReveal from "@/components/SectionReveal";
 import DiagnosisResult from "@/components/DiagnosisResult";
 import { Button } from "@/components/ui/button";
@@ -21,16 +22,6 @@ const placeholders = [
   "AC is blowing warm air",
 ];
 
-const dtcLookup: Record<string, string> = {
-  P0300: "Random/Multiple Cylinder Misfire Detected",
-  P0420: "Catalyst System Efficiency Below Threshold (Bank 1)",
-  P0171: "System Too Lean (Bank 1)",
-  P0442: "Evaporative Emission System Leak Detected (Small Leak)",
-  P0301: "Cylinder 1 Misfire Detected",
-  P0455: "Evaporative Emission System Leak Detected (Large Leak)",
-  P0128: "Coolant Thermostat — Coolant Temperature Below Thermostat Regulating Temperature",
-  P0016: "Crankshaft/Camshaft Position Correlation — Bank 1 Sensor A",
-};
 
 const symptomCategories = [
   {
@@ -82,7 +73,10 @@ export default function VehicleInsights() {
   const placeholder = CyclingPlaceholder();
 
   const dtcCodes = dtcInput.toUpperCase().split(",").map((c) => c.trim()).filter(Boolean);
-  const dtcDescriptions = dtcCodes.map((code) => ({ code, desc: dtcLookup[code] || null }));
+  const dtcDescriptions = dtcCodes.map((code) => {
+    const entry = getDtcEntry(code);
+    return { code, entry, isValid: isValidDtcPattern(code) };
+  });
 
   const handleDiagnose = () => {
     if (activeTab === "dtc" && dtcInput.trim()) {
@@ -169,9 +163,39 @@ export default function VehicleInsights() {
                 {dtcDescriptions.length > 0 && dtcDescriptions[0].code && (
                   <div className="space-y-2">
                     {dtcDescriptions.map((d) => (
-                      <div key={d.code} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm">
-                        <span className="font-mono font-bold text-wrenchli-teal shrink-0">{d.code}</span>
-                        <span className="text-muted-foreground">{d.desc || "Code not found — we'll look it up for you"}</span>
+                      <div key={d.code} className="rounded-lg border border-border bg-card p-3 text-sm">
+                        {d.entry ? (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono font-bold text-wrenchli-teal shrink-0">{d.code}</span>
+                              <span className="font-semibold">{d.entry.name}</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground leading-relaxed">{d.entry.description}</p>
+                          </div>
+                        ) : d.isValid ? (
+                          <div className="space-y-2">
+                            <div className="flex items-start gap-2">
+                              <span className="font-mono font-bold text-wrenchli-teal shrink-0">{d.code}</span>
+                              <span className="text-muted-foreground">
+                                Code {d.code} recognized as a valid OBD2 diagnostic code, but detailed information is not yet in our database. We recommend getting a professional diagnosis to understand this code.
+                              </span>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="text-xs bg-accent text-accent-foreground hover:bg-accent/90"
+                              asChild
+                            >
+                              <Link to={`/get-quote?code=${d.code}&vehicle=${encodeURIComponent([selectedYear, selectedMake, selectedModel].filter(Boolean).join(" "))}`}>
+                                Get Shop Quotes for This Code <ArrowRight className="ml-1 h-3 w-3" />
+                              </Link>
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-start gap-2">
+                            <span className="font-mono font-bold text-destructive shrink-0">{d.code}</span>
+                            <span className="text-muted-foreground">Invalid code format</span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
