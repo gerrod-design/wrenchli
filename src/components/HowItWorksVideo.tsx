@@ -1,126 +1,82 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Play, Search, ClipboardList, GitFork, Wrench, CheckCircle, ArrowRight } from "lucide-react";
+import {
+  Search, ClipboardList, GitFork, Wrench, CheckCircle,
+  ArrowRight, RotateCcw,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import SectionReveal from "@/components/SectionReveal";
-import heroPoster from "@/assets/hero-poster.jpg";
-import heroVideo from "@/assets/hero-video.mp4";
+import PhoneMockup from "@/components/PhoneMockup";
 
 const steps = [
-  { step: 1, icon: Search, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner.", startTime: 0, endTime: 18 },
-  { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and what it might cost.", startTime: 18, endTime: 35 },
-  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Watch a DIY tutorial and order parts, or get quotes from vetted local shops.", startTime: 35, endTime: 55 },
-  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing.", startTime: 55, endTime: 72 },
-  { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control.", startTime: 72, endTime: 90 },
+  { step: 1, icon: Search, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner." },
+  { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and what it might cost." },
+  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Watch a DIY tutorial and order parts, or get quotes from vetted local shops." },
+  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing." },
+  { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control." },
 ];
 
 export default function HowItWorksVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [hasPlayed, setHasPlayed] = useState(false);
 
-  // Track video time and sync to steps
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleTimeUpdate = () => {
-      const t = video.currentTime;
-      const current = steps.find((s) => t >= s.startTime && t < s.endTime);
-      if (current) {
-        setActiveStep(current.step);
-        setCompletedSteps((prev) => {
-          const next = new Set(prev);
-          steps.filter((s) => s.endTime <= t).forEach((s) => next.add(s.step));
-          return next;
-        });
-      }
-    };
-
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setCompletedSteps(new Set(steps.map((s) => s.step)));
-    };
-
-    video.addEventListener("timeupdate", handleTimeUpdate);
-    video.addEventListener("play", handlePlay);
-    video.addEventListener("pause", handlePause);
-    video.addEventListener("ended", handleEnded);
-    return () => {
-      video.removeEventListener("timeupdate", handleTimeUpdate);
-      video.removeEventListener("play", handlePlay);
-      video.removeEventListener("pause", handlePause);
-      video.removeEventListener("ended", handleEnded);
-    };
+  const handleStepChange = useCallback((step: number) => {
+    setActiveStep(step);
+    setCompletedSteps((prev) => {
+      const next = new Set(prev);
+      steps.filter((s) => s.step < step).forEach((s) => next.add(s.step));
+      return next;
+    });
   }, []);
 
-  const handleVideoClick = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      video.play();
-    } else {
-      video.pause();
-    }
+  const handleComplete = useCallback(() => {
+    setCompletedSteps(new Set(steps.map((s) => s.step)));
+    setHasPlayed(true);
   }, []);
 
-  const handleStepClick = useCallback((step: typeof steps[number]) => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.currentTime = step.startTime;
-    if (video.paused) video.play();
+  const handleStepClick = useCallback((step: number) => {
+    setActiveStep(step);
+    setCompletedSteps((prev) => {
+      const next = new Set(prev);
+      steps.filter((s) => s.step < step).forEach((s) => next.add(s.step));
+      return next;
+    });
+    setIsPlaying(true);
+  }, []);
+
+  const handleReplay = useCallback(() => {
+    setActiveStep(1);
+    setCompletedSteps(new Set());
+    setIsPlaying(true);
   }, []);
 
   return (
     <section className="section-padding bg-background">
       <div className="container-wrenchli">
+        {/* Section header */}
         <SectionReveal>
-          <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">How It Works</h2>
-          <p className="mt-3 text-center text-muted-foreground md:text-lg">
-            See how easy it is — in under 90 seconds.
+          <p className="text-center text-xs font-semibold uppercase tracking-[3px] text-muted-foreground">
+            How It Works
           </p>
+          <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
+            See how easy it is — in under 90 seconds.
+          </h2>
         </SectionReveal>
 
         {/* Desktop/Tablet: side by side — Mobile: stacked */}
         <div className="mt-10 grid gap-6 lg:grid-cols-[55%_1fr] lg:gap-10 items-start">
-          {/* Video Player */}
+          {/* Animated Phone Mockup */}
           <SectionReveal>
-            <div
-              className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-primary cursor-pointer group"
-              onClick={handleVideoClick}
-            >
-              <video
-                ref={videoRef}
-                src={heroVideo}
-                poster={heroPoster}
-                playsInline
-                preload="metadata"
-                controls={isPlaying}
-                className="w-full h-full object-cover"
-              />
-
-              {/* Play overlay — hidden when playing */}
-              {!isPlaying && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 transition-all">
-                  {/* Play button */}
-                  <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-white/95 shadow-xl transition-transform group-hover:scale-110">
-                    <Play className="h-7 w-7 text-primary ml-1 fill-primary" />
-                  </div>
-
-                  {/* Caption bar */}
-                  <div className="absolute bottom-0 inset-x-0 px-4 py-3 bg-gradient-to-t from-black/70 to-transparent">
-                    <p className="text-white text-sm font-medium flex items-center gap-2">
-                      <Play className="h-3.5 w-3.5 fill-white" />
-                      Watch: Your first diagnosis in 90 seconds
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <PhoneMockup
+              activeStep={activeStep}
+              onStepChange={handleStepChange}
+              isPlaying={isPlaying}
+              onPlayingChange={setIsPlaying}
+              onComplete={handleComplete}
+            />
           </SectionReveal>
 
           {/* Steps */}
@@ -132,7 +88,7 @@ export default function HowItWorksVideo() {
               return (
                 <SectionReveal key={s.step} delay={i * 80}>
                   <button
-                    onClick={() => handleStepClick(s)}
+                    onClick={() => handleStepClick(s.step)}
                     className={cn(
                       "w-full text-left flex items-start gap-3 rounded-lg border-l-[3px] px-4 py-3 transition-all duration-300",
                       isActive
@@ -176,14 +132,32 @@ export default function HowItWorksVideo() {
           </div>
         </div>
 
-        {/* CTA */}
+        {/* After-walkthrough CTA */}
         <SectionReveal>
-          <div className="mt-10 text-center">
-            <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
-              <Link to="/vehicle-insights">
-                Get Your Free Diagnosis <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+          <div className="mt-10 text-center space-y-3">
+            <p className="font-heading text-lg font-bold text-foreground md:text-2xl">
+              Ready to try it yourself?
+            </p>
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
+                <Link to="/vehicle-insights">
+                  Get Your Free Diagnosis <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              {hasPlayed && (
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  onClick={handleReplay}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" /> Watch Again
+                </Button>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Takes about 60 seconds. No account required.
+            </p>
           </div>
         </SectionReveal>
       </div>
