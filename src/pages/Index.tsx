@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import heroHome from "@/assets/hero-home.jpg";
 import SEO from "@/components/SEO";
 import {
-  Search, ShieldCheck, DollarSign, Zap, CreditCard, Clock,
-  Car, Store, BarChart3, Users, Wrench, ArrowRight, CheckCircle,
+  ShieldCheck, Zap, CreditCard,
+  Car, Store, ArrowRight,
   Smartphone, MessageCircle
 } from "lucide-react";
 import StatCounter from "@/components/StatCounter";
 import SectionReveal from "@/components/SectionReveal";
-import WaitlistForm from "@/components/WaitlistForm";
+import QuickActionBar from "@/components/QuickActionBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -28,24 +28,7 @@ const howItWorks = [
 ];
 
 export default function Index() {
-  const [issueText, setIssueText] = useState("");
   const [dtcCode, setDtcCode] = useState("");
-  const [selectedMake, setSelectedMake] = useState("");
-
-  const modelsByMake: Record<string, string[]> = {
-    Ford: ["F-150", "Escape", "Explorer", "Mustang", "Edge", "Bronco", "Ranger", "Expedition", "Fusion", "Focus"],
-    Chevrolet: ["Silverado", "Equinox", "Malibu", "Traverse", "Camaro", "Tahoe", "Suburban", "Colorado", "Blazer", "Trax"],
-    Toyota: ["Camry", "Corolla", "RAV4", "Highlander", "Tacoma", "Tundra", "4Runner", "Prius", "Sienna", "Supra"],
-    Honda: ["Civic", "Accord", "CR-V", "Pilot", "HR-V", "Odyssey", "Ridgeline", "Passport", "Fit", "Insight"],
-    Chrysler: ["300", "Pacifica", "Voyager"],
-    Jeep: ["Wrangler", "Grand Cherokee", "Cherokee", "Compass", "Renegade", "Gladiator"],
-    GMC: ["Sierra", "Terrain", "Acadia", "Yukon", "Canyon", "Hummer EV"],
-    Hyundai: ["Elantra", "Sonata", "Tucson", "Santa Fe", "Kona", "Palisade", "Venue", "Ioniq 5"],
-    Kia: ["Forte", "K5", "Sportage", "Sorento", "Telluride", "Soul", "Seltos", "EV6"],
-    Nissan: ["Altima", "Sentra", "Rogue", "Pathfinder", "Frontier", "Murano", "Kicks", "Versa"],
-    BMW: ["3 Series", "5 Series", "X3", "X5", "X1", "4 Series", "7 Series", "iX"],
-    Mercedes: ["C-Class", "E-Class", "GLC", "GLE", "A-Class", "S-Class", "GLA", "GLB"],
-  };
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -88,46 +71,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Quick Action Bar */}
-      <section id="quote" className="relative -mt-8 z-10">
-        <div className="container-wrenchli">
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-xl md:p-8">
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_auto_auto_auto_auto]">
-              <Input
-                placeholder="Describe your issue or enter a code..."
-                value={issueText}
-                onChange={(e) => setIssueText(e.target.value)}
-                className="h-12 text-base sm:col-span-2 md:col-span-1 min-w-0"
-              />
-              <select className="flex h-12 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                <option value="">Year</option>
-                {Array.from({ length: 30 }, (_, i) => 2025 - i).map((y) => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
-              <select
-                value={selectedMake}
-                onChange={(e) => setSelectedMake(e.target.value)}
-                className="flex h-12 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="">Make</option>
-                {["Ford", "Chevrolet", "Toyota", "Honda", "Chrysler", "Jeep", "GMC", "Hyundai", "Kia", "Nissan", "BMW", "Mercedes", "Other"].map((m) => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
-              <select className="flex h-12 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                <option value="">Model</option>
-                {(modelsByMake[selectedMake] || []).map((model) => (
-                  <option key={model} value={model}>{model}</option>
-                ))}
-              </select>
-              <Button className="h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-6 whitespace-nowrap">
-                Get Quotes
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <QuickActionBar />
 
       {/* Value Proposition Cards */}
       <section className="section-padding bg-background">
