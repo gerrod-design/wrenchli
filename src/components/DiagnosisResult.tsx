@@ -1,11 +1,13 @@
-import { useState, useCallback } from "react";
-import { Cpu, Loader2, AlertCircle } from "lucide-react";
+import { useState, useCallback, useMemo } from "react";
+import { Cpu, Loader2, AlertCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DisclaimerBanner from "./diagnosis/DisclaimerBanner";
 import VehicleContextBar from "./diagnosis/VehicleContextBar";
 import DiagnosisCard from "./diagnosis/DiagnosisCard";
 import StillNotSure from "./diagnosis/StillNotSure";
+import SymptomMatchResults, { NoMatchFallback } from "./diagnosis/SymptomMatchResults";
+import { matchSymptoms } from "@/data/symptomLibrary";
 import type { Diagnosis, DiagnosisResultProps } from "./diagnosis/types";
 
 const DIAGNOSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/diagnose`;
@@ -17,6 +19,12 @@ export default function DiagnosisResult({ codes, symptom, year, make, model }: D
   const [error, setError] = useState("");
 
   const vehicleStr = [year, make, model].filter(Boolean).join(" ");
+
+  // Instant client-side symptom matching
+  const symptomMatches = useMemo(() => {
+    if (!symptom) return [];
+    return matchSymptoms(symptom);
+  }, [symptom]);
 
   const runDiagnosis = useCallback(async () => {
     setIsLoading(true);
@@ -63,34 +71,87 @@ export default function DiagnosisResult({ codes, symptom, year, make, model }: D
     document.getElementById("diagnosis-input")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Show instant symptom matches when symptom is provided (before AI run)
+  const showInstantMatches = symptom && !hasRun;
+
   return (
     <section className="section-padding bg-secondary">
       <div className="container-wrenchli max-w-3xl">
-        <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">
-          {hasRun ? "Your Diagnosis" : "Ready to Diagnose"}
-        </h2>
-        <p className="mt-3 mb-8 text-center text-muted-foreground">
-          {hasRun
-            ? `AI-powered analysis${vehicleStr ? ` for your ${vehicleStr}` : ""}`
-            : `Get an AI-powered diagnosis${vehicleStr ? ` for your ${vehicleStr}` : ""}`}
-        </p>
-
-        {!hasRun && (
-          <div className="text-center">
-            <Button
-              onClick={runDiagnosis}
-              size="lg"
-              className="h-14 px-10 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-bold text-lg transition-transform hover:scale-[1.02]"
-            >
-              <Cpu className="mr-2 h-5 w-5" />
-              Run AI Diagnosis
-            </Button>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Free • No account required • Powered by AI
+        {/* Instant symptom matches (shown before AI diagnosis) */}
+        {showInstantMatches && (
+          <>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">
+              {symptomMatches.length > 0 ? "Quick Match Results" : "Ready to Diagnose"}
+            </h2>
+            <p className="mt-3 mb-8 text-center text-muted-foreground">
+              {symptomMatches.length > 0
+                ? "Based on common symptom patterns — run AI diagnosis for a more detailed analysis."
+                : `Get an AI-powered diagnosis${vehicleStr ? ` for your ${vehicleStr}` : ""}`}
             </p>
-          </div>
+
+            {symptomMatches.length > 0 && (
+              <div className="space-y-6 mb-8">
+                <DisclaimerBanner />
+                <VehicleContextBar vehicleStr={vehicleStr} onChangeVehicle={handleChangeVehicle} />
+                <SymptomMatchResults matches={symptomMatches} vehicle={vehicleStr} />
+
+                {symptomMatches.length > 1 && (
+                  <p className="text-center text-sm text-muted-foreground italic">
+                    Multiple potential causes are listed because symptoms can overlap. A qualified technician can perform a hands-on inspection to pinpoint the exact issue for your vehicle.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {symptomMatches.length === 0 && (
+              <div className="mb-8">
+                <NoMatchFallback vehicle={vehicleStr} />
+              </div>
+            )}
+
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground mb-3">
+                {symptomMatches.length > 0 ? "Want a deeper, vehicle-specific analysis?" : ""}
+              </p>
+              <Button
+                onClick={runDiagnosis}
+                size="lg"
+                className="h-14 px-10 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-bold text-lg transition-transform hover:scale-[1.02]"
+              >
+                <Cpu className="mr-2 h-5 w-5" />
+                Run AI Diagnosis
+              </Button>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Free • No account required • Powered by AI
+              </p>
+            </div>
+          </>
         )}
 
+        {/* DTC code flow — no instant matches, just the run button */}
+        {codes && !hasRun && (
+          <>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Ready to Diagnose</h2>
+            <p className="mt-3 mb-8 text-center text-muted-foreground">
+              Get an AI-powered diagnosis{vehicleStr ? ` for your ${vehicleStr}` : ""}
+            </p>
+            <div className="text-center">
+              <Button
+                onClick={runDiagnosis}
+                size="lg"
+                className="h-14 px-10 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-bold text-lg transition-transform hover:scale-[1.02]"
+              >
+                <Cpu className="mr-2 h-5 w-5" />
+                Run AI Diagnosis
+              </Button>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Free • No account required • Powered by AI
+              </p>
+            </div>
+          </>
+        )}
+
+        {/* Loading state */}
         {isLoading && (
           <div className="mt-8 flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-wrenchli-teal" />
@@ -98,6 +159,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model }: D
           </div>
         )}
 
+        {/* Error state */}
         {error && (
           <div className="mt-8 rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center">
             <AlertCircle className="mx-auto h-6 w-6 text-destructive mb-2" />
@@ -113,8 +175,18 @@ export default function DiagnosisResult({ codes, symptom, year, make, model }: D
           </div>
         )}
 
+        {/* AI diagnosis results */}
         {diagnoses.length > 0 && !isLoading && (
           <div className="space-y-6">
+            {!showInstantMatches && (
+              <>
+                <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Your AI Diagnosis</h2>
+                <p className="mt-1 mb-4 text-center text-muted-foreground">
+                  AI-powered analysis{vehicleStr ? ` for your ${vehicleStr}` : ""}
+                </p>
+              </>
+            )}
+
             <DisclaimerBanner />
             <VehicleContextBar vehicleStr={vehicleStr} onChangeVehicle={handleChangeVehicle} />
 
