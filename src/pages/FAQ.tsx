@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import SectionReveal from "@/components/SectionReveal";
 import WaitlistForm from "@/components/WaitlistForm";
@@ -23,6 +24,11 @@ const shopFaqs = [
 export default function FAQ() {
   return (
     <main className="pb-[60px] md:pb-0">
+      <SEO
+        title="FAQ"
+        description="Frequently asked questions about Wrenchli — how it works, pricing, shop verification, financing options, and launch timeline."
+        path="/faq"
+      />
       <section className="bg-primary text-primary-foreground section-padding">
         <div className="container-wrenchli text-center">
           <SectionReveal>

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import {
   ShieldCheck, DollarSign, Star, CreditCard, Calendar, Bell,
   Car, Search, BarChart3, CheckCircle, ArrowRight, MessageSquare
@@ -38,6 +39,11 @@ const faqs = [
 export default function ForCarOwners() {
   return (
     <main className="pb-[60px] md:pb-0">
+      <SEO
+        title="For Car Owners"
+        description="Stop overpaying for car repairs. Get instant quotes from vetted local shops, compare prices, and finance if you need to. Free for car owners."
+        path="/for-car-owners"
+      />
       {/* Hero */}
       <section className="bg-primary text-primary-foreground section-padding">
         <div className="container-wrenchli text-center">

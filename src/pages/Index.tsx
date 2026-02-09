@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import {
   Search, ShieldCheck, DollarSign, Zap, CreditCard, Clock,
   Car, Store, BarChart3, Users, Wrench, ArrowRight, CheckCircle,
@@ -31,6 +32,11 @@ export default function Index() {
 
   return (
     <main className="pb-[60px] md:pb-0">
+      <SEO
+        title="Wrenchli — Car Repair, Finally Fixed"
+        description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Detroit."
+        path="/"
+      />
       {/* Hero */}
       <section className="relative bg-primary text-primary-foreground overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-wrenchli-trust-blue/30 opacity-90" />
