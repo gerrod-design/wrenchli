@@ -5,6 +5,7 @@ import { Loader2, ChevronDown, MapPin } from "lucide-react";
 import { sanitizeVin, isValidVin, decodeVin } from "@/lib/vinDecoder";
 import type { DecodedVehicle } from "@/lib/vinDecoder";
 import { cn } from "@/lib/utils";
+import VinPrivacyNotice from "./VinPrivacyNotice";
 
 interface Props {
   onDecoded: (vehicle: DecodedVehicle) => void;
@@ -24,7 +25,7 @@ export default function VinInput({ onDecoded }: Props) {
 
   const handleDecode = async () => {
     if (!isValidVin(vin)) {
-      setError("VIN must be exactly 17 alphanumeric characters (no I, O, or Q).");
+      setError("VINs are exactly 17 characters and don't contain the letters I, O, or Q. Please check your entry.");
       return;
     }
     setLoading(true);
@@ -32,12 +33,12 @@ export default function VinInput({ onDecoded }: Props) {
     try {
       const vehicle = await decodeVin(vin);
       if (!vehicle.make) {
-        setError("We couldn't decode that VIN. Please double-check and try again.");
+        setError("We couldn't find vehicle details for that VIN. This can happen with very new vehicles, imports, or specialty vehicles. Please use the Year/Make/Model dropdown instead.");
         return;
       }
       onDecoded(vehicle);
     } catch {
-      setError("We couldn't decode that VIN. Please double-check the number and try again, or use the Year/Make/Model dropdown instead.");
+      setError("We couldn't find vehicle details for that VIN. This can happen with very new vehicles, imports, or specialty vehicles. Please use the Year/Make/Model dropdown instead.");
     } finally {
       setLoading(false);
     }
@@ -99,6 +100,8 @@ export default function VinInput({ onDecoded }: Props) {
           </ol>
         </div>
       </div>
+
+      <VinPrivacyNotice />
     </div>
   );
 }
