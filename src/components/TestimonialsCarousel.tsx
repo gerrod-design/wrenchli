@@ -38,6 +38,13 @@ const testimonials = [
       "My mechanic is amazing but nobody knows about him. A platform where I can recommend him and he actually gets found? I'd sign up for that in a heartbeat.",
     vehicle: "2017 Dodge Ram",
   },
+  {
+    name: "Tamika W.",
+    location: "Livonia, MI",
+    quote:
+      "I've been going back and forth on whether to fix my car or just get a new one. If Wrenchli could break down the real cost of both options side by side, that would save me so much stress and guesswork.",
+    vehicle: "2014 Nissan Altima",
+  },
 ];
 
 export default function TestimonialsCarousel() {
