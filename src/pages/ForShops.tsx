@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "@/hooks/use-toast";
+import CustomerRecommendationSection from "@/components/recommend/CustomerRecommendationSection";
 
 const steps = [
   { step: 1, title: "Join the Network", desc: "Submit your application, verify credentials, and go live in days — not weeks." },
@@ -200,6 +201,9 @@ export default function ForShops() {
           </div>
         </div>
       </section>
+
+      {/* Customer Recommendations Social Proof */}
+      <CustomerRecommendationSection onApply={() => document.getElementById("apply")?.scrollIntoView({ behavior: "smooth" })} />
 
       {/* Platform Features — 3 Tabs */}
       <section className="section-padding bg-background">
