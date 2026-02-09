@@ -1,124 +1,168 @@
-import { MapPin, Target, Eye, Heart, Users, Calendar } from "lucide-react";
+import { MapPin, Target, Eye, Rocket, Users, Building, Award, Briefcase } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
-
-const values = [
-  { icon: Eye, title: "Transparency", desc: "No hidden costs, no surprises. We believe in showing you exactly what you're paying for." },
-  { icon: Heart, title: "Trust", desc: "Every shop is vetted. Every review is real. We're building a platform you can rely on." },
-  { icon: Users, title: "Accessibility", desc: "Fair pricing and financing options so everyone can keep their car on the road." },
-];
-
-const milestones = [
-  { date: "Dec 2024", event: "Wrenchli, Inc. incorporated in Delaware" },
-  { date: "Q1 2025", event: "Consumer research — 500+ survey respondents, 78% strong interest" },
-  { date: "Q2 2025", event: "Prototype built, 30+ warm shop relationships in Detroit" },
-  { date: "2025", event: "Launching in Detroit — you're here for the beginning" },
-];
-
-const team = [
-  { name: "Founder & CEO", title: "Leading vision, strategy & fundraising", initials: "FC" },
-  { name: "Co-Founder & CTO", title: "Building the platform & technical architecture", initials: "CT" },
-  { name: "Head of Partnerships", title: "Shop relationships & Detroit market", initials: "HP" },
-];
 
 export default function About() {
   return (
     <main className="pb-[60px] md:pb-0">
+      {/* Hero */}
       <section className="bg-primary text-primary-foreground section-padding">
         <div className="container-wrenchli text-center">
           <SectionReveal>
-            <h1 className="font-heading text-3xl font-extrabold md:text-5xl">About Wrenchli</h1>
-            <p className="mt-4 max-w-2xl mx-auto text-primary-foreground/70 md:text-lg">
+            <h1 className="font-heading text-3xl font-extrabold md:text-5xl lg:text-6xl">About Wrenchli</h1>
+            <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
               We're fixing the broken auto repair experience — starting right here in Detroit.
             </p>
           </SectionReveal>
         </div>
       </section>
 
-      {/* Mission */}
+      {/* Our Story */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
-            <div className="flex items-center gap-2 text-accent mb-4">
-              <MapPin className="h-5 w-5" />
-              <span className="font-heading font-semibold text-sm uppercase tracking-wider">Detroit, Michigan</span>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl">Our Story</h2>
+            <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
+              <p>
+                Wrenchli was born from a simple observation: <strong className="text-foreground">car repair is broken for everyone.</strong>
+              </p>
+              <p>
+                Car owners overpay because they can't compare prices. They accept unnecessary work because they don't know what's really wrong. And they settle for shops they don't trust because they have no better option.
+              </p>
+              <p>
+                On the other side, independent repair shops — the backbone of the industry — lose customers to dealerships and chains with bigger marketing budgets, even when they do better work at lower prices. They run their businesses on paper tickets and phone calls in an age of instant everything.
+              </p>
+              <p>
+                We're building the platform that fixes both sides. Transparent pricing and vetted shops for consumers. Pre-qualified customers and modern tools for shops. And embedded financing so cost never stands between a car owner and the repair they need.
+              </p>
+              <p className="text-foreground font-medium">
+                Based in Detroit — the heart of America's automotive industry — Wrenchli is where technology meets the trades.
+              </p>
             </div>
-            <h2 className="font-heading text-2xl font-bold md:text-3xl">Our Mission</h2>
-            <p className="mt-4 text-muted-foreground leading-relaxed">
-              Two out of three car owners don't trust their mechanic, and prices for the same repair can vary by 300% across shops. That's not a minor inconvenience — it's a systemic problem in a $288 billion industry.
-            </p>
-            <p className="mt-4 text-muted-foreground leading-relaxed">
-              Wrenchli exists to bring transparency, trust, and accessibility to auto repair. We connect car owners with vetted local shops through instant price comparison, honest reviews, and built-in financing for those who need it. For shops, we deliver pre-qualified customers and modern tools to run their business.
-            </p>
           </SectionReveal>
         </div>
       </section>
 
-      {/* Values */}
+      {/* Mission & Vision */}
       <section className="section-padding bg-secondary">
         <div className="container-wrenchli">
-          <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Our Values</h2>
-          </SectionReveal>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {values.map((v, i) => (
-              <SectionReveal key={v.title} delay={i * 150}>
-                <div className="text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10">
-                    <v.icon className="h-7 w-7 text-accent" />
-                  </div>
-                  <h3 className="font-heading text-lg font-semibold">{v.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{v.desc}</p>
+          <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+            <SectionReveal>
+              <div className="rounded-2xl border border-border bg-card p-8 h-full">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
+                  <Target className="h-6 w-6 text-accent" />
                 </div>
-              </SectionReveal>
-            ))}
+                <h3 className="font-heading text-xl font-bold">Our Mission</h3>
+                <p className="mt-3 text-muted-foreground leading-relaxed">
+                  To bring transparency, choice, and accessibility to auto repair — empowering car owners to make informed decisions and independent shops to thrive in a modern marketplace.
+                </p>
+              </div>
+            </SectionReveal>
+            <SectionReveal delay={150}>
+              <div className="rounded-2xl border border-border bg-card p-8 h-full">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-wrenchli-trust-blue/10">
+                  <Eye className="h-6 w-6 text-wrenchli-trust-blue" />
+                </div>
+                <h3 className="font-heading text-xl font-bold">Our Vision</h3>
+                <p className="mt-3 text-muted-foreground leading-relaxed">
+                  A world where getting your car fixed is as simple, transparent, and stress-free as any other service. Where every car owner has access to fair pricing, honest shops, and flexible payment options.
+                </p>
+              </div>
+            </SectionReveal>
           </div>
         </div>
       </section>
 
-      {/* Team */}
+      {/* Leadership Team */}
       <section className="section-padding bg-background">
-        <div className="container-wrenchli">
+        <div className="container-wrenchli max-w-4xl">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">The Team</h2>
-            <p className="mt-3 text-center text-muted-foreground">Building Wrenchli from the ground up.</p>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Leadership</h2>
+            <p className="mt-3 text-center text-muted-foreground md:text-lg">Decades of automotive, finance, and technology experience.</p>
           </SectionReveal>
-          <div className="mt-12 grid gap-8 md:grid-cols-3 max-w-3xl mx-auto">
-            {team.map((t, i) => (
-              <SectionReveal key={t.name} delay={i * 150}>
-                <div className="text-center rounded-xl border border-border bg-card p-6 shadow-sm">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground font-heading font-bold text-lg">
-                    {t.initials}
-                  </div>
-                  <h3 className="font-heading font-semibold">{t.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{t.title}</p>
+
+          <div className="mt-12 grid gap-8 md:grid-cols-2">
+            <SectionReveal>
+              <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+                <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Users className="h-10 w-10" />
                 </div>
-              </SectionReveal>
-            ))}
+                <h3 className="text-center font-heading text-xl font-bold">Gerrod Parchmon</h3>
+                <p className="text-center text-sm font-semibold text-accent mt-1">Founder & CEO</p>
+                <div className="mt-4 space-y-3 text-sm text-muted-foreground leading-relaxed">
+                  <p>
+                    30+ years spanning the full automotive value chain — from the factory floor to the C-suite.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <Building className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
+                      <span><strong className="text-foreground">10 years at Chrysler Manufacturing</strong> — deep understanding of how vehicles are built</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Briefcase className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
+                      <span><strong className="text-foreground">Auto Finance Leadership</strong> — managed $45B+ portfolios at Chrysler Financial, Bank of America, and Huntington</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Award className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
+                      <span><strong className="text-foreground">MD at JPMorgan Chase</strong> — led 300+ person organization in financial services</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground italic">
+                    MS in Management, Strategy & Leadership — Michigan State University
+                  </p>
+                </div>
+              </div>
+            </SectionReveal>
+
+            <SectionReveal delay={150}>
+              <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+                <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Users className="h-10 w-10" />
+                </div>
+                <h3 className="text-center font-heading text-xl font-bold">Jenine Parchmon</h3>
+                <p className="text-center text-sm font-semibold text-accent mt-1">CTO</p>
+                <div className="mt-4 space-y-3 text-sm text-muted-foreground leading-relaxed">
+                  <p>
+                    20+ years leading enterprise technology, digital transformation, and payment systems across automotive and banking.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <Building className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
+                      <span><strong className="text-foreground">15 years at Comerica Bank</strong> — SVP and Domain CIO driving enterprise technology strategy</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Briefcase className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
+                      <span><strong className="text-foreground">6 years at Volkswagen Group / gedas USA</strong> — automotive technology and systems integration</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Award className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
+                      <span><strong className="text-foreground">Expertise:</strong> Enterprise tech, digital transformation, payment systems, and IT governance</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SectionReveal>
           </div>
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="section-padding bg-secondary">
-        <div className="container-wrenchli max-w-2xl">
+      {/* Why Detroit */}
+      <section className="section-padding bg-primary text-primary-foreground">
+        <div className="container-wrenchli max-w-3xl text-center">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Our Journey</h2>
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-1 text-sm font-medium text-accent mb-6">
+              <MapPin className="h-4 w-4" /> Detroit, Michigan
+            </div>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl">Why Detroit?</h2>
+            <p className="mt-5 text-lg text-primary-foreground/70 leading-relaxed">
+              Detroit isn't just where cars are made — it's where car culture <em>lives.</em>
+            </p>
+            <p className="mt-4 text-primary-foreground/60 leading-relaxed">
+              This city built the modern automobile. It knows what it means to reinvent an industry. With one of the highest concentrations of independent repair shops in the country and a community that takes pride in keeping vehicles on the road, Detroit is the perfect proving ground for a platform that's rewriting the rules of auto repair.
+            </p>
+            <p className="mt-4 text-primary-foreground/60 leading-relaxed">
+              We're launching here first because this is home — and because if Wrenchli can work in Detroit, it can work anywhere.
+            </p>
           </SectionReveal>
-          <div className="mt-10 space-y-6">
-            {milestones.map((m, i) => (
-              <SectionReveal key={i} delay={i * 100}>
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10">
-                    <Calendar className="h-4 w-4 text-accent" />
-                  </div>
-                  <div>
-                    <div className="font-heading text-sm font-semibold text-accent">{m.date}</div>
-                    <p className="text-sm text-muted-foreground">{m.event}</p>
-                  </div>
-                </div>
-              </SectionReveal>
-            ))}
-          </div>
         </div>
       </section>
     </main>
