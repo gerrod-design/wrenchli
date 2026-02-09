@@ -60,19 +60,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Trust Statistics */}
-      <section className="bg-primary text-primary-foreground py-16 md:py-20">
-        <div className="container-wrenchli">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <StatCounter end={288} prefix="$" suffix="B" label="U.S. Auto Repair Market" />
-            <StatCounter end={300} suffix="%" label="Price Variation for Same Repair" />
-            <StatCounter end={66} suffix="%" label="of Consumers Distrust Repair Shops" />
-          </div>
-          <p className="mt-8 text-center text-primary-foreground/60 md:text-lg">
-            We're here to change that. Wrenchli brings trust back to auto repair.
-          </p>
-        </div>
-      </section>
 
       {/* How It Works moved above QuickActionBar */}
 

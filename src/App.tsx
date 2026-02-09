@@ -19,6 +19,7 @@ import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Garage from "./pages/Garage";
+import Investors from "./pages/Investors";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ function AnimatedRoutes() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/garage" element={<Garage />} />
+          <Route path="/investors" element={<Investors />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
