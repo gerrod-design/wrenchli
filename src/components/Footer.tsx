@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Wrench, Linkedin } from "lucide-react";
+import { Linkedin } from "lucide-react";
+import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
 const footerLinks = {
   Company: [
@@ -35,7 +36,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="mb-4 flex items-center gap-2 font-heading text-xl font-bold">
-              <Wrench className="h-6 w-6 text-accent" />
+              <img src={wrenchliLogo} alt="Wrenchli logo" className="h-7 w-7 rounded object-contain" />
               Wrenchli
             </Link>
             <p className="mb-5 text-sm leading-relaxed text-primary-foreground/60">
