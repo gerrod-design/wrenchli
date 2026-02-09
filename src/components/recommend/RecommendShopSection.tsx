@@ -21,7 +21,7 @@ export default function RecommendShopSection({ onOpenModal }: RecommendShopSecti
             </p>
           </div>
           <p className="mt-4 text-muted-foreground max-w-[600px] mx-auto leading-relaxed">
-            The best shops don't always have the best marketing. Help us find the hidden gems in your neighborhood. If you have a mechanic you trust — someone who's honest, fair, and does great work — we'd love to know about them.
+            Great mechanics don't always have great marketing. Know a hidden gem? Tell us about the shop you trust.
           </p>
           <Button
             onClick={onOpenModal}
