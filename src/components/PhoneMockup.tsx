@@ -8,6 +8,13 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
+import DeviceFrame from "@/components/walkthrough/DeviceFrame";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  desktopSharedScreens,
+  desktopDiyScreens,
+  desktopShopScreens,
+} from "@/components/walkthrough/desktopScreens";
 
 /* ─── Screen definitions ─── */
 
@@ -489,10 +496,17 @@ export default function PhoneMockup({
   const [phase, setPhase] = useState<Phase>("idle");
   const [screenIndex, setScreenIndex] = useState(0);
 
+  const isMobile = useIsMobile();
+
+  // Select screen sets based on viewport
+  const activeSharedScreens = isMobile ? sharedScreens : desktopSharedScreens;
+  const activeDiyScreens = isMobile ? diyScreens : desktopDiyScreens;
+  const activeShopScreens = isMobile ? shopScreens : desktopShopScreens;
+
   const currentScreens =
     phase === "path" || phase === "done"
-      ? selectedPath === "diy" ? diyScreens : shopScreens
-      : sharedScreens;
+      ? selectedPath === "diy" ? activeDiyScreens : activeShopScreens
+      : activeSharedScreens;
   const currentScreen = currentScreens[screenIndex];
 
   // Auto-continue: 8s countdown when choosing
@@ -500,9 +514,9 @@ export default function PhoneMockup({
     onPathSelect("diy");
     setPhase("path");
     setScreenIndex(0);
-    onStepChange(diyScreens[0].step);
+    onStepChange(activeDiyScreens[0].step);
     onPlayingChange(true);
-  }, [onPathSelect, onStepChange, onPlayingChange]);
+  }, [onPathSelect, onStepChange, onPlayingChange, activeDiyScreens]);
 
   const autoContinue = useAutoContinue(phase === "choosing", 8, handleAutoContinue);
 
@@ -512,16 +526,16 @@ export default function PhoneMockup({
 
     const timer = setTimeout(() => {
       if (phase === "shared") {
-        if (screenIndex < sharedScreens.length - 1) {
+        if (screenIndex < activeSharedScreens.length - 1) {
           const next = screenIndex + 1;
           setScreenIndex(next);
-          onStepChange(sharedScreens[next].step);
+          onStepChange(activeSharedScreens[next].step);
         } else {
           setPhase("choosing");
           onPlayingChange(false);
         }
       } else if (phase === "path") {
-        const pathScreens = selectedPath === "diy" ? diyScreens : shopScreens;
+        const pathScreens = selectedPath === "diy" ? activeDiyScreens : activeShopScreens;
         if (screenIndex < pathScreens.length - 1) {
           const next = screenIndex + 1;
           setScreenIndex(next);
@@ -542,26 +556,26 @@ export default function PhoneMockup({
     onPathSelect(path);
     setPhase("path");
     setScreenIndex(0);
-    const pathScreens = path === "diy" ? diyScreens : shopScreens;
+    const pathScreens = path === "diy" ? activeDiyScreens : activeShopScreens;
     onStepChange(pathScreens[0].step);
     onPlayingChange(true);
-  }, [autoContinue, onPathSelect, onStepChange, onPlayingChange]);
+  }, [autoContinue, onPathSelect, onStepChange, onPlayingChange, activeDiyScreens, activeShopScreens]);
 
   const handlePlay = useCallback(() => {
     autoContinue.reset();
     setPhase("shared");
     setScreenIndex(0);
-    onStepChange(sharedScreens[0].step);
+    onStepChange(activeSharedScreens[0].step);
     onPlayingChange(true);
-  }, [autoContinue, onStepChange, onPlayingChange]);
+  }, [autoContinue, onStepChange, onPlayingChange, activeSharedScreens]);
 
   const handleReplay = useCallback(() => {
     autoContinue.reset();
     setPhase("shared");
     setScreenIndex(0);
-    onStepChange(sharedScreens[0].step);
+    onStepChange(activeSharedScreens[0].step);
     onPlayingChange(true);
-  }, [autoContinue, onStepChange, onPlayingChange]);
+  }, [autoContinue, onStepChange, onPlayingChange, activeSharedScreens]);
 
   const handleWatchOther = useCallback(() => {
     const otherPath = selectedPath === "diy" ? "shop" : "diy";
@@ -572,165 +586,187 @@ export default function PhoneMockup({
   useEffect(() => {
     if (activeStep === null) return;
     if (activeStep <= 2) {
-      const idx = sharedScreens.findIndex((s) => s.step === activeStep);
+      const idx = activeSharedScreens.findIndex((s) => s.step === activeStep);
       if (idx !== -1) {
         setPhase("shared");
         setScreenIndex(idx);
       }
     } else if (selectedPath) {
-      const pathScreens = selectedPath === "diy" ? diyScreens : shopScreens;
+      const pathScreens = selectedPath === "diy" ? activeDiyScreens : activeShopScreens;
       const idx = pathScreens.findIndex((s) => s.step === activeStep);
       if (idx !== -1) {
         setPhase("path");
         setScreenIndex(idx);
       }
     }
-  }, [activeStep]);
+  }, [activeStep, activeSharedScreens, activeDiyScreens, activeShopScreens, selectedPath]);
 
   const renderScreen = () => {
     if (phase === "idle" || phase === "shared" || phase === "choosing") {
-      return sharedScreens[screenIndex]?.render();
+      return activeSharedScreens[screenIndex]?.render();
     }
     if (phase === "path" || phase === "done") {
-      const pathScreens = selectedPath === "diy" ? diyScreens : shopScreens;
+      const pathScreens = selectedPath === "diy" ? activeDiyScreens : activeShopScreens;
       return pathScreens[screenIndex]?.render();
     }
-    return sharedScreens[0]?.render();
+    return activeSharedScreens[0]?.render();
   };
 
   return (
-    <div className="flex items-center justify-center" role="region" aria-label="Interactive branching walkthrough showing how to use Wrenchli">
-      <div className="relative w-[260px] rounded-[32px] border-[3px] border-foreground/20 bg-foreground/5 p-2.5 shadow-xl sm:w-[280px]">
-        {/* Notch */}
-        <div className="absolute left-1/2 top-0 z-10 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-foreground/20" aria-hidden="true" />
+    <div role="region" aria-label="Interactive branching walkthrough showing how to use Wrenchli">
+      <DeviceFrame>
+        <div className="absolute inset-0">{renderScreen()}</div>
 
-        {/* Screen */}
-        <div className="relative aspect-[9/19.5] w-full overflow-hidden rounded-[20px] bg-background">
-          <div className="absolute inset-0">{renderScreen()}</div>
+        {/* Play overlay */}
+        <AnimatePresence>
+          {phase === "idle" && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={handlePlay}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-primary/80"
+              aria-label="Play walkthrough animation"
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg transition-transform hover:scale-110">
+                <ArrowRight className="h-6 w-6 text-primary ml-0.5" />
+              </div>
+              <p className={cn("font-medium text-primary-foreground", isMobile ? "text-[11px]" : "text-sm")}>See the walkthrough</p>
+            </motion.button>
+          )}
+        </AnimatePresence>
 
-          {/* Play overlay */}
-          <AnimatePresence>
-            {phase === "idle" && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                onClick={handlePlay}
-                className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-primary/80"
-                aria-label="Play walkthrough animation"
-              >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg transition-transform hover:scale-110">
-                  <ArrowRight className="h-6 w-6 text-primary ml-0.5" />
-                </div>
-                <p className="text-[11px] font-medium text-primary-foreground">See the walkthrough</p>
-              </motion.button>
-            )}
-          </AnimatePresence>
+        {/* Branch choice overlay */}
+        <AnimatePresence>
+          {phase === "choosing" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center px-3 py-4"
+              style={{ backgroundColor: "rgba(30, 58, 95, 0.92)" }}
+              role="dialog"
+              aria-label="Choose your path"
+            >
+              <p id="branch-question" className={cn(
+                "font-heading font-bold text-white text-center mb-3 leading-tight",
+                isMobile ? "text-[13px]" : "text-lg"
+              )}>
+                Now, how do you want to fix it?
+              </p>
 
-          {/* Branch choice overlay */}
-          <AnimatePresence>
-            {phase === "choosing" && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="absolute inset-0 z-20 flex flex-col items-center justify-center px-3 py-4"
-                style={{ backgroundColor: "rgba(30, 58, 95, 0.92)" }}
-                role="dialog"
-                aria-label="Choose your path"
-              >
-                <p id="branch-question" className="font-heading text-[13px] font-bold text-white text-center mb-3 leading-tight">
-                  Now, how do you want to fix it?
-                </p>
-
-                <div className="flex flex-col gap-2 w-full max-w-[220px]" role="group" aria-labelledby="branch-question">
-                  <button
-                    onClick={() => handlePathSelect("diy")}
-                    className="rounded-xl p-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg border-2 border-wrenchli-teal"
-                    style={{ backgroundColor: "rgba(22, 160, 133, 0.2)" }}
-                    aria-label="Watch the DIY path — fix it yourself with video guides and parts links. About 35 seconds."
-                  >
-                    <p className="text-lg mb-1">🔧</p>
-                    <p className="text-[10px] font-bold text-white mb-0.5">WATCH THE DIY PATH</p>
-                    <p className="text-[8px] text-white/80 leading-snug">Fix it yourself with video guides and parts links</p>
-                    <p className="text-[7px] text-white/50 mt-1">~35 seconds</p>
-                  </button>
-
-                  <button
-                    onClick={() => handlePathSelect("shop")}
-                    className="rounded-xl p-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg border-2 border-accent"
-                    style={{ backgroundColor: "rgba(230, 126, 34, 0.2)" }}
-                    aria-label="Watch the shop path — get quotes from trusted local shops with financing. About 35 seconds."
-                  >
-                    <p className="text-lg mb-1">👨‍🔧</p>
-                    <p className="text-[10px] font-bold text-white mb-0.5">WATCH THE SHOP PATH</p>
-                    <p className="text-[8px] text-white/80 leading-snug">Get quotes from trusted local shops with financing</p>
-                    <p className="text-[7px] text-white/50 mt-1">~35 seconds</p>
-                  </button>
-                </div>
-
-                <p className="text-[8px] text-white/60 mt-2 text-center">Or watch both — start with either.</p>
-
-                {/* Auto-continue countdown */}
-                {!autoContinue.cancelled && (
-                  <p className="text-[8px] text-white/40 mt-2">
-                    Auto-playing DIY path in {autoContinue.countdown}…{" "}
-                    <button
-                      onClick={autoContinue.cancel}
-                      className="text-white/70 underline hover:text-white"
-                    >
-                      Cancel
-                    </button>
-                  </p>
+              <div
+                className={cn(
+                  "gap-3 w-full",
+                  isMobile ? "flex flex-col max-w-[220px]" : "grid grid-cols-2 max-w-md"
                 )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Completion overlay */}
-          <AnimatePresence>
-            {phase === "done" && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute inset-0 z-20 flex flex-col items-center justify-center px-4 py-4 gap-3"
-                style={{ backgroundColor: "rgba(30, 58, 95, 0.92)" }}
+                role="group"
+                aria-labelledby="branch-question"
               >
-                <p className="font-heading text-[13px] font-bold text-white text-center">
-                  Ready to try it yourself?
+                <button
+                  onClick={() => handlePathSelect("diy")}
+                  className={cn(
+                    "rounded-xl text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg border-2 border-wrenchli-teal",
+                    isMobile ? "p-3" : "p-5"
+                  )}
+                  style={{ backgroundColor: "rgba(22, 160, 133, 0.2)" }}
+                  aria-label="Watch the DIY path"
+                >
+                  <p className={cn(isMobile ? "text-lg mb-1" : "text-2xl mb-2")}>🔧</p>
+                  <p className={cn("font-bold text-white", isMobile ? "text-[10px] mb-0.5" : "text-sm mb-1")}>WATCH THE DIY PATH</p>
+                  <p className={cn("text-white/80 leading-snug", isMobile ? "text-[8px]" : "text-xs")}>Fix it yourself with video guides and parts links</p>
+                  <p className={cn("text-white/50 mt-1", isMobile ? "text-[7px]" : "text-[10px]")}>~35 seconds</p>
+                </button>
+
+                <button
+                  onClick={() => handlePathSelect("shop")}
+                  className={cn(
+                    "rounded-xl text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg border-2 border-accent",
+                    isMobile ? "p-3" : "p-5"
+                  )}
+                  style={{ backgroundColor: "rgba(230, 126, 34, 0.2)" }}
+                  aria-label="Watch the shop path"
+                >
+                  <p className={cn(isMobile ? "text-lg mb-1" : "text-2xl mb-2")}>👨‍🔧</p>
+                  <p className={cn("font-bold text-white", isMobile ? "text-[10px] mb-0.5" : "text-sm mb-1")}>WATCH THE SHOP PATH</p>
+                  <p className={cn("text-white/80 leading-snug", isMobile ? "text-[8px]" : "text-xs")}>Get quotes from trusted local shops with financing</p>
+                  <p className={cn("text-white/50 mt-1", isMobile ? "text-[7px]" : "text-[10px]")}>~35 seconds</p>
+                </button>
+              </div>
+
+              <p className={cn("text-white/60 mt-2 text-center", isMobile ? "text-[8px]" : "text-xs")}>Or watch both — start with either.</p>
+
+              {/* Auto-continue countdown */}
+              {!autoContinue.cancelled && (
+                <p className={cn("text-white/40 mt-2", isMobile ? "text-[8px]" : "text-xs")}>
+                  Auto-playing DIY path in {autoContinue.countdown}…{" "}
+                  <button
+                    onClick={autoContinue.cancel}
+                    className="text-white/70 underline hover:text-white"
+                  >
+                    Cancel
+                  </button>
                 </p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-                <Link
-                  to="/vehicle-insights"
-                  className="rounded-lg bg-accent px-4 py-2 text-[10px] font-bold text-accent-foreground hover:bg-accent/90 transition-colors"
-                >
-                  Get Your Free Diagnosis
-                </Link>
+        {/* Completion overlay */}
+        <AnimatePresence>
+          {phase === "done" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center px-4 py-4 gap-3"
+              style={{ backgroundColor: "rgba(30, 58, 95, 0.92)" }}
+            >
+              <p className={cn(
+                "font-heading font-bold text-white text-center",
+                isMobile ? "text-[13px]" : "text-lg"
+              )}>
+                Ready to try it yourself?
+              </p>
 
-                <button
-                  onClick={handleWatchOther}
-                  className="flex items-center gap-1 text-[9px] text-white/70 hover:text-white transition-colors"
-                >
-                  <Play className="h-3 w-3" />
-                  Watch the {selectedPath === "diy" ? "Shop" : "DIY"} path instead
-                </button>
+              <Link
+                to="/vehicle-insights"
+                className={cn(
+                  "rounded-lg bg-accent font-bold text-accent-foreground hover:bg-accent/90 transition-colors",
+                  isMobile ? "px-4 py-2 text-[10px]" : "px-6 py-3 text-sm"
+                )}
+              >
+                Get Your Free Diagnosis
+              </Link>
 
-                <button
-                  onClick={handleReplay}
-                  className="flex items-center gap-1 text-[9px] text-white/50 hover:text-white/80 transition-colors"
-                >
-                  <RotateCcw className="h-3 w-3" />
-                  Replay from the beginning
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
+              <button
+                onClick={handleWatchOther}
+                className={cn(
+                  "flex items-center gap-1 text-white/70 hover:text-white transition-colors",
+                  isMobile ? "text-[9px]" : "text-xs"
+                )}
+              >
+                <Play className="h-3 w-3" />
+                Watch the {selectedPath === "diy" ? "Shop" : "DIY"} path instead
+              </button>
+
+              <button
+                onClick={handleReplay}
+                className={cn(
+                  "flex items-center gap-1 text-white/50 hover:text-white/80 transition-colors",
+                  isMobile ? "text-[9px]" : "text-xs"
+                )}
+              >
+                <RotateCcw className="h-3 w-3" />
+                Replay from the beginning
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </DeviceFrame>
     </div>
   );
 }
