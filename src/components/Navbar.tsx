@@ -103,6 +103,18 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg">
+      {/* Trust bar */}
+      <div className="hidden border-b border-primary-foreground/10 bg-primary/90 lg:block">
+        <div className="container-wrenchli flex h-8 items-center justify-center gap-6 text-xs text-primary-foreground/60">
+          <span>Free diagnosis</span>
+          <span className="text-primary-foreground/20">•</span>
+          <span>DIY tutorials</span>
+          <span className="text-primary-foreground/20">•</span>
+          <span>Shop quotes</span>
+          <span className="text-primary-foreground/20">•</span>
+          <span>No account required</span>
+        </div>
+      </div>
       <div className="container-wrenchli flex h-16 items-center justify-between md:h-[68px]">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold">
@@ -209,6 +221,14 @@ export default function Navbar() {
               )}
               {vehicles.length > 0 && <GarageBadge />}
             </Link>
+          </div>
+
+          {/* Trust items */}
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-primary-foreground/50">
+            <span>✓ Free diagnosis</span>
+            <span>✓ DIY tutorials</span>
+            <span>✓ Shop quotes</span>
+            <span>✓ No account required</span>
           </div>
 
           <div className="mt-6 flex flex-col gap-3">

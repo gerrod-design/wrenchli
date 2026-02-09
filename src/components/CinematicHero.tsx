@@ -140,16 +140,6 @@ export default function CinematicHero() {
           </Button>
         </motion.div>
 
-        {/* Trust text */}
-        <motion.p
-          {...fadeUp(2.0)}
-          className="mt-5 text-sm text-white/60 tracking-wide"
-        >
-          Free diagnosis{" "}
-          <span className="mx-1.5 text-white/30">•</span> DIY tutorials{" "}
-          <span className="mx-1.5 text-white/30">•</span> Shop quotes{" "}
-          <span className="mx-1.5 text-white/30">•</span> No account required
-        </motion.p>
 
         {/* Watch Our Story */}
         <motion.button

@@ -35,11 +35,6 @@ export default function Index() {
       <CinematicHero />
 
       <QuickActionBar />
-      <div className="text-center mt-4 mb-2">
-        <p className="text-sm text-muted-foreground">
-          Free diagnosis • DIY tutorials • Shop quotes • No account required
-        </p>
-      </div>
 
       {/* Value Proposition Cards */}
       <section className="section-padding bg-background">
