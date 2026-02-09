@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SEO from "@/components/SEO";
 import heroShops from "@/assets/hero-shops.jpg";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Store, ArrowRight, TrendingUp, DollarSign, Wrench, Star,
   CreditCard, BarChart3, Users, CheckCircle, Shield, Calendar,
@@ -84,10 +85,24 @@ export default function ForShops() {
     e.preventDefault();
     if (!form.email || !form.shopName) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    toast({ title: "Application received! 🔧", description: "We'll reach out about partnership opportunities soon." });
-    setForm({ shopName: "", ownerName: "", email: "", phone: "", location: "", bays: "", message: "" });
-    setLoading(false);
+    try {
+      const { error } = await supabase.from("shop_applications").insert({
+        shop_name: form.shopName,
+        owner_name: form.ownerName || null,
+        email: form.email,
+        phone: form.phone || null,
+        city: form.location || null,
+        state: null,
+        message: form.message || null,
+      });
+      if (error) throw error;
+      toast({ title: "Application received! 🔧", description: "We'll reach out about partnership opportunities soon." });
+      setForm({ shopName: "", ownerName: "", email: "", phone: "", location: "", bays: "", message: "" });
+    } catch {
+      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

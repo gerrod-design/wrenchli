@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface WaitlistFormProps {
   userType?: "consumer" | "shop";
@@ -19,16 +20,17 @@ export default function WaitlistForm({ userType = "consumer", source = "home", c
     if (!email) return;
 
     setLoading(true);
-    // TODO: Connect to Supabase when Cloud is enabled
-    // For now, simulate success
-    await new Promise((r) => setTimeout(r, 800));
-    toast({
-      title: "You're on the list! 🎉",
-      description: "We'll notify you when Wrenchli launches in Detroit.",
-    });
-    setEmail("");
-    setName("");
-    setLoading(false);
+    try {
+      const { error } = await supabase.from("waitlist_signups").insert({ email, name: name || null });
+      if (error) throw error;
+      toast({ title: "You're on the list! 🎉", description: "We'll notify you when Wrenchli launches in Detroit." });
+      setEmail("");
+      setName("");
+    } catch {
+      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

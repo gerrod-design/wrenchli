@@ -5,6 +5,7 @@ import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const bayOptions = ["1-3 bays", "4-6 bays", "7-10 bays", "10+ bays"];
 
@@ -18,20 +19,45 @@ export default function Contact() {
     e.preventDefault();
     if (!consumerForm.email || !consumerForm.message) return;
     setLoadingConsumer(true);
-    await new Promise((r) => setTimeout(r, 800));
-    toast({ title: "Message sent! ✉️", description: "We'll get back to you as soon as possible." });
-    setConsumerForm({ name: "", email: "", phone: "", message: "" });
-    setLoadingConsumer(false);
+    try {
+      const { error } = await supabase.from("contact_submissions").insert({
+        name: consumerForm.name || null,
+        email: consumerForm.email,
+        phone: consumerForm.phone || null,
+        message: consumerForm.message,
+      });
+      if (error) throw error;
+      toast({ title: "Message sent! ✉️", description: "We'll get back to you as soon as possible." });
+      setConsumerForm({ name: "", email: "", phone: "", message: "" });
+    } catch {
+      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setLoadingConsumer(false);
+    }
   };
 
   const submitShop = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!shopForm.email || !shopForm.shopName) return;
     setLoadingShop(true);
-    await new Promise((r) => setTimeout(r, 800));
-    toast({ title: "Request received! 🔧", description: "Our partnerships team will be in touch soon." });
-    setShopForm({ shopName: "", name: "", email: "", phone: "", city: "", bays: "", message: "" });
-    setLoadingShop(false);
+    try {
+      const { error } = await supabase.from("shop_applications").insert({
+        shop_name: shopForm.shopName,
+        owner_name: shopForm.name || null,
+        email: shopForm.email,
+        phone: shopForm.phone || null,
+        city: shopForm.city || null,
+        state: null,
+        message: shopForm.message || null,
+      });
+      if (error) throw error;
+      toast({ title: "Request received! 🔧", description: "Our partnerships team will be in touch soon." });
+      setShopForm({ shopName: "", name: "", email: "", phone: "", city: "", bays: "", message: "" });
+    } catch {
+      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setLoadingShop(false);
+    }
   };
 
   return (
