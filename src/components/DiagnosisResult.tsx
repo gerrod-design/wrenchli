@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
-import { Cpu, AlertCircle, Zap, Wrench } from "lucide-react";
+import { Cpu, AlertCircle } from "lucide-react";
+import EkgLoader from "./diagnosis/EkgLoader";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DisclaimerBanner from "./diagnosis/DisclaimerBanner";
@@ -154,12 +155,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
         {/* Branded loading state */}
         {isLoading && (
           <div className="mt-8 flex flex-col items-center gap-4 py-8">
-            <div className="relative">
-              <div className="h-14 w-14 rounded-full border-2 border-wrenchli-teal/20 flex items-center justify-center">
-                <Wrench className="h-7 w-7 text-wrenchli-teal animate-spin" style={{ animationDuration: "2s" }} />
-              </div>
-              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-wrenchli-teal animate-spin" />
-            </div>
+            <EkgLoader />
             <p className="text-sm font-medium text-foreground">
               {codes ? `Looking up ${codes}...` : "Analyzing your vehicle issue..."}
             </p>
