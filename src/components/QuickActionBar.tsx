@@ -1,17 +1,44 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { parseDtcCodes, getDtcDescription } from "@/data/dtcCodes";
 import VehicleIdentifier, { type VehicleData } from "@/components/vehicle/VehicleIdentifier";
+import { useGarage } from "@/hooks/useGarage";
+import VehicleSilhouette, { mapBodyClass, DEFAULT_COLOR } from "@/components/vehicle/VehicleSilhouette";
 
 export default function QuickActionBar() {
   const navigate = useNavigate();
   const [issueText, setIssueText] = useState("");
   const [vehicle, setVehicle] = useState<VehicleData | null>(null);
   const [validationError, setValidationError] = useState("");
+  const [garagePreFilled, setGaragePreFilled] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  const { getActiveVehicle, updateLastUsed } = useGarage();
+  const activeGarageVehicle = getActiveVehicle();
+
+  // Pre-fill from garage on mount
+  useEffect(() => {
+    if (activeGarageVehicle && !vehicle && !dismissed) {
+      const data: VehicleData = {
+        year: activeGarageVehicle.year,
+        make: activeGarageVehicle.make,
+        model: activeGarageVehicle.model,
+        trim: activeGarageVehicle.trim,
+        engine: activeGarageVehicle.engine,
+        transmission: activeGarageVehicle.transmission,
+        driveType: activeGarageVehicle.driveType,
+        fuelType: activeGarageVehicle.fuelType,
+      };
+      setVehicle(data);
+      setGaragePreFilled(true);
+      updateLastUsed(activeGarageVehicle.garageId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const detectedCodes = useMemo(() => parseDtcCodes(issueText), [issueText]);
 
@@ -27,7 +54,14 @@ export default function QuickActionBar() {
   const handleVehicleChange = useCallback((data: VehicleData | null) => {
     setVehicle(data);
     setValidationError("");
+    if (data) setGaragePreFilled(false);
   }, []);
+
+  const handleDismissGarage = () => {
+    setGaragePreFilled(false);
+    setDismissed(true);
+    setVehicle(null);
+  };
 
   const handleSubmit = () => {
     if (!vehicle?.year || !vehicle?.make || !vehicle?.model) {
@@ -58,6 +92,34 @@ export default function QuickActionBar() {
     <section id="quote" className="relative -mt-8 z-10">
       <div className="container-wrenchli">
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xl md:p-8 space-y-4">
+
+          {/* Welcome back bar when pre-filled from garage */}
+          {garagePreFilled && activeGarageVehicle && (
+            <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 flex items-center gap-3">
+              <VehicleSilhouette
+                bodyType={activeGarageVehicle.bodyType || mapBodyClass("")}
+                color={activeGarageVehicle.color || DEFAULT_COLOR.hex}
+                className="w-16 h-8 shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">
+                  Welcome back! Using: <span className="text-accent">{activeGarageVehicle.nickname}</span>
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {activeGarageVehicle.year} {activeGarageVehicle.make} {activeGarageVehicle.model}
+                  {activeGarageVehicle.trim ? ` ${activeGarageVehicle.trim}` : ""}
+                </p>
+              </div>
+              <button
+                onClick={handleDismissGarage}
+                className="text-xs text-muted-foreground hover:text-foreground shrink-0 p-1"
+                aria-label="Choose a different vehicle"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
           {/* Issue description */}
           <Input
             placeholder="Describe your issue or enter a code..."
@@ -86,8 +148,10 @@ export default function QuickActionBar() {
             </div>
           )}
 
-          {/* Vehicle identifier */}
-          <VehicleIdentifier onVehicleChange={handleVehicleChange} />
+          {/* Vehicle identifier — hidden when pre-filled from garage */}
+          {!garagePreFilled && (
+            <VehicleIdentifier onVehicleChange={handleVehicleChange} />
+          )}
 
           {/* Submit */}
           <Button
