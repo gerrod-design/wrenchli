@@ -193,7 +193,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
 
           {diagnosis.diy_feasibility === "moderate" && (
             <p className="text-xs text-muted-foreground mb-4 italic">
-              Not comfortable? That's okay — <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&vehicle=${encodeURIComponent(vehicle)}`} className="text-wrenchli-teal font-semibold hover:underline">get a professional quote instead →</Link>
+              Not comfortable? That's okay — <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&code=${encodeURIComponent(diagnosis.code || "")}&vehicle=${encodeURIComponent(vehicle)}&urgency=${diagnosis.urgency}&diy=${diagnosis.diy_feasibility}`} className="text-wrenchli-teal font-semibold hover:underline">get a professional quote instead →</Link>
             </p>
           )}
 
@@ -296,7 +296,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             className="w-full text-xs bg-accent text-accent-foreground hover:bg-accent/90 font-semibold mt-auto"
             asChild
           >
-            <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&vehicle=${encodeURIComponent(vehicle)}`}>
+            <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&code=${encodeURIComponent(diagnosis.code || "")}&vehicle=${encodeURIComponent(vehicle)}&urgency=${diagnosis.urgency}&diy=${diagnosis.diy_feasibility}`}>
               <Wrench className="mr-1.5 h-3.5 w-3.5" /> Get Shop Quotes <ArrowRight className="ml-1.5 h-3 w-3" />
             </Link>
           </Button>
