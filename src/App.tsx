@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Garage from "./pages/Garage";
 import Investors from "./pages/Investors";
+import GetQuote from "./pages/GetQuote";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ function AnimatedRoutes() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/garage" element={<Garage />} />
           <Route path="/investors" element={<Investors />} />
+          <Route path="/get-quote" element={<GetQuote />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>

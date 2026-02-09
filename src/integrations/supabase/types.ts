@@ -41,6 +41,81 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_requests: {
+        Row: {
+          cost_estimate_details: Json | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          customer_notes: string | null
+          customer_phone: string | null
+          diagnosis_code: string | null
+          diagnosis_diy_feasibility: string | null
+          diagnosis_title: string
+          diagnosis_urgency: string | null
+          estimated_cost_high: number | null
+          estimated_cost_low: number | null
+          id: string
+          metro_area: string | null
+          referral_requested_at: string | null
+          status: string
+          updated_at: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_trim: string | null
+          vehicle_year: string | null
+          zip_code: string
+        }
+        Insert: {
+          cost_estimate_details?: Json | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_notes?: string | null
+          customer_phone?: string | null
+          diagnosis_code?: string | null
+          diagnosis_diy_feasibility?: string | null
+          diagnosis_title: string
+          diagnosis_urgency?: string | null
+          estimated_cost_high?: number | null
+          estimated_cost_low?: number | null
+          id?: string
+          metro_area?: string | null
+          referral_requested_at?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_trim?: string | null
+          vehicle_year?: string | null
+          zip_code: string
+        }
+        Update: {
+          cost_estimate_details?: Json | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_notes?: string | null
+          customer_phone?: string | null
+          diagnosis_code?: string | null
+          diagnosis_diy_feasibility?: string | null
+          diagnosis_title?: string
+          diagnosis_urgency?: string | null
+          estimated_cost_high?: number | null
+          estimated_cost_low?: number | null
+          id?: string
+          metro_area?: string | null
+          referral_requested_at?: string | null
+          status?: string
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_trim?: string | null
+          vehicle_year?: string | null
+          zip_code?: string
+        }
+        Relationships: []
+      }
       shop_applications: {
         Row: {
           city: string | null

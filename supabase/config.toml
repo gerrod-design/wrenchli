@@ -2,3 +2,9 @@ project_id = "etytcjxqqjzpalehqoib"
 
 [functions.chat]
 verify_jwt = false
+
+[functions.diagnose]
+verify_jwt = false
+
+[functions.estimate-repair]
+verify_jwt = false
