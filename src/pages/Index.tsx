@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
+import WaitlistForm from "@/components/WaitlistForm";
 
 const valueProps = [
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
@@ -139,7 +140,26 @@ export default function Index() {
 
       <TestimonialsCarousel />
 
-      {/* Final CTA */}
+      {/* Waitlist Signup */}
+      <section className="section-padding bg-secondary">
+        <div className="container-wrenchli max-w-2xl text-center">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl">
+              Be the First to Know
+            </h2>
+            <p className="mt-3 text-muted-foreground leading-relaxed">
+              Wrenchli is launching in Detroit soon. Join the early access list and get notified when we go live — plus exclusive launch-day pricing.
+            </p>
+            <div className="mt-8">
+              <WaitlistForm source="home-waitlist" />
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              No spam, ever. Unsubscribe anytime.
+            </p>
+          </SectionReveal>
+        </div>
+      </section>
+
       <section className="section-padding bg-primary text-primary-foreground">
         <div className="container-wrenchli text-center">
           <SectionReveal>
