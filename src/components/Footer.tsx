@@ -8,6 +8,7 @@ const footerLinks = {
   Company: [
     { label: "About Us", to: "/about" },
     { label: "Leadership", to: "/about#leadership" },
+    { label: "Investors", to: "/investors" },
     { label: "Careers", to: "/about", badge: "Coming Soon" },
     { label: "Contact", to: "/contact" },
   ],
