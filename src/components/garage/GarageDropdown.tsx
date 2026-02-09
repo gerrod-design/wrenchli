@@ -4,13 +4,15 @@ import { Car, Plus } from "lucide-react";
 import { useGarage } from "@/hooks/useGarage";
 import GarageBadge from "@/components/vehicle/GarageBadge";
 import GarageVehicleCard from "./GarageVehicleCard";
+import GaragePrivacyNotice from "./GaragePrivacyNotice";
+import GarageClearDialog from "./GarageClearDialog";
+import GarageSyncTeaser from "./GarageSyncTeaser";
 
 export default function GarageDropdown() {
-  const { vehicles, removeVehicle, updateNickname } = useGarage();
+  const { vehicles, removeVehicle, updateNickname, clearAll } = useGarage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -67,7 +69,7 @@ export default function GarageDropdown() {
             </div>
           )}
 
-          {vehicles.length < 5 && (
+          {!isEmpty && vehicles.length < 5 && (
             <div className="border-t border-border px-4 py-3">
               <Link
                 to="/vehicle-insights"
@@ -79,13 +81,17 @@ export default function GarageDropdown() {
             </div>
           )}
 
-          <div className="border-t border-border px-4 py-3 bg-muted/50">
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Vehicles saved in this browser.{" "}
-              <span className="text-muted-foreground/60">
-                Account sync coming soon.
-              </span>
-            </p>
+          {/* Account sync teaser */}
+          {!isEmpty && (
+            <div className="border-t border-border px-4 py-3">
+              <GarageSyncTeaser />
+            </div>
+          )}
+
+          {/* Privacy + Clear */}
+          <div className="border-t border-border px-4 py-3 bg-muted/50 space-y-2">
+            <GaragePrivacyNotice />
+            {!isEmpty && <GarageClearDialog onClear={clearAll} />}
           </div>
         </div>
       )}

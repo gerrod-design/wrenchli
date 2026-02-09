@@ -1,7 +1,8 @@
-import { useState, useCallback, useSyncExternalStore } from "react";
+import { useState, useCallback, useSyncExternalStore, useEffect } from "react";
 
 // ─── Types ──────────────────────────────────────────────────────
 export interface DiagnosticHistoryEntry {
+  id: string;
   date: string;
   type: "code" | "symptom";
   input: string;
@@ -28,6 +29,7 @@ export interface GarageVehicle {
 // ─── Constants ──────────────────────────────────────────────────
 const STORAGE_KEY = "wrenchli_garage";
 const MAX_VEHICLES = 5;
+const MAX_HISTORY = 20;
 const DISMISSED_KEY = "wrenchli_garage_dismissed"; // sessionStorage
 
 // ─── Helpers ────────────────────────────────────────────────────
@@ -35,7 +37,8 @@ function readGarage(): GarageVehicle[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch {
+  } catch (e) {
+    console.error("Error reading garage:", e);
     return [];
   }
 }
@@ -69,6 +72,27 @@ function getSnapshot() {
   return snapshot;
 }
 
+// Listen for storage events from other tabs
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === STORAGE_KEY) {
+      notifyListeners();
+    }
+  });
+}
+
+// ─── Incognito detection ────────────────────────────────────────
+export function isIncognito(): boolean {
+  try {
+    localStorage.setItem("__wrenchli_test", "1");
+    localStorage.removeItem("__wrenchli_test");
+    // Can't truly detect incognito in modern browsers, but we check if storage persists
+    return false;
+  } catch {
+    return true;
+  }
+}
+
 // ─── Hook ───────────────────────────────────────────────────────
 export function useGarage() {
   const vehicles = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
@@ -78,9 +102,11 @@ export function useGarage() {
       const current = readGarage();
       if (current.length >= MAX_VEHICLES) return false;
 
-      // Dedupe by year+make+model+vin
+      // Dedupe by VIN or year+make+model+trim
       const exists = current.some(
-        (g) => g.year === v.year && g.make === v.make && g.model === v.model && (v.vin ? g.vin === v.vin : true)
+        (g) =>
+          (v.vin && g.vin === v.vin) ||
+          (g.year === v.year && g.make === v.make && g.model === v.model && g.trim === v.trim)
       );
       if (exists) return false;
 
@@ -112,6 +138,10 @@ export function useGarage() {
     writeGarage(current.filter((v) => v.garageId !== garageId));
   }, []);
 
+  const clearAll = useCallback(() => {
+    writeGarage([]);
+  }, []);
+
   const updateLastUsed = useCallback((garageId: string) => {
     const current = readGarage();
     writeGarage(
@@ -124,20 +154,62 @@ export function useGarage() {
     writeGarage(current.map((v) => (v.garageId === garageId ? { ...v, nickname } : v)));
   }, []);
 
+  const addDiagnosticEntry = useCallback(
+    (garageId: string, entry: Omit<DiagnosticHistoryEntry, "id" | "date">) => {
+      const current = readGarage();
+      const vehicle = current.find((v) => v.garageId === garageId);
+      if (!vehicle) return;
+
+      const newEntry: DiagnosticHistoryEntry = {
+        id: `diag_${Date.now()}`,
+        date: new Date().toISOString(),
+        ...entry,
+      };
+
+      if (!vehicle.diagnosticHistory) vehicle.diagnosticHistory = [];
+      vehicle.diagnosticHistory.unshift(newEntry);
+      vehicle.diagnosticHistory = vehicle.diagnosticHistory.slice(0, MAX_HISTORY);
+      vehicle.lastUsed = new Date().toISOString();
+
+      writeGarage(current);
+    },
+    []
+  );
+
   const findVehicle = useCallback(
     (year: string, make: string, model: string, vin?: string) => {
-      return vehicles.find(
-        (g) => g.year === year && g.make === model && g.model === model && (vin ? g.vin === vin : true)
-      ) || vehicles.find(
-        (g) => g.year === year && g.make === make && g.model === model
+      return (
+        vehicles.find(
+          (g) => vin && g.vin === vin
+        ) ||
+        vehicles.find(
+          (g) => g.year === year && g.make === make && g.model === model
+        )
       );
     },
     [vehicles]
   );
 
+  /** Get most recently used vehicle */
+  const getActiveVehicle = useCallback(() => {
+    if (vehicles.length === 0) return null;
+    return [...vehicles].sort((a, b) => new Date(b.lastUsed).getTime() - new Date(a.lastUsed).getTime())[0];
+  }, [vehicles]);
+
   const isFull = vehicles.length >= MAX_VEHICLES;
 
-  return { vehicles, addVehicle, removeVehicle, updateLastUsed, updateNickname, findVehicle, isFull } as const;
+  return {
+    vehicles,
+    addVehicle,
+    removeVehicle,
+    clearAll,
+    updateLastUsed,
+    updateNickname,
+    addDiagnosticEntry,
+    findVehicle,
+    getActiveVehicle,
+    isFull,
+  } as const;
 }
 
 // ─── Session dismissal helpers ──────────────────────────────────
