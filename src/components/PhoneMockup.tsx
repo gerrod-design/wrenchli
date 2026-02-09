@@ -22,7 +22,7 @@ import {
 const sharedScreens = [
   {
     step: 1,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -49,7 +49,7 @@ const sharedScreens = [
   },
   {
     step: 1,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -73,7 +73,7 @@ const sharedScreens = [
   },
   {
     step: 2,
-    duration: 1500,
+    duration: 2500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -96,7 +96,7 @@ const sharedScreens = [
   },
   {
     step: 2,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -133,7 +133,7 @@ const sharedScreens = [
   },
   {
     step: 2,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -162,7 +162,7 @@ const sharedScreens = [
 const diyScreens = [
   {
     step: 3,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -187,7 +187,7 @@ const diyScreens = [
   },
   {
     step: 4,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -220,7 +220,7 @@ const diyScreens = [
   },
   {
     step: 5,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -248,7 +248,7 @@ const diyScreens = [
   },
   {
     step: 5,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -278,7 +278,7 @@ const diyScreens = [
 const shopScreens = [
   {
     step: 3,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -307,7 +307,7 @@ const shopScreens = [
   },
   {
     step: 3,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -344,7 +344,7 @@ const shopScreens = [
   },
   {
     step: 4,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
@@ -386,7 +386,7 @@ const shopScreens = [
   },
   {
     step: 5,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">

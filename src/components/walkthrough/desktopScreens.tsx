@@ -11,7 +11,7 @@ import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 export const desktopSharedScreens = [
   {
     step: 1,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -44,7 +44,7 @@ export const desktopSharedScreens = [
   },
   {
     step: 1,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -68,7 +68,7 @@ export const desktopSharedScreens = [
   },
   {
     step: 2,
-    duration: 1500,
+    duration: 2500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -91,7 +91,7 @@ export const desktopSharedScreens = [
   },
   {
     step: 2,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -128,7 +128,7 @@ export const desktopSharedScreens = [
   },
   {
     step: 2,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -160,7 +160,7 @@ export const desktopSharedScreens = [
 export const desktopDiyScreens = [
   {
     step: 3,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -185,7 +185,7 @@ export const desktopDiyScreens = [
   },
   {
     step: 4,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -220,7 +220,7 @@ export const desktopDiyScreens = [
   },
   {
     step: 5,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -248,7 +248,7 @@ export const desktopDiyScreens = [
   },
   {
     step: 5,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -282,7 +282,7 @@ export const desktopShopScreens = [
   /* ZIP Code Entry */
   {
     step: 3,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -315,7 +315,7 @@ export const desktopShopScreens = [
   /* AI Cost Estimate Results */
   {
     step: 3,
-    duration: 2500,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -362,7 +362,7 @@ export const desktopShopScreens = [
   /* Repair vs. Replace Comparison */
   {
     step: 4,
-    duration: 2500,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -411,7 +411,7 @@ export const desktopShopScreens = [
   /* Shop Referral Form */
   {
     step: 4,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -437,7 +437,7 @@ export const desktopShopScreens = [
   /* Confirmation */
   {
     step: 5,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
@@ -465,7 +465,7 @@ export const desktopShopScreens = [
   /* Garage with status */
   {
     step: 5,
-    duration: 2000,
+    duration: 3500,
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
