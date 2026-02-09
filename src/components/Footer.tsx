@@ -30,7 +30,7 @@ const footerLinks = {
 export default function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground">
-      <div className="container-wrenchli py-12 md:py-16">
+      <div className="container-wrenchli py-12 pb-24 md:py-16 md:pb-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div className="lg:col-span-1">
