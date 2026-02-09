@@ -75,7 +75,7 @@ export default function Index() {
             <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
               <Link to="/#quote">Get Your Free Quote</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="h-14 px-10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold text-lg">
+            <Button asChild size="lg" variant="outline" className="h-14 px-10 bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold text-lg">
               <Link to="/for-shops#apply">Join as a Partner Shop</Link>
             </Button>
           </div>
@@ -333,7 +333,7 @@ export default function Index() {
               <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
                 <Link to="/#quote">Get Your Free Quote</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-14 px-10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold text-lg">
+              <Button asChild size="lg" variant="outline" className="h-14 px-10 bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground font-semibold text-lg">
                 <Link to="/for-shops#apply">Become a Partner Shop</Link>
               </Button>
             </div>
