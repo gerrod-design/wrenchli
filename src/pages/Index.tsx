@@ -5,12 +5,12 @@ import {
   ShieldCheck, Zap, CreditCard,
   Car, Store, ArrowRight,
   Smartphone, MessageCircle,
-  Search, ClipboardList, GitFork, Wrench, CheckCircle
 } from "lucide-react";
 import StatCounter from "@/components/StatCounter";
 import SectionReveal from "@/components/SectionReveal";
 import QuickActionBar from "@/components/QuickActionBar";
 import CinematicHero from "@/components/CinematicHero";
+import HowItWorksVideo from "@/components/HowItWorksVideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -20,13 +20,6 @@ const valueProps = [
   { icon: CreditCard, title: "Flexible Financing", desc: "Payment plans that fit your budget. All credit types welcome." },
 ];
 
-const howItWorks = [
-  { step: 1, icon: Search, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner" },
-  { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and what it might cost" },
-  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Watch a DIY tutorial and order parts, or get quotes from vetted local shops" },
-  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing" },
-  { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control" },
-];
 
 export default function Index() {
   const [dtcCode, setDtcCode] = useState("");
@@ -81,54 +74,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* How It Works — 5 steps */}
-      <section className="section-padding bg-background">
-        <div className="container-wrenchli">
-          <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">How It Works</h2>
-            <p className="mt-3 text-center text-muted-foreground md:text-lg">Five simple steps from problem to solution.</p>
-          </SectionReveal>
-
-          {/* Desktop: horizontal flow */}
-          <div className="mt-12 hidden md:flex items-start justify-between">
-            {howItWorks.map((s, i) => (
-              <SectionReveal key={s.step} delay={i * 120} className="flex flex-col items-center text-center flex-1 relative">
-                <>
-                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground font-heading font-bold text-lg">
-                    {s.step}
-                  </div>
-                  {i < howItWorks.length - 1 && (
-                    <div className="absolute top-6 left-[calc(50%+24px)] w-[calc(100%-48px)] h-0.5 bg-border" />
-                  )}
-                  <s.icon className="mt-3 h-5 w-5 text-wrenchli-teal" />
-                  <h3 className="mt-2 font-heading text-sm font-semibold">{s.title}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground max-w-[160px]">{s.desc}</p>
-                </>
-              </SectionReveal>
-            ))}
-          </div>
-
-          {/* Mobile: vertical timeline */}
-          <div className="mt-10 space-y-6 md:hidden">
-            {howItWorks.map((s, i) => (
-              <SectionReveal key={s.step} delay={i * 100}>
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground font-heading font-bold">
-                    {s.step}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-heading text-base font-semibold">{s.title}</h3>
-                      <s.icon className="h-4 w-4 text-wrenchli-teal" />
-                    </div>
-                    <p className="mt-0.5 text-sm text-muted-foreground">{s.desc}</p>
-                  </div>
-                </div>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* How It Works — Video + Steps */}
+      <HowItWorksVideo />
 
       {/* Dual-Audience Split */}
       <section className="section-padding bg-secondary">
