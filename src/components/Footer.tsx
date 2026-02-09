@@ -62,12 +62,21 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label} className="flex items-center gap-2">
-                    <Link
-                      to={link.to}
-                      className="text-sm text-primary-foreground/60 transition-colors hover:text-accent"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.to.includes("#") ? (
+                      <a
+                        href={link.to}
+                        className="text-sm text-primary-foreground/60 transition-colors hover:text-accent"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.to}
+                        className="text-sm text-primary-foreground/60 transition-colors hover:text-accent"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                     {link.badge && (
                       <span className="rounded bg-primary-foreground/10 px-1.5 py-0.5 text-[10px] text-primary-foreground/40">
                         {link.badge}
