@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UrgencyBadge from "./UrgencyBadge";
 import YouTubeTutorials from "./YouTubeTutorials";
+import OrderParts from "./OrderParts";
 import type { Diagnosis } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +48,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
   const DiyIcon = diy.icon;
   const isAdvanced = diagnosis.diy_feasibility === "advanced";
   const [showTutorials, setShowTutorials] = useState(false);
+  const [showParts, setShowParts] = useState(false);
 
   return (
     <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
@@ -177,9 +179,22 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               variant="outline"
               size="sm"
               className="w-full text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
+              onClick={() => setShowParts(!showParts)}
             >
               <ShoppingCart className="mr-1.5 h-3.5 w-3.5" /> Order Parts
+              <ChevronDown className={cn("ml-auto h-3.5 w-3.5 transition-transform duration-200", showParts && "rotate-180")} />
             </Button>
+
+            <div
+              className={cn(
+                "overflow-hidden transition-all duration-300 ease-in-out",
+                showParts ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"
+              )}
+            >
+              <div className="pt-2">
+                <OrderParts diagnosisTitle={diagnosis.title} vehicle={vehicle} />
+              </div>
+            </div>
             <Button
               size="sm"
               className={cn(
