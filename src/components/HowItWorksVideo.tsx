@@ -2,38 +2,66 @@ import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   Search, ClipboardList, GitFork, Wrench, CheckCircle,
-  ArrowRight, RotateCcw,
+  ArrowRight, RotateCcw, Play, Tv, Store,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import SectionReveal from "@/components/SectionReveal";
-import PhoneMockup from "@/components/PhoneMockup";
+import PhoneMockup, { type WalkthroughPath } from "@/components/PhoneMockup";
 
-const steps = [
+/* Step definitions that change based on selected path */
+const sharedSteps = [
   { step: 1, icon: Search, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner." },
   { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and what it might cost." },
-  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Watch a DIY tutorial and order parts, or get quotes from vetted local shops." },
-  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing." },
-  { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control." },
 ];
+
+const diySteps = [
+  { step: 3, icon: Tv, title: "Watch a Tutorial", desc: "Get a step-by-step video guide matched to your exact vehicle." },
+  { step: 4, icon: Wrench, title: "Order Parts", desc: "One-click ordering for the exact parts your car needs." },
+  { step: 5, icon: CheckCircle, title: "Fix It Yourself", desc: "Follow the guide, save hundreds, and feel the satisfaction." },
+];
+
+const shopSteps = [
+  { step: 3, icon: Store, title: "Compare Shop Quotes", desc: "Get instant quotes from vetted local shops — see prices side by side." },
+  { step: 4, icon: GitFork, title: "Choose Financing", desc: "Pay in full or split into payments. All credit types welcome." },
+  { step: 5, icon: CheckCircle, title: "Book & Get Fixed", desc: "Pick a time, show up, and get back on the road with confidence." },
+];
+
+const branchStep = {
+  step: 3,
+  icon: GitFork,
+  title: "Choose Your Path",
+  desc: "Fix it yourself with video guides, or get quotes from trusted local shops.",
+};
 
 export default function HowItWorksVideo() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [selectedPath, setSelectedPath] = useState<WalkthroughPath>(null);
+
+  // Build the visible steps list
+  const getSteps = () => {
+    if (!selectedPath) {
+      // Before a path is chosen, show shared + the branch prompt
+      return [...sharedSteps, branchStep];
+    }
+    return [...sharedSteps, ...(selectedPath === "diy" ? diySteps : shopSteps)];
+  };
+  const steps = getSteps();
 
   const handleStepChange = useCallback((step: number) => {
     setActiveStep(step);
     setCompletedSteps((prev) => {
       const next = new Set(prev);
-      steps.filter((s) => s.step < step).forEach((s) => next.add(s.step));
+      for (let i = 1; i < step; i++) next.add(i);
       return next;
     });
   }, []);
 
   const handleComplete = useCallback(() => {
-    setCompletedSteps(new Set(steps.map((s) => s.step)));
+    setCompletedSteps(new Set([1, 2, 3, 4, 5]));
     setHasPlayed(true);
   }, []);
 
@@ -41,7 +69,7 @@ export default function HowItWorksVideo() {
     setActiveStep(step);
     setCompletedSteps((prev) => {
       const next = new Set(prev);
-      steps.filter((s) => s.step < step).forEach((s) => next.add(s.step));
+      for (let i = 1; i < step; i++) next.add(i);
       return next;
     });
     setIsPlaying(true);
@@ -50,7 +78,14 @@ export default function HowItWorksVideo() {
   const handleReplay = useCallback(() => {
     setActiveStep(1);
     setCompletedSteps(new Set());
+    setSelectedPath(null);
     setIsPlaying(true);
+  }, []);
+
+  const handlePathSelect = useCallback((path: "diy" | "shop") => {
+    setSelectedPath(path);
+    // Mark steps 1-2 as completed
+    setCompletedSteps(new Set([1, 2]));
   }, []);
 
   return (
@@ -62,7 +97,7 @@ export default function HowItWorksVideo() {
             How It Works
           </p>
           <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
-            See how easy it is — in under 90 seconds.
+            Your car, your choice — in under 70 seconds.
           </h2>
         </SectionReveal>
 
@@ -76,6 +111,8 @@ export default function HowItWorksVideo() {
               isPlaying={isPlaying}
               onPlayingChange={setIsPlaying}
               onComplete={handleComplete}
+              selectedPath={selectedPath}
+              onPathSelect={handlePathSelect}
             />
           </SectionReveal>
 
@@ -86,7 +123,7 @@ export default function HowItWorksVideo() {
               const isCompleted = completedSteps.has(s.step) && !isActive;
 
               return (
-                <SectionReveal key={s.step} delay={i * 80}>
+                <SectionReveal key={`${s.step}-${s.title}`} delay={i * 80}>
                   <button
                     onClick={() => handleStepClick(s.step)}
                     className={cn(
@@ -98,7 +135,6 @@ export default function HowItWorksVideo() {
                           : "border-l-border opacity-60 hover:opacity-80 hover:bg-muted/30"
                     )}
                   >
-                    {/* Step number / check */}
                     <div
                       className={cn(
                         "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors duration-300",
@@ -129,6 +165,20 @@ export default function HowItWorksVideo() {
                 </SectionReveal>
               );
             })}
+
+            {/* Path indicator pill */}
+            {selectedPath && (
+              <div className="mt-2 flex items-center justify-center gap-2">
+                <span className={cn(
+                  "rounded-full px-3 py-1 text-[10px] font-semibold",
+                  selectedPath === "diy"
+                    ? "bg-wrenchli-teal/10 text-wrenchli-teal"
+                    : "bg-accent/10 text-accent"
+                )}>
+                  {selectedPath === "diy" ? "🔧 DIY Path" : "👨‍🔧 Shop Path"}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

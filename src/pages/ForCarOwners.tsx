@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import type { WalkthroughPath } from "@/components/PhoneMockup";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroCarOwners from "@/assets/hero-car-owners.jpg";
@@ -42,6 +43,7 @@ const faqs = [
 function CarOwnersWalkthrough() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [selectedPath, setSelectedPath] = useState<WalkthroughPath>(null);
 
   const handleStepChange = useCallback((step: number) => {
     setActiveStep(step);
@@ -67,6 +69,8 @@ function CarOwnersWalkthrough() {
               isPlaying={isPlaying}
               onPlayingChange={setIsPlaying}
               onComplete={() => {}}
+              selectedPath={selectedPath}
+              onPathSelect={setSelectedPath}
             />
           </SectionReveal>
         </div>
