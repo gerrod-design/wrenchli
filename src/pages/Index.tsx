@@ -34,6 +34,8 @@ export default function Index() {
       {/* Cinematic Hero */}
       <CinematicHero />
 
+      <HowItWorksVideo />
+
       <QuickActionBar />
 
       {/* Value Proposition Cards */}
@@ -69,8 +71,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* How It Works — Video + Steps */}
-      <HowItWorksVideo />
+      {/* How It Works moved above QuickActionBar */}
 
       {/* Dual-Audience Split */}
       <section className="section-padding bg-secondary">
