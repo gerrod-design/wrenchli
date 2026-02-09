@@ -112,9 +112,9 @@ export default function CinematicHero() {
           className="mt-5 md:mt-6 text-base md:text-xl leading-relaxed text-white/90 max-w-[600px]"
         >
           Find out what's wrong. Learn to fix it yourself.
-          <br className="hidden sm:block" />{" "}
+          <br />
           Or get instant quotes from trusted local shops.
-          <br className="hidden sm:block" />{" "}
+          <br />
           Your car, your choice.
         </motion.p>
 
