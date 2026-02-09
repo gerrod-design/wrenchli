@@ -55,6 +55,7 @@ export type Database = {
           diagnosis_urgency: string | null
           estimated_cost_high: number | null
           estimated_cost_low: number | null
+          financing_interested: boolean
           id: string
           metro_area: string | null
           referral_requested_at: string | null
@@ -79,6 +80,7 @@ export type Database = {
           diagnosis_urgency?: string | null
           estimated_cost_high?: number | null
           estimated_cost_low?: number | null
+          financing_interested?: boolean
           id?: string
           metro_area?: string | null
           referral_requested_at?: string | null
@@ -103,6 +105,7 @@ export type Database = {
           diagnosis_urgency?: string | null
           estimated_cost_high?: number | null
           estimated_cost_low?: number | null
+          financing_interested?: boolean
           id?: string
           metro_area?: string | null
           referral_requested_at?: string | null
