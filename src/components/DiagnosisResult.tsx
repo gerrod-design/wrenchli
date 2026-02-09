@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { Cpu, AlertCircle } from "lucide-react";
-import EkgLoader from "./diagnosis/EkgLoader";
+import VehicleScanLoader from "./diagnosis/VehicleScanLoader";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DisclaimerBanner from "./diagnosis/DisclaimerBanner";
@@ -10,6 +10,7 @@ import StillNotSure from "./diagnosis/StillNotSure";
 import SymptomMatchResults, { NoMatchFallback } from "./diagnosis/SymptomMatchResults";
 import { matchSymptoms } from "@/data/symptomLibrary";
 import type { Diagnosis, DiagnosisResultProps } from "./diagnosis/types";
+import { useGarage } from "@/hooks/useGarage";
 
 const DIAGNOSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/diagnose`;
 
@@ -20,6 +21,8 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
   const [error, setError] = useState("");
 
   const vehicleStr = [year, make, model].filter(Boolean).join(" ");
+  const { findVehicle } = useGarage();
+  const garageVehicle = findVehicle(year, make, model);
 
   // Instant client-side symptom matching
   const symptomMatches = useMemo(() => {
@@ -154,12 +157,13 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
 
         {/* Branded loading state */}
         {isLoading && (
-          <div className="mt-8 flex flex-col items-center gap-4 py-8">
-            <EkgLoader />
-            <p className="text-sm font-medium text-foreground">
-              {codes ? `Looking up ${codes}...` : "Analyzing your vehicle issue..."}
-            </p>
-            <p className="text-xs text-muted-foreground">This usually takes a few seconds</p>
+          <div className="mt-8">
+            <VehicleScanLoader
+              vehicleName={vehicleStr}
+              bodyType={garageVehicle?.bodyType}
+              color={garageVehicle?.color}
+              codes={codes}
+            />
           </div>
         )}
 

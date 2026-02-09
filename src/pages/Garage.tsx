@@ -9,7 +9,7 @@ import GarageSyncTeaser from "@/components/garage/GarageSyncTeaser";
 import { Button } from "@/components/ui/button";
 
 export default function Garage() {
-  const { vehicles, removeVehicle, updateNickname, clearAll } = useGarage();
+  const { vehicles, removeVehicle, updateNickname, updateColor, clearAll } = useGarage();
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -44,6 +44,7 @@ export default function Garage() {
                   isActive={i === 0}
                   onRemove={removeVehicle}
                   onRename={updateNickname}
+                  onColorChange={updateColor}
                 />
               ))}
 
@@ -55,12 +56,10 @@ export default function Garage() {
                 </Button>
               )}
 
-              {/* Sync teaser */}
               <div className="rounded-lg border border-border bg-card p-4">
                 <GarageSyncTeaser />
               </div>
 
-              {/* Privacy + Clear */}
               <div className="space-y-3 pt-2">
                 <GaragePrivacyNotice />
                 <GarageClearDialog onClear={clearAll} />

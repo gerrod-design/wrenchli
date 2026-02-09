@@ -1,6 +1,6 @@
-import { CarFront } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { GarageVehicle } from "@/hooks/useGarage";
+import VehicleSilhouette, { DEFAULT_COLOR } from "./VehicleSilhouette";
 
 interface Props {
   vehicles: GarageVehicle[];
@@ -32,10 +32,14 @@ export default function GarageSelector({ vehicles, onSelect, onAddNew }: Props) 
             key={v.garageId}
             className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 hover:border-wrenchli-teal/40 transition-colors"
           >
-            <CarFront className="h-5 w-5 text-wrenchli-teal shrink-0" />
+            <VehicleSilhouette
+              bodyType={v.bodyType || "sedan"}
+              color={v.color || DEFAULT_COLOR.hex}
+              className="w-20 h-10 shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground truncate">
-                🚗 {v.nickname}
+                {v.nickname}
               </p>
               <p className="text-xs text-muted-foreground truncate">{name}{details ? ` • ${details}` : ""}</p>
               <p className="text-[11px] text-muted-foreground/60">Last used: {timeAgo(v.lastUsed)}</p>
