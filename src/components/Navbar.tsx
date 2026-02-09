@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Wrench, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
 interface DropdownItem {
   label: string;
@@ -101,7 +102,7 @@ export default function Navbar() {
       <div className="container-wrenchli flex h-16 items-center justify-between md:h-[68px]">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold">
-          <Wrench className="h-6 w-6 text-accent" />
+          <img src={wrenchliLogo} alt="Wrenchli logo" className="h-8 w-8 object-contain" />
           Wrenchli
         </Link>
 
