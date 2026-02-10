@@ -26,7 +26,7 @@ export default function Index() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Wrenchli — Car Repair, Finally Fixed"
+        title="Wrenchli — Vehicle Repair, Finally Fixed"
         description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Detroit."
         path="/"
       />

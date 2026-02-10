@@ -158,7 +158,7 @@ export default function CostOfOwnership({
 
                 <div className="relative">
                   <Input
-                    placeholder="Link to listing (AutoTrader, Cars.com, etc.) — optional"
+                     placeholder="Link to listing (AutoTrader, Cars.com, etc.) — optional"
                     value={listingUrl}
                     onChange={(e) => setListingUrl(e.target.value)}
                     className="h-11 pr-9"

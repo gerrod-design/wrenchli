@@ -38,7 +38,7 @@ const platformTabs = [
     value: "acquisition",
     label: "Customer Acquisition",
     features: [
-      { icon: Users, title: "Quote Requests", desc: "Receive repair requests from local car owners with full vehicle and issue details." },
+      { icon: Users, title: "Quote Requests", desc: "Receive repair requests from local vehicle owners with full vehicle and issue details." },
       { icon: Eye, title: "Local Visibility", desc: "Professional shop profile with your services, hours, photos, and location on the Wrenchli marketplace." },
       { icon: Star, title: "Verified Reviews", desc: "Real reviews from real customers, tied to completed repairs. No fake or purchased reviews." },
     ],

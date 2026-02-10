@@ -21,7 +21,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    label: "For Car Owners",
+    label: "For Vehicle Owners",
     to: "/for-car-owners",
     dropdown: [
       { label: "How It Works", to: "/for-car-owners" },

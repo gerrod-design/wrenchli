@@ -52,7 +52,7 @@ export default function Investors() {
             </div>
             <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                Car owners face a broken experience every time something goes wrong with their vehicle. They don't know what's wrong, they don't know what it should cost, and they don't know who to trust.
+                Vehicle owners face a broken experience every time something goes wrong with their vehicle. They don't know what's wrong, they don't know what it should cost, and they don't know who to trust.
               </p>
               <p>
                 Independent repair shops — which make up 70%+ of the market — struggle with customer acquisition, payment collection, and competing against dealership service departments with larger marketing budgets.

@@ -139,7 +139,7 @@ export default function HowItWorksVideo() {
             How It Works
           </p>
           <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
-            Your car, your choice — in under 70 seconds.
+            Your vehicle, your choice — in under 70 seconds.
           </h2>
         </SectionReveal>
 

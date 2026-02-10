@@ -75,7 +75,7 @@ export default function BrandVideoModal({ isOpen, onClose }: Props) {
             {/* Below video CTA */}
             <div className="mt-6 text-center">
               <p className="text-white/70 font-heading text-base font-semibold mb-4">
-                Car Repair, Finally Fixed.
+                Vehicle Repair, Finally Fixed.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button
