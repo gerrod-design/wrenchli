@@ -19,7 +19,7 @@ const placeholders = [
   "My brakes are squeaking",
   "There's a burning smell from the engine",
   "Check engine light is on",
-  "Car shakes when braking",
+  "Vehicle shakes when braking",
   "AC is blowing warm air",
 ];
 
@@ -39,7 +39,7 @@ const symptomCategories = [
   },
   {
     icon: Gauge, label: "Performance Issues", emoji: "🚗",
-    items: ["Car won't start", "Rough idle / vibration", "Loss of power / acceleration", "Overheating", "Poor fuel economy"],
+    items: ["Vehicle won't start", "Rough idle / vibration", "Loss of power / acceleration", "Overheating", "Poor fuel economy"],
   },
 ];
 
@@ -106,7 +106,7 @@ export default function VehicleInsights() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Vehicle Insights — DIY Diagnostics"
-        description="Understand your car before visiting the shop. AI-powered diagnostics, OBD2 code lookup, symptom checker, and maintenance schedules."
+        description="Understand your vehicle before visiting the shop. AI-powered diagnostics, OBD2 code lookup, symptom checker, and maintenance schedules."
         path="/vehicle-insights"
       />
       {/* Hero */}
@@ -122,7 +122,7 @@ export default function VehicleInsights() {
               Know What's Wrong. Fix It <span className="text-wrenchli-teal">Your Way.</span>
             </h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              Not every car problem needs a trip to the shop. Wrenchli Vehicle Insights helps you understand what might be wrong with your car and gives you real choices — watch a step-by-step video tutorial and order the parts to fix it yourself, or get quotes from trusted local shops if you'd rather leave it to a professional. Either way, you're in control.
+              Not every vehicle problem needs a trip to the shop. Wrenchli Vehicle Insights helps you understand what might be wrong with your vehicle and gives you real choices — watch a step-by-step video tutorial and order the parts to fix it yourself, or get quotes from trusted local shops if you'd rather leave it to a professional. Either way, you're in control.
             </p>
             <Button
               size="lg"
@@ -139,7 +139,7 @@ export default function VehicleInsights() {
       <section id="diagnosis-input" className="section-padding bg-background">
         <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">What's going on with your car?</h2>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">What's going on with your vehicle?</h2>
             <p className="mt-3 text-center text-muted-foreground">Describe symptoms or enter a diagnostic code to get started.</p>
           </SectionReveal>
 
@@ -362,7 +362,7 @@ export default function VehicleInsights() {
         <div className="container-wrenchli">
           <SectionReveal>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">
-              Thousands of Car Owners Fix It Themselves Every Day
+              Thousands of Vehicle Owners Fix It Themselves Every Day
             </h2>
             <p className="mt-3 text-center text-muted-foreground md:text-lg max-w-2xl mx-auto">
               These common repairs are done at home by regular people — no mechanic certification required.

@@ -12,7 +12,7 @@ const footerLinks = {
     { label: "Careers", to: "/about", badge: "Coming Soon" },
     { label: "Contact", to: "/contact" },
   ],
-  "For Car Owners": [
+  "For Vehicle Owners": [
     { label: "How It Works", to: "/for-car-owners" },
     { label: "Get a Quote", to: "/#quote" },
     { label: "💬 Recommend a Shop", to: "__recommend__" },

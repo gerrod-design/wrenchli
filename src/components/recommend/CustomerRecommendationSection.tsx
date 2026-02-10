@@ -44,7 +44,7 @@ export default function CustomerRecommendationSection({ onApply }: CustomerRecom
               <span className="text-muted-foreground font-normal"> Is yours one of them?</span>
             </p>
             <p className="mt-4 text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Car owners trust you. Now let them find you on the platform they're already using to diagnose their vehicles and compare repair options.
+              Vehicle owners trust you. Now let them find you on the platform they're already using to diagnose their vehicles and compare repair options.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Button

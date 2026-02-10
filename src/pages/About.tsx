@@ -36,16 +36,16 @@ export default function About() {
             <h2 className="font-heading text-2xl font-bold md:text-4xl">Our Story</h2>
             <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                Wrenchli was born from a simple observation: <strong className="text-foreground">car repair is broken for everyone.</strong>
+                Wrenchli was born from a simple observation: <strong className="text-foreground">vehicle repair is broken for everyone.</strong>
               </p>
               <p>
-                Car owners overpay because they can't compare prices. They accept unnecessary work because they don't know what's really wrong. And they settle for shops they don't trust because they have no better option.
+                Vehicle owners overpay because they can't compare prices. They accept unnecessary work because they don't know what's really wrong. And they settle for shops they don't trust because they have no better option.
               </p>
               <p>
                 On the other side, independent repair shops — the backbone of the industry — lose customers to dealerships and chains with bigger marketing budgets, even when they do better work at lower prices. They run their businesses on paper tickets and phone calls in an age of instant everything.
               </p>
               <p>
-                We're building the platform that fixes both sides. Transparent pricing and vetted shops for consumers. Pre-qualified customers and modern tools for shops. And embedded financing so cost never stands between a car owner and the repair they need.
+                We're building the platform that fixes both sides. Transparent pricing and vetted shops for consumers. Pre-qualified customers and modern tools for shops. And embedded financing so cost never stands between a vehicle owner and the repair they need.
               </p>
               <p className="text-foreground font-medium">
                 Based in Detroit — the heart of America's automotive industry — Wrenchli is where technology meets the trades.
@@ -75,7 +75,7 @@ export default function About() {
                 </div>
                 <h3 className="font-heading text-xl font-bold">Our Mission</h3>
                 <p className="mt-3 text-muted-foreground leading-relaxed">
-                  To bring transparency, choice, and accessibility to auto repair — empowering car owners to make informed decisions and independent shops to thrive in a modern marketplace.
+                  To bring transparency, choice, and accessibility to auto repair — empowering vehicle owners to make informed decisions and independent shops to thrive in a modern marketplace.
                 </p>
               </div>
             </SectionReveal>
@@ -86,7 +86,7 @@ export default function About() {
                 </div>
                 <h3 className="font-heading text-xl font-bold">Our Vision</h3>
                 <p className="mt-3 text-muted-foreground leading-relaxed">
-                  A world where getting your car fixed is as simple, transparent, and stress-free as any other service. Where every car owner has access to fair pricing, honest shops, and flexible payment options.
+                  A world where getting your vehicle fixed is as simple, transparent, and stress-free as any other service. Where every vehicle owner has access to fair pricing, honest shops, and flexible payment options.
                 </p>
               </div>
             </SectionReveal>
@@ -176,7 +176,7 @@ export default function About() {
             </div>
             <h2 className="font-heading text-2xl font-bold md:text-4xl">Why Detroit?</h2>
             <p className="mt-5 text-lg text-primary-foreground/70 leading-relaxed">
-              Detroit isn't just where cars are made — it's where car culture <em>lives.</em>
+              Detroit isn't just where cars are made — it's where automotive culture <em>lives.</em>
             </p>
             <p className="mt-4 text-primary-foreground/60 leading-relaxed">
               This city built the modern automobile. It knows what it means to reinvent an industry. With one of the highest concentrations of independent repair shops in the country and a community that takes pride in keeping vehicles on the road, Detroit is the perfect proving ground for a platform that's rewriting the rules of auto repair.

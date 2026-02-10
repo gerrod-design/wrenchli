@@ -12,7 +12,7 @@ export default function StillNotSure({ vehicle }: StillNotSureProps) {
       <Wrench className="mx-auto h-8 w-8 text-accent mb-3" />
       <h3 className="font-heading text-lg font-bold">Still not sure what's wrong?</h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
-        That's completely okay — car problems can be tricky to diagnose without seeing the vehicle. Get quotes from trusted local shops who can perform a full diagnostic inspection.
+        That's completely okay — vehicle problems can be tricky to diagnose without seeing it in person. Get quotes from trusted local shops who can perform a full diagnostic inspection.
       </p>
       <Button
         size="lg"

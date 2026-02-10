@@ -85,7 +85,7 @@ export default function Contact() {
           <SectionReveal>
             <h1 className="font-heading text-3xl font-extrabold md:text-5xl lg:text-6xl">Get in Touch</h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              Whether you're a car owner with a question or a shop interested in partnering — we'd love to hear from you.
+              Whether you're a vehicle owner with a question or a shop interested in partnering — we'd love to hear from you.
             </p>
           </SectionReveal>
         </div>
@@ -98,7 +98,7 @@ export default function Contact() {
           <SectionReveal>
             <div className="rounded-2xl border border-border bg-card p-6 md:p-8 h-full">
               <div className="inline-flex items-center gap-2 rounded-full bg-wrenchli-green/10 px-3 py-1 text-sm font-medium text-wrenchli-green mb-4">
-                <Car className="h-4 w-4" /> For Car Owners
+                <Car className="h-4 w-4" /> For Vehicle Owners
               </div>
               <h2 className="font-heading text-xl font-bold md:text-2xl">Have a Question?</h2>
               <p className="mt-2 text-sm text-muted-foreground">Ask us anything about Wrenchli, repairs, or how it works.</p>

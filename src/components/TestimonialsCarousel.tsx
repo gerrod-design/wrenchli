@@ -21,7 +21,7 @@ const testimonials = [
     name: "Dave R.",
     location: "Warren, MI",
     quote:
-      "Nobody's doing this for car owners right now — giving us real transparency. When I heard about Wrenchli I thought, finally, someone gets it. I'd use this every time.",
+      "Nobody's doing this for vehicle owners right now — giving us real transparency. When I heard about Wrenchli I thought, finally, someone gets it. I'd use this every time.",
     vehicle: "2016 Chevy Malibu",
   },
   {
@@ -42,7 +42,7 @@ const testimonials = [
     name: "Tamika W.",
     location: "Livonia, MI",
     quote:
-      "I've been going back and forth on whether to fix my car or just get a new one. If Wrenchli could break down the real cost of both options side by side, that would save me so much stress and guesswork.",
+      "I've been going back and forth on whether to fix my vehicle or just get a new one. If Wrenchli could break down the real cost of both options side by side, that would save me so much stress and guesswork.",
     vehicle: "2014 Nissan Altima",
   },
 ];

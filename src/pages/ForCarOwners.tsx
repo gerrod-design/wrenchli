@@ -27,11 +27,11 @@ const benefits = [
   { icon: Star, title: "Real Customer Reviews", desc: "Honest feedback from real customers tied to real repairs. No fake reviews, no gaming the system." },
   { icon: CreditCard, title: "Financing for Everyone", desc: "Multiple lending partners, all credit profiles welcome. Apply at checkout and get approved in minutes." },
   { icon: Calendar, title: "Book Online, Anytime", desc: "Schedule your repair 24/7 — no phone tag, no waiting on hold. Pick the time that works for you." },
-  { icon: Bell, title: "Status Updates", desc: "Get text and email notifications as your repair progresses. Know exactly when your car will be ready." },
+  { icon: Bell, title: "Status Updates", desc: "Get text and email notifications as your repair progresses. Know exactly when your vehicle will be ready." },
 ];
 
 const faqs = [
-  { q: "Is Wrenchli really free for car owners?", a: "Yes, 100% free. We charge shops a small transaction fee when you book through the platform — you never pay extra. The price you see from each shop is the price you pay." },
+  { q: "Is Wrenchli really free for vehicle owners?", a: "Yes, 100% free. We charge shops a small transaction fee when you book through the platform — you never pay extra. The price you see from each shop is the price you pay." },
   { q: "How do you verify the shops?", a: "Every shop on Wrenchli must be licensed, insured, and meet our quality standards. We verify credentials, check business history, and continuously monitor customer satisfaction ratings." },
   { q: "How accurate are the quotes?", a: "Quotes are binding once you accept them. Shops provide itemized breakdowns of parts, labor, and fees based on your vehicle and repair description. If additional work is discovered, the shop must get your approval before proceeding." },
   { q: "What financing options are available?", a: "We're partnering with multiple lenders to offer financing for all credit profiles — good, fair, and rebuilding. You'll be able to apply at checkout and see your options in minutes. This feature is launching soon." },
@@ -141,8 +141,8 @@ export default function ForCarOwners() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="For Car Owners"
-        description="Stop overpaying for car repairs. Get instant quotes from vetted local shops, compare prices, and finance if you need to. Free for car owners."
+        title="For Vehicle Owners"
+        description="Stop overpaying for vehicle repairs. Get instant quotes from vetted local shops, compare prices, and finance if you need to. Free for vehicle owners."
         path="/for-car-owners"
       />
       {/* Hero */}
@@ -152,7 +152,7 @@ export default function ForCarOwners() {
         <div className="container-wrenchli text-center relative">
           <SectionReveal>
             <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-wrenchli-green/20 px-4 py-1 text-sm font-medium text-wrenchli-green">
-              <Car className="h-4 w-4" /> For Car Owners
+              <Car className="h-4 w-4" /> For Vehicle Owners
             </div>
             <h1 className="mt-6 font-heading text-3xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
               Stop Overpaying. Start Trusting.
@@ -203,7 +203,7 @@ export default function ForCarOwners() {
       <section className="section-padding bg-secondary">
         <div className="container-wrenchli">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Why Car Owners Choose Wrenchli</h2>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Why Vehicle Owners Choose Wrenchli</h2>
           </SectionReveal>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {benefits.map((b, i) => (
@@ -248,7 +248,7 @@ export default function ForCarOwners() {
           <SectionReveal>
             <h2 className="font-heading text-3xl font-bold md:text-5xl">Ready to Get Started?</h2>
             <p className="mt-4 text-lg text-primary-foreground/70">
-              Get your first quote in under 60 seconds. Free for car owners — always.
+              Get your first quote in under 60 seconds. Free for vehicle owners — always.
             </p>
             <Button asChild size="lg" className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
               <Link to="/#quote">

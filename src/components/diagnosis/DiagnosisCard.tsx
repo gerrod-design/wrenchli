@@ -13,7 +13,7 @@ const diyConfig = {
     icon: CheckCircle,
     label: "Easy",
     badge: "🟢 Easy",
-    subtitle: "Most car owners can handle this repair",
+    subtitle: "Most vehicle owners can handle this repair",
     className: "text-wrenchli-green",
     cardBg: "hsl(170 76% 96%)",
     cardBorder: "hsl(170 73% 36%)",
