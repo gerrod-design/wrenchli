@@ -29,8 +29,14 @@ export default function Contact() {
       if (error) throw error;
       toast({ title: "Message sent! ✉️", description: "We'll get back to you as soon as possible." });
       setConsumerForm({ name: "", email: "", phone: "", message: "" });
-    } catch {
-      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+    } catch (err: unknown) {
+      const msg = err && typeof err === "object" && "message" in err ? String((err as { message: string }).message) : "";
+      const isRateLimit = msg.toLowerCase().includes("rate limit");
+      toast({
+        title: isRateLimit ? "Too many submissions" : "Something went wrong",
+        description: isRateLimit ? "Please wait a few minutes before submitting again." : "Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoadingConsumer(false);
     }
@@ -53,8 +59,14 @@ export default function Contact() {
       if (error) throw error;
       toast({ title: "Request received! 🔧", description: "Our partnerships team will be in touch soon." });
       setShopForm({ shopName: "", name: "", email: "", phone: "", city: "", bays: "", message: "" });
-    } catch {
-      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+    } catch (err: unknown) {
+      const msg = err && typeof err === "object" && "message" in err ? String((err as { message: string }).message) : "";
+      const isRateLimit = msg.toLowerCase().includes("rate limit");
+      toast({
+        title: isRateLimit ? "Too many submissions" : "Something went wrong",
+        description: isRateLimit ? "Please wait a few minutes before submitting again." : "Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoadingShop(false);
     }
