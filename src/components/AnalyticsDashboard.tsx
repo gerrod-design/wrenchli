@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, FunnelChart, Funnel, LabelList,
+  LineChart, Line,
 } from "recharts";
 import {
   TrendingUp,
@@ -62,6 +63,13 @@ interface DetailedStats {
     variant: string;
     users: number;
     conversionRate: number;
+  }>;
+  dailyTimeSeries: Array<{
+    date: string;
+    pageViews: number;
+    clicks: number;
+    impressions: number;
+    conversions: number;
   }>;
 }
 
@@ -178,6 +186,20 @@ const AnalyticsDashboard = () => {
         conversionRate: t.users.size > 0 ? (t.conversions / t.users.size) * 100 : 0,
       }));
 
+      // Daily time series
+      const dayMap: Record<string, { pageViews: number; clicks: number; impressions: number; conversions: number }> = {};
+      events.forEach((e) => {
+        const day = e.timestamp.split("T")[0];
+        if (!dayMap[day]) dayMap[day] = { pageViews: 0, clicks: 0, impressions: 0, conversions: 0 };
+        if (e.event_type === "page_view") dayMap[day].pageViews += 1;
+        if (e.event_type === "ad_click") dayMap[day].clicks += 1;
+        if (e.event_type === "ad_impression") dayMap[day].impressions += 1;
+        if (e.event_type === "ad_conversion") dayMap[day].conversions += 1;
+      });
+      const dailyTimeSeries = Object.entries(dayMap)
+        .map(([date, d]) => ({ date, ...d }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
       setStats({
         totalSessions: sessions,
         totalPageViews: pageViews,
@@ -188,6 +210,7 @@ const AnalyticsDashboard = () => {
         topGeoLocations,
         deviceBreakdown,
         abTestResults,
+        dailyTimeSeries,
       });
     } catch (err) {
       console.error("Failed to fetch analytics stats:", err);
@@ -315,6 +338,32 @@ const AnalyticsDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Daily Time Series */}
+      {stats && stats.dailyTimeSeries.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" /> Daily Event Trends
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={stats.dailyTimeSeries}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={50} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
+                <Legend />
+                <Line type="monotone" dataKey="pageViews" name="Page Views" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="impressions" name="Impressions" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="clicks" name="Clicks" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="conversions" name="Conversions" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Funnel: Impression → Click → Conversion */}
       {stats && (
