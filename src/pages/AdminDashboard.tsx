@@ -136,6 +136,7 @@ export default function AdminDashboard() {
   const [contacts, setContacts] = useState<ContactSubmission[]>([]);
 
   const fetchAll = async () => {
+    console.log("[AdminDashboard] fetchAll started");
     setLoading(true);
     setError(null);
     try {
@@ -158,6 +159,7 @@ export default function AdminDashboard() {
       console.error("Dashboard fetch failed:", err);
       setError(err?.message || "Failed to load dashboard data");
     } finally {
+      console.log("[AdminDashboard] fetchAll complete, error:", error);
       setLoading(false);
     }
   };
