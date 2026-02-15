@@ -80,11 +80,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(newSession?.user ?? null);
 
         if (newSession?.user) {
-          // Small delay to ensure the auth token is propagated to the client
-          await new Promise(resolve => setTimeout(resolve, 100));
+          // Delay to ensure the auth token is propagated
+          await new Promise(resolve => setTimeout(resolve, 500));
           if (!mounted) return;
           
-          const admin = await checkAdmin(newSession.user.id);
+          // Retry up to 3 times
+          let admin = false;
+          for (let i = 0; i < 3 && !admin; i++) {
+            admin = await checkAdmin(newSession.user.id);
+            if (!admin && i < 2) await new Promise(r => setTimeout(r, 300));
+          }
           if (mounted) {
             setIsAdmin(admin);
             setLoading(false);

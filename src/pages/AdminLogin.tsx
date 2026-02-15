@@ -51,50 +51,28 @@ export default function AdminLogin() {
       return;
     }
 
-    // After successful login, verify admin status with both methods and show alert
-    try {
-      // Wait for session to propagate
-      await new Promise(r => setTimeout(r, 500));
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
-      
-      if (!userId) {
-        const msg = "Login succeeded but no session found!";
-        alert(msg);
-        setDebugInfo(msg);
-        setSubmitting(false);
-        return;
-      }
+    // Wait for session to propagate, then verify admin and navigate
+    await new Promise(r => setTimeout(r, 500));
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
 
-      // Test 1: RPC
-      const { data: rpcResult, error: rpcError } = await supabase.rpc("has_role", {
-        _user_id: userId,
-        _role: "admin",
-      });
-
-      // Test 2: Direct query
-      const { data: directResult, error: directError } = await supabase
+    if (userId) {
+      const { data } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)
         .eq("role", "admin")
         .maybeSingle();
 
-      const info = [
-        `User: ${userId.slice(0, 8)}`,
-        `RPC: ${JSON.stringify(rpcResult)} (err: ${rpcError?.message || "none"})`,
-        `Direct: ${JSON.stringify(directResult)} (err: ${directError?.message || "none"})`,
-      ].join(" | ");
-
-      prompt("Copy this debug info and send it to me:", info);
-      setDebugInfo(info);
-    } catch (debugErr: any) {
-      const msg = `Exception: ${debugErr?.message}`;
-      prompt("Copy this debug info:", msg);
-      setDebugInfo(msg);
+      if (data) {
+        // Admin confirmed — force full page navigate to bypass React state race
+        window.location.href = "/admin";
+        return;
+      }
     }
 
+    setError("This account does not have admin access.");
     setSubmitting(false);
   };
 
