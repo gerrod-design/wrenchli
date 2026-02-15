@@ -105,6 +105,34 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 212 27% 84%;
+
+    /* Advertising section tokens – DIY (info/blue) */
+    --ad-info-bg: 212 40% 14%;
+    --ad-info-bg-end: 220 35% 16%;
+    --ad-info-border: 212 35% 25%;
+    --ad-info-heading: 210 40% 90%;
+    --ad-info-text: 210 30% 75%;
+    --ad-info-icon: 210 40% 65%;
+    --ad-info-subtle: 210 30% 50%;
+
+    /* Advertising section tokens – Upgrade (success/green) */
+    --ad-success-bg: 145 30% 13%;
+    --ad-success-bg-end: 155 28% 15%;
+    --ad-success-border: 145 30% 25%;
+    --ad-success-heading: 145 40% 88%;
+    --ad-success-text: 145 30% 70%;
+    --ad-success-icon: 145 50% 55%;
+
+    /* Advertising badge tokens */
+    --ad-badge-savings: 145 35% 18%;
+    --ad-badge-savings-text: 145 45% 75%;
+    --ad-badge-savings-border: 145 30% 30%;
+    --ad-badge-value: 212 35% 20%;
+    --ad-badge-value-text: 210 40% 80%;
+    --ad-badge-value-border: 212 30% 35%;
+
+    /* Star rating */
+    --ad-star: 45 90% 50%;
   }
 }
 
