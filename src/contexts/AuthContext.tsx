@@ -126,10 +126,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setIsAdmin(false);
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error("[AuthContext] signOut error:", err);
+    } finally {
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+    }
   };
 
   return (
