@@ -15,6 +15,7 @@ import {
   Loader2, RefreshCw, DollarSign, Mail, BarChart3,
 } from "lucide-react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import OptimizationEngine from "@/components/OptimizationEngine";
 
 interface FinanceSelection {
   id: string;
@@ -215,18 +216,24 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="finance" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="finance"><CreditCard className="h-4 w-4 mr-1.5 hidden sm:inline" />Finance</TabsTrigger>
             <TabsTrigger value="quotes"><FileText className="h-4 w-4 mr-1.5 hidden sm:inline" />Quotes</TabsTrigger>
             <TabsTrigger value="waitlist"><Users className="h-4 w-4 mr-1.5 hidden sm:inline" />Waitlist</TabsTrigger>
             <TabsTrigger value="shops"><Store className="h-4 w-4 mr-1.5 hidden sm:inline" />Shops</TabsTrigger>
             <TabsTrigger value="contacts"><Mail className="h-4 w-4 mr-1.5 hidden sm:inline" />Contacts</TabsTrigger>
             <TabsTrigger value="analytics"><BarChart3 className="h-4 w-4 mr-1.5 hidden sm:inline" />Analytics</TabsTrigger>
+            <TabsTrigger value="optimization"><TrendingUp className="h-4 w-4 mr-1.5 hidden sm:inline" />Optimize</TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="mt-6">
             <AnalyticsDashboard />
+          </TabsContent>
+
+          {/* Optimization Tab */}
+          <TabsContent value="optimization" className="mt-6">
+            <OptimizationEngine />
           </TabsContent>
 
           {/* Finance Tab */}
