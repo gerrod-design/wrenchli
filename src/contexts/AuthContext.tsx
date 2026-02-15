@@ -22,17 +22,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdmin = async (userId: string) => {
     try {
-      const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Admin check timed out")), 5000)
-      );
-      const rpc = supabase.rpc("has_role", {
+      // Primary: use RPC
+      const { data, error } = await supabase.rpc("has_role", {
         _user_id: userId,
         _role: "admin",
       });
-      const { data } = await Promise.race([rpc, timeout]);
-      setIsAdmin(!!data);
+      
+      if (!error) {
+        console.log("[AuthContext] has_role result:", data);
+        setIsAdmin(!!data);
+        return;
+      }
+      
+      console.warn("[AuthContext] RPC failed, trying direct query:", error.message);
+      
+      // Fallback: direct query (will work if user already has admin role via SECURITY DEFINER)
+      const { data: roles, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      
+      if (!roleError && roles) {
+        console.log("[AuthContext] Direct query found admin role");
+        setIsAdmin(true);
+        return;
+      }
+      
+      console.warn("[AuthContext] Admin check failed:", roleError?.message);
+      setIsAdmin(false);
     } catch (err) {
-      console.warn("[AuthContext] checkAdmin failed:", err);
+      console.warn("[AuthContext] checkAdmin exception:", err);
       setIsAdmin(false);
     }
   };
