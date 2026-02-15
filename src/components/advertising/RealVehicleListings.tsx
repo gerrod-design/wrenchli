@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Car,
@@ -15,6 +16,9 @@ import {
   Star,
   Shield,
   Truck,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
 import type { TrackingContext } from "./types";
@@ -131,6 +135,7 @@ const BADGE_ICONS: Record<string, typeof Award> = {
 const VehicleImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
   const [idx, setIdx] = useState(0);
   const [imgError, setImgError] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const next = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -146,6 +151,23 @@ const VehicleImageCarousel = ({ images, alt }: { images: string[]; alt: string }
     setImgError(false);
   }, [images.length]);
 
+  const openLightbox = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLightboxOpen(true);
+  }, []);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") setIdx((i) => (i + 1) % images.length);
+      else if (e.key === "ArrowLeft") setIdx((i) => (i - 1 + images.length) % images.length);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightboxOpen, images.length]);
+
   if (imgError) {
     return (
       <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
@@ -155,41 +177,100 @@ const VehicleImageCarousel = ({ images, alt }: { images: string[]; alt: string }
   }
 
   return (
-    <div className="relative w-full h-full group">
-      <img
-        src={images[idx]}
-        alt={`${alt} - photo ${idx + 1}`}
-        className="w-full h-full object-cover"
-        loading="lazy"
-        onError={() => setImgError(true)}
-      />
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={prev}
-            className="absolute left-1 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background/90 rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-foreground"
-            aria-label="Previous photo"
-          >
-            ‹
-          </button>
-          <button
-            onClick={next}
-            className="absolute right-1 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background/90 rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-foreground"
-            aria-label="Next photo"
-          >
-            ›
-          </button>
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-            {images.slice(0, 5).map((_, i) => (
-              <span
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full ${i === idx ? "bg-background" : "bg-background/50"}`}
-              />
-            ))}
+    <>
+      <div className="relative w-full h-full group cursor-pointer" onClick={openLightbox}>
+        <img
+          src={images[idx]}
+          alt={`${alt} - photo ${idx + 1}`}
+          className="w-full h-full object-cover"
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-1 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background/90 rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-foreground"
+              aria-label="Previous photo"
+            >
+              ‹
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-1 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background/90 rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-foreground"
+              aria-label="Next photo"
+            >
+              ›
+            </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+              {images.slice(0, 5).map((_, i) => (
+                <span
+                  key={i}
+                  className={`w-1.5 h-1.5 rounded-full ${i === idx ? "bg-background" : "bg-background/50"}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Fullscreen Lightbox */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none [&>button]:hidden">
+          <div className="relative w-full h-[90vh] flex items-center justify-center">
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 z-50 bg-background/20 hover:bg-background/40 rounded-full w-10 h-10 flex items-center justify-center text-white transition-colors"
+              aria-label="Close lightbox"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <img
+              src={images[idx]}
+              alt={`${alt} - photo ${idx + 1}`}
+              className="max-w-full max-h-full object-contain"
+            />
+
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={prev}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 rounded-full w-12 h-12 flex items-center justify-center text-white transition-colors"
+                  aria-label="Previous photo"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button
+                  onClick={next}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/20 hover:bg-background/40 rounded-full w-12 h-12 flex items-center justify-center text-white transition-colors"
+                  aria-label="Next photo"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+
+                {/* Thumbnail strip */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 max-w-[80vw] overflow-x-auto py-2 px-4">
+                  {images.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={(e) => { e.stopPropagation(); setIdx(i); }}
+                      className={`flex-shrink-0 w-16 h-12 rounded overflow-hidden border-2 transition-all ${i === idx ? "border-white scale-110" : "border-transparent opacity-60 hover:opacity-100"}`}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+
+                <span className="absolute top-4 left-4 text-white/70 text-sm bg-black/40 px-3 py-1 rounded-full">
+                  {idx + 1} / {images.length}
+                </span>
+              </>
+            )}
           </div>
-        </>
-      )}
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
