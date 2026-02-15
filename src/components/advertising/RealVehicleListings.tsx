@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Car,
   ExternalLink,
@@ -64,65 +65,32 @@ interface VehicleSearchParams {
   maxMileage?: number;
 }
 
-/* ─── Mock data ─── */
+/* ─── Fetch from edge function ─── */
 
-const getMockListings = (_params: VehicleSearchParams): Promise<EnhancedVehicleListing[]> =>
-  new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve([
-          {
-            id: "mock-1",
-            vin: "1HGCM82633A123456",
-            spec: { make: "Honda", model: "Accord", year: 2019, trim: "LX", bodyStyle: "Sedan", engine: "1.5L Turbo I4", transmission: "CVT", drivetrain: "FWD", fuelType: "Gasoline", mpgCity: 30, mpgHighway: 38 },
-            price: 22995,
-            mileage: 45000,
-            location: { city: "Detroit", state: "MI", zipCode: "48201", distance: 5.2 },
-            dealer: { name: "Metro Honda", rating: 4.2, reviewCount: 847 },
-            features: ["Backup Camera", "Bluetooth", "Honda Sensing", "Keyless Entry"],
-            images: [],
-            badges: ["certified", "one-owner"],
-            marketValue: { kbb: 23500, edmunds: 23200 },
-            monthlyPayment: { amount: 389, apr: 4.9, termMonths: 60, downPayment: 2000 },
-            source: "autotrader",
-            sourceUrl: "https://www.autotrader.com/cars-for-sale/certified/honda/accord",
-            daysOnMarket: 12,
-            priceHistory: [{ date: "2024-01-15", price: 23995 }, { date: "2024-02-01", price: 22995 }],
-          },
-          {
-            id: "mock-2",
-            spec: { make: "Toyota", model: "Camry", year: 2020, trim: "LE", bodyStyle: "Sedan", engine: "2.5L I4", transmission: "Automatic", drivetrain: "FWD", fuelType: "Gasoline", mpgCity: 28, mpgHighway: 39 },
-            price: 24450,
-            mileage: 32000,
-            location: { city: "Dearborn", state: "MI", zipCode: "48124", distance: 7.8 },
-            dealer: { name: "Toyota of Dearborn", rating: 4.5, reviewCount: 1203 },
-            features: ["Apple CarPlay", "Lane Assist", "Auto Emergency Braking"],
-            images: [],
-            badges: ["low-mileage", "warranty"],
-            monthlyPayment: { amount: 425, apr: 3.9, termMonths: 60, downPayment: 2500 },
-            source: "cars.com",
-            sourceUrl: "https://www.cars.com/vehicledetail/detail/456789",
-            daysOnMarket: 8,
-          },
-          {
-            id: "mock-3",
-            spec: { make: "Ford", model: "Escape", year: 2018, trim: "SE", bodyStyle: "SUV", engine: "1.5L Turbo I4", transmission: "Automatic", drivetrain: "AWD", fuelType: "Gasoline", mpgCity: 23, mpgHighway: 30 },
-            price: 19999,
-            mileage: 52000,
-            location: { city: "Southfield", state: "MI", zipCode: "48075", distance: 12.3 },
-            dealer: { name: "Bill Brown Ford", rating: 3.9, reviewCount: 543 },
-            features: ["AWD", "Heated Seats", "Sync 3", "Roof Rails"],
-            images: [],
-            badges: ["accident-free"],
-            monthlyPayment: { amount: 349, apr: 5.9, termMonths: 60, downPayment: 1500 },
-            source: "cargurus",
-            sourceUrl: "https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action",
-            daysOnMarket: 23,
-          },
-        ]),
-      1500,
-    ),
-  );
+async function fetchVehicleListings(params: VehicleSearchParams): Promise<{ listings: EnhancedVehicleListing[]; source: string }> {
+  const { data, error } = await supabase.functions.invoke("vehicle-search", {
+    body: {
+      zipCode: params.userZipCode,
+      maxDistance: params.maxDistance,
+      minYear: params.minYear,
+      maxYear: params.maxYear,
+      maxPrice: params.maxPrice,
+      maxMileage: params.maxMileage,
+      makes: params.makes,
+    },
+  });
+
+  if (error) throw new Error(error.message || "Vehicle search failed");
+  if (!data?.success) throw new Error(data?.error || "No results");
+
+  const listings: EnhancedVehicleListing[] = (data.listings || []).map((l: any) => ({
+    ...l,
+    badges: (l.badges || []) as EnhancedVehicleListing["badges"],
+    source: l.source as EnhancedVehicleListing["source"],
+  }));
+
+  return { listings, source: data.source || "unknown" };
+}
 
 /* ─── Relevance scoring ─── */
 
@@ -308,12 +276,13 @@ export const VehicleListingsSection = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalResults, setTotalResults] = useState(0);
+  const [dataSource, setDataSource] = useState<string>("unknown");
 
   useEffect(() => {
     if (!userZipCode) return;
     setLoading(true);
     setError(null);
-    getMockListings({
+    fetchVehicleListings({
       userZipCode,
       maxDistance: 50,
       minYear: 2015,
@@ -322,10 +291,11 @@ export const VehicleListingsSection = ({
       maxMileage: 100000,
       makes: ["Honda", "Toyota", "Ford", "Chevrolet", "Nissan"],
     })
-      .then((all) => {
+      .then(({ listings: all, source }) => {
         all.sort((a, b) => relevanceScore(b) - relevanceScore(a));
         setListings(all.slice(0, 6));
         setTotalResults(all.length);
+        setDataSource(source);
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Search failed"))
       .finally(() => setLoading(false));
@@ -368,7 +338,9 @@ export const VehicleListingsSection = ({
           <h3 id="upgrade-section-heading" className="font-heading text-lg font-bold text-ad-success-heading">Consider Upgrading Instead</h3>
           <p className="text-sm text-ad-success-text">{totalResults} vehicles found within 50 miles • Better long-term value</p>
         </div>
-        <Badge className="ml-auto bg-ad-vehicle-live text-ad-vehicle-live-text border-ad-vehicle-live-border">Live Results</Badge>
+        <Badge className="ml-auto bg-ad-vehicle-live text-ad-vehicle-live-text border-ad-vehicle-live-border">
+          {dataSource === "cargurus" ? "Live Results" : "Sample Results"}
+        </Badge>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" role="list" aria-label="Vehicle upgrade options">
