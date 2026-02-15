@@ -43,7 +43,7 @@ export default function AdminLogin() {
       return;
     }
 
-    // Login flow with inline debug
+    // Login flow
     const { error: err } = await signIn(email, password);
     if (err) {
       setError(err);
@@ -51,24 +51,48 @@ export default function AdminLogin() {
       return;
     }
 
-    // After successful login, manually verify admin status and show debug info
+    // After successful login, verify admin status with both methods and show alert
     try {
+      // Wait for session to propagate
+      await new Promise(r => setTimeout(r, 500));
+      
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
-      let info = `Login OK. User ID: ${userId?.slice(0, 8)}...`;
-
-      if (userId) {
-        const { data: rpcResult, error: rpcError } = await supabase.rpc("has_role", {
-          _user_id: userId,
-          _role: "admin",
-        });
-        info += ` | has_role: ${JSON.stringify(rpcResult)}, error: ${rpcError?.message || "none"}`;
-      } else {
-        info += " | No session found after login!";
+      
+      if (!userId) {
+        const msg = "Login succeeded but no session found!";
+        alert(msg);
+        setDebugInfo(msg);
+        setSubmitting(false);
+        return;
       }
+
+      // Test 1: RPC
+      const { data: rpcResult, error: rpcError } = await supabase.rpc("has_role", {
+        _user_id: userId,
+        _role: "admin",
+      });
+
+      // Test 2: Direct query
+      const { data: directResult, error: directError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      const info = [
+        `User: ${userId.slice(0, 8)}`,
+        `RPC: ${JSON.stringify(rpcResult)} (err: ${rpcError?.message || "none"})`,
+        `Direct: ${JSON.stringify(directResult)} (err: ${directError?.message || "none"})`,
+      ].join(" | ");
+
+      alert(info);
       setDebugInfo(info);
     } catch (debugErr: any) {
-      setDebugInfo(`Debug exception: ${debugErr?.message}`);
+      const msg = `Exception: ${debugErr?.message}`;
+      alert(msg);
+      setDebugInfo(msg);
     }
 
     setSubmitting(false);
@@ -115,12 +139,15 @@ export default function AdminLogin() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={async () => {
-                    await signOut();
-                    // Force clear any persisted session
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    window.location.reload();
+                  onClick={() => {
+                    // Nuclear: clear everything and reload
+                    try { localStorage.clear(); } catch (_) {}
+                    try { sessionStorage.clear(); } catch (_) {}
+                    // Remove supabase auth keys specifically
+                    for (const key of Object.keys(localStorage)) {
+                      if (key.startsWith('sb-')) localStorage.removeItem(key);
+                    }
+                    window.location.href = '/admin/login';
                   }}
                   className="w-full"
                 >
