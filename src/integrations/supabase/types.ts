@@ -41,6 +41,65 @@ export type Database = {
         }
         Relationships: []
       }
+      finance_selections: {
+        Row: {
+          apr: number
+          created_at: string
+          id: string
+          monthly_payment: number
+          option_type: string
+          provider: string
+          quote_request_id: string | null
+          repair_cost: number
+          term_months: number
+          total_cost: number
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          apr: number
+          created_at?: string
+          id?: string
+          monthly_payment: number
+          option_type: string
+          provider: string
+          quote_request_id?: string | null
+          repair_cost: number
+          term_months: number
+          total_cost: number
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          apr?: number
+          created_at?: string
+          id?: string
+          monthly_payment?: number
+          option_type?: string
+          provider?: string
+          quote_request_id?: string | null
+          repair_cost?: number
+          term_months?: number
+          total_cost?: number
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_selections_quote_request_id_fkey"
+            columns: ["quote_request_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_requests: {
         Row: {
           cost_estimate_details: Json | null
