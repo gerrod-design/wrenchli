@@ -42,148 +42,93 @@ interface VehicleListing {
   daysOnMarket?: number;
 }
 
-/* ─── Firecrawl: scrape CarGurus search results ─── */
+/* ─── MarketCheck API ─── */
 
-async function searchVehicles(
+async function searchMarketCheck(
   apiKey: string,
   params: SearchParams
 ): Promise<VehicleListing[]> {
-  const makesQuery = params.makes?.length
-    ? params.makes.join(" OR ")
-    : "Honda OR Toyota OR Ford";
+  const url = new URL("https://mc-api.marketcheck.com/v2/search/car/active");
+  url.searchParams.set("api_key", apiKey);
+  url.searchParams.set("zip", params.zipCode);
+  url.searchParams.set("radius", String(params.maxDistance ?? 50));
+  url.searchParams.set("rows", "6");
+  url.searchParams.set("car_type", "used");
 
-  const query = `used cars for sale near zip ${params.zipCode} ${makesQuery} under $${params.maxPrice ?? 40000} low mileage`;
+  if (params.makes?.length) {
+    url.searchParams.set("make", params.makes.join(","));
+  }
+  if (params.minYear) url.searchParams.set("year_range", `${params.minYear}-${params.maxYear ?? 2026}`);
+  if (params.maxPrice) url.searchParams.set("price_range", `0-${params.maxPrice}`);
+  if (params.maxMileage) url.searchParams.set("miles_range", `0-${params.maxMileage}`);
 
-  console.log("Firecrawl searching:", query);
+  console.log("MarketCheck query:", url.toString().replace(apiKey, "***"));
 
-  const resp = await fetch("https://api.firecrawl.dev/v1/search", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query,
-      limit: 10,
-      lang: "en",
-      country: "us",
-    }),
-  });
-
+  const resp = await fetch(url.toString());
   const data = await resp.json();
-  console.log("Firecrawl search status:", resp.status);
 
   if (!resp.ok) {
-    console.error("Firecrawl search error:", JSON.stringify(data));
+    console.error("MarketCheck error:", JSON.stringify(data));
     return [];
   }
 
-  const results = data?.data ?? [];
-  console.log(`Got ${results.length} search results`);
+  const results = data?.listings ?? [];
+  console.log(`MarketCheck returned ${results.length} listings`);
 
-  // Parse vehicle listings from search result titles/descriptions
-  const listings: VehicleListing[] = [];
-
-  for (let i = 0; i < results.length && listings.length < 6; i++) {
-    const r = results[i];
-    const title = r.title || "";
-    const desc = r.description || "";
-    const url = r.url || "";
-
-    // Try to parse "2020 Toyota Camry LE" pattern from title
-    const yearMatch = title.match(/\b(20\d{2})\b/);
-    if (!yearMatch) continue;
-
-    const year = parseInt(yearMatch[1]);
-    if (params.minYear && year < params.minYear) continue;
-
-    // Extract make/model from title after year
-    const afterYear = title.substring(title.indexOf(yearMatch[0]) + yearMatch[0].length).trim();
-    const words = afterYear.split(/[\s\-–|•,]+/).filter(Boolean);
-    if (words.length < 2) continue;
-
-    const make = words[0];
-    const model = words[1];
-    const trim = words.length > 2 ? words[2] : undefined;
-
-    // Extract price from title or description
-    const priceMatch = (title + " " + desc).match(/\$[\d,]+/);
-    const price = priceMatch ? parseInt(priceMatch[0].replace(/[^0-9]/g, "")) : 0;
-    if (!price || (params.maxPrice && price > params.maxPrice)) continue;
-
-    // Extract mileage
-    const mileMatch = desc.match(/([\d,]+)\s*(?:mi|mile)/i);
-    const mileage = mileMatch ? parseInt(mileMatch[1].replace(/,/g, "")) : 0;
-
-    // Determine source
-    let source: string = "web";
-    if (url.includes("cargurus")) source = "cargurus";
-    else if (url.includes("autotrader")) source = "autotrader";
-    else if (url.includes("cars.com")) source = "cars.com";
-
-    // Extract location from description
-    const locMatch = desc.match(/([A-Z][a-z]+(?:\s[A-Z][a-z]+)?),?\s+([A-Z]{2})\b/);
-    const city = locMatch ? locMatch[1] : "";
-    const state = locMatch ? locMatch[2] : "";
-
-    // Calculate monthly payment
+  return results.map((r: any) => {
+    const price = r.price ?? 0;
     const apr = 5.9;
     const termMonths = 60;
     const downPayment = Math.round(price * 0.1);
     const loanAmount = price - downPayment;
     const monthlyRate = apr / 100 / 12;
-    const monthlyPayment = Math.round(
-      loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, termMonths)) /
-        (Math.pow(1 + monthlyRate, termMonths) - 1)
-    );
+    const monthlyPayment = loanAmount > 0
+      ? Math.round(loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, termMonths)) / (Math.pow(1 + monthlyRate, termMonths) - 1))
+      : 0;
 
-    // Detect badges from description
     const badges: string[] = [];
-    const dl = desc.toLowerCase();
-    if (dl.includes("certified") || dl.includes("cpo")) badges.push("certified");
-    if (dl.includes("low mile") || dl.includes("low-mile")) badges.push("low-mileage");
-    if (dl.includes("one owner") || dl.includes("1-owner")) badges.push("one-owner");
-    if (dl.includes("no accident") || dl.includes("accident free") || dl.includes("clean")) badges.push("accident-free");
+    if (r.is_certified) badges.push("certified");
+    if ((r.miles ?? 0) < 40000) badges.push("low-mileage");
+    if (r.one_owner) badges.push("one-owner");
+    if (r.clean_title) badges.push("accident-free");
 
-    listings.push({
-      id: `search-${i}-${year}-${make}`,
-      spec: { make, model, year, trim },
+    return {
+      id: r.id ?? `mc-${r.vin ?? Math.random().toString(36).slice(2)}`,
+      spec: {
+        make: r.build?.make ?? r.make ?? "",
+        model: r.build?.model ?? r.model ?? "",
+        year: r.build?.year ?? r.year ?? 0,
+        trim: r.build?.trim ?? r.trim,
+        bodyStyle: r.build?.body_type ?? r.body_type,
+        engine: r.build?.engine ?? r.engine,
+        transmission: r.build?.transmission ?? r.transmission,
+        drivetrain: r.build?.drivetrain ?? r.drivetrain,
+        fuelType: r.build?.fuel_type ?? r.fuel_type,
+        mpgCity: r.build?.city_miles,
+        mpgHighway: r.build?.highway_miles,
+      },
       price,
-      mileage,
-      location: { city, state, zipCode: params.zipCode },
-      dealer: { name: source === "cargurus" ? "via CarGurus" : source === "autotrader" ? "via AutoTrader" : "via Cars.com" },
-      features: [],
-      images: [],
+      mileage: r.miles ?? 0,
+      location: {
+        city: r.dealer?.city ?? "",
+        state: r.dealer?.state ?? "",
+        zipCode: r.dealer?.zip ?? params.zipCode,
+        distance: r.dist,
+      },
+      dealer: {
+        name: r.dealer?.name ?? "Dealer",
+        rating: r.dealer?.rating,
+        reviewCount: r.dealer?.review_count,
+      },
+      features: r.extra?.features ?? [],
+      images: r.media?.photo_links?.slice(0, 5) ?? [],
       badges,
       monthlyPayment: price > 0 ? { amount: monthlyPayment, apr, termMonths, downPayment } : undefined,
-      source,
-      sourceUrl: url,
-    } as VehicleListing);
-  }
-
-  console.log(`Parsed ${listings.length} vehicle listings from search`);
-  return listings;
-}
-
-/* ─── NHTSA enrichment ─── */
-
-async function enrichWithNHTSA(listings: VehicleListing[]): Promise<VehicleListing[]> {
-  const enriched = await Promise.all(
-    listings.map(async (listing) => {
-      try {
-        const url = `https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/${encodeURIComponent(listing.spec.make)}/modelyear/${listing.spec.year}/vehicleType/car?format=json`;
-        const resp = await fetch(url);
-        if (resp.ok) {
-          // NHTSA confirms the make/model exists — we keep it as-is
-          // Additional enrichment could include safety ratings, recalls, etc.
-        }
-      } catch {
-        // Non-critical — just skip enrichment
-      }
-      return listing;
-    })
-  );
-  return enriched;
+      source: "marketcheck",
+      sourceUrl: r.vdp_url ?? "",
+      daysOnMarket: r.dom,
+    } as VehicleListing;
+  });
 }
 
 /* ─── Fallback mock data ─── */
@@ -254,36 +199,31 @@ Deno.serve(async (req) => {
       );
     }
 
-    const firecrawlKey = Deno.env.get("FIRECRAWL_API_KEY");
+    const marketCheckKey = Deno.env.get("MARKETCHECK_API_KEY");
 
     let listings: VehicleListing[] = [];
 
-    if (firecrawlKey) {
+    if (marketCheckKey) {
       try {
-        listings = await searchVehicles(firecrawlKey, params);
-        console.log(`Search returned ${listings.length} listings`);
+        listings = await searchMarketCheck(marketCheckKey, params);
       } catch (err) {
-        console.error("CarGurus scrape failed, using fallback:", err);
+        console.error("MarketCheck search failed, using fallback:", err);
       }
     } else {
-      console.warn("FIRECRAWL_API_KEY not set, using fallback data");
+      console.warn("MARKETCHECK_API_KEY not set, using fallback data");
     }
 
-    // Fall back to mock data if scrape returned nothing
     if (listings.length === 0) {
       console.log("Using fallback listings");
       listings = getFallbackListings(params);
     }
-
-    // Enrich with NHTSA data
-    listings = await enrichWithNHTSA(listings);
 
     return new Response(
       JSON.stringify({
         success: true,
         listings,
         total: listings.length,
-        source: listings[0]?.source === "fallback" ? "fallback" : "cargurus",
+        source: listings[0]?.source === "fallback" ? "fallback" : "marketcheck",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
