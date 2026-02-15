@@ -110,7 +110,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 border-t border-primary-foreground/10 pt-6 flex flex-col items-center gap-2 text-xs text-primary-foreground/40">
-          <p>© {new Date().getFullYear()} Wrenchli, Inc. | Delaware Corporation | All Rights Reserved</p>
+          <p>© {new Date().getFullYear()} Wrenchli, Inc. | Delaware Corporation | All&nbsp;Rights&nbsp;Reserved</p>
           <p className="text-primary-foreground/30 text-[11px]">Built in Detroit. Driven by trust.</p>
         </div>
       </div>
