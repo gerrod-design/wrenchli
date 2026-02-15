@@ -109,29 +109,10 @@ export default function AdminLogin() {
             {error && (
               <p className="text-sm text-destructive text-center">{error}</p>
             )}
-            {user && !isAdmin && !debugInfo && (
-              <div className="space-y-2">
-                <p className="text-sm text-destructive text-center">
-                  This account does not have admin access.
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    // Nuclear: clear everything and reload
-                    try { localStorage.clear(); } catch (_) {}
-                    try { sessionStorage.clear(); } catch (_) {}
-                    // Remove supabase auth keys specifically
-                    for (const key of Object.keys(localStorage)) {
-                      if (key.startsWith('sb-')) localStorage.removeItem(key);
-                    }
-                    window.location.href = '/admin/login';
-                  }}
-                  className="w-full"
-                >
-                  Sign Out &amp; Try Another Account
-                </Button>
-              </div>
+            {user && !isAdmin && (
+              <p className="text-sm text-destructive text-center">
+                This account does not have admin access.
+              </p>
             )}
             {debugInfo && (
               <div className="rounded-lg bg-muted p-3 text-xs font-mono break-all">
@@ -152,6 +133,21 @@ export default function AdminLogin() {
             <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-center">
               <p className="text-sm text-green-800 font-medium">Account created! We'll grant admin access next.</p>
             </div>
+          )}
+
+          {user && !isAdmin && (
+            <a
+              href="/admin/login"
+              onClick={(e) => {
+                e.preventDefault();
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.replace("/admin/login");
+              }}
+              className="block text-center text-sm font-medium text-destructive hover:underline cursor-pointer"
+            >
+              Sign out &amp; try another account
+            </a>
           )}
 
           <div className="text-center">
