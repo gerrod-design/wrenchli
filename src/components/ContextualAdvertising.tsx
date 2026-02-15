@@ -1,5 +1,6 @@
 import { Package } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
+import { showDIY } from "@/lib/diyVisibility";
 import {
   DIYSectionSkeleton,
   VehicleSectionSkeleton,
@@ -12,20 +13,6 @@ import DIYProductSection from "./advertising/DIYProductSection";
 import VehicleReplacementSection from "./advertising/VehicleReplacementSection";
 import ServiceAdSection from "./advertising/ServiceAdSection";
 import type { TrackingContext } from "./advertising/types";
-
-/* ── DIY visibility logic ── */
-
-function showDIY(repairCost: number, diyFeasibility?: string): boolean {
-  const thresholds: Record<string, number> = {
-    easy: 5000,
-    moderate: 3000,
-    advanced: 1500,
-  };
-  const maxCost = thresholds[diyFeasibility || ""] ?? 2000;
-  return repairCost < maxCost;
-}
-
-/* ── Main component ── */
 
 const ContextualAdvertising = ({
   diagnosis,
