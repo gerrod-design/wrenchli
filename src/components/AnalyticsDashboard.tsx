@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -81,10 +81,10 @@ const AnalyticsDashboard = () => {
     end: new Date().toISOString().split("T")[0],
   });
 
-  const isoRange = {
+  const isoRange = useMemo(() => ({
     start: `${dateRange.start}T00:00:00Z`,
     end: `${dateRange.end}T23:59:59Z`,
-  };
+  }), [dateRange.start, dateRange.end]);
 
   const { metrics, loading: revenueLoading } = useRevenueAnalytics(isoRange);
   const [stats, setStats] = useState<DetailedStats | null>(null);
@@ -95,15 +95,17 @@ const AnalyticsDashboard = () => {
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
+      const rangeStart = `${dateRange.start}T00:00:00Z`;
+      const rangeEnd = `${dateRange.end}T23:59:59Z`;
       // Calculate previous period (same duration, immediately before current range)
-      const startMs = new Date(isoRange.start).getTime();
-      const endMs = new Date(isoRange.end).getTime();
+      const startMs = new Date(rangeStart).getTime();
+      const endMs = new Date(rangeEnd).getTime();
       const durationMs = endMs - startMs;
       const prevStart = new Date(startMs - durationMs).toISOString();
       const prevEnd = new Date(startMs - 1).toISOString();
 
       const [currentRes, prevRes] = await Promise.all([
-        supabase.from("analytics_events").select("*").gte("timestamp", isoRange.start).lte("timestamp", isoRange.end),
+        supabase.from("analytics_events").select("*").gte("timestamp", rangeStart).lte("timestamp", rangeEnd),
         supabase.from("analytics_events").select("event_type, session_id, value").gte("timestamp", prevStart).lte("timestamp", prevEnd),
       ]);
 
@@ -235,7 +237,7 @@ const AnalyticsDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [isoRange.start, isoRange.end]);
+  }, [dateRange.start, dateRange.end]);
 
   useEffect(() => {
     fetchStats();
