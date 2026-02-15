@@ -127,7 +127,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      // Use native fetch to avoid Supabase client auth lock
+      const tokenKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+      const tokenData = tokenKey ? JSON.parse(localStorage.getItem(tokenKey) || '{}') : null;
+      const accessToken = tokenData?.access_token;
+
+      if (accessToken) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        await fetch(`${supabaseUrl}/auth/v1/logout`, {
+          method: 'POST',
+          headers: {
+            'apikey': anonKey,
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+      }
+
+      // Clear local storage token
+      if (tokenKey) localStorage.removeItem(tokenKey);
     } catch (err) {
       console.error("[AuthContext] signOut error:", err);
     } finally {

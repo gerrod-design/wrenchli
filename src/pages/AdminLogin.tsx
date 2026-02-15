@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Lock } from "lucide-react";
 import SEO from "@/components/SEO";
-import { supabase } from "@/integrations/supabase/client";
+
 
 export default function AdminLogin() {
   const { user, isAdmin, loading, signIn, signUp, signOut } = useAuth();
@@ -50,22 +50,24 @@ export default function AdminLogin() {
       return;
     }
 
-    // Wait for session to propagate, then verify admin
+    // Wait for session to propagate, then verify admin via native fetch
     await new Promise(r => setTimeout(r, 500));
 
-    const { data: { session } } = await supabase.auth.getSession();
-    const userId = session?.user?.id;
+    const tokenKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+    const tokenData = tokenKey ? JSON.parse(localStorage.getItem(tokenKey) || '{}') : null;
+    const accessToken = tokenData?.access_token;
+    const userId = tokenData?.user?.id;
 
-    if (userId) {
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .eq("role", "admin")
-        .maybeSingle();
+    if (userId && accessToken) {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/user_roles?select=role&user_id=eq.${userId}&role=eq.admin&limit=1`,
+        { headers: { 'apikey': anonKey, 'Authorization': `Bearer ${accessToken}` } }
+      );
+      const data = res.ok ? await res.json() : [];
 
-      if (data) {
-        // Admin confirmed — use React state to trigger Navigate
+      if (Array.isArray(data) && data.length > 0) {
         setAdminConfirmed(true);
         return;
       }
