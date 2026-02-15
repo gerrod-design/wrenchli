@@ -25,7 +25,7 @@ const ServiceAdCard = ({
               <div className="flex items-center gap-2 mb-1">
                 <h4 className="font-semibold text-sm">{service.company}</h4>
                 {service.badge && (
-                  <Badge className="text-xs bg-blue-600 text-white px-1 py-0">{service.badge}</Badge>
+                  <Badge className="text-xs bg-primary text-primary-foreground px-1 py-0">{service.badge}</Badge>
                 )}
               </div>
               <p className="text-xs text-muted-foreground mb-1">{service.description}</p>
@@ -54,7 +54,7 @@ const ServiceAdCard = ({
           <div className="flex items-center justify-center gap-1 mb-1">
             <h4 className="font-semibold text-sm">{service.company}</h4>
             {service.badge && (
-              <Badge className="text-xs bg-blue-600 text-white px-1 py-0">{service.badge}</Badge>
+              <Badge className="text-xs bg-primary text-primary-foreground px-1 py-0">{service.badge}</Badge>
             )}
           </div>
           <p className="text-xs text-muted-foreground mb-2">{service.description}</p>
@@ -62,7 +62,7 @@ const ServiceAdCard = ({
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={`h-3 w-3 ${i < Math.floor(service.rating) ? "text-yellow-400 fill-current" : "text-muted-foreground/30"}`}
+                className={`h-3 w-3 ${i < Math.floor(service.rating) ? "text-ad-star fill-current" : "text-muted-foreground/30"}`}
               />
             ))}
             <span className="text-xs text-muted-foreground">({service.reviewCount.toLocaleString()})</span>

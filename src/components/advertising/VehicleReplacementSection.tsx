@@ -52,14 +52,14 @@ const VehicleReplacementSection = ({
   repairCost: number;
   trackCtx: TrackingContext;
 }) => (
-  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
+  <div className="bg-gradient-to-r from-ad-success-bg to-ad-success-bg-end rounded-2xl p-6 border border-ad-success-border">
     <div className="flex items-center gap-3 mb-4">
-      <Car className="h-5 w-5 text-green-600" />
+      <Car className="h-5 w-5 text-ad-success-icon" />
       <div>
-        <h3 className="font-heading text-lg font-bold text-green-900">Consider Upgrading Instead</h3>
-        <p className="text-sm text-green-700">These vehicles might be a better long-term investment</p>
+        <h3 className="font-heading text-lg font-bold text-ad-success-heading">Consider Upgrading Instead</h3>
+        <p className="text-sm text-ad-success-text">These vehicles might be a better long-term investment</p>
       </div>
-      <Badge className="ml-auto bg-blue-100 text-blue-800 border-blue-300">Better Value</Badge>
+      <Badge className="ml-auto bg-ad-badge-value text-ad-badge-value-text border-ad-badge-value-border">Better Value</Badge>
     </div>
     <div className="grid gap-4 md:grid-cols-3">
       {VEHICLES.map((v, i) => (
@@ -77,11 +77,11 @@ const VehicleReplacementSection = ({
         />
       ))}
     </div>
-    <div className="mt-4 pt-4 border-t border-green-200 flex items-center justify-between">
-      <p className="text-sm text-green-700">
+    <div className="mt-4 pt-4 border-t border-ad-success-border flex items-center justify-between">
+      <p className="text-sm text-ad-success-text">
         Monthly payments starting around $280-350 vs. ${repairCost.toLocaleString()} repair cost
       </p>
-      <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-100" asChild>
+      <Button variant="outline" size="sm" className="border-ad-success-border text-ad-success-text hover:bg-ad-success-bg" asChild>
         <a
           href="https://www.kbb.com/whats-my-car-worth/"
           target="_blank"

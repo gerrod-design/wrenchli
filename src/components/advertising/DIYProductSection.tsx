@@ -35,14 +35,14 @@ const DIYProductSection = ({
   const handleBrowseAll = () => trackAdClick({ ...trackCtx, click_type: "browse_parts" });
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+    <div className="bg-gradient-to-r from-ad-info-bg to-ad-info-bg-end rounded-2xl p-6 border border-ad-info-border">
       <div className="flex items-center gap-3 mb-4">
-        <Wrench className="h-5 w-5 text-blue-600" />
+        <Wrench className="h-5 w-5 text-ad-info-icon" />
         <div>
-          <h3 className="font-heading text-lg font-bold text-blue-900">DIY Repair Option</h3>
-          <p className="text-sm text-blue-700">Save money by fixing it yourself with these parts</p>
+          <h3 className="font-heading text-lg font-bold text-ad-info-heading">DIY Repair Option</h3>
+          <p className="text-sm text-ad-info-text">Save money by fixing it yourself with these parts</p>
         </div>
-        <Badge className="ml-auto bg-green-100 text-green-800 border-green-300">Save 60-70%</Badge>
+        <Badge className="ml-auto bg-ad-badge-savings text-ad-badge-savings-text border-ad-badge-savings-border">Save 60-70%</Badge>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         {products.map((p) => (
@@ -50,18 +50,18 @@ const DIYProductSection = ({
         ))}
       </div>
       {diyEstimate && (
-        <div className="mt-4 pt-4 border-t border-blue-200 flex items-center justify-between text-sm">
+        <div className="mt-4 pt-4 border-t border-ad-info-border flex items-center justify-between text-sm">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1 text-blue-700">
-              <Clock className="h-4 w-4 text-blue-600" />
+            <span className="flex items-center gap-1 text-ad-info-text">
+              <Clock className="h-4 w-4 text-ad-info-icon" />
               {diyEstimate.timeRange}
             </span>
-            <span className="flex items-center gap-1 text-green-700">
-              <DollarSign className="h-4 w-4 text-green-600" />
+            <span className="flex items-center gap-1 text-ad-success-text">
+              <DollarSign className="h-4 w-4 text-ad-success-icon" />
               Total parts: {diyEstimate.totalPartsRange}
             </span>
           </div>
-          <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100" asChild>
+          <Button variant="outline" size="sm" className="border-ad-info-border text-ad-info-text hover:bg-ad-info-bg" asChild>
             <a
               href={buildAmazonSearchLink("auto repair parts", vehicleStr)}
               target="_blank"
@@ -74,7 +74,7 @@ const DIYProductSection = ({
         </div>
       )}
       {source === "ai" && (
-        <p className="mt-2 text-xs text-blue-600/60 text-center">
+        <p className="mt-2 text-xs text-ad-info-subtle text-center">
           Recommendations powered by AI — verify fitment for your specific vehicle
         </p>
       )}
