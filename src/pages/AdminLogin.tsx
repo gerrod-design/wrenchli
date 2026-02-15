@@ -15,7 +15,7 @@ export default function AdminLogin() {
   const [submitting, setSubmitting] = useState(false);
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [signupSuccess, setSignupSuccess] = useState(false);
-  const [debugInfo, setDebugInfo] = useState("");
+  const [adminConfirmed, setAdminConfirmed] = useState(false);
 
   if (loading) {
     return (
@@ -25,14 +25,13 @@ export default function AdminLogin() {
     );
   }
 
-  if (user && isAdmin) {
+  if ((user && isAdmin) || adminConfirmed) {
     return <Navigate to="/admin" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setDebugInfo("");
     setSubmitting(true);
 
     if (mode === "signup") {
@@ -51,9 +50,9 @@ export default function AdminLogin() {
       return;
     }
 
-    // Wait for session to propagate, then verify admin and navigate
+    // Wait for session to propagate, then verify admin
     await new Promise(r => setTimeout(r, 500));
-    
+
     const { data: { session } } = await supabase.auth.getSession();
     const userId = session?.user?.id;
 
@@ -66,14 +65,24 @@ export default function AdminLogin() {
         .maybeSingle();
 
       if (data) {
-        // Admin confirmed — force full page navigate to bypass React state race
-        window.location.href = "/admin";
+        // Admin confirmed — use React state to trigger Navigate
+        setAdminConfirmed(true);
         return;
       }
     }
 
     setError("This account does not have admin access.");
     setSubmitting(false);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (_) {
+      // ignore
+    }
+    setAdminConfirmed(false);
+    setError("");
   };
 
   return (
@@ -114,11 +123,6 @@ export default function AdminLogin() {
                 This account does not have admin access.
               </p>
             )}
-            {debugInfo && (
-              <div className="rounded-lg bg-muted p-3 text-xs font-mono break-all">
-                {debugInfo}
-              </div>
-            )}
             <Button
               type="submit"
               disabled={submitting}
@@ -130,30 +134,26 @@ export default function AdminLogin() {
           </form>
 
           {signupSuccess && (
-            <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-center">
-              <p className="text-sm text-green-800 font-medium">Account created! We'll grant admin access next.</p>
+            <div className="rounded-lg border border-border bg-muted p-3 text-center">
+              <p className="text-sm font-medium">Account created! We'll grant admin access next.</p>
             </div>
           )}
 
           {user && !isAdmin && (
-            <a
-              href="/admin/login"
-              onClick={(e) => {
-                e.preventDefault();
-                localStorage.clear();
-                sessionStorage.clear();
-                window.location.replace("/admin/login");
-              }}
-              className="block text-center text-sm font-medium text-destructive hover:underline cursor-pointer"
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSignOut}
+              className="w-full"
             >
-              Sign out &amp; try another account
-            </a>
+              Sign Out &amp; Try Another Account
+            </Button>
           )}
 
           <div className="text-center">
             <button
               type="button"
-              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSignupSuccess(false); setDebugInfo(""); }}
+              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSignupSuccess(false); }}
               className="text-sm text-accent hover:underline"
             >
               {mode === "login" ? "Need an account? Sign up" : "Already have an account? Sign in"}
