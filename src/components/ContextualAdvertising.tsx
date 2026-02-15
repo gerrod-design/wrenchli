@@ -376,6 +376,25 @@ const ServiceAdSection = ({ services, layout = "horizontal" }: { services: Servi
   );
 };
 
+/* ── DIY visibility logic ── */
+
+/**
+ * Determines whether to show the DIY section based on repair cost and difficulty.
+ * - easy: always show (up to $5,000)
+ * - moderate: show up to $3,000
+ * - advanced: show up to $1,500
+ * - unknown: show up to $2,000 (original default)
+ */
+function showDIY(repairCost: number, diyFeasibility?: string): boolean {
+  const thresholds: Record<string, number> = {
+    easy: 5000,
+    moderate: 3000,
+    advanced: 1500,
+  };
+  const maxCost = thresholds[diyFeasibility || ""] ?? 2000;
+  return repairCost < maxCost;
+}
+
 /* ── Main component ── */
 
 const ContextualAdvertising = ({
@@ -384,6 +403,7 @@ const ContextualAdvertising = ({
   vehicleInfo,
   repairCost,
   repairRecommendation,
+  diyFeasibility,
   placement = "full",
 }: {
   diagnosis: string;
@@ -391,6 +411,7 @@ const ContextualAdvertising = ({
   vehicleInfo: any;
   repairCost: number;
   repairRecommendation: "repair" | "replace" | "consider_both";
+  diyFeasibility?: "easy" | "moderate" | "advanced" | string;
   placement?: "full" | "sidebar" | "footer";
 }) => {
   const { data, loading } = useProductRecommendations(diagnosis, diagnosisCode, vehicleInfo);
@@ -438,7 +459,7 @@ const ContextualAdvertising = ({
 
   return (
     <div className="space-y-6">
-      {repairCost < 2000 && products.length > 0 && (
+      {showDIY(repairCost, diyFeasibility) && products.length > 0 && (
         <DIYProductSection
           products={products}
           diyEstimate={diyEstimate}
