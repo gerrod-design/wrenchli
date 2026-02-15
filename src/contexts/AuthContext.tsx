@@ -21,22 +21,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const adminCheckDone = useRef(false);
 
-  // Check admin role via direct query (user can read own roles via RLS policy)
-  const checkAdmin = async (userId: string): Promise<boolean> => {
+  // Check admin role via native fetch to avoid Supabase client auth locks
+  const checkAdmin = async (userId: string, accessToken: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .eq("role", "admin")
-        .maybeSingle();
-
-      if (error) {
-        console.error("[AuthContext] admin check error:", error.message);
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/user_roles?select=role&user_id=eq.${userId}&role=eq.admin&limit=1`,
+        {
+          headers: {
+            'apikey': anonKey,
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        }
+      );
+      if (!res.ok) {
+        console.error("[AuthContext] admin check failed:", res.status);
         return false;
       }
-
-      return !!data;
+      const data = await res.json();
+      return Array.isArray(data) && data.length > 0;
     } catch (err) {
       console.error("[AuthContext] checkAdmin exception:", err);
       return false;
@@ -55,8 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
 
-        if (initialSession?.user) {
-          const admin = await checkAdmin(initialSession.user.id);
+        if (initialSession?.user && initialSession.access_token) {
+          const admin = await checkAdmin(initialSession.user.id, initialSession.access_token);
           if (mounted) {
             setIsAdmin(admin);
             adminCheckDone.current = true;
@@ -79,17 +83,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
-        if (newSession?.user) {
-          // Delay to ensure the auth token is propagated
-          await new Promise(resolve => setTimeout(resolve, 500));
-          if (!mounted) return;
-          
-          // Retry up to 3 times
-          let admin = false;
-          for (let i = 0; i < 3 && !admin; i++) {
-            admin = await checkAdmin(newSession.user.id);
-            if (!admin && i < 2) await new Promise(r => setTimeout(r, 300));
-          }
+        if (newSession?.user && newSession.access_token) {
+          const admin = await checkAdmin(newSession.user.id, newSession.access_token);
           if (mounted) {
             setIsAdmin(admin);
             setLoading(false);

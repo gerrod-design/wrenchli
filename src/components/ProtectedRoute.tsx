@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -10,23 +10,28 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const [timedOut, setTimedOut] = useState(false);
   const [directAdminCheck, setDirectAdminCheck] = useState<boolean | null>(null);
 
-  // Independent admin check as fallback
+  // Independent admin check as fallback using native fetch
   useEffect(() => {
     if (!user || isAdmin) return;
 
     let cancelled = false;
     const check = async () => {
-      // Wait a bit for session to settle
-      await new Promise(r => setTimeout(r, 300));
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
+      try {
+        const tokenKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        const tokenData = tokenKey ? JSON.parse(localStorage.getItem(tokenKey) || '{}') : null;
+        const accessToken = tokenData?.access_token;
+        if (!accessToken) { setDirectAdminCheck(false); return; }
 
-      if (!cancelled) {
-        setDirectAdminCheck(!!data);
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const res = await fetch(
+          `${supabaseUrl}/rest/v1/user_roles?select=role&user_id=eq.${user.id}&role=eq.admin&limit=1`,
+          { headers: { 'apikey': anonKey, 'Authorization': `Bearer ${accessToken}` } }
+        );
+        const data = res.ok ? await res.json() : [];
+        if (!cancelled) setDirectAdminCheck(Array.isArray(data) && data.length > 0);
+      } catch {
+        if (!cancelled) setDirectAdminCheck(false);
       }
     };
     check();
