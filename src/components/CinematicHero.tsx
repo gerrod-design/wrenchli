@@ -110,11 +110,9 @@ export default function CinematicHero() {
           {...fadeUp(1.2, 15)}
           className="mt-5 md:mt-6 text-base md:text-xl leading-relaxed text-white/90 max-w-[600px]"
         >
-          Find out what's wrong. Learn to fix it yourself.
+          Fixing the broken vehicle repair experience.
           <br />
-          Or get instant quotes from trusted local shops.
-          <br />
-          Your vehicle, your choice.
+          Coming soon to Detroit.
         </motion.p>
 
         {/* CTA Buttons */}
