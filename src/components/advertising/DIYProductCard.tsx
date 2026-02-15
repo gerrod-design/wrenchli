@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, ShoppingCart, Package } from "lucide-react";
+import { Star, ShoppingCart } from "lucide-react";
 import type { ProductRecommendation } from "@/data/adRecommendations";
+import ProductImageDisplay from "./EnhancedProductImages";
 
 const DIYProductCard = ({
   product,
@@ -11,19 +12,14 @@ const DIYProductCard = ({
   product: ProductRecommendation;
   onTrack?: (p: ProductRecommendation) => void;
 }) => (
-  <Card className="hover:shadow-md transition-shadow duration-200 p-3" role="article" aria-label={`Product: ${product.title}`}>
+  <Card className="hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 p-3" role="article" aria-label={`Product: ${product.title}`}>
     <CardContent className="p-0">
       <div className="flex gap-3">
-        <div className="relative shrink-0">
-          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center" aria-hidden="true">
-            <Package className="h-8 w-8 text-muted-foreground" />
-          </div>
-          {product.badge && (
-            <Badge className="absolute -top-1 -right-1 text-xs px-1 py-0.5 bg-accent text-accent-foreground">
-              {product.badge}
-            </Badge>
-          )}
-        </div>
+        <ProductImageDisplay
+          product={{ ...product, description: product.title, images: [] }}
+          size="medium"
+          className="shrink-0"
+        />
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-sm leading-tight mb-1 line-clamp-2">{product.title}</h4>
           <div className="flex items-center gap-1 mb-1" role="img" aria-label={`Rated ${product.rating} out of 5 stars, ${product.reviewCount.toLocaleString()} reviews`}>
