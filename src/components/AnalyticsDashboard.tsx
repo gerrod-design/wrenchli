@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import {
   TrendingUp,
+  TrendingDown,
   MousePointer,
   DollarSign,
   Target,
@@ -22,6 +23,7 @@ import {
   Calendar,
   Download,
   RefreshCw,
+  Minus,
 } from "lucide-react";
 import { useRevenueAnalytics } from "@/hooks/useRevenueAnalytics";
 import { supabase } from "@/integrations/supabase/client";
@@ -86,19 +88,35 @@ const AnalyticsDashboard = () => {
 
   const { metrics, loading: revenueLoading } = useRevenueAnalytics(isoRange);
   const [stats, setStats] = useState<DetailedStats | null>(null);
+  const [prevStats, setPrevStats] = useState<{ sessions: number; clicks: number; revenue: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: events, error } = await supabase
-        .from("analytics_events")
-        .select("*")
-        .gte("timestamp", isoRange.start)
-        .lte("timestamp", isoRange.end);
+      // Calculate previous period (same duration, immediately before current range)
+      const startMs = new Date(isoRange.start).getTime();
+      const endMs = new Date(isoRange.end).getTime();
+      const durationMs = endMs - startMs;
+      const prevStart = new Date(startMs - durationMs).toISOString();
+      const prevEnd = new Date(startMs - 1).toISOString();
 
-      if (error) throw error;
+      const [currentRes, prevRes] = await Promise.all([
+        supabase.from("analytics_events").select("*").gte("timestamp", isoRange.start).lte("timestamp", isoRange.end),
+        supabase.from("analytics_events").select("event_type, session_id, value").gte("timestamp", prevStart).lte("timestamp", prevEnd),
+      ]);
+
+      if (currentRes.error) throw currentRes.error;
+      const events = currentRes.data;
+
+      // Previous period summary
+      const prevEvents = prevRes.data || [];
+      const prevSessions = new Set(prevEvents.map((e) => e.session_id)).size;
+      const prevClicks = prevEvents.filter((e) => e.event_type === "ad_click").length;
+      const prevRevenue = prevEvents.filter((e) => e.event_type === "ad_conversion").reduce((s, e) => s + (e.value || 0), 0);
+      setPrevStats({ sessions: prevSessions, clicks: prevClicks, revenue: prevRevenue });
+
       if (!events || events.length === 0) {
         setStats(null);
         return;
@@ -223,6 +241,18 @@ const AnalyticsDashboard = () => {
     fetchStats();
   }, [dateRange.start, dateRange.end]);
 
+  const WowBadge = ({ current, previous }: { current: number; previous: number }) => {
+    if (previous === 0 && current === 0) return null;
+    if (previous === 0) return <Badge className="bg-emerald-100 text-emerald-700 text-xs ml-2">New</Badge>;
+    const pct = ((current - previous) / previous) * 100;
+    if (Math.abs(pct) < 0.5) return <Badge variant="secondary" className="text-xs ml-2"><Minus className="h-3 w-3 mr-0.5" />0%</Badge>;
+    return pct > 0 ? (
+      <Badge className="bg-emerald-100 text-emerald-700 text-xs ml-2"><TrendingUp className="h-3 w-3 mr-0.5" />+{pct.toFixed(1)}%</Badge>
+    ) : (
+      <Badge className="bg-red-100 text-red-700 text-xs ml-2"><TrendingDown className="h-3 w-3 mr-0.5" />{pct.toFixed(1)}%</Badge>
+    );
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchStats();
@@ -307,7 +337,10 @@ const AnalyticsDashboard = () => {
               <Users className="h-4 w-4" />
               <span className="text-xs font-medium uppercase tracking-wider">Sessions</span>
             </div>
-            <p className="font-heading text-2xl font-bold mt-1">{stats?.totalSessions.toLocaleString() ?? 0}</p>
+            <div className="flex items-center mt-1">
+              <p className="font-heading text-2xl font-bold">{stats?.totalSessions.toLocaleString() ?? 0}</p>
+              {prevStats && <WowBadge current={stats?.totalSessions ?? 0} previous={prevStats.sessions} />}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -316,7 +349,10 @@ const AnalyticsDashboard = () => {
               <MousePointer className="h-4 w-4" />
               <span className="text-xs font-medium uppercase tracking-wider">Ad Clicks</span>
             </div>
-            <p className="font-heading text-2xl font-bold mt-1">{stats?.totalClicks.toLocaleString() ?? 0}</p>
+            <div className="flex items-center mt-1">
+              <p className="font-heading text-2xl font-bold">{stats?.totalClicks.toLocaleString() ?? 0}</p>
+              {prevStats && <WowBadge current={stats?.totalClicks ?? 0} previous={prevStats.clicks} />}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -325,7 +361,10 @@ const AnalyticsDashboard = () => {
               <DollarSign className="h-4 w-4" />
               <span className="text-xs font-medium uppercase tracking-wider">Revenue</span>
             </div>
-            <p className="font-heading text-2xl font-bold mt-1">${(stats?.totalRevenue ?? 0).toFixed(2)}</p>
+            <div className="flex items-center mt-1">
+              <p className="font-heading text-2xl font-bold">${(stats?.totalRevenue ?? 0).toFixed(2)}</p>
+              {prevStats && <WowBadge current={stats?.totalRevenue ?? 0} previous={prevStats.revenue} />}
+            </div>
           </CardContent>
         </Card>
         <Card>
