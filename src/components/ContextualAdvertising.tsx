@@ -10,7 +10,7 @@ import { useProductRecommendations } from "@/hooks/useProductRecommendations";
 
 import DIYProductCard from "./advertising/DIYProductCard";
 import DIYProductSection from "./advertising/DIYProductSection";
-import VehicleReplacementSection from "./advertising/VehicleReplacementSection";
+import VehicleListingsSection from "./advertising/RealVehicleListings";
 import ServiceAdSection from "./advertising/ServiceAdSection";
 import type { TrackingContext } from "./advertising/types";
 
@@ -22,6 +22,7 @@ const ContextualAdvertising = ({
   repairRecommendation,
   diyFeasibility,
   placement = "full",
+  userZipCode,
 }: {
   diagnosis: string;
   diagnosisCode?: string;
@@ -30,6 +31,7 @@ const ContextualAdvertising = ({
   repairRecommendation: "repair" | "replace" | "consider_both";
   diyFeasibility?: "easy" | "moderate" | "advanced" | string;
   placement?: "full" | "sidebar" | "footer";
+  userZipCode?: string;
 }) => {
   const { data, loading } = useProductRecommendations(diagnosis, diagnosisCode, vehicleInfo);
 
@@ -115,7 +117,12 @@ const ContextualAdvertising = ({
         />
       )}
       {(repairRecommendation === "replace" || repairRecommendation === "consider_both") && (
-        <VehicleReplacementSection currentVehicle={vehicleInfo} repairCost={repairCost} trackCtx={trackCtx} />
+        <VehicleListingsSection
+          userZipCode={userZipCode || ""}
+          repairCost={repairCost}
+          currentVehicle={vehicleInfo}
+          trackCtx={trackCtx}
+        />
       )}
       <ServiceAdSection services={services} layout="grid" trackCtx={trackCtx} />
     </div>
