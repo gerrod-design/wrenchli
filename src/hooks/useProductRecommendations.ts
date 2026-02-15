@@ -6,6 +6,18 @@ import {
   type ProductRecommendation,
   type RecommendationSet,
 } from "@/data/adRecommendations";
+import { resolveProductImages } from "@/components/advertising/EnhancedProductImages";
+
+/** Preload images so they're cached before the UI renders */
+function preloadProductImages(products: ProductRecommendation[]) {
+  products.forEach((p) => {
+    const images = resolveProductImages({ ...p, description: p.title, images: [] });
+    images.forEach(({ url }) => {
+      const img = new Image();
+      img.src = url;
+    });
+  });
+}
 
 const RECOMMEND_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/recommend-products`;
 
@@ -22,6 +34,7 @@ export function useProductRecommendations(
 
     const local = getLocalRecommendations(diagnosis, code);
     if (local) {
+      preloadProductImages(local.products);
       setData(local);
       setLoading(false);
       return;
@@ -69,6 +82,7 @@ export function useProductRecommendations(
             })
           );
 
+          preloadProductImages(products);
           setData({
             products,
             services: getServiceRecommendations(),
