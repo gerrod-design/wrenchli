@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CostOfOwnership from "@/components/quote/CostOfOwnership";
+import FinancePrescreen from "@/components/FinancePrescreen";
 
 const ESTIMATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-repair`;
 
@@ -381,8 +382,19 @@ export default function GetQuote() {
               </div>
             </SectionReveal>
 
-            {/* Cost of Ownership comparison */}
+            {/* Finance Options */}
             <SectionReveal delay={150}>
+              <FinancePrescreen
+                repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
+                vehicleData={{ year, make, model, trim }}
+                onFinanceSelected={(option) => {
+                  toast.success(`Selected ${option.provider} — $${Math.round(option.monthlyPayment)}/month`);
+                }}
+              />
+            </SectionReveal>
+
+            {/* Cost of Ownership comparison */}
+            <SectionReveal delay={200}>
               <CostOfOwnership
                 currentVehicle={vehicleStr}
                 repairCostLow={estimate.cost_low}
@@ -392,7 +404,7 @@ export default function GetQuote() {
             </SectionReveal>
 
             {/* Step 3: Request referral */}
-            <SectionReveal delay={200}>
+            <SectionReveal delay={250}>
               <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-4">
                 <h3 className="font-heading text-lg font-bold">Ready to Connect with a Shop?</h3>
                 <p className="text-sm text-muted-foreground">
