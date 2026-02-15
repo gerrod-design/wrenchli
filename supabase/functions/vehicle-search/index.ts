@@ -42,6 +42,23 @@ interface VehicleListing {
   daysOnMarket?: number;
 }
 
+/* ─── In-memory cache (per isolate) ─── */
+
+const cache = new Map<string, { listings: VehicleListing[]; ts: number }>();
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+function getCacheKey(params: SearchParams): string {
+  return JSON.stringify({
+    z: params.zipCode,
+    d: params.maxDistance ?? 50,
+    y0: params.minYear,
+    y1: params.maxYear,
+    p: params.maxPrice,
+    m: params.maxMileage,
+    mk: params.makes?.sort(),
+  });
+}
+
 /* ─── MarketCheck API ─── */
 
 async function searchMarketCheck(
@@ -199,23 +216,40 @@ Deno.serve(async (req) => {
       );
     }
 
-    const marketCheckKey = Deno.env.get("MARKETCHECK_API_KEY");
+    const cacheKey = getCacheKey(params);
+    const cached = cache.get(cacheKey);
+    let listings: VehicleListing[];
+    let fromCache = false;
 
-    let listings: VehicleListing[] = [];
-
-    if (marketCheckKey) {
-      try {
-        listings = await searchMarketCheck(marketCheckKey, params);
-      } catch (err) {
-        console.error("MarketCheck search failed, using fallback:", err);
-      }
+    if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
+      console.log("Cache hit for", params.zipCode);
+      listings = cached.listings;
+      fromCache = true;
     } else {
-      console.warn("MARKETCHECK_API_KEY not set, using fallback data");
-    }
+      listings = [];
+      const marketCheckKey = Deno.env.get("MARKETCHECK_API_KEY");
 
-    if (listings.length === 0) {
-      console.log("Using fallback listings");
-      listings = getFallbackListings(params);
+      if (marketCheckKey) {
+        try {
+          listings = await searchMarketCheck(marketCheckKey, params);
+        } catch (err) {
+          console.error("MarketCheck search failed, using fallback:", err);
+        }
+      } else {
+        console.warn("MARKETCHECK_API_KEY not set, using fallback data");
+      }
+
+      if (listings.length === 0) {
+        console.log("Using fallback listings");
+        listings = getFallbackListings(params);
+      }
+
+      // Cache results (evict old entries if cache grows too large)
+      if (cache.size > 50) {
+        const oldest = [...cache.entries()].sort((a, b) => a[1].ts - b[1].ts)[0];
+        if (oldest) cache.delete(oldest[0]);
+      }
+      cache.set(cacheKey, { listings, ts: Date.now() });
     }
 
     return new Response(
@@ -224,6 +258,7 @@ Deno.serve(async (req) => {
         listings,
         total: listings.length,
         source: listings[0]?.source === "fallback" ? "fallback" : "marketcheck",
+        cached: fromCache,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
