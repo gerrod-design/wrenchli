@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -126,6 +126,73 @@ const BADGE_ICONS: Record<string, typeof Award> = {
   warranty: Shield,
 };
 
+/* ─── Image Carousel ─── */
+
+const VehicleImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
+  const [idx, setIdx] = useState(0);
+  const [imgError, setImgError] = useState(false);
+
+  const next = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIdx((i) => (i + 1) % images.length);
+    setImgError(false);
+  }, [images.length]);
+
+  const prev = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIdx((i) => (i - 1 + images.length) % images.length);
+    setImgError(false);
+  }, [images.length]);
+
+  if (imgError) {
+    return (
+      <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
+        <Car className="h-16 w-16 text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full group">
+      <img
+        src={images[idx]}
+        alt={`${alt} - photo ${idx + 1}`}
+        className="w-full h-full object-cover"
+        loading="lazy"
+        onError={() => setImgError(true)}
+      />
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={prev}
+            className="absolute left-1 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background/90 rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-foreground"
+            aria-label="Previous photo"
+          >
+            ‹
+          </button>
+          <button
+            onClick={next}
+            className="absolute right-1 top-1/2 -translate-y-1/2 bg-background/70 hover:bg-background/90 rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-foreground"
+            aria-label="Next photo"
+          >
+            ›
+          </button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            {images.slice(0, 5).map((_, i) => (
+              <span
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full ${i === idx ? "bg-background" : "bg-background/50"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 /* ─── Card ─── */
 
 const EnhancedVehicleCard = ({
@@ -142,9 +209,13 @@ const EnhancedVehicleCard = ({
       <CardContent className="p-0">
         {/* Image / placeholder */}
         <div className="relative h-48 bg-muted rounded-t-lg overflow-hidden">
-          <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
-            <Car className="h-16 w-16 text-muted-foreground" />
-          </div>
+         {listing.images.length > 0 ? (
+            <VehicleImageCarousel images={listing.images} alt={title} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
+              <Car className="h-16 w-16 text-muted-foreground" />
+            </div>
+          )}
 
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-wrap gap-1">
@@ -339,7 +410,7 @@ export const VehicleListingsSection = ({
           <p className="text-sm text-ad-success-text">{totalResults} vehicles found within 50 miles • Better long-term value</p>
         </div>
         <Badge className="ml-auto bg-ad-vehicle-live text-ad-vehicle-live-text border-ad-vehicle-live-border">
-          {dataSource === "cargurus" ? "Live Results" : "Sample Results"}
+          {dataSource === "fallback" ? "Sample Results" : "Live Results"}
         </Badge>
       </div>
 
