@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Star, ShoppingCart, ExternalLink, Wrench, Car, Package,
-  TrendingUp, Shield, Truck, Clock, DollarSign, Loader2,
+  TrendingUp, Shield, Truck, Clock, DollarSign,
 } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
 import {
