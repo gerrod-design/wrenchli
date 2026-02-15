@@ -734,6 +734,8 @@ export function getLocalRecommendations(
   code?: string
 ): RecommendationSet | undefined {
   const category = classifyDiagnosis(diagnosis, code);
+  // "general" means no specific match — let AI handle it
+  if (category === "general") return undefined;
   const products = productCatalog[category];
   if (!products || products.length === 0) return undefined;
 
