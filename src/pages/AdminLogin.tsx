@@ -87,11 +87,11 @@ export default function AdminLogin() {
         `Direct: ${JSON.stringify(directResult)} (err: ${directError?.message || "none"})`,
       ].join(" | ");
 
-      alert(info);
+      prompt("Copy this debug info and send it to me:", info);
       setDebugInfo(info);
     } catch (debugErr: any) {
       const msg = `Exception: ${debugErr?.message}`;
-      alert(msg);
+      prompt("Copy this debug info:", msg);
       setDebugInfo(msg);
     }
 
