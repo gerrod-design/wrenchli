@@ -8,6 +8,11 @@ import {
 } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
 import {
+  DIYSectionSkeleton,
+  VehicleSectionSkeleton,
+  ServiceSectionSkeleton,
+} from "@/components/EnhancedLoading";
+import {
   getLocalRecommendations,
   getServiceRecommendations,
   buildAmazonSearchLink,
@@ -451,10 +456,16 @@ const ContextualAdvertising = ({
   const { data, loading } = useProductRecommendations(diagnosis, diagnosisCode, vehicleInfo);
 
   if (loading) {
+    if (placement === "sidebar") {
+      return <ServiceSectionSkeleton layout="horizontal" />;
+    }
     return (
-      <div className="rounded-2xl border border-border bg-card p-8 text-center">
-        <Loader2 className="h-6 w-6 animate-spin text-accent mx-auto mb-2" />
-        <p className="text-sm text-muted-foreground">Finding the best products for your repair...</p>
+      <div className="space-y-6">
+        {showDIY(repairCost, diyFeasibility) && <DIYSectionSkeleton />}
+        {(repairRecommendation === "replace" || repairRecommendation === "consider_both") && (
+          <VehicleSectionSkeleton />
+        )}
+        <ServiceSectionSkeleton layout="grid" />
       </div>
     );
   }
