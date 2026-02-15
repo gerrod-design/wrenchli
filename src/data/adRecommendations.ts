@@ -34,6 +34,7 @@ export interface ProductRecommendation {
   badge?: string;
   prime?: boolean;
   category: "part" | "tool" | "supply";
+  imageUrl?: string;
 }
 
 export interface ServiceRecommendation {

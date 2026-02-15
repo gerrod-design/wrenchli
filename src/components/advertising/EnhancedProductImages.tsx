@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Package, Loader2 } from "lucide-react";
+import productImageMap from "@/data/productImageMap";
 
 export interface ProductImageData {
   url: string;
@@ -21,6 +22,7 @@ export interface EnhancedProduct {
   prime?: boolean;
   badge?: string;
   images?: ProductImageData[];
+  imageUrl?: string;
   asin?: string;
 }
 
@@ -32,6 +34,18 @@ export const getAmazonImageUrl = (asin: string, size: "small" | "medium" | "larg
 export const resolveProductImages = (product: EnhancedProduct): ProductImageData[] => {
   if (product.images && product.images.length > 0) return product.images;
 
+  // Prefer local curated image from the image map
+  const localImage = productImageMap[product.id];
+  if (localImage) {
+    return [{ url: localImage, alt: `${product.brand} ${product.title}` }];
+  }
+
+  // Then try explicit imageUrl on the product
+  if (product.imageUrl) {
+    return [{ url: product.imageUrl, alt: `${product.brand} ${product.title}` }];
+  }
+
+  // Fall back to ASIN-based Amazon image
   if (product.asin) {
     return [{ url: getAmazonImageUrl(product.asin, "medium"), alt: `${product.brand} ${product.title}` }];
   }
