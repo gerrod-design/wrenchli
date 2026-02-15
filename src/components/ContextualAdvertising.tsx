@@ -1,175 +1,120 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Star, ShoppingCart, ExternalLink, Wrench, Car, Package,
-  TrendingUp, Shield, Truck, Clock, DollarSign,
+  TrendingUp, Shield, Truck, Clock, DollarSign, Loader2,
 } from "lucide-react";
+import {
+  getLocalRecommendations,
+  getServiceRecommendations,
+  buildAmazonSearchLink,
+  type ProductRecommendation,
+  type ServiceRecommendation,
+  type RecommendationSet,
+} from "@/data/adRecommendations";
 
-interface AdProduct {
-  id: string;
-  title: string;
-  description: string;
-  price: string;
-  originalPrice?: string;
-  rating: number;
-  reviewCount: number;
-  brand: string;
-  affiliate_link: string;
-  badge?: string;
-  prime?: boolean;
+const RECOMMEND_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/recommend-products`;
+
+/* ── Hooks ── */
+
+function useProductRecommendations(
+  diagnosis: string,
+  code: string | undefined,
+  vehicleInfo: any
+): { data: RecommendationSet | null; loading: boolean } {
+  const [data, setData] = useState<RecommendationSet | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    // 1) Try local mapping first
+    const local = getLocalRecommendations(diagnosis, code);
+    if (local) {
+      setData(local);
+      setLoading(false);
+      return;
+    }
+
+    // 2) AI fallback
+    (async () => {
+      try {
+        const resp = await fetch(RECOMMEND_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            diagnosis_title: diagnosis,
+            diagnosis_code: code,
+            vehicle_year: vehicleInfo?.year,
+            vehicle_make: vehicleInfo?.make,
+            vehicle_model: vehicleInfo?.model,
+            vehicle_trim: vehicleInfo?.trim,
+          }),
+        });
+
+        if (!resp.ok) throw new Error("AI recommendation failed");
+
+        const ai = await resp.json();
+        if (!cancelled) {
+          const vehicleStr = [vehicleInfo?.year, vehicleInfo?.make, vehicleInfo?.model]
+            .filter(Boolean)
+            .join(" ");
+
+          const products: ProductRecommendation[] = (ai.products || []).map(
+            (p: any, i: number) => ({
+              id: `ai-${i}`,
+              title: p.title,
+              description: p.description,
+              price: p.price,
+              rating: p.rating || 4.4,
+              reviewCount: p.review_count || 1000,
+              brand: p.brand,
+              asin: "",
+              link: buildAmazonSearchLink(p.search_query, vehicleStr),
+              category: p.category || "part",
+              prime: true,
+            })
+          );
+
+          setData({
+            products,
+            services: getServiceRecommendations(),
+            diyEstimate: ai.diy_time_range
+              ? { timeRange: ai.diy_time_range, totalPartsRange: ai.total_parts_range }
+              : undefined,
+            source: "ai",
+          });
+        }
+      } catch (e) {
+        console.error("AI product recommendation error:", e);
+        // Fallback to general local products
+        if (!cancelled) {
+          setData({
+            products: getLocalRecommendations("general")?.products || [],
+            services: getServiceRecommendations(),
+            source: "local",
+          });
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [diagnosis, code, vehicleInfo?.year, vehicleInfo?.make, vehicleInfo?.model]);
+
+  return { data, loading };
 }
-
-interface VehicleAd {
-  id: string;
-  year: number;
-  make: string;
-  model: string;
-  price: string;
-  mileage: string;
-  location: string;
-  dealer: string;
-  features: string[];
-  badge?: string;
-  link: string;
-}
-
-interface ServiceAd {
-  id: string;
-  company: string;
-  service: string;
-  description: string;
-  price: string;
-  rating: number;
-  reviewCount: number;
-  badge?: string;
-  cta: string;
-  link: string;
-}
-
-const generateDIYProducts = (_diagnosis: string, vehicleInfo: any): AdProduct[] => [
-  {
-    id: "brake-pads-1",
-    title: "Bosch Blue Disc Brake Pad Set",
-    description: `Premium ceramic brake pads for ${vehicleInfo?.year || "2015"}-2020 ${vehicleInfo?.make || "Ford"} ${vehicleInfo?.model || "F-150"}`,
-    price: "$67.99",
-    originalPrice: "$89.99",
-    rating: 4.6,
-    reviewCount: 2847,
-    brand: "Bosch",
-    affiliate_link: "#",
-    badge: "Best Seller",
-    prime: true,
-  },
-  {
-    id: "brake-tool-1",
-    title: "OEMTOOLS Brake Caliper Tool Set",
-    description: "13-piece disc brake pad and caliper service tool kit",
-    price: "$34.95",
-    rating: 4.4,
-    reviewCount: 1923,
-    brand: "OEMTOOLS",
-    affiliate_link: "#",
-    prime: true,
-  },
-  {
-    id: "brake-fluid-1",
-    title: "Valvoline MaxLife DOT 3 Brake Fluid",
-    description: "32 oz bottle, prevents corrosion and extends brake system life",
-    price: "$12.99",
-    rating: 4.8,
-    reviewCount: 5643,
-    brand: "Valvoline",
-    affiliate_link: "#",
-    badge: "Amazon Choice",
-    prime: true,
-  },
-];
-
-const generateVehicleAds = (_currentVehicle: any, _repairCost: number): VehicleAd[] => [
-  {
-    id: "vehicle-1",
-    year: 2019,
-    make: "Honda",
-    model: "Accord",
-    price: "$22,995",
-    mileage: "45,000",
-    location: "Detroit, MI",
-    dealer: "Metro Honda",
-    features: ["Backup Camera", "Bluetooth", "Honda Sensing"],
-    badge: "Certified Pre-Owned",
-    link: "#",
-  },
-  {
-    id: "vehicle-2",
-    year: 2020,
-    make: "Toyota",
-    model: "Camry",
-    price: "$24,450",
-    mileage: "32,000",
-    location: "Dearborn, MI",
-    dealer: "Toyota of Dearborn",
-    features: ["Apple CarPlay", "Lane Assist", "Automatic Transmission"],
-    badge: "Low Mileage",
-    link: "#",
-  },
-  {
-    id: "vehicle-3",
-    year: 2018,
-    make: "Ford",
-    model: "Escape",
-    price: "$19,999",
-    mileage: "52,000",
-    location: "Southfield, MI",
-    dealer: "Bill Brown Ford",
-    features: ["AWD", "Heated Seats", "Sync 3"],
-    link: "#",
-  },
-];
-
-const generateServiceAds = (): ServiceAd[] => [
-  {
-    id: "insurance-1",
-    company: "Progressive",
-    service: "Auto Insurance",
-    description: "Save up to $620/year with personalized rates",
-    price: "Get Quote",
-    rating: 4.2,
-    reviewCount: 12847,
-    badge: "Local Agent",
-    cta: "Get Free Quote",
-    link: "#",
-  },
-  {
-    id: "warranty-1",
-    company: "CarShield",
-    service: "Extended Warranty",
-    description: "Protect against expensive repairs with comprehensive coverage",
-    price: "From $99/mo",
-    rating: 4.1,
-    reviewCount: 8934,
-    badge: "Most Popular",
-    cta: "Get Coverage",
-    link: "#",
-  },
-  {
-    id: "financing-1",
-    company: "Capital One Auto",
-    service: "Auto Refinancing",
-    description: "Lower your monthly payment with auto loan refinancing",
-    price: "Rates from 3.99%",
-    rating: 4.5,
-    reviewCount: 15632,
-    cta: "Check Rates",
-    link: "#",
-  },
-];
 
 /* ── Sub-components ── */
 
-const DIYProductCard = ({ product, size = "normal" }: { product: AdProduct; size?: "normal" | "compact" }) => (
-  <Card className={`hover:shadow-md transition-shadow duration-200 ${size === "compact" ? "p-3" : "p-4"}`}>
+const DIYProductCard = ({ product }: { product: ProductRecommendation }) => (
+  <Card className="hover:shadow-md transition-shadow duration-200 p-3">
     <CardContent className="p-0">
       <div className="flex gap-3">
         <div className="relative shrink-0">
@@ -197,8 +142,10 @@ const DIYProductCard = ({ product, size = "normal" }: { product: AdProduct; size
             {product.originalPrice && <span className="text-xs text-muted-foreground line-through">{product.originalPrice}</span>}
             {product.prime && <Badge className="text-xs bg-blue-600 text-white px-1 py-0">Prime</Badge>}
           </div>
-          <Button size="sm" className="w-full text-xs">
-            <ShoppingCart className="h-3 w-3 mr-1" /> Add to Cart
+          <Button size="sm" className="w-full text-xs" asChild>
+            <a href={product.link} target="_blank" rel="noopener noreferrer">
+              <ShoppingCart className="h-3 w-3 mr-1" /> View on Amazon
+            </a>
           </Button>
         </div>
       </div>
@@ -206,7 +153,7 @@ const DIYProductCard = ({ product, size = "normal" }: { product: AdProduct; size
   </Card>
 );
 
-const VehicleAdCard = ({ vehicle }: { vehicle: VehicleAd }) => (
+const VehicleAdCard = ({ vehicle }: { vehicle: { year: number; make: string; model: string; price: string; mileage: string; location: string; dealer: string; features: string[]; badge?: string; link: string } }) => (
   <Card className="hover:shadow-md transition-shadow duration-200">
     <CardContent className="p-4">
       <div className="relative mb-3">
@@ -229,15 +176,17 @@ const VehicleAdCard = ({ vehicle }: { vehicle: VehicleAd }) => (
             <Badge key={i} variant="outline" className="text-xs px-1 py-0">{f}</Badge>
           ))}
         </div>
-        <Button size="sm" className="w-full">
-          <ExternalLink className="h-3 w-3 mr-1" /> View Details
+        <Button size="sm" className="w-full" asChild>
+          <a href={vehicle.link} target="_blank" rel="noopener noreferrer">
+            <ExternalLink className="h-3 w-3 mr-1" /> View Details
+          </a>
         </Button>
       </div>
     </CardContent>
   </Card>
 );
 
-const ServiceAdCard = ({ service, layout = "vertical" }: { service: ServiceAd; layout?: "vertical" | "horizontal" }) => {
+const ServiceAdCard = ({ service, layout = "vertical" }: { service: ServiceRecommendation; layout?: "vertical" | "horizontal" }) => {
   if (layout === "horizontal") {
     return (
       <Card className="hover:shadow-sm transition-shadow duration-200">
@@ -254,7 +203,9 @@ const ServiceAdCard = ({ service, layout = "vertical" }: { service: ServiceAd; l
               <p className="text-xs text-muted-foreground mb-1">{service.description}</p>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-accent">{service.price}</span>
-                <Button size="sm" variant="outline" className="text-xs">{service.cta}</Button>
+                <Button size="sm" variant="outline" className="text-xs" asChild>
+                  <a href={service.link} target="_blank" rel="noopener noreferrer">{service.cta}</a>
+                </Button>
               </div>
             </div>
           </div>
@@ -282,7 +233,9 @@ const ServiceAdCard = ({ service, layout = "vertical" }: { service: ServiceAd; l
             <span className="text-xs text-muted-foreground">({service.reviewCount.toLocaleString()})</span>
           </div>
           <span className="text-sm font-bold text-accent block">{service.price}</span>
-          <Button size="sm" className="w-full text-xs mt-2">{service.cta}</Button>
+          <Button size="sm" className="w-full text-xs mt-2" asChild>
+            <a href={service.link} target="_blank" rel="noopener noreferrer">{service.cta}</a>
+          </Button>
         </div>
       </CardContent>
     </Card>
@@ -291,8 +244,19 @@ const ServiceAdCard = ({ service, layout = "vertical" }: { service: ServiceAd; l
 
 /* ── Section wrappers ── */
 
-const DIYProductSection = ({ diagnosis, vehicleInfo }: { diagnosis: string; vehicleInfo: any }) => {
-  const products = generateDIYProducts(diagnosis, vehicleInfo);
+const DIYProductSection = ({
+  products,
+  diyEstimate,
+  source,
+  vehicleInfo,
+}: {
+  products: ProductRecommendation[];
+  diyEstimate?: { timeRange: string; totalPartsRange: string };
+  source: "local" | "ai";
+  vehicleInfo: any;
+}) => {
+  const vehicleStr = [vehicleInfo?.year, vehicleInfo?.make, vehicleInfo?.model].filter(Boolean).join(" ");
+
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
       <div className="flex items-center gap-3 mb-4">
@@ -304,23 +268,61 @@ const DIYProductSection = ({ diagnosis, vehicleInfo }: { diagnosis: string; vehi
         <Badge className="ml-auto bg-green-100 text-green-800 border-green-300">Save 60-70%</Badge>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
-        {products.map((p) => <DIYProductCard key={p.id} product={p} size="compact" />)}
+        {products.map((p) => <DIYProductCard key={p.id} product={p} />)}
       </div>
-      <div className="mt-4 pt-4 border-t border-blue-200 flex items-center justify-between text-sm">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1 text-blue-700"><Clock className="h-4 w-4 text-blue-600" />2-3 hour job</span>
-          <span className="flex items-center gap-1 text-green-700"><DollarSign className="h-4 w-4 text-green-600" />Total parts: ~$115</span>
+      {diyEstimate && (
+        <div className="mt-4 pt-4 border-t border-blue-200 flex items-center justify-between text-sm">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1 text-blue-700">
+              <Clock className="h-4 w-4 text-blue-600" />{diyEstimate.timeRange}
+            </span>
+            <span className="flex items-center gap-1 text-green-700">
+              <DollarSign className="h-4 w-4 text-green-600" />Total parts: {diyEstimate.totalPartsRange}
+            </span>
+          </div>
+          <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100" asChild>
+            <a
+              href={buildAmazonSearchLink("auto repair parts", vehicleStr)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLink className="h-3 w-3 mr-1" /> Browse All Parts
+            </a>
+          </Button>
         </div>
-        <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
-          <ExternalLink className="h-3 w-3 mr-1" /> View Tutorial
-        </Button>
-      </div>
+      )}
+      {source === "ai" && (
+        <p className="mt-2 text-xs text-blue-600/60 text-center">
+          Recommendations powered by AI — verify fitment for your specific vehicle
+        </p>
+      )}
     </div>
   );
 };
 
 const VehicleReplacementSection = ({ currentVehicle, repairCost }: { currentVehicle: any; repairCost: number }) => {
-  const vehicles = generateVehicleAds(currentVehicle, repairCost);
+  // Static vehicle ads — will be replaced with real inventory API later
+  const vehicles = [
+    {
+      year: 2019, make: "Honda", model: "Accord", price: "$22,995", mileage: "45,000",
+      location: "Detroit, MI", dealer: "Metro Honda",
+      features: ["Backup Camera", "Bluetooth", "Honda Sensing"],
+      badge: "Certified Pre-Owned", link: "https://www.autotrader.com/cars-for-sale/certified/honda/accord",
+    },
+    {
+      year: 2020, make: "Toyota", model: "Camry", price: "$24,450", mileage: "32,000",
+      location: "Dearborn, MI", dealer: "Toyota of Dearborn",
+      features: ["Apple CarPlay", "Lane Assist", "Automatic"],
+      badge: "Low Mileage", link: "https://www.autotrader.com/cars-for-sale/certified/toyota/camry",
+    },
+    {
+      year: 2018, make: "Ford", model: "Escape", price: "$19,999", mileage: "52,000",
+      location: "Southfield, MI", dealer: "Bill Brown Ford",
+      features: ["AWD", "Heated Seats", "Sync 3"],
+      link: "https://www.autotrader.com/cars-for-sale/ford/escape",
+    },
+  ];
+
   return (
     <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
       <div className="flex items-center gap-3 mb-4">
@@ -332,20 +334,21 @@ const VehicleReplacementSection = ({ currentVehicle, repairCost }: { currentVehi
         <Badge className="ml-auto bg-blue-100 text-blue-800 border-blue-300">Better Value</Badge>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {vehicles.map((v) => <VehicleAdCard key={v.id} vehicle={v} />)}
+        {vehicles.map((v, i) => <VehicleAdCard key={i} vehicle={v} />)}
       </div>
       <div className="mt-4 pt-4 border-t border-green-200 flex items-center justify-between">
         <p className="text-sm text-green-700">Monthly payments starting around $280-350 vs. ${repairCost.toLocaleString()} repair cost</p>
-        <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-100">
-          <Truck className="h-3 w-3 mr-1" /> Check Trade Value
+        <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-100" asChild>
+          <a href="https://www.kbb.com/whats-my-car-worth/" target="_blank" rel="noopener noreferrer">
+            <Truck className="h-3 w-3 mr-1" /> Check Trade Value
+          </a>
         </Button>
       </div>
     </div>
   );
 };
 
-const ServiceAdSection = ({ layout = "horizontal" }: { layout?: "horizontal" | "grid" }) => {
-  const services = generateServiceAds();
+const ServiceAdSection = ({ services, layout = "horizontal" }: { services: ServiceRecommendation[]; layout?: "horizontal" | "grid" }) => {
   if (layout === "horizontal") {
     return (
       <div className="space-y-3">
@@ -377,28 +380,47 @@ const ServiceAdSection = ({ layout = "horizontal" }: { layout?: "horizontal" | "
 
 const ContextualAdvertising = ({
   diagnosis,
+  diagnosisCode,
   vehicleInfo,
   repairCost,
   repairRecommendation,
   placement = "full",
 }: {
   diagnosis: string;
+  diagnosisCode?: string;
   vehicleInfo: any;
   repairCost: number;
   repairRecommendation: "repair" | "replace" | "consider_both";
   placement?: "full" | "sidebar" | "footer";
 }) => {
+  const { data, loading } = useProductRecommendations(diagnosis, diagnosisCode, vehicleInfo);
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-8 text-center">
+        <Loader2 className="h-6 w-6 animate-spin text-accent mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground">Finding the best products for your repair...</p>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const { products, services, diyEstimate, source } = data;
+
   if (placement === "sidebar") {
     return (
       <div className="space-y-4">
-        <ServiceAdSection layout="horizontal" />
-        <div className="rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Package className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Featured Product</span>
+        <ServiceAdSection services={services} layout="horizontal" />
+        {products.length > 0 && (
+          <div className="rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Package className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Featured Product</span>
+            </div>
+            <DIYProductCard product={products[0]} />
           </div>
-          <DIYProductCard product={generateDIYProducts(diagnosis, vehicleInfo)[0]} size="compact" />
-        </div>
+        )}
       </div>
     );
   }
@@ -409,20 +431,25 @@ const ContextualAdvertising = ({
         <h3 className="font-heading text-lg font-bold mb-4">
           More Options For Your {vehicleInfo?.year} {vehicleInfo?.make} {vehicleInfo?.model}
         </h3>
-        <ServiceAdSection layout="grid" />
+        <ServiceAdSection services={services} layout="grid" />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {repairCost < 2000 && (
-        <DIYProductSection diagnosis={diagnosis} vehicleInfo={vehicleInfo} />
+      {repairCost < 2000 && products.length > 0 && (
+        <DIYProductSection
+          products={products}
+          diyEstimate={diyEstimate}
+          source={source}
+          vehicleInfo={vehicleInfo}
+        />
       )}
       {(repairRecommendation === "replace" || repairRecommendation === "consider_both") && (
         <VehicleReplacementSection currentVehicle={vehicleInfo} repairCost={repairCost} />
       )}
-      <ServiceAdSection layout="grid" />
+      <ServiceAdSection services={services} layout="grid" />
     </div>
   );
 };

@@ -426,6 +426,7 @@ export default function GetQuote() {
             <SectionReveal delay={225}>
               <ContextualAdvertising
                 diagnosis={diagnosis}
+                diagnosisCode={code}
                 vehicleInfo={{ year, make, model, trim }}
                 repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
                 repairRecommendation="consider_both"
