@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -19,77 +19,93 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const adminCheckDone = useRef(false);
 
-  const checkAdmin = async (userId: string) => {
+  // Check admin role - separated from auth state listener to avoid race conditions
+  const checkAdmin = async (userId: string): Promise<boolean> => {
     try {
-      // Primary: use RPC
+      console.log("[AuthContext] Checking admin for user:", userId);
       const { data, error } = await supabase.rpc("has_role", {
         _user_id: userId,
         _role: "admin",
       });
-      
-      if (!error) {
-        console.log("[AuthContext] has_role result:", data);
-        setIsAdmin(!!data);
-        return;
-      }
-      
-      console.warn("[AuthContext] RPC failed, trying direct query:", error.message);
-      
-      // Fallback: direct query (will work if user already has admin role via SECURITY DEFINER)
-      const { data: roles, error: roleError } = await supabase
+      console.log("[AuthContext] has_role response:", { data, error: error?.message });
+      if (!error) return !!data;
+
+      // Fallback: direct query
+      console.warn("[AuthContext] RPC failed, trying direct query");
+      const { data: roles } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)
         .eq("role", "admin")
         .maybeSingle();
-      
-      if (!roleError && roles) {
-        console.log("[AuthContext] Direct query found admin role");
-        setIsAdmin(true);
-        return;
-      }
-      
-      console.warn("[AuthContext] Admin check failed:", roleError?.message);
-      setIsAdmin(false);
+      return !!roles;
     } catch (err) {
       console.warn("[AuthContext] checkAdmin exception:", err);
-      setIsAdmin(false);
+      return false;
     }
   };
 
   useEffect(() => {
     let mounted = true;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+    // Step 1: Get initial session
+    const initAuth = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
         if (!mounted) return;
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await checkAdmin(session.user.id);
+
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+
+        if (initialSession?.user) {
+          const admin = await checkAdmin(initialSession.user.id);
+          if (mounted) {
+            setIsAdmin(admin);
+            adminCheckDone.current = true;
+          }
+        }
+      } catch (err) {
+        console.warn("[AuthContext] initAuth failed:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    initAuth();
+
+    // Step 2: Listen for auth changes (sign in, sign out, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, newSession) => {
+        if (!mounted) return;
+        
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+
+        if (newSession?.user) {
+          // Small delay to ensure the auth token is propagated to the client
+          await new Promise(resolve => setTimeout(resolve, 100));
+          if (!mounted) return;
+          
+          const admin = await checkAdmin(newSession.user.id);
+          if (mounted) {
+            setIsAdmin(admin);
+            setLoading(false);
+          }
         } else {
           setIsAdmin(false);
+          setLoading(false);
         }
-        if (mounted) setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!mounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await checkAdmin(session.user.id);
-      }
-      if (mounted) setLoading(false);
-    }).catch(() => {
-      if (mounted) setLoading(false);
-    });
-
-    // Fallback: ensure loading resolves even if everything hangs
+    // Safety fallback
     const safetyTimer = setTimeout(() => {
-      if (mounted) setLoading(false);
+      if (mounted && loading) {
+        console.warn("[AuthContext] Safety timeout - forcing loading to false");
+        setLoading(false);
+      }
     }, 8000);
 
     return () => {
