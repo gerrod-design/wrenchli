@@ -21,24 +21,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const adminCheckDone = useRef(false);
 
-  // Check admin role - separated from auth state listener to avoid race conditions
+  // Check admin role via direct query (user can read own roles via RLS policy)
   const checkAdmin = async (userId: string): Promise<boolean> => {
     try {
-      console.log("[AuthContext] Checking admin for:", userId);
-      
-      // Use the SECURITY DEFINER function which bypasses RLS
-      const { data, error } = await supabase.rpc("has_role", {
-        _user_id: userId,
-        _role: "admin",
-      });
-      
-      console.log("[AuthContext] has_role result:", JSON.stringify({ data, error: error?.message }));
-      
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
       if (error) {
-        console.error("[AuthContext] has_role error:", error);
+        console.error("[AuthContext] admin check error:", error.message);
         return false;
       }
-      
+
       return !!data;
     } catch (err) {
       console.error("[AuthContext] checkAdmin exception:", err);
