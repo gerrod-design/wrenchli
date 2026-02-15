@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import {
   LogOut, CreditCard, FileText, Users, Store, TrendingUp,
-  Loader2, RefreshCw, DollarSign,
+  Loader2, RefreshCw, DollarSign, Mail,
 } from "lucide-react";
 
 interface FinanceSelection {
@@ -63,6 +63,15 @@ interface ShopRecommendation {
   recommender_name: string | null;
   recommender_email: string | null;
   specializations: string[] | null;
+}
+
+interface ContactSubmission {
+  id: string;
+  created_at: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  message: string | null;
 }
 
 const COLORS = ["hsl(var(--accent))", "#10b981", "#6366f1", "#f59e0b", "#ef4444", "#8b5cf6"];
@@ -121,19 +130,22 @@ export default function AdminDashboard() {
   const [quoteRequests, setQuoteRequests] = useState<QuoteRequest[]>([]);
   const [waitlist, setWaitlist] = useState<WaitlistSignup[]>([]);
   const [shopRecs, setShopRecs] = useState<ShopRecommendation[]>([]);
+  const [contacts, setContacts] = useState<ContactSubmission[]>([]);
 
   const fetchAll = async () => {
     setLoading(true);
-    const [fs, qr, wl, sr] = await Promise.all([
+    const [fs, qr, wl, sr, cs] = await Promise.all([
       supabase.from("finance_selections" as any).select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("quote_requests" as any).select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("waitlist_signups" as any).select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("shop_recommendations" as any).select("*").order("created_at", { ascending: false }).limit(500),
+      supabase.from("contact_submissions" as any).select("*").order("created_at", { ascending: false }).limit(500),
     ]);
     setFinanceSelections((fs.data as any[]) || []);
     setQuoteRequests((qr.data as any[]) || []);
     setWaitlist((wl.data as any[]) || []);
     setShopRecs((sr.data as any[]) || []);
+    setContacts((cs.data as any[]) || []);
     setLoading(false);
   };
 
@@ -193,19 +205,21 @@ export default function AdminDashboard() {
 
       <div className="container-wrenchli py-6 space-y-6">
         {/* Summary Stats */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard icon={CreditCard} label="Finance Selections" value={financeSelections.length} sub={`Avg repair: $${avgRepairCost.toLocaleString()}`} />
           <StatCard icon={FileText} label="Quote Requests" value={quoteRequests.length} sub={`${financingInterested} interested in financing`} />
           <StatCard icon={Users} label="Waitlist Signups" value={waitlist.length} />
           <StatCard icon={Store} label="Shop Recommendations" value={shopRecs.length} />
+          <StatCard icon={Mail} label="Contact Submissions" value={contacts.length} />
         </div>
 
         <Tabs defaultValue="finance" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="finance"><CreditCard className="h-4 w-4 mr-1.5 hidden sm:inline" />Finance</TabsTrigger>
             <TabsTrigger value="quotes"><FileText className="h-4 w-4 mr-1.5 hidden sm:inline" />Quotes</TabsTrigger>
             <TabsTrigger value="waitlist"><Users className="h-4 w-4 mr-1.5 hidden sm:inline" />Waitlist</TabsTrigger>
             <TabsTrigger value="shops"><Store className="h-4 w-4 mr-1.5 hidden sm:inline" />Shops</TabsTrigger>
+            <TabsTrigger value="contacts"><Mail className="h-4 w-4 mr-1.5 hidden sm:inline" />Contacts</TabsTrigger>
           </TabsList>
 
           {/* Finance Tab */}
@@ -313,6 +327,20 @@ export default function AdminDashboard() {
                 s.recommender_name || "—",
                 s.recommender_email || "—",
                 s.specializations?.join(", ") || "—",
+              ])}
+            />
+          </TabsContent>
+
+          {/* Contacts Tab */}
+          <TabsContent value="contacts" className="mt-6">
+            <DataTable
+              columns={["Date", "Name", "Email", "Phone", "Message"]}
+              rows={contacts.map((c) => [
+                fmtDate(c.created_at),
+                c.name || "—",
+                c.email || "—",
+                c.phone || "—",
+                c.message ? (c.message.length > 80 ? c.message.slice(0, 80) + "…" : c.message) : "—",
               ])}
             />
           </TabsContent>
