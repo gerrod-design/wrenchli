@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CostOfOwnership from "@/components/quote/CostOfOwnership";
+import type { RecommendationLevel } from "@/components/quote/VehicleValueAnalyzer";
 import FinancePrescreen from "@/components/FinancePrescreen";
 import ContextualAdvertising from "@/components/ContextualAdvertising";
 
@@ -61,7 +62,7 @@ export default function GetQuote() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [quoteId, setQuoteId] = useState<string | null>(null);
-
+  const [valueRec, setValueRec] = useState<RecommendationLevel | null>(null);
   const handleGetEstimate = async () => {
     const zip = zipCode.replace(/\D/g, "").slice(0, 5);
     if (zip.length !== 5) {
@@ -419,6 +420,11 @@ export default function GetQuote() {
                 repairCostLow={estimate.cost_low}
                 repairCostHigh={estimate.cost_high}
                 zipCode={zipCode.replace(/\D/g, "").slice(0, 5)}
+                vehicleYear={year}
+                vehicleMake={make}
+                vehicleModel={model}
+                vehicleTrim={trim}
+                onRecommendation={setValueRec}
               />
             </SectionReveal>
 
@@ -429,7 +435,13 @@ export default function GetQuote() {
                 diagnosisCode={code}
                 vehicleInfo={{ year, make, model, trim }}
                 repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
-                repairRecommendation="consider_both"
+                repairRecommendation={
+                  valueRec
+                    ? ["repair_and_replace", "replace_emphasis"].includes(valueRec.type)
+                      ? "consider_both"
+                      : "repair"
+                    : "consider_both"
+                }
                 diyFeasibility={diyFeasibility}
                 userZipCode={zipCode.replace(/\D/g, "").slice(0, 5)}
               />

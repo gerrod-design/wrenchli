@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import VehicleValueAnalyzer, { type RecommendationLevel } from "./VehicleValueAnalyzer";
 
 const COMPARE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/compare-ownership`;
 
@@ -33,6 +34,11 @@ interface CostOfOwnershipProps {
   repairCostLow: number;
   repairCostHigh: number;
   zipCode: string;
+  vehicleYear?: string;
+  vehicleMake?: string;
+  vehicleModel?: string;
+  vehicleTrim?: string;
+  onRecommendation?: (rec: RecommendationLevel) => void;
 }
 
 function fmt(n: number) {
@@ -44,8 +50,14 @@ export default function CostOfOwnership({
   repairCostLow,
   repairCostHigh,
   zipCode,
+  vehicleYear,
+  vehicleMake,
+  vehicleModel,
+  vehicleTrim,
+  onRecommendation,
 }: CostOfOwnershipProps) {
   const [expanded, setExpanded] = useState(false);
+  const [recommendation, setRecommendation] = useState<RecommendationLevel | null>(null);
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -117,6 +129,33 @@ export default function CostOfOwnership({
 
       <div className={cn("overflow-hidden transition-all duration-300 ease-in-out", expanded ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0")}>
         <div className="px-5 md:px-6 pb-5 md:pb-6 space-y-5 border-t border-border pt-5">
+          {/* Vehicle Value Analyzer — always visible when expanded */}
+          {vehicleYear && vehicleMake && vehicleModel && (
+            <VehicleValueAnalyzer
+              vehicleYear={vehicleYear}
+              vehicleMake={vehicleMake}
+              vehicleModel={vehicleModel}
+              vehicleTrim={vehicleTrim}
+              repairCostLow={repairCostLow}
+              repairCostHigh={repairCostHigh}
+              onRecommendation={(rec) => {
+                setRecommendation(rec);
+                onRecommendation?.(rec);
+              }}
+            />
+          )}
+
+          {/* Separator between analyzer and TCO tool */}
+          {recommendation && (
+            <div className="border-t border-border pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                {["repair_and_replace", "replace_emphasis"].includes(recommendation.type)
+                  ? "📊 Full 3-Year Comparison"
+                  : "📊 Want to compare anyway? Run a full 3-year analysis"}
+              </p>
+            </div>
+          )}
+
           {!result ? (
             <>
               {/* Input form */}
