@@ -197,33 +197,35 @@ export default function AdminDashboard() {
 
   const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
 
-  if (loading) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-secondary">
-        <div className="text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin text-accent mx-auto" />
-          <p className="text-sm text-muted-foreground">Loading dashboard data…</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-secondary">
-        <div className="text-center space-y-4 max-w-md">
-          <div className="rounded-full bg-destructive/10 p-3 w-fit mx-auto">
-            <TrendingUp className="h-6 w-6 text-destructive" />
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center space-y-3">
+            <Loader2 className="h-8 w-8 animate-spin text-accent mx-auto" />
+            <p className="text-sm text-muted-foreground">Loading dashboard data…</p>
           </div>
-          <h2 className="font-heading text-lg font-semibold">Unable to load dashboard</h2>
-          <p className="text-sm text-muted-foreground">{error}</p>
-          <Button variant="outline" onClick={fetchAll}>
-            <RefreshCw className="h-4 w-4 mr-1" /> Try Again
-          </Button>
         </div>
-      </main>
-    );
-  }
+      );
+    }
+    if (error) {
+      return (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center space-y-4 max-w-md">
+            <div className="rounded-full bg-destructive/10 p-3 w-fit mx-auto">
+              <TrendingUp className="h-6 w-6 text-destructive" />
+            </div>
+            <h2 className="font-heading text-lg font-semibold">Unable to load dashboard</h2>
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <Button variant="outline" onClick={fetchAll}>
+              <RefreshCw className="h-4 w-4 mr-1" /> Try Again
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <main className="min-h-screen bg-secondary pb-[60px] md:pb-0">
@@ -248,6 +250,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="container-wrenchli py-6 space-y-6">
+        {(loading || error) ? renderContent() : (<>
         {/* Summary Stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard icon={CreditCard} label="Finance Selections" value={financeSelections.length} sub={`Avg repair: $${avgRepairCost.toLocaleString()}`} />
@@ -401,6 +404,7 @@ export default function AdminDashboard() {
             />
           </TabsContent>
         </Tabs>
+        </>)}
       </div>
     </main>
   );
