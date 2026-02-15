@@ -72,23 +72,28 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     );
   }
 
-  // Allow access if AuthContext says admin OR our direct check confirms it
-  const hasAdmin = isAdmin || directAdminCheck === true;
-
-  if (!user || !hasAdmin) {
-    // If direct check hasn't completed yet, show loading
-    if (user && !isAdmin && directAdminCheck === null) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin text-accent mx-auto" />
-            <p className="text-sm text-muted-foreground">Verifying admin access…</p>
-          </div>
-        </div>
-      );
-    }
+  // No user at all → redirect to login
+  if (!user) {
     return <Navigate to="/admin/login" replace />;
   }
 
-  return <>{children}</>;
+  // If neither AuthContext nor direct check has confirmed admin yet, keep waiting
+  if (!isAdmin && directAdminCheck === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <Loader2 className="h-8 w-8 animate-spin text-accent mx-auto" />
+          <p className="text-sm text-muted-foreground">Verifying admin access…</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Admin confirmed by either source
+  if (isAdmin || directAdminCheck === true) {
+    return <>{children}</>;
+  }
+
+  // Both checks done, not admin → redirect
+  return <Navigate to="/admin/login" replace />;
 }
