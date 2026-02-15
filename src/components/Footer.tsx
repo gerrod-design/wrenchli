@@ -25,6 +25,11 @@ const footerLinks = {
     { label: "Shop Software", to: "/for-shops#features" },
     { label: "Apply Now", to: "/for-shops#apply" },
   ],
+  "For Finance Providers": [
+    { label: "Partner With Us", to: "/contact", badge: "Coming Soon" },
+    { label: "Integration", to: "/contact", badge: "Coming Soon" },
+    { label: "Contact Us", to: "/contact" },
+  ],
   Legal: [
     { label: "Privacy Policy", to: "/privacy", badge: "Coming Soon" },
     { label: "Terms of Service", to: "/terms", badge: "Coming Soon" },
@@ -37,7 +42,7 @@ export default function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-wrenchli py-12 pb-24 md:py-16 md:pb-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="mb-4 flex items-center gap-2 font-heading text-xl font-bold">
