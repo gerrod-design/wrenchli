@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Lock } from "lucide-react";
 import SEO from "@/components/SEO";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminLogin() {
   const { user, isAdmin, loading, signIn, signUp } = useAuth();
@@ -14,6 +15,7 @@ export default function AdminLogin() {
   const [submitting, setSubmitting] = useState(false);
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [debugInfo, setDebugInfo] = useState("");
 
   if (loading) {
     return (
@@ -30,20 +32,45 @@ export default function AdminLogin() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setDebugInfo("");
     setSubmitting(true);
+
     if (mode === "signup") {
       const { error: err } = await signUp(email, password);
-      if (err) {
-        setError(err);
-      } else {
-        setSignupSuccess(true);
-      }
-    } else {
-      const { error: err } = await signIn(email, password);
-      if (err) {
-        setError(err);
-      }
+      if (err) setError(err);
+      else setSignupSuccess(true);
+      setSubmitting(false);
+      return;
     }
+
+    // Login flow with inline debug
+    const { error: err } = await signIn(email, password);
+    if (err) {
+      setError(err);
+      setSubmitting(false);
+      return;
+    }
+
+    // After successful login, manually verify admin status and show debug info
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      let info = `Login OK. User ID: ${userId?.slice(0, 8)}...`;
+
+      if (userId) {
+        const { data: rpcResult, error: rpcError } = await supabase.rpc("has_role", {
+          _user_id: userId,
+          _role: "admin",
+        });
+        info += ` | has_role: ${JSON.stringify(rpcResult)}, error: ${rpcError?.message || "none"}`;
+      } else {
+        info += " | No session found after login!";
+      }
+      setDebugInfo(info);
+    } catch (debugErr: any) {
+      setDebugInfo(`Debug exception: ${debugErr?.message}`);
+    }
+
     setSubmitting(false);
   };
 
@@ -80,10 +107,15 @@ export default function AdminLogin() {
             {error && (
               <p className="text-sm text-destructive text-center">{error}</p>
             )}
-            {user && !isAdmin && (
+            {user && !isAdmin && !debugInfo && (
               <p className="text-sm text-destructive text-center">
                 This account does not have admin access.
               </p>
+            )}
+            {debugInfo && (
+              <div className="rounded-lg bg-muted p-3 text-xs font-mono break-all">
+                {debugInfo}
+              </div>
             )}
             <Button
               type="submit"
@@ -104,7 +136,7 @@ export default function AdminLogin() {
           <div className="text-center">
             <button
               type="button"
-              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSignupSuccess(false); }}
+              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSignupSuccess(false); setDebugInfo(""); }}
               className="text-sm text-accent hover:underline"
             >
               {mode === "login" ? "Need an account? Sign up" : "Already have an account? Sign in"}
