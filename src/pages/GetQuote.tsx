@@ -430,6 +430,7 @@ export default function GetQuote() {
                 vehicleInfo={{ year, make, model, trim }}
                 repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
                 repairRecommendation="consider_both"
+                diyFeasibility={diyFeasibility}
               />
             </SectionReveal>
 
