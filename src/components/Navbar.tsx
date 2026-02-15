@@ -29,16 +29,6 @@ const navItems: NavItem[] = [
       { label: "Financing", to: "/for-car-owners#financing" },
     ],
   },
-  {
-    label: "For Repair Shops",
-    to: "/for-shops",
-    dropdown: [
-      { label: "Partner Program", to: "/for-shops" },
-      { label: "Shop Software", to: "/for-shops#features" },
-      { label: "Apply Now", to: "/for-shops#apply" },
-      { label: "💬 Recommend a Shop You Trust", to: "__recommend__" },
-    ],
-  },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
