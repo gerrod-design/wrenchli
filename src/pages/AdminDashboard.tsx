@@ -139,32 +139,48 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      // Ensure session is ready before querying
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      // Use native fetch with the stored token to avoid Supabase client auth locks
+      const tokenKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+      const tokenData = tokenKey ? JSON.parse(localStorage.getItem(tokenKey) || '{}') : null;
+      const accessToken = tokenData?.access_token;
+      
+      if (!accessToken) {
         setError("No active session. Please sign in again.");
         setLoading(false);
         return;
       }
 
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
+      const headers = {
+        'apikey': anonKey,
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      };
+
+      const fetchTable = async (table: string) => {
+        const res = await fetch(
+          `${supabaseUrl}/rest/v1/${table}?select=*&order=created_at.desc&limit=500`,
+          { headers }
+        );
+        if (!res.ok) throw new Error(`${table}: ${res.status} ${res.statusText}`);
+        return res.json();
+      };
+
       const [fs, qr, wl, sr, cs] = await Promise.all([
-        supabase.from("finance_selections").select("*").order("created_at", { ascending: false }).limit(500),
-        supabase.from("quote_requests").select("*").order("created_at", { ascending: false }).limit(500),
-        supabase.from("waitlist_signups").select("*").order("created_at", { ascending: false }).limit(500),
-        supabase.from("shop_recommendations").select("*").order("created_at", { ascending: false }).limit(500),
-        supabase.from("contact_submissions").select("*").order("created_at", { ascending: false }).limit(500),
+        fetchTable("finance_selections"),
+        fetchTable("quote_requests"),
+        fetchTable("waitlist_signups"),
+        fetchTable("shop_recommendations"),
+        fetchTable("contact_submissions"),
       ]);
 
-      const firstError = [fs, qr, wl, sr, cs].find(r => r.error);
-      if (firstError?.error) {
-        throw new Error(firstError.error.message);
-      }
-
-      setFinanceSelections((fs.data ?? []) as FinanceSelection[]);
-      setQuoteRequests((qr.data ?? []) as QuoteRequest[]);
-      setWaitlist((wl.data ?? []) as WaitlistSignup[]);
-      setShopRecs((sr.data ?? []) as ShopRecommendation[]);
-      setContacts((cs.data ?? []) as ContactSubmission[]);
+      setFinanceSelections(fs || []);
+      setQuoteRequests(qr || []);
+      setWaitlist(wl || []);
+      setShopRecs(sr || []);
+      setContacts(cs || []);
     } catch (err: any) {
       console.error("Dashboard fetch failed:", err);
       setError(err?.message || "Failed to load dashboard data");
