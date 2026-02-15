@@ -90,10 +90,12 @@ const AnalyticsDashboard = () => {
   const [stats, setStats] = useState<DetailedStats | null>(null);
   const [prevStats, setPrevStats] = useState<{ sessions: number; clicks: number; revenue: number } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const rangeStart = `${dateRange.start}T00:00:00Z`;
       const rangeEnd = `${dateRange.end}T23:59:59Z`;
@@ -232,8 +234,9 @@ const AnalyticsDashboard = () => {
         abTestResults,
         dailyTimeSeries,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to fetch analytics stats:", err);
+      setError(err?.message || "Failed to load analytics data");
     } finally {
       setLoading(false);
     }
@@ -241,6 +244,13 @@ const AnalyticsDashboard = () => {
 
   useEffect(() => {
     fetchStats();
+    const timeout = setTimeout(() => {
+      setLoading((prev) => {
+        if (prev) setError("Loading timed out. The server may be slow or unavailable.");
+        return false;
+      });
+    }, 15000);
+    return () => clearTimeout(timeout);
   }, [dateRange.start, dateRange.end]);
 
   const WowBadge = ({ current, previous }: { current: number; previous: number }) => {
@@ -284,6 +294,26 @@ const AnalyticsDashboard = () => {
 
   const isLoading = loading || revenueLoading;
 
+  if (error && !isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" /> Analytics Dashboard
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 space-y-3">
+            <p className="text-sm text-destructive">{error}</p>
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <RefreshCw className="h-4 w-4 mr-1" /> Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (isLoading) {
     return (
       <Card>
@@ -293,8 +323,9 @@ const AnalyticsDashboard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center py-8 space-y-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent" />
+            <p className="text-xs text-muted-foreground">Loading analytics…</p>
           </div>
         </CardContent>
       </Card>

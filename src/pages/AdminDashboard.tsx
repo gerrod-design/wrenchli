@@ -128,6 +128,7 @@ function DataTable({ columns, rows }: { columns: string[]; rows: any[][] }) {
 export default function AdminDashboard() {
   const { signOut } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [financeSelections, setFinanceSelections] = useState<FinanceSelection[]>([]);
   const [quoteRequests, setQuoteRequests] = useState<QuoteRequest[]>([]);
   const [waitlist, setWaitlist] = useState<WaitlistSignup[]>([]);
@@ -136,22 +137,41 @@ export default function AdminDashboard() {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [fs, qr, wl, sr, cs] = await Promise.all([
-      supabase.from("finance_selections" as any).select("*").order("created_at", { ascending: false }).limit(500),
-      supabase.from("quote_requests" as any).select("*").order("created_at", { ascending: false }).limit(500),
-      supabase.from("waitlist_signups" as any).select("*").order("created_at", { ascending: false }).limit(500),
-      supabase.from("shop_recommendations" as any).select("*").order("created_at", { ascending: false }).limit(500),
-      supabase.from("contact_submissions" as any).select("*").order("created_at", { ascending: false }).limit(500),
-    ]);
-    setFinanceSelections((fs.data as any[]) || []);
-    setQuoteRequests((qr.data as any[]) || []);
-    setWaitlist((wl.data as any[]) || []);
-    setShopRecs((sr.data as any[]) || []);
-    setContacts((cs.data as any[]) || []);
-    setLoading(false);
+    setError(null);
+    try {
+      const [fs, qr, wl, sr, cs] = await Promise.all([
+        supabase.from("finance_selections" as any).select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("quote_requests" as any).select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("waitlist_signups" as any).select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("shop_recommendations" as any).select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("contact_submissions" as any).select("*").order("created_at", { ascending: false }).limit(500),
+      ]);
+      if (fs.error || qr.error || wl.error || sr.error || cs.error) {
+        throw new Error("Failed to load one or more data sources");
+      }
+      setFinanceSelections((fs.data as any[]) || []);
+      setQuoteRequests((qr.data as any[]) || []);
+      setWaitlist((wl.data as any[]) || []);
+      setShopRecs((sr.data as any[]) || []);
+      setContacts((cs.data as any[]) || []);
+    } catch (err: any) {
+      console.error("Dashboard fetch failed:", err);
+      setError(err?.message || "Failed to load dashboard data");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => {
+    fetchAll();
+    const timeout = setTimeout(() => {
+      setLoading((prev) => {
+        if (prev) setError("Loading timed out. The server may be slow or unavailable.");
+        return false;
+      });
+    }, 15000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   // Finance analytics
   const providerCounts = financeSelections.reduce<Record<string, number>>((acc, s) => {
@@ -178,7 +198,27 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-secondary">
-        <Loader2 className="h-8 w-8 animate-spin text-accent" />
+        <div className="text-center space-y-3">
+          <Loader2 className="h-8 w-8 animate-spin text-accent mx-auto" />
+          <p className="text-sm text-muted-foreground">Loading dashboard data…</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-secondary">
+        <div className="text-center space-y-4 max-w-md">
+          <div className="rounded-full bg-destructive/10 p-3 w-fit mx-auto">
+            <TrendingUp className="h-6 w-6 text-destructive" />
+          </div>
+          <h2 className="font-heading text-lg font-semibold">Unable to load dashboard</h2>
+          <p className="text-sm text-muted-foreground">{error}</p>
+          <Button variant="outline" onClick={fetchAll}>
+            <RefreshCw className="h-4 w-4 mr-1" /> Try Again
+          </Button>
+        </div>
       </main>
     );
   }
