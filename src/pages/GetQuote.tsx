@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CostOfOwnership from "@/components/quote/CostOfOwnership";
 import FinancePrescreen from "@/components/FinancePrescreen";
+import ContextualAdvertising from "@/components/ContextualAdvertising";
 
 const ESTIMATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-repair`;
 
@@ -418,6 +419,16 @@ export default function GetQuote() {
                 repairCostLow={estimate.cost_low}
                 repairCostHigh={estimate.cost_high}
                 zipCode={zipCode.replace(/\D/g, "").slice(0, 5)}
+              />
+            </SectionReveal>
+
+            {/* Contextual Advertising */}
+            <SectionReveal delay={225}>
+              <ContextualAdvertising
+                diagnosis={diagnosis}
+                vehicleInfo={{ year, make, model, trim }}
+                repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
+                repairRecommendation="consider_both"
               />
             </SectionReveal>
 
