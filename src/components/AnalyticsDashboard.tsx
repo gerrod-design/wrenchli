@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend,
+  PieChart, Pie, Cell, Legend, FunnelChart, Funnel, LabelList,
 } from "recharts";
 import {
   TrendingUp,
@@ -37,6 +37,7 @@ const CHART_COLORS = [
 interface DetailedStats {
   totalSessions: number;
   totalPageViews: number;
+  totalImpressions: number;
   totalClicks: number;
   totalRevenue: number;
   topRepairTypes: Array<{
@@ -97,6 +98,7 @@ const AnalyticsDashboard = () => {
 
       const sessions = new Set(events.map((e) => e.session_id)).size;
       const pageViews = events.filter((e) => e.event_type === "page_view").length;
+      const impressions = events.filter((e) => e.event_type === "ad_impression").length;
       const clicks = events.filter((e) => e.event_type === "ad_click").length;
       const conversions = events.filter((e) => e.event_type === "ad_conversion");
       const totalRevenue = conversions.reduce((s, e) => s + (e.value || 0), 0);
@@ -179,6 +181,7 @@ const AnalyticsDashboard = () => {
       setStats({
         totalSessions: sessions,
         totalPageViews: pageViews,
+        totalImpressions: impressions,
         totalClicks: clicks,
         totalRevenue,
         topRepairTypes,
@@ -312,6 +315,73 @@ const AnalyticsDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Funnel: Impression → Click → Conversion */}
+      {stats && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" /> Conversion Funnel
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              const funnelData = [
+                { name: "Impressions", value: stats.totalImpressions || 0, fill: "hsl(var(--accent))" },
+                { name: "Clicks", value: stats.totalClicks || 0, fill: "#6366f1" },
+                { name: "Conversions", value: stats.totalRevenue > 0 ? stats.totalPageViews : 0, fill: "#10b981" },
+              ];
+              // Use actual conversion count instead of revenue-based
+              const conversionCount = stats.totalRevenue; // already sum of conversion values
+              const actualFunnel = [
+                { name: "Impressions", value: stats.totalImpressions || stats.totalPageViews, fill: "hsl(var(--accent))" },
+                { name: "Clicks", value: stats.totalClicks, fill: "#6366f1" },
+                { name: "Conversions", value: metrics?.conversionRate ? Math.round((stats.totalClicks * (metrics.conversionRate / 100))) : 0, fill: "#10b981" },
+              ];
+              const maxVal = Math.max(...actualFunnel.map(d => d.value), 1);
+              return (
+                <div className="space-y-6">
+                  {/* Visual bar funnel */}
+                  <div className="space-y-3">
+                    {actualFunnel.map((step, i) => {
+                      const pct = ((step.value / maxVal) * 100);
+                      const dropOff = i > 0 && actualFunnel[i - 1].value > 0
+                        ? ((1 - step.value / actualFunnel[i - 1].value) * 100).toFixed(1)
+                        : null;
+                      return (
+                        <div key={step.name} className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="font-medium">{step.name}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold">{step.value.toLocaleString()}</span>
+                              {dropOff && (
+                                <Badge variant="secondary" className="text-xs">
+                                  −{dropOff}% drop
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <div className="h-8 rounded-md bg-muted overflow-hidden">
+                            <div
+                              className="h-full rounded-md transition-all duration-700"
+                              style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: step.fill }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Summary row */}
+                  <div className="flex items-center justify-between pt-2 border-t border-border text-sm text-muted-foreground">
+                    <span>Overall conversion: <strong className="text-foreground">{actualFunnel[0].value > 0 ? ((actualFunnel[2].value / actualFunnel[0].value) * 100).toFixed(2) : "0.00"}%</strong></span>
+                    <span>Click-through rate: <strong className="text-foreground">{actualFunnel[0].value > 0 ? ((actualFunnel[1].value / actualFunnel[0].value) * 100).toFixed(2) : "0.00"}%</strong></span>
+                  </div>
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Category performance from revenue hook */}
       {metrics && metrics.topPerformingCategories.length > 0 && (
