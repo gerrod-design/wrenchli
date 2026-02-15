@@ -100,8 +100,9 @@ export default function CinematicHero() {
           className="mt-5 md:mt-6 font-heading text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] text-white"
           style={{ textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
         >
-          Vehicle Repair, Finally{" "}
-          <span className="text-accent">Fixed.</span>
+          Vehicle Repair.
+          <br />
+          Finally <span className="text-accent">Fixed.</span>
         </motion.h1>
 
         {/* Subtitle */}
