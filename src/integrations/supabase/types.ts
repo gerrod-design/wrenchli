@@ -68,6 +68,108 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          action: string
+          ad_placement: string | null
+          ad_position: number | null
+          ad_source: string | null
+          category: string
+          city: string | null
+          event_type: string
+          id: string
+          item_brand: string | null
+          item_category: string | null
+          item_id: string | null
+          item_price: string | null
+          item_title: string | null
+          item_url: string | null
+          label: string | null
+          metadata: Json | null
+          page_title: string | null
+          page_url: string
+          referrer: string | null
+          repair_cost_estimate: number | null
+          repair_diagnosis: string | null
+          session_id: string
+          state: string | null
+          timestamp: string
+          user_agent: string | null
+          user_id: string | null
+          value: number | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          action: string
+          ad_placement?: string | null
+          ad_position?: number | null
+          ad_source?: string | null
+          category: string
+          city?: string | null
+          event_type: string
+          id?: string
+          item_brand?: string | null
+          item_category?: string | null
+          item_id?: string | null
+          item_price?: string | null
+          item_title?: string | null
+          item_url?: string | null
+          label?: string | null
+          metadata?: Json | null
+          page_title?: string | null
+          page_url: string
+          referrer?: string | null
+          repair_cost_estimate?: number | null
+          repair_diagnosis?: string | null
+          session_id: string
+          state?: string | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+          value?: number | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          action?: string
+          ad_placement?: string | null
+          ad_position?: number | null
+          ad_source?: string | null
+          category?: string
+          city?: string | null
+          event_type?: string
+          id?: string
+          item_brand?: string | null
+          item_category?: string | null
+          item_id?: string | null
+          item_price?: string | null
+          item_title?: string | null
+          item_url?: string | null
+          label?: string | null
+          metadata?: Json | null
+          page_title?: string | null
+          page_url?: string
+          referrer?: string | null
+          repair_cost_estimate?: number | null
+          repair_diagnosis?: string | null
+          session_id?: string
+          state?: string | null
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+          value?: number | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string

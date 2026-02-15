@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Package } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
+import { trackEvent, ABTester } from "@/lib/analytics";
 import { showDIY } from "@/lib/diyVisibility";
 import {
   DIYSectionSkeleton,
@@ -34,6 +36,21 @@ const ContextualAdvertising = ({
   userZipCode?: string;
 }) => {
   const { data, loading } = useProductRecommendations(diagnosis, diagnosisCode, vehicleInfo);
+
+  // Track section impression when loaded
+  useEffect(() => {
+    if (!loading && data) {
+      trackEvent({
+        event_type: "ad_impression",
+        category: "navigation",
+        action: "section_view",
+        label: "contextual_advertising",
+        repair_diagnosis: diagnosis,
+        repair_cost_estimate: repairCost,
+        ad_placement: placement,
+      });
+    }
+  }, [loading, data, diagnosis, repairCost, placement]);
 
   if (loading) {
     if (placement === "sidebar") {
