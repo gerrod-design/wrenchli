@@ -6,6 +6,7 @@ import {
   Star, ShoppingCart, ExternalLink, Wrench, Car, Package,
   TrendingUp, Shield, Truck, Clock, DollarSign, Loader2,
 } from "lucide-react";
+import { trackAdClick } from "@/lib/adClickTracker";
 import {
   getLocalRecommendations,
   getServiceRecommendations,
@@ -113,7 +114,7 @@ function useProductRecommendations(
 
 /* ── Sub-components ── */
 
-const DIYProductCard = ({ product }: { product: ProductRecommendation }) => (
+const DIYProductCard = ({ product, onTrack }: { product: ProductRecommendation; onTrack?: (p: ProductRecommendation) => void }) => (
   <Card className="hover:shadow-md transition-shadow duration-200 p-3">
     <CardContent className="p-0">
       <div className="flex gap-3">
@@ -143,7 +144,7 @@ const DIYProductCard = ({ product }: { product: ProductRecommendation }) => (
             {product.prime && <Badge className="text-xs bg-blue-600 text-white px-1 py-0">Prime</Badge>}
           </div>
           <Button size="sm" className="w-full text-xs" asChild>
-            <a href={product.link} target="_blank" rel="noopener noreferrer">
+            <a href={product.link} target="_blank" rel="noopener noreferrer" onClick={() => onTrack?.(product)}>
               <ShoppingCart className="h-3 w-3 mr-1" /> View on Amazon
             </a>
           </Button>
@@ -153,7 +154,7 @@ const DIYProductCard = ({ product }: { product: ProductRecommendation }) => (
   </Card>
 );
 
-const VehicleAdCard = ({ vehicle }: { vehicle: { year: number; make: string; model: string; price: string; mileage: string; location: string; dealer: string; features: string[]; badge?: string; link: string } }) => (
+const VehicleAdCard = ({ vehicle, onTrack }: { vehicle: { year: number; make: string; model: string; price: string; mileage: string; location: string; dealer: string; features: string[]; badge?: string; link: string }; onTrack?: () => void }) => (
   <Card className="hover:shadow-md transition-shadow duration-200">
     <CardContent className="p-4">
       <div className="relative mb-3">
@@ -177,7 +178,7 @@ const VehicleAdCard = ({ vehicle }: { vehicle: { year: number; make: string; mod
           ))}
         </div>
         <Button size="sm" className="w-full" asChild>
-          <a href={vehicle.link} target="_blank" rel="noopener noreferrer">
+          <a href={vehicle.link} target="_blank" rel="noopener noreferrer" onClick={onTrack}>
             <ExternalLink className="h-3 w-3 mr-1" /> View Details
           </a>
         </Button>
@@ -186,7 +187,7 @@ const VehicleAdCard = ({ vehicle }: { vehicle: { year: number; make: string; mod
   </Card>
 );
 
-const ServiceAdCard = ({ service, layout = "vertical" }: { service: ServiceRecommendation; layout?: "vertical" | "horizontal" }) => {
+const ServiceAdCard = ({ service, layout = "vertical", onTrack }: { service: ServiceRecommendation; layout?: "vertical" | "horizontal"; onTrack?: () => void }) => {
   if (layout === "horizontal") {
     return (
       <Card className="hover:shadow-sm transition-shadow duration-200">
@@ -204,7 +205,7 @@ const ServiceAdCard = ({ service, layout = "vertical" }: { service: ServiceRecom
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-accent">{service.price}</span>
                 <Button size="sm" variant="outline" className="text-xs" asChild>
-                  <a href={service.link} target="_blank" rel="noopener noreferrer">{service.cta}</a>
+                  <a href={service.link} target="_blank" rel="noopener noreferrer" onClick={onTrack}>{service.cta}</a>
                 </Button>
               </div>
             </div>
@@ -234,13 +235,25 @@ const ServiceAdCard = ({ service, layout = "vertical" }: { service: ServiceRecom
           </div>
           <span className="text-sm font-bold text-accent block">{service.price}</span>
           <Button size="sm" className="w-full text-xs mt-2" asChild>
-            <a href={service.link} target="_blank" rel="noopener noreferrer">{service.cta}</a>
+            <a href={service.link} target="_blank" rel="noopener noreferrer" onClick={onTrack}>{service.cta}</a>
           </Button>
         </div>
       </CardContent>
     </Card>
   );
 };
+
+/* ── Tracking context type ── */
+
+interface TrackingContext {
+  diagnosis_title: string;
+  diagnosis_code?: string;
+  vehicle_year?: string;
+  vehicle_make?: string;
+  vehicle_model?: string;
+  source: string;
+  placement: string;
+}
 
 /* ── Section wrappers ── */
 
@@ -249,13 +262,21 @@ const DIYProductSection = ({
   diyEstimate,
   source,
   vehicleInfo,
+  trackCtx,
 }: {
   products: ProductRecommendation[];
   diyEstimate?: { timeRange: string; totalPartsRange: string };
   source: "local" | "ai";
   vehicleInfo: any;
+  trackCtx: TrackingContext;
 }) => {
   const vehicleStr = [vehicleInfo?.year, vehicleInfo?.make, vehicleInfo?.model].filter(Boolean).join(" ");
+
+  const handleProductClick = (p: ProductRecommendation) =>
+    trackAdClick({ ...trackCtx, click_type: "product", item_id: p.id, item_title: p.title, item_brand: p.brand, item_category: p.category, item_price: p.price });
+
+  const handleBrowseAll = () =>
+    trackAdClick({ ...trackCtx, click_type: "browse_parts" });
 
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
@@ -268,7 +289,7 @@ const DIYProductSection = ({
         <Badge className="ml-auto bg-green-100 text-green-800 border-green-300">Save 60-70%</Badge>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
-        {products.map((p) => <DIYProductCard key={p.id} product={p} />)}
+        {products.map((p) => <DIYProductCard key={p.id} product={p} onTrack={handleProductClick} />)}
       </div>
       {diyEstimate && (
         <div className="mt-4 pt-4 border-t border-blue-200 flex items-center justify-between text-sm">
@@ -285,6 +306,7 @@ const DIYProductSection = ({
               href={buildAmazonSearchLink("auto repair parts", vehicleStr)}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={handleBrowseAll}
             >
               <ExternalLink className="h-3 w-3 mr-1" /> Browse All Parts
             </a>
@@ -300,8 +322,7 @@ const DIYProductSection = ({
   );
 };
 
-const VehicleReplacementSection = ({ currentVehicle, repairCost }: { currentVehicle: any; repairCost: number }) => {
-  // Static vehicle ads — will be replaced with real inventory API later
+const VehicleReplacementSection = ({ currentVehicle, repairCost, trackCtx }: { currentVehicle: any; repairCost: number; trackCtx: TrackingContext }) => {
   const vehicles = [
     {
       year: 2019, make: "Honda", model: "Accord", price: "$22,995", mileage: "45,000",
@@ -334,12 +355,17 @@ const VehicleReplacementSection = ({ currentVehicle, repairCost }: { currentVehi
         <Badge className="ml-auto bg-blue-100 text-blue-800 border-blue-300">Better Value</Badge>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {vehicles.map((v, i) => <VehicleAdCard key={i} vehicle={v} />)}
+        {vehicles.map((v, i) => (
+          <VehicleAdCard key={i} vehicle={v} onTrack={() =>
+            trackAdClick({ ...trackCtx, click_type: "vehicle", item_title: `${v.year} ${v.make} ${v.model}`, item_price: v.price })
+          } />
+        ))}
       </div>
       <div className="mt-4 pt-4 border-t border-green-200 flex items-center justify-between">
         <p className="text-sm text-green-700">Monthly payments starting around $280-350 vs. ${repairCost.toLocaleString()} repair cost</p>
         <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-100" asChild>
-          <a href="https://www.kbb.com/whats-my-car-worth/" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.kbb.com/whats-my-car-worth/" target="_blank" rel="noopener noreferrer"
+            onClick={() => trackAdClick({ ...trackCtx, click_type: "trade_value" })}>
             <Truck className="h-3 w-3 mr-1" /> Check Trade Value
           </a>
         </Button>
@@ -348,7 +374,7 @@ const VehicleReplacementSection = ({ currentVehicle, repairCost }: { currentVehi
   );
 };
 
-const ServiceAdSection = ({ services, layout = "horizontal" }: { services: ServiceRecommendation[]; layout?: "horizontal" | "grid" }) => {
+const ServiceAdSection = ({ services, layout = "horizontal", trackCtx }: { services: ServiceRecommendation[]; layout?: "horizontal" | "grid"; trackCtx?: TrackingContext }) => {
   if (layout === "horizontal") {
     return (
       <div className="space-y-3">
@@ -356,7 +382,11 @@ const ServiceAdSection = ({ services, layout = "horizontal" }: { services: Servi
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium text-muted-foreground">Recommended Services</span>
         </div>
-        {services.map((s) => <ServiceAdCard key={s.id} service={s} layout="horizontal" />)}
+        {services.map((s) => (
+          <ServiceAdCard key={s.id} service={s} layout="horizontal" onTrack={trackCtx ? () =>
+            trackAdClick({ ...trackCtx, click_type: "service", item_id: s.id, item_title: s.company, item_price: s.price })
+          : undefined} />
+        ))}
       </div>
     );
   }
@@ -370,7 +400,11 @@ const ServiceAdSection = ({ services, layout = "horizontal" }: { services: Servi
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {services.map((s) => <ServiceAdCard key={s.id} service={s} />)}
+        {services.map((s) => (
+          <ServiceAdCard key={s.id} service={s} onTrack={trackCtx ? () =>
+            trackAdClick({ ...trackCtx, click_type: "service", item_id: s.id, item_title: s.company, item_price: s.price })
+          : undefined} />
+        ))}
       </div>
     </div>
   );
@@ -429,17 +463,29 @@ const ContextualAdvertising = ({
 
   const { products, services, diyEstimate, source } = data;
 
+  const trackCtx: TrackingContext = {
+    diagnosis_title: diagnosis,
+    diagnosis_code: diagnosisCode,
+    vehicle_year: vehicleInfo?.year?.toString(),
+    vehicle_make: vehicleInfo?.make,
+    vehicle_model: vehicleInfo?.model,
+    source,
+    placement,
+  };
+
   if (placement === "sidebar") {
     return (
       <div className="space-y-4">
-        <ServiceAdSection services={services} layout="horizontal" />
+        <ServiceAdSection services={services} layout="horizontal" trackCtx={trackCtx} />
         {products.length > 0 && (
           <div className="rounded-xl border border-border bg-card p-4">
             <div className="flex items-center gap-2 mb-3">
               <Package className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Featured Product</span>
             </div>
-            <DIYProductCard product={products[0]} />
+            <DIYProductCard product={products[0]} onTrack={(p) =>
+              trackAdClick({ ...trackCtx, click_type: "product", item_id: p.id, item_title: p.title, item_brand: p.brand, item_category: p.category, item_price: p.price })
+            } />
           </div>
         )}
       </div>
@@ -452,7 +498,7 @@ const ContextualAdvertising = ({
         <h3 className="font-heading text-lg font-bold mb-4">
           More Options For Your {vehicleInfo?.year} {vehicleInfo?.make} {vehicleInfo?.model}
         </h3>
-        <ServiceAdSection services={services} layout="grid" />
+        <ServiceAdSection services={services} layout="grid" trackCtx={trackCtx} />
       </div>
     );
   }
@@ -465,12 +511,13 @@ const ContextualAdvertising = ({
           diyEstimate={diyEstimate}
           source={source}
           vehicleInfo={vehicleInfo}
+          trackCtx={trackCtx}
         />
       )}
       {(repairRecommendation === "replace" || repairRecommendation === "consider_both") && (
-        <VehicleReplacementSection currentVehicle={vehicleInfo} repairCost={repairCost} />
+        <VehicleReplacementSection currentVehicle={vehicleInfo} repairCost={repairCost} trackCtx={trackCtx} />
       )}
-      <ServiceAdSection services={services} layout="grid" />
+      <ServiceAdSection services={services} layout="grid" trackCtx={trackCtx} />
     </div>
   );
 };
