@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Star, ShoppingCart, ExternalLink, Wrench, Car, Package,
-  TrendingUp, Shield, Truck, Clock, DollarSign,
-} from "lucide-react";
+import { Package } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
 import {
   DIYSectionSkeleton,
@@ -17,13 +11,18 @@ import {
   getServiceRecommendations,
   buildAmazonSearchLink,
   type ProductRecommendation,
-  type ServiceRecommendation,
   type RecommendationSet,
 } from "@/data/adRecommendations";
 
+import DIYProductCard from "./advertising/DIYProductCard";
+import DIYProductSection from "./advertising/DIYProductSection";
+import VehicleReplacementSection from "./advertising/VehicleReplacementSection";
+import ServiceAdSection from "./advertising/ServiceAdSection";
+import type { TrackingContext } from "./advertising/types";
+
 const RECOMMEND_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/recommend-products`;
 
-/* ── Hooks ── */
+/* ── Hook ── */
 
 function useProductRecommendations(
   diagnosis: string,
@@ -36,7 +35,6 @@ function useProductRecommendations(
   useEffect(() => {
     let cancelled = false;
 
-    // 1) Try local mapping first
     const local = getLocalRecommendations(diagnosis, code);
     if (local) {
       setData(local);
@@ -44,7 +42,6 @@ function useProductRecommendations(
       return;
     }
 
-    // 2) AI fallback
     (async () => {
       try {
         const resp = await fetch(RECOMMEND_URL, {
@@ -98,7 +95,6 @@ function useProductRecommendations(
         }
       } catch (e) {
         console.error("AI product recommendation error:", e);
-        // Fallback to general local products
         if (!cancelled) {
           setData({
             products: getLocalRecommendations("general")?.products || [],
@@ -117,313 +113,8 @@ function useProductRecommendations(
   return { data, loading };
 }
 
-/* ── Sub-components ── */
-
-const DIYProductCard = ({ product, onTrack }: { product: ProductRecommendation; onTrack?: (p: ProductRecommendation) => void }) => (
-  <Card className="hover:shadow-md transition-shadow duration-200 p-3">
-    <CardContent className="p-0">
-      <div className="flex gap-3">
-        <div className="relative shrink-0">
-          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-            <Package className="h-8 w-8 text-muted-foreground" />
-          </div>
-          {product.badge && (
-            <Badge className="absolute -top-1 -right-1 text-xs px-1 py-0.5 bg-orange-500 text-white">
-              {product.badge}
-            </Badge>
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-sm leading-tight mb-1 line-clamp-2">{product.title}</h4>
-          <div className="flex items-center gap-1 mb-1">
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className={`h-3 w-3 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-muted-foreground/30"}`} />
-              ))}
-            </div>
-            <span className="text-xs text-muted-foreground">({product.reviewCount.toLocaleString()})</span>
-          </div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-bold text-sm">{product.price}</span>
-            {product.originalPrice && <span className="text-xs text-muted-foreground line-through">{product.originalPrice}</span>}
-            {product.prime && <Badge className="text-xs bg-blue-600 text-white px-1 py-0">Prime</Badge>}
-          </div>
-          <Button size="sm" className="w-full text-xs" asChild>
-            <a href={product.link} target="_blank" rel="noopener noreferrer" onClick={() => onTrack?.(product)}>
-              <ShoppingCart className="h-3 w-3 mr-1" /> View on Amazon
-            </a>
-          </Button>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const VehicleAdCard = ({ vehicle, onTrack }: { vehicle: { year: number; make: string; model: string; price: string; mileage: string; location: string; dealer: string; features: string[]; badge?: string; link: string }; onTrack?: () => void }) => (
-  <Card className="hover:shadow-md transition-shadow duration-200">
-    <CardContent className="p-4">
-      <div className="relative mb-3">
-        <div className="w-full h-32 bg-muted rounded-lg flex items-center justify-center">
-          <Car className="h-12 w-12 text-muted-foreground" />
-        </div>
-        {vehicle.badge && (
-          <Badge className="absolute top-2 left-2 bg-green-600 text-white text-xs">{vehicle.badge}</Badge>
-        )}
-      </div>
-      <div className="space-y-2">
-        <h3 className="font-semibold text-sm">{vehicle.year} {vehicle.make} {vehicle.model}</h3>
-        <div className="flex justify-between text-sm">
-          <span className="font-bold text-accent">{vehicle.price}</span>
-          <span className="text-muted-foreground">{vehicle.mileage} miles</span>
-        </div>
-        <p className="text-xs text-muted-foreground">{vehicle.dealer} • {vehicle.location}</p>
-        <div className="flex flex-wrap gap-1 mb-2">
-          {vehicle.features.slice(0, 2).map((f, i) => (
-            <Badge key={i} variant="outline" className="text-xs px-1 py-0">{f}</Badge>
-          ))}
-        </div>
-        <Button size="sm" className="w-full" asChild>
-          <a href={vehicle.link} target="_blank" rel="noopener noreferrer" onClick={onTrack}>
-            <ExternalLink className="h-3 w-3 mr-1" /> View Details
-          </a>
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const ServiceAdCard = ({ service, layout = "vertical", onTrack }: { service: ServiceRecommendation; layout?: "vertical" | "horizontal"; onTrack?: () => void }) => {
-  if (layout === "horizontal") {
-    return (
-      <Card className="hover:shadow-sm transition-shadow duration-200">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-8 bg-muted rounded flex items-center justify-center shrink-0">
-              <Shield className="h-5 w-5 text-muted-foreground" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h4 className="font-semibold text-sm">{service.company}</h4>
-                {service.badge && <Badge className="text-xs bg-blue-600 text-white px-1 py-0">{service.badge}</Badge>}
-              </div>
-              <p className="text-xs text-muted-foreground mb-1">{service.description}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-accent">{service.price}</span>
-                <Button size="sm" variant="outline" className="text-xs" asChild>
-                  <a href={service.link} target="_blank" rel="noopener noreferrer" onClick={onTrack}>{service.cta}</a>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="hover:shadow-md transition-shadow duration-200">
-      <CardContent className="p-4 text-center space-y-3">
-        <div className="w-16 h-10 bg-muted rounded mx-auto flex items-center justify-center">
-          <Shield className="h-6 w-6 text-muted-foreground" />
-        </div>
-        <div>
-          <div className="flex items-center justify-center gap-1 mb-1">
-            <h4 className="font-semibold text-sm">{service.company}</h4>
-            {service.badge && <Badge className="text-xs bg-blue-600 text-white px-1 py-0">{service.badge}</Badge>}
-          </div>
-          <p className="text-xs text-muted-foreground mb-2">{service.description}</p>
-          <div className="flex items-center justify-center gap-1 mb-2">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className={`h-3 w-3 ${i < Math.floor(service.rating) ? "text-yellow-400 fill-current" : "text-muted-foreground/30"}`} />
-            ))}
-            <span className="text-xs text-muted-foreground">({service.reviewCount.toLocaleString()})</span>
-          </div>
-          <span className="text-sm font-bold text-accent block">{service.price}</span>
-          <Button size="sm" className="w-full text-xs mt-2" asChild>
-            <a href={service.link} target="_blank" rel="noopener noreferrer" onClick={onTrack}>{service.cta}</a>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-/* ── Tracking context type ── */
-
-interface TrackingContext {
-  diagnosis_title: string;
-  diagnosis_code?: string;
-  vehicle_year?: string;
-  vehicle_make?: string;
-  vehicle_model?: string;
-  source: string;
-  placement: string;
-}
-
-/* ── Section wrappers ── */
-
-const DIYProductSection = ({
-  products,
-  diyEstimate,
-  source,
-  vehicleInfo,
-  trackCtx,
-}: {
-  products: ProductRecommendation[];
-  diyEstimate?: { timeRange: string; totalPartsRange: string };
-  source: "local" | "ai";
-  vehicleInfo: any;
-  trackCtx: TrackingContext;
-}) => {
-  const vehicleStr = [vehicleInfo?.year, vehicleInfo?.make, vehicleInfo?.model].filter(Boolean).join(" ");
-
-  const handleProductClick = (p: ProductRecommendation) =>
-    trackAdClick({ ...trackCtx, click_type: "product", item_id: p.id, item_title: p.title, item_brand: p.brand, item_category: p.category, item_price: p.price });
-
-  const handleBrowseAll = () =>
-    trackAdClick({ ...trackCtx, click_type: "browse_parts" });
-
-  return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-      <div className="flex items-center gap-3 mb-4">
-        <Wrench className="h-5 w-5 text-blue-600" />
-        <div>
-          <h3 className="font-heading text-lg font-bold text-blue-900">DIY Repair Option</h3>
-          <p className="text-sm text-blue-700">Save money by fixing it yourself with these parts</p>
-        </div>
-        <Badge className="ml-auto bg-green-100 text-green-800 border-green-300">Save 60-70%</Badge>
-      </div>
-      <div className="grid gap-3 md:grid-cols-3">
-        {products.map((p) => <DIYProductCard key={p.id} product={p} onTrack={handleProductClick} />)}
-      </div>
-      {diyEstimate && (
-        <div className="mt-4 pt-4 border-t border-blue-200 flex items-center justify-between text-sm">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1 text-blue-700">
-              <Clock className="h-4 w-4 text-blue-600" />{diyEstimate.timeRange}
-            </span>
-            <span className="flex items-center gap-1 text-green-700">
-              <DollarSign className="h-4 w-4 text-green-600" />Total parts: {diyEstimate.totalPartsRange}
-            </span>
-          </div>
-          <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100" asChild>
-            <a
-              href={buildAmazonSearchLink("auto repair parts", vehicleStr)}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleBrowseAll}
-            >
-              <ExternalLink className="h-3 w-3 mr-1" /> Browse All Parts
-            </a>
-          </Button>
-        </div>
-      )}
-      {source === "ai" && (
-        <p className="mt-2 text-xs text-blue-600/60 text-center">
-          Recommendations powered by AI — verify fitment for your specific vehicle
-        </p>
-      )}
-    </div>
-  );
-};
-
-const VehicleReplacementSection = ({ currentVehicle, repairCost, trackCtx }: { currentVehicle: any; repairCost: number; trackCtx: TrackingContext }) => {
-  const vehicles = [
-    {
-      year: 2019, make: "Honda", model: "Accord", price: "$22,995", mileage: "45,000",
-      location: "Detroit, MI", dealer: "Metro Honda",
-      features: ["Backup Camera", "Bluetooth", "Honda Sensing"],
-      badge: "Certified Pre-Owned", link: "https://www.autotrader.com/cars-for-sale/certified/honda/accord",
-    },
-    {
-      year: 2020, make: "Toyota", model: "Camry", price: "$24,450", mileage: "32,000",
-      location: "Dearborn, MI", dealer: "Toyota of Dearborn",
-      features: ["Apple CarPlay", "Lane Assist", "Automatic"],
-      badge: "Low Mileage", link: "https://www.autotrader.com/cars-for-sale/certified/toyota/camry",
-    },
-    {
-      year: 2018, make: "Ford", model: "Escape", price: "$19,999", mileage: "52,000",
-      location: "Southfield, MI", dealer: "Bill Brown Ford",
-      features: ["AWD", "Heated Seats", "Sync 3"],
-      link: "https://www.autotrader.com/cars-for-sale/ford/escape",
-    },
-  ];
-
-  return (
-    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
-      <div className="flex items-center gap-3 mb-4">
-        <Car className="h-5 w-5 text-green-600" />
-        <div>
-          <h3 className="font-heading text-lg font-bold text-green-900">Consider Upgrading Instead</h3>
-          <p className="text-sm text-green-700">These vehicles might be a better long-term investment</p>
-        </div>
-        <Badge className="ml-auto bg-blue-100 text-blue-800 border-blue-300">Better Value</Badge>
-      </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        {vehicles.map((v, i) => (
-          <VehicleAdCard key={i} vehicle={v} onTrack={() =>
-            trackAdClick({ ...trackCtx, click_type: "vehicle", item_title: `${v.year} ${v.make} ${v.model}`, item_price: v.price })
-          } />
-        ))}
-      </div>
-      <div className="mt-4 pt-4 border-t border-green-200 flex items-center justify-between">
-        <p className="text-sm text-green-700">Monthly payments starting around $280-350 vs. ${repairCost.toLocaleString()} repair cost</p>
-        <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-100" asChild>
-          <a href="https://www.kbb.com/whats-my-car-worth/" target="_blank" rel="noopener noreferrer"
-            onClick={() => trackAdClick({ ...trackCtx, click_type: "trade_value" })}>
-            <Truck className="h-3 w-3 mr-1" /> Check Trade Value
-          </a>
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-const ServiceAdSection = ({ services, layout = "horizontal", trackCtx }: { services: ServiceRecommendation[]; layout?: "horizontal" | "grid"; trackCtx?: TrackingContext }) => {
-  if (layout === "horizontal") {
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-muted-foreground">Recommended Services</span>
-        </div>
-        {services.map((s) => (
-          <ServiceAdCard key={s.id} service={s} layout="horizontal" onTrack={trackCtx ? () =>
-            trackAdClick({ ...trackCtx, click_type: "service", item_id: s.id, item_title: s.company, item_price: s.price })
-          : undefined} />
-        ))}
-      </div>
-    );
-  }
-  return (
-    <div className="bg-muted/30 rounded-2xl p-6 border border-border">
-      <div className="flex items-center gap-3 mb-4">
-        <Shield className="h-5 w-5 text-muted-foreground" />
-        <div>
-          <h3 className="font-heading text-lg font-bold">Protect Your Investment</h3>
-          <p className="text-sm text-muted-foreground">Services to keep your vehicle running smoothly</p>
-        </div>
-      </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        {services.map((s) => (
-          <ServiceAdCard key={s.id} service={s} onTrack={trackCtx ? () =>
-            trackAdClick({ ...trackCtx, click_type: "service", item_id: s.id, item_title: s.company, item_price: s.price })
-          : undefined} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
 /* ── DIY visibility logic ── */
 
-/**
- * Determines whether to show the DIY section based on repair cost and difficulty.
- * - easy: always show (up to $5,000)
- * - moderate: show up to $3,000
- * - advanced: show up to $1,500
- * - unknown: show up to $2,000 (original default)
- */
 function showDIY(repairCost: number, diyFeasibility?: string): boolean {
   const thresholds: Record<string, number> = {
     easy: 5000,
@@ -494,9 +185,20 @@ const ContextualAdvertising = ({
               <Package className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Featured Product</span>
             </div>
-            <DIYProductCard product={products[0]} onTrack={(p) =>
-              trackAdClick({ ...trackCtx, click_type: "product", item_id: p.id, item_title: p.title, item_brand: p.brand, item_category: p.category, item_price: p.price })
-            } />
+            <DIYProductCard
+              product={products[0]}
+              onTrack={(p) =>
+                trackAdClick({
+                  ...trackCtx,
+                  click_type: "product",
+                  item_id: p.id,
+                  item_title: p.title,
+                  item_brand: p.brand,
+                  item_category: p.category,
+                  item_price: p.price,
+                })
+              }
+            />
           </div>
         )}
       </div>
