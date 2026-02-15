@@ -52,29 +52,33 @@ const VehicleReplacementSection = ({
   repairCost: number;
   trackCtx: TrackingContext;
 }) => (
-  <div className="bg-gradient-to-r from-ad-success-bg to-ad-success-bg-end rounded-2xl p-6 border border-ad-success-border">
+  <section
+    aria-labelledby="upgrade-section-heading"
+    className="bg-gradient-to-r from-ad-success-bg to-ad-success-bg-end rounded-2xl p-6 border border-ad-success-border"
+  >
     <div className="flex items-center gap-3 mb-4">
-      <Car className="h-5 w-5 text-ad-success-icon" />
+      <Car className="h-5 w-5 text-ad-success-icon" aria-hidden="true" />
       <div>
-        <h3 className="font-heading text-lg font-bold text-ad-success-heading">Consider Upgrading Instead</h3>
+        <h3 id="upgrade-section-heading" className="font-heading text-lg font-bold text-ad-success-heading">Consider Upgrading Instead</h3>
         <p className="text-sm text-ad-success-text">These vehicles might be a better long-term investment</p>
       </div>
       <Badge className="ml-auto bg-ad-badge-value text-ad-badge-value-text border-ad-badge-value-border">Better Value</Badge>
     </div>
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-3" role="list" aria-label="Vehicle upgrade options">
       {VEHICLES.map((v, i) => (
-        <VehicleAdCard
-          key={i}
-          vehicle={v}
-          onTrack={() =>
-            trackAdClick({
-              ...trackCtx,
-              click_type: "vehicle",
-              item_title: `${v.year} ${v.make} ${v.model}`,
-              item_price: v.price,
-            })
-          }
-        />
+        <div key={i} role="listitem">
+          <VehicleAdCard
+            vehicle={v}
+            onTrack={() =>
+              trackAdClick({
+                ...trackCtx,
+                click_type: "vehicle",
+                item_title: `${v.year} ${v.make} ${v.model}`,
+                item_price: v.price,
+              })
+            }
+          />
+        </div>
       ))}
     </div>
     <div className="mt-4 pt-4 border-t border-ad-success-border flex items-center justify-between">
@@ -87,12 +91,13 @@ const VehicleReplacementSection = ({
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => trackAdClick({ ...trackCtx, click_type: "trade_value" })}
+          aria-label="Check your vehicle trade-in value on Kelley Blue Book (opens in new tab)"
         >
-          <Truck className="h-3 w-3 mr-1" /> Check Trade Value
+          <Truck className="h-3 w-3 mr-1" aria-hidden="true" /> Check Trade Value
         </a>
       </Button>
     </div>
-  </div>
+  </section>
 );
 
 export default VehicleReplacementSection;
