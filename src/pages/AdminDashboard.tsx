@@ -136,30 +136,39 @@ export default function AdminDashboard() {
   const [contacts, setContacts] = useState<ContactSubmission[]>([]);
 
   const fetchAll = async () => {
-    console.log("[AdminDashboard] fetchAll started");
     setLoading(true);
     setError(null);
     try {
-      const [fs, qr, wl, sr, cs] = await Promise.all([
-        supabase.from("finance_selections" as any).select("*").order("created_at", { ascending: false }).limit(500),
-        supabase.from("quote_requests" as any).select("*").order("created_at", { ascending: false }).limit(500),
-        supabase.from("waitlist_signups" as any).select("*").order("created_at", { ascending: false }).limit(500),
-        supabase.from("shop_recommendations" as any).select("*").order("created_at", { ascending: false }).limit(500),
-        supabase.from("contact_submissions" as any).select("*").order("created_at", { ascending: false }).limit(500),
-      ]);
-      if (fs.error || qr.error || wl.error || sr.error || cs.error) {
-        throw new Error("Failed to load one or more data sources");
+      // Ensure session is ready before querying
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setError("No active session. Please sign in again.");
+        setLoading(false);
+        return;
       }
-      setFinanceSelections((fs.data as any[]) || []);
-      setQuoteRequests((qr.data as any[]) || []);
-      setWaitlist((wl.data as any[]) || []);
-      setShopRecs((sr.data as any[]) || []);
-      setContacts((cs.data as any[]) || []);
+
+      const [fs, qr, wl, sr, cs] = await Promise.all([
+        supabase.from("finance_selections").select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("quote_requests").select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("waitlist_signups").select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("shop_recommendations").select("*").order("created_at", { ascending: false }).limit(500),
+        supabase.from("contact_submissions").select("*").order("created_at", { ascending: false }).limit(500),
+      ]);
+
+      const firstError = [fs, qr, wl, sr, cs].find(r => r.error);
+      if (firstError?.error) {
+        throw new Error(firstError.error.message);
+      }
+
+      setFinanceSelections((fs.data ?? []) as FinanceSelection[]);
+      setQuoteRequests((qr.data ?? []) as QuoteRequest[]);
+      setWaitlist((wl.data ?? []) as WaitlistSignup[]);
+      setShopRecs((sr.data ?? []) as ShopRecommendation[]);
+      setContacts((cs.data ?? []) as ContactSubmission[]);
     } catch (err: any) {
       console.error("Dashboard fetch failed:", err);
       setError(err?.message || "Failed to load dashboard data");
     } finally {
-      console.log("[AdminDashboard] fetchAll complete, error:", error);
       setLoading(false);
     }
   };
