@@ -387,8 +387,26 @@ export default function GetQuote() {
               <FinancePrescreen
                 repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
                 vehicleData={{ year, make, model, trim }}
-                onFinanceSelected={(option) => {
+                onFinanceSelected={async (option) => {
                   toast.success(`Selected ${option.provider} — $${Math.round(option.monthlyPayment)}/month`);
+                  try {
+                    await supabase.from("finance_selections" as any).insert({
+                      quote_request_id: quoteId || null,
+                      provider: option.provider,
+                      option_type: option.type,
+                      apr: option.apr,
+                      monthly_payment: Math.round(option.monthlyPayment * 100) / 100,
+                      term_months: option.term,
+                      total_cost: Math.round(option.totalCost * 100) / 100,
+                      repair_cost: Math.round((estimate.cost_low + estimate.cost_high) / 2),
+                      vehicle_year: year || null,
+                      vehicle_make: make || null,
+                      vehicle_model: model || null,
+                      zip_code: zipCode.replace(/\D/g, "").slice(0, 5),
+                    } as any);
+                  } catch (e) {
+                    console.error("Finance selection tracking error:", e);
+                  }
                 }}
               />
             </SectionReveal>
