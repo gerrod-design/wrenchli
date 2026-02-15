@@ -8,7 +8,7 @@ import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminLogin() {
-  const { user, isAdmin, loading, signIn, signUp } = useAuth();
+  const { user, isAdmin, loading, signIn, signUp, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -108,9 +108,19 @@ export default function AdminLogin() {
               <p className="text-sm text-destructive text-center">{error}</p>
             )}
             {user && !isAdmin && !debugInfo && (
-              <p className="text-sm text-destructive text-center">
-                This account does not have admin access.
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm text-destructive text-center">
+                  This account does not have admin access.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={signOut}
+                  className="w-full"
+                >
+                  Sign Out &amp; Try Another Account
+                </Button>
+              </div>
             )}
             {debugInfo && (
               <div className="rounded-lg bg-muted p-3 text-xs font-mono break-all">
