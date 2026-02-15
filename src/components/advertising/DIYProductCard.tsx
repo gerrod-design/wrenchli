@@ -19,7 +19,7 @@ const DIYProductCard = ({
             <Package className="h-8 w-8 text-muted-foreground" />
           </div>
           {product.badge && (
-            <Badge className="absolute -top-1 -right-1 text-xs px-1 py-0.5 bg-orange-500 text-white">
+            <Badge className="absolute -top-1 -right-1 text-xs px-1 py-0.5 bg-accent text-accent-foreground">
               {product.badge}
             </Badge>
           )}
@@ -31,7 +31,7 @@ const DIYProductCard = ({
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-3 w-3 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-muted-foreground/30"}`}
+                  className={`h-3 w-3 ${i < Math.floor(product.rating) ? "text-ad-star fill-current" : "text-muted-foreground/30"}`}
                 />
               ))}
             </div>
@@ -42,7 +42,7 @@ const DIYProductCard = ({
             {product.originalPrice && (
               <span className="text-xs text-muted-foreground line-through">{product.originalPrice}</span>
             )}
-            {product.prime && <Badge className="text-xs bg-blue-600 text-white px-1 py-0">Prime</Badge>}
+            {product.prime && <Badge className="text-xs bg-primary text-primary-foreground px-1 py-0">Prime</Badge>}
           </div>
           <Button size="sm" className="w-full text-xs" asChild>
             <a href={product.link} target="_blank" rel="noopener noreferrer" onClick={() => onTrack?.(product)}>

@@ -18,7 +18,7 @@ const VehicleAdCard = ({
           <Car className="h-12 w-12 text-muted-foreground" />
         </div>
         {vehicle.badge && (
-          <Badge className="absolute top-2 left-2 bg-green-600 text-white text-xs">{vehicle.badge}</Badge>
+          <Badge className="absolute top-2 left-2 bg-ad-success-icon text-accent-foreground text-xs">{vehicle.badge}</Badge>
         )}
       </div>
       <div className="space-y-2">
