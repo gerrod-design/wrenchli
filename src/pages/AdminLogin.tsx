@@ -115,7 +115,13 @@ export default function AdminLogin() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={signOut}
+                  onClick={async () => {
+                    await signOut();
+                    // Force clear any persisted session
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.reload();
+                  }}
                   className="w-full"
                 >
                   Sign Out &amp; Try Another Account
