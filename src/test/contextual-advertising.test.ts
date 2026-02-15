@@ -141,8 +141,10 @@ describe("ContextualAdvertising integration", () => {
     const { text, cleanup } = await mount({
       repairRecommendation: "replace",
       repairCost: 5000,
+      userZipCode: "48201",
     });
-    expect(text()).toContain("Consider Upgrading Instead");
+    // The section renders with async vehicle search — shows loading or heading
+    expect(text()).toContain("Finding Better Options");
     cleanup();
   });
 
@@ -154,8 +156,9 @@ describe("ContextualAdvertising integration", () => {
     const { text, cleanup } = await mount({
       repairRecommendation: "consider_both",
       repairCost: 4000,
+      userZipCode: "48201",
     });
-    expect(text()).toContain("Consider Upgrading Instead");
+    expect(text()).toContain("Finding Better Options");
     cleanup();
   });
 

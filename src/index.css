@@ -75,6 +75,21 @@
     /* Star rating */
     --ad-star: 45 93% 47%;
 
+    /* Vehicle badge tokens */
+    --ad-badge-certified: 145 60% 35%;
+    --ad-badge-certified-fg: 0 0% 100%;
+    --ad-badge-lowmile: 212 60% 45%;
+    --ad-badge-lowmile-fg: 0 0% 100%;
+    --ad-badge-oneowner: 270 50% 45%;
+    --ad-badge-oneowner-fg: 0 0% 100%;
+    --ad-badge-accfree: 160 60% 38%;
+    --ad-badge-accfree-fg: 0 0% 100%;
+    --ad-badge-warranty: 28 70% 50%;
+    --ad-badge-warranty-fg: 0 0% 100%;
+    --ad-badge-live: 212 60% 94%;
+    --ad-badge-live-text: 212 60% 30%;
+    --ad-badge-live-border: 212 50% 72%;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -133,6 +148,21 @@
 
     /* Star rating */
     --ad-star: 45 90% 50%;
+
+    /* Vehicle badge tokens */
+    --ad-badge-certified: 145 50% 50%;
+    --ad-badge-certified-fg: 0 0% 100%;
+    --ad-badge-lowmile: 212 50% 55%;
+    --ad-badge-lowmile-fg: 0 0% 100%;
+    --ad-badge-oneowner: 270 40% 55%;
+    --ad-badge-oneowner-fg: 0 0% 100%;
+    --ad-badge-accfree: 160 50% 50%;
+    --ad-badge-accfree-fg: 0 0% 100%;
+    --ad-badge-warranty: 28 60% 55%;
+    --ad-badge-warranty-fg: 0 0% 100%;
+    --ad-badge-live: 212 35% 20%;
+    --ad-badge-live-text: 210 40% 80%;
+    --ad-badge-live-border: 212 30% 35%;
   }
 }
 

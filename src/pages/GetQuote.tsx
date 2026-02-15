@@ -431,6 +431,7 @@ export default function GetQuote() {
                 repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
                 repairRecommendation="consider_both"
                 diyFeasibility={diyFeasibility}
+                userZipCode={zipCode.replace(/\D/g, "").slice(0, 5)}
               />
             </SectionReveal>
 
