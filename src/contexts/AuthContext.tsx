@@ -22,19 +22,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdmin = async (userId: string) => {
     try {
-      const { data } = await supabase.rpc("has_role", {
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Admin check timed out")), 5000)
+      );
+      const rpc = supabase.rpc("has_role", {
         _user_id: userId,
         _role: "admin",
       });
+      const { data } = await Promise.race([rpc, timeout]);
       setIsAdmin(!!data);
-    } catch {
+    } catch (err) {
+      console.warn("[AuthContext] checkAdmin failed:", err);
       setIsAdmin(false);
     }
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
@@ -42,20 +50,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setIsAdmin(false);
         }
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     );
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
         await checkAdmin(session.user.id);
       }
-      setLoading(false);
+      if (mounted) setLoading(false);
+    }).catch(() => {
+      if (mounted) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Fallback: ensure loading resolves even if everything hangs
+    const safetyTimer = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 8000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(safetyTimer);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
