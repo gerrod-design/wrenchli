@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
+} from "recharts";
+import {
   TrendingUp,
   MousePointer,
   DollarSign,
@@ -20,6 +24,15 @@ import {
 } from "lucide-react";
 import { useRevenueAnalytics } from "@/hooks/useRevenueAnalytics";
 import { supabase } from "@/integrations/supabase/client";
+
+const CHART_COLORS = [
+  "hsl(var(--accent))",
+  "#10b981",
+  "#6366f1",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+];
 
 interface DetailedStats {
   totalSessions: number;
@@ -344,22 +357,40 @@ const AnalyticsDashboard = () => {
               {(!stats?.topRepairTypes.length) ? (
                 <p className="text-muted-foreground text-sm">No repair data yet.</p>
               ) : (
-                <div className="space-y-3">
-                  {stats.topRepairTypes.map((r, i) => (
-                    <div key={r.diagnosis} className="flex items-center justify-between p-4 rounded-lg border border-border">
-                      <div className="flex items-center gap-3">
-                        <Badge variant={i === 0 ? "default" : "secondary"}>#{i + 1}</Badge>
-                        <div>
-                          <h3 className="font-medium">{r.diagnosis}</h3>
-                          <p className="text-sm text-muted-foreground">Avg repair: ${r.avgRepairCost.toFixed(0)}</p>
+                <div className="space-y-6">
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={stats.topRepairTypes.map((r) => ({
+                      name: r.diagnosis.length > 20 ? r.diagnosis.slice(0, 20) + "…" : r.diagnosis,
+                      events: r.count,
+                      avgCost: Math.round(r.avgRepairCost),
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={60} />
+                      <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                      />
+                      <Bar dataKey="events" name="Events" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="avgCost" name="Avg Cost ($)" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="space-y-3">
+                    {stats.topRepairTypes.map((r, i) => (
+                      <div key={r.diagnosis} className="flex items-center justify-between p-4 rounded-lg border border-border">
+                        <div className="flex items-center gap-3">
+                          <Badge variant={i === 0 ? "default" : "secondary"}>#{i + 1}</Badge>
+                          <div>
+                            <h3 className="font-medium">{r.diagnosis}</h3>
+                            <p className="text-sm text-muted-foreground">Avg repair: ${r.avgRepairCost.toFixed(0)}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">{r.count} events</p>
+                          <p className="text-sm text-muted-foreground">{r.clickRate.toFixed(1)}% CTR</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold">{r.count} events</p>
-                        <p className="text-sm text-muted-foreground">{r.clickRate.toFixed(1)}% CTR</p>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -374,22 +405,40 @@ const AnalyticsDashboard = () => {
               {(!stats?.topGeoLocations.length) ? (
                 <p className="text-muted-foreground text-sm">No geographic data yet.</p>
               ) : (
-                <div className="space-y-3">
-                  {stats.topGeoLocations.map((loc, i) => (
-                    <div key={`${loc.city}-${loc.state}`} className="flex items-center justify-between p-4 rounded-lg border border-border">
-                      <div className="flex items-center gap-3">
-                        <Badge variant={i === 0 ? "default" : "secondary"}>#{i + 1}</Badge>
-                        <div>
-                          <h3 className="font-medium">{loc.city}, {loc.state}</h3>
-                          <p className="text-sm text-muted-foreground">{loc.sessions} sessions</p>
+                <div className="space-y-6">
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={stats.topGeoLocations.map((loc) => ({
+                      name: `${loc.city}, ${loc.state}`,
+                      sessions: loc.sessions,
+                      revenue: Number(loc.revenue.toFixed(2)),
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={60} />
+                      <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                      />
+                      <Bar dataKey="sessions" name="Sessions" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="revenue" name="Revenue ($)" fill="#10b981" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="space-y-3">
+                    {stats.topGeoLocations.map((loc, i) => (
+                      <div key={`${loc.city}-${loc.state}`} className="flex items-center justify-between p-4 rounded-lg border border-border">
+                        <div className="flex items-center gap-3">
+                          <Badge variant={i === 0 ? "default" : "secondary"}>#{i + 1}</Badge>
+                          <div>
+                            <h3 className="font-medium">{loc.city}, {loc.state}</h3>
+                            <p className="text-sm text-muted-foreground">{loc.sessions} sessions</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">${loc.revenue.toFixed(2)}</p>
+                          <p className="text-sm text-muted-foreground">Revenue</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold">${loc.revenue.toFixed(2)}</p>
-                        <p className="text-sm text-muted-foreground">Revenue</p>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -404,22 +453,44 @@ const AnalyticsDashboard = () => {
               {(!stats?.deviceBreakdown.length) ? (
                 <p className="text-muted-foreground text-sm">No device data yet.</p>
               ) : (
-                <div className="space-y-3">
-                  {stats.deviceBreakdown.map((d) => {
-                    const Icon = d.device === "Mobile" ? Smartphone : Monitor;
-                    return (
-                      <div key={d.device} className="flex items-center justify-between p-4 rounded-lg border border-border">
-                        <div className="flex items-center gap-3">
-                          <Icon className="h-5 w-5 text-muted-foreground" />
-                          <div>
-                            <h3 className="font-medium">{d.device}</h3>
-                            <p className="text-sm text-muted-foreground">{d.percentage.toFixed(1)}% of traffic</p>
+                <div className="space-y-6">
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <ResponsiveContainer width="100%" height={280}>
+                      <PieChart>
+                        <Pie
+                          data={stats.deviceBreakdown.map((d) => ({ name: d.device, value: d.count }))}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {stats.deviceBreakdown.map((_, i) => (
+                            <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Legend />
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="space-y-3">
+                      {stats.deviceBreakdown.map((d) => {
+                        const Icon = d.device === "Mobile" ? Smartphone : Monitor;
+                        return (
+                          <div key={d.device} className="flex items-center justify-between p-4 rounded-lg border border-border">
+                            <div className="flex items-center gap-3">
+                              <Icon className="h-5 w-5 text-muted-foreground" />
+                              <div>
+                                <h3 className="font-medium">{d.device}</h3>
+                                <p className="text-sm text-muted-foreground">{d.percentage.toFixed(1)}% of traffic</p>
+                              </div>
+                            </div>
+                            <p className="font-bold">{d.count.toLocaleString()} events</p>
                           </div>
-                        </div>
-                        <p className="font-bold">{d.count.toLocaleString()} events</p>
-                      </div>
-                    );
-                  })}
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -435,6 +506,22 @@ const AnalyticsDashboard = () => {
                 <p className="text-muted-foreground text-sm">No A/B test data yet.</p>
               ) : (
                 <div className="space-y-6">
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={stats.abTestResults.map((t) => ({
+                      name: `${t.testName.replace(/_/g, " ").slice(0, 15)}… / ${t.variant}`,
+                      users: t.users,
+                      conversion: Number(t.conversionRate.toFixed(1)),
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={60} />
+                      <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                      />
+                      <Bar dataKey="users" name="Users" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="conversion" name="Conv. Rate (%)" fill="#10b981" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                   {Object.entries(
                     stats.abTestResults.reduce<Record<string, typeof stats.abTestResults>>((acc, t) => {
                       if (!acc[t.testName]) acc[t.testName] = [];
