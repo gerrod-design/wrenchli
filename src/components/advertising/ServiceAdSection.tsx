@@ -27,33 +27,39 @@ const ServiceAdSection = ({
 
   if (layout === "horizontal") {
     return (
-      <div className="space-y-3">
+      <section aria-label="Recommended services" className="space-y-3">
         <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          <TrendingUp className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           <span className="text-sm font-medium text-muted-foreground">Recommended Services</span>
         </div>
-        {services.map((s) => (
-          <ServiceAdCard key={s.id} service={s} layout="horizontal" onTrack={makeOnTrack(s)} />
-        ))}
-      </div>
+        <div role="list" aria-label="Service recommendations">
+          {services.map((s) => (
+            <div key={s.id} role="listitem" className="mb-3 last:mb-0">
+              <ServiceAdCard service={s} layout="horizontal" onTrack={makeOnTrack(s)} />
+            </div>
+          ))}
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="bg-muted/30 rounded-2xl p-6 border border-border">
+    <section aria-labelledby="services-section-heading" className="bg-muted/30 rounded-2xl p-6 border border-border">
       <div className="flex items-center gap-3 mb-4">
-        <Shield className="h-5 w-5 text-muted-foreground" />
+        <Shield className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
         <div>
-          <h3 className="font-heading text-lg font-bold">Protect Your Investment</h3>
+          <h3 id="services-section-heading" className="font-heading text-lg font-bold">Protect Your Investment</h3>
           <p className="text-sm text-muted-foreground">Services to keep your vehicle running smoothly</p>
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3" role="list" aria-label="Available services">
         {services.map((s) => (
-          <ServiceAdCard key={s.id} service={s} onTrack={makeOnTrack(s)} />
+          <div key={s.id} role="listitem">
+            <ServiceAdCard service={s} onTrack={makeOnTrack(s)} />
+          </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

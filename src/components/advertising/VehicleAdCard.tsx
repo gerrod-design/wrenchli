@@ -10,43 +10,51 @@ const VehicleAdCard = ({
 }: {
   vehicle: VehicleListing;
   onTrack?: () => void;
-}) => (
-  <Card className="hover:shadow-md transition-shadow duration-200">
-    <CardContent className="p-4">
-      <div className="relative mb-3">
-        <div className="w-full h-32 bg-muted rounded-lg flex items-center justify-center">
-          <Car className="h-12 w-12 text-muted-foreground" />
+}) => {
+  const vehicleName = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+
+  return (
+    <Card className="hover:shadow-md transition-shadow duration-200" role="article" aria-label={`Vehicle listing: ${vehicleName}`}>
+      <CardContent className="p-4">
+        <div className="relative mb-3">
+          <div className="w-full h-32 bg-muted rounded-lg flex items-center justify-center" aria-hidden="true">
+            <Car className="h-12 w-12 text-muted-foreground" />
+          </div>
+          {vehicle.badge && (
+            <Badge className="absolute top-2 left-2 bg-ad-success-icon text-accent-foreground text-xs">{vehicle.badge}</Badge>
+          )}
         </div>
-        {vehicle.badge && (
-          <Badge className="absolute top-2 left-2 bg-ad-success-icon text-accent-foreground text-xs">{vehicle.badge}</Badge>
-        )}
-      </div>
-      <div className="space-y-2">
-        <h3 className="font-semibold text-sm">
-          {vehicle.year} {vehicle.make} {vehicle.model}
-        </h3>
-        <div className="flex justify-between text-sm">
-          <span className="font-bold text-accent">{vehicle.price}</span>
-          <span className="text-muted-foreground">{vehicle.mileage} miles</span>
+        <div className="space-y-2">
+          <h3 className="font-semibold text-sm">{vehicleName}</h3>
+          <div className="flex justify-between text-sm">
+            <span className="font-bold text-accent" aria-label={`Price: ${vehicle.price}`}>{vehicle.price}</span>
+            <span className="text-muted-foreground" aria-label={`Mileage: ${vehicle.mileage} miles`}>{vehicle.mileage} miles</span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {vehicle.dealer} • {vehicle.location}
+          </p>
+          <div className="flex flex-wrap gap-1 mb-2" role="list" aria-label="Vehicle features">
+            {vehicle.features.slice(0, 2).map((f, i) => (
+              <Badge key={i} variant="outline" className="text-xs px-1 py-0" role="listitem">
+                {f}
+              </Badge>
+            ))}
+          </div>
+          <Button size="sm" className="w-full" asChild>
+            <a
+              href={vehicle.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onTrack}
+              aria-label={`View details for ${vehicleName} (opens in new tab)`}
+            >
+              <ExternalLink className="h-3 w-3 mr-1" aria-hidden="true" /> View Details
+            </a>
+          </Button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          {vehicle.dealer} • {vehicle.location}
-        </p>
-        <div className="flex flex-wrap gap-1 mb-2">
-          {vehicle.features.slice(0, 2).map((f, i) => (
-            <Badge key={i} variant="outline" className="text-xs px-1 py-0">
-              {f}
-            </Badge>
-          ))}
-        </div>
-        <Button size="sm" className="w-full" asChild>
-          <a href={vehicle.link} target="_blank" rel="noopener noreferrer" onClick={onTrack}>
-            <ExternalLink className="h-3 w-3 mr-1" /> View Details
-          </a>
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
-);
+      </CardContent>
+    </Card>
+  );
+};
 
 export default VehicleAdCard;
