@@ -120,7 +120,7 @@ export default function AdminLogin() {
             {error && (
               <p className="text-sm text-destructive text-center">{error}</p>
             )}
-            {user && !isAdmin && (
+            {user && !isAdmin && !submitting && !adminConfirmed && (
               <p className="text-sm text-destructive text-center">
                 This account does not have admin access.
               </p>
@@ -141,7 +141,7 @@ export default function AdminLogin() {
             </div>
           )}
 
-          {user && !isAdmin && (
+          {user && !isAdmin && !submitting && !adminConfirmed && (
             <Button
               type="button"
               variant="outline"
