@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_click_events: {
+        Row: {
+          click_type: string
+          created_at: string
+          diagnosis_code: string | null
+          diagnosis_title: string | null
+          id: string
+          item_brand: string | null
+          item_category: string | null
+          item_id: string | null
+          item_price: string | null
+          item_title: string | null
+          placement: string | null
+          source: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: string | null
+        }
+        Insert: {
+          click_type: string
+          created_at?: string
+          diagnosis_code?: string | null
+          diagnosis_title?: string | null
+          id?: string
+          item_brand?: string | null
+          item_category?: string | null
+          item_id?: string | null
+          item_price?: string | null
+          item_title?: string | null
+          placement?: string | null
+          source?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+        }
+        Update: {
+          click_type?: string
+          created_at?: string
+          diagnosis_code?: string | null
+          diagnosis_title?: string | null
+          id?: string
+          item_brand?: string | null
+          item_category?: string | null
+          item_id?: string | null
+          item_price?: string | null
+          item_title?: string | null
+          placement?: string | null
+          source?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string
