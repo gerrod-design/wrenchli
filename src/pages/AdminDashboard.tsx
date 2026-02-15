@@ -262,6 +262,9 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-3">
             <Link to="/" className="font-heading text-lg font-bold text-primary">Wrenchli</Link>
             <Badge variant="outline" className="text-xs">Admin</Badge>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/">← Back to Site</Link>
+            </Button>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={fetchAll}>
