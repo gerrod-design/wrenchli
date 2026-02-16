@@ -32,8 +32,8 @@ export default function VinInput({ onDecoded }: Props) {
     setError("");
     try {
       const vehicle = await decodeVin(vin);
-      if (!vehicle.make) {
-        setError("We couldn't find vehicle details for that VIN. This can happen with very new vehicles, imports, or specialty vehicles. Please use the Year/Make/Model dropdown instead.");
+      if (!vehicle.make || !vehicle.model) {
+        setError("We couldn't find complete vehicle details for that VIN. This can happen with older vehicles (pre-2000), imports, or specialty vehicles. Please use the Year/Make/Model dropdown instead.");
         return;
       }
       onDecoded(vehicle);
