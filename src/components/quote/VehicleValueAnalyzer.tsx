@@ -37,34 +37,47 @@ interface Props {
   onRecommendation?: (rec: RecommendationLevel) => void;
 }
 
-/* ── Trim-level MSRP database ── */
+/* ── MSRP database — Make-Model-Year (base trim) ── */
 const MSRP_DATABASE: Record<string, number> = {
-  "Honda-Accord-2019-LX": 24020, "Honda-Accord-2020-LX": 24970,
-  "Honda-Accord-2021-LX": 25470, "Honda-Accord-2022-LX": 27615,
-  "Honda-Civic-2019-LX": 20345, "Honda-Civic-2020-LX": 21050,
-  "Honda-Civic-2021-LX": 21700, "Honda-Civic-2022-LX": 22550,
-  "Honda-CR-V-2019-LX": 25350, "Honda-CR-V-2020-LX": 25850,
-  "Toyota-Camry-2019-LE": 24095, "Toyota-Camry-2020-LE": 24425,
-  "Toyota-Camry-2021-LE": 25045, "Toyota-Camry-2022-LE": 25945,
-  "Toyota-Corolla-2019-LE": 19600, "Toyota-Corolla-2020-LE": 20025,
-  "Toyota-RAV4-2019-LE": 26545, "Toyota-RAV4-2020-LE": 26950,
-  "Ford-F-150-2019-XL": 28155, "Ford-F-150-2020-XL": 28940,
-  "Ford-F-150-2021-XL": 29290, "Ford-F-150-2022-XL": 30165,
-  "Ford-Escape-2019-S": 25200, "Ford-Escape-2020-S": 25980,
-  "Chevrolet-Silverado 1500-2019-WT": 29795, "Chevrolet-Silverado 1500-2020-WT": 29300,
-  "Chevrolet-Equinox-2019-L": 24995, "Chevrolet-Equinox-2020-L": 25800,
-  "Nissan-Altima-2019-S": 24100, "Nissan-Altima-2020-S": 24300,
-  "Nissan-Rogue-2019-S": 26260, "Nissan-Rogue-2020-S": 26750,
-  "Hyundai-Elantra-2019-SE": 17985, "Hyundai-Elantra-2020-SE": 19650,
-  "Hyundai-Tucson-2019-SE": 23550, "Hyundai-Tucson-2020-SE": 23550,
-  "Kia-Forte-2019-FE": 17690, "Kia-Forte-2020-FE": 17890,
-  "Kia-Sorento-2019-L": 26290, "Kia-Sorento-2020-L": 27060,
-  "Subaru-Outback-2019-2.5i": 26795, "Subaru-Outback-2020-Base": 27655,
-  "Mazda-CX-5-2019-Sport": 25345, "Mazda-CX-5-2020-Sport": 25190,
-  "Jeep-Grand Cherokee-2019-Laredo": 32195, "Jeep-Grand Cherokee-2020-Laredo": 33090,
-  "BMW-3 Series-2019-330i": 40250, "BMW-3 Series-2020-330i": 41250,
-  "Mercedes-Benz-C-Class-2019-C 300": 41400, "Mercedes-Benz-C-Class-2020-C 300": 42650,
-  "Tesla-Model 3-2019-Standard Range Plus": 35000, "Tesla-Model 3-2020-Standard Range Plus": 37990,
+  // Honda
+  "Honda-Accord-2024": 27295, "Honda-Accord-2023": 26120, "Honda-Accord-2022": 25100, "Honda-Accord-2021": 24970, "Honda-Accord-2020": 24020, "Honda-Accord-2019": 24020,
+  "Honda-Civic-2024": 25050, "Honda-Civic-2023": 24100, "Honda-Civic-2022": 23100, "Honda-Civic-2021": 22550, "Honda-Civic-2020": 21250, "Honda-Civic-2019": 20345,
+  "Honda-CR-V-2024": 33200, "Honda-CR-V-2023": 32350, "Honda-CR-V-2022": 31100, "Honda-CR-V-2021": 30100, "Honda-CR-V-2020": 28945, "Honda-CR-V-2019": 25350,
+  // Toyota
+  "Toyota-Camry-2024": 26320, "Toyota-Camry-2023": 25295, "Toyota-Camry-2022": 24425, "Toyota-Camry-2021": 24970, "Toyota-Camry-2020": 24095, "Toyota-Camry-2019": 24095,
+  "Toyota-Corolla-2024": 24255, "Toyota-Corolla-2023": 23195, "Toyota-Corolla-2022": 22195, "Toyota-Corolla-2021": 21550, "Toyota-Corolla-2020": 20430, "Toyota-Corolla-2019": 19600,
+  "Toyota-RAV4-2024": 31080, "Toyota-RAV4-2023": 29825, "Toyota-RAV4-2022": 28500, "Toyota-RAV4-2021": 27325, "Toyota-RAV4-2020": 26350, "Toyota-RAV4-2019": 26545,
+  // Ford
+  "Ford-F-150-2024": 37240, "Ford-F-150-2023": 35290, "Ford-F-150-2022": 33695, "Ford-F-150-2021": 31895, "Ford-F-150-2020": 28745, "Ford-F-150-2019": 28155,
+  "Ford-Escape-2024": 27170, "Ford-Escape-2023": 26080, "Ford-Escape-2022": 25200, "Ford-Escape-2021": 24885, "Ford-Escape-2020": 24885, "Ford-Escape-2019": 25200,
+  "Ford-Explorer-2024": 36760, "Ford-Explorer-2023": 35650, "Ford-Explorer-2022": 33245, "Ford-Explorer-2021": 32765, "Ford-Explorer-2020": 32765,
+  // Chevrolet
+  "Chevrolet-Silverado-2024": 36200, "Chevrolet-Silverado-2023": 34600, "Chevrolet-Silverado-2022": 32220, "Chevrolet-Silverado-2021": 30400, "Chevrolet-Silverado-2020": 28300,
+  "Chevrolet-Equinox-2024": 27200, "Chevrolet-Equinox-2023": 26600, "Chevrolet-Equinox-2022": 25800, "Chevrolet-Equinox-2021": 24995, "Chevrolet-Equinox-2020": 23800,
+  "Chevrolet-Malibu-2024": 25100, "Chevrolet-Malibu-2023": 24200, "Chevrolet-Malibu-2022": 23220, "Chevrolet-Malibu-2021": 22270, "Chevrolet-Malibu-2020": 22140,
+  // Nissan
+  "Nissan-Altima-2024": 25080, "Nissan-Altima-2023": 24300, "Nissan-Altima-2022": 23550, "Nissan-Altima-2021": 24400, "Nissan-Altima-2020": 24200, "Nissan-Altima-2019": 24100,
+  "Nissan-Rogue-2024": 27360, "Nissan-Rogue-2023": 26745, "Nissan-Rogue-2022": 25850, "Nissan-Rogue-2021": 25650, "Nissan-Rogue-2020": 25300, "Nissan-Rogue-2019": 26260,
+  "Nissan-Sentra-2024": 20680, "Nissan-Sentra-2023": 19460, "Nissan-Sentra-2022": 18940, "Nissan-Sentra-2021": 19090, "Nissan-Sentra-2020": 17990,
+  // Hyundai
+  "Hyundai-Elantra-2024": 22750, "Hyundai-Elantra-2023": 21600, "Hyundai-Elantra-2022": 20350, "Hyundai-Elantra-2021": 19650, "Hyundai-Elantra-2020": 19300, "Hyundai-Elantra-2019": 17985,
+  "Hyundai-Tucson-2024": 27700, "Hyundai-Tucson-2023": 26400, "Hyundai-Tucson-2022": 25350, "Hyundai-Tucson-2021": 24950, "Hyundai-Tucson-2020": 23700, "Hyundai-Tucson-2019": 23550,
+  "Hyundai-Santa Fe-2024": 33900, "Hyundai-Santa Fe-2023": 32200, "Hyundai-Santa Fe-2022": 30800, "Hyundai-Santa Fe-2021": 28200, "Hyundai-Santa Fe-2020": 26900,
+  // Kia
+  "Kia-Forte-2024": 19490, "Kia-Forte-2023": 18890, "Kia-Forte-2022": 17890, "Kia-Forte-2021": 17790, "Kia-Forte-2020": 17890, "Kia-Forte-2019": 17690,
+  "Kia-Sorento-2024": 31990, "Kia-Sorento-2023": 30990, "Kia-Sorento-2022": 29990, "Kia-Sorento-2021": 29590, "Kia-Sorento-2020": 27060, "Kia-Sorento-2019": 26290,
+  // Subaru
+  "Subaru-Outback-2024": 30090, "Subaru-Outback-2023": 29295, "Subaru-Outback-2022": 28070, "Subaru-Outback-2021": 27655, "Subaru-Outback-2020": 27655, "Subaru-Outback-2019": 26795,
+  // Mazda
+  "Mazda-CX-5-2024": 28250, "Mazda-CX-5-2023": 26700, "Mazda-CX-5-2022": 26100, "Mazda-CX-5-2021": 25370, "Mazda-CX-5-2020": 25190, "Mazda-CX-5-2019": 25345,
+  // Jeep
+  "Jeep-Grand Cherokee-2024": 38995, "Jeep-Grand Cherokee-2023": 37545, "Jeep-Grand Cherokee-2022": 36290, "Jeep-Grand Cherokee-2021": 33090, "Jeep-Grand Cherokee-2020": 33090, "Jeep-Grand Cherokee-2019": 32195,
+  // BMW
+  "BMW-3 Series-2024": 43800, "BMW-3 Series-2023": 43000, "BMW-3 Series-2022": 41450, "BMW-3 Series-2021": 41250, "BMW-3 Series-2020": 41250, "BMW-3 Series-2019": 40250,
+  // Mercedes-Benz
+  "Mercedes-Benz-C-Class-2024": 44600, "Mercedes-Benz-C-Class-2023": 43550, "Mercedes-Benz-C-Class-2022": 43050, "Mercedes-Benz-C-Class-2021": 42650, "Mercedes-Benz-C-Class-2020": 42650, "Mercedes-Benz-C-Class-2019": 41400,
+  // Tesla
+  "Tesla-Model 3-2024": 38990, "Tesla-Model 3-2023": 40240, "Tesla-Model 3-2022": 46990, "Tesla-Model 3-2021": 37990, "Tesla-Model 3-2020": 37990, "Tesla-Model 3-2019": 35000,
 };
 
 /* ── Brand-average fallback ── */
@@ -78,16 +91,20 @@ const BRAND_AVERAGES: Record<string, number> = {
   Volvo: 42000, Tesla: 45000, Chrysler: 30000,
 };
 
+/* ── Brand reliability tiers ── */
+const RELIABLE_BRANDS = ["Honda", "Toyota", "Mazda", "Subaru"];
+const LESS_RELIABLE_BRANDS = ["BMW", "Mercedes-Benz", "Audi", "Jaguar", "Land Rover"];
+
 function estimateMSRP(make: string, model: string, year: number, trim?: string): number {
-  // Try trim-level lookup first
+  // Try exact make-model-year lookup
+  const key = `${make}-${model}-${year}`;
+  if (MSRP_DATABASE[key]) return MSRP_DATABASE[key];
+
+  // Try trim-level key (legacy compat)
   if (trim) {
-    const trimKey = `${make}-${model}-${year}-${trim}`;
+    const trimKey = `${key}-${trim}`;
     if (MSRP_DATABASE[trimKey]) return MSRP_DATABASE[trimKey];
   }
-  // Try without trim (first matching entry for make-model-year)
-  const prefix = `${make}-${model}-${year}-`;
-  const match = Object.keys(MSRP_DATABASE).find((k) => k.startsWith(prefix));
-  if (match) return MSRP_DATABASE[match];
 
   // Fall back to brand average
   const base = BRAND_AVERAGES[make] ?? 30000;
@@ -139,6 +156,7 @@ function calculateRecommendation(
   value: number,
   vehicleAge: number,
   mileage: number,
+  make?: string,
 ): RecommendationLevel {
   const costRatio = repairCost / value;
 
@@ -148,11 +166,15 @@ function calculateRecommendation(
   if (mileage > 100000) threshold = 0.12;
   if (vehicleAge >= 12) threshold = 0.10;
 
+  // Brand reliability adjustments
+  if (make && RELIABLE_BRANDS.includes(make)) threshold += 0.03;
+  if (make && LESS_RELIABLE_BRANDS.includes(make) && vehicleAge > 7) threshold -= 0.03;
+
   if (costRatio < threshold * 0.6) {
     return {
       type: "repair_only",
       message: "Smart Investment — Repair Recommended",
-      reasoning: `This repair costs only ${(costRatio * 100).toFixed(1)}% of your vehicle's estimated value. It's a financially sound investment.`,
+      reasoning: `This repair costs only ${(costRatio * 100).toFixed(1)}% of your vehicle's estimated value. It's a financially sound investment that should give you reliable transportation.`,
       costRatio,
       threshold,
     };
@@ -161,7 +183,7 @@ function calculateRecommendation(
     return {
       type: "repair_with_note",
       message: "Reasonable Repair Cost",
-      reasoning: `At ${(costRatio * 100).toFixed(1)}% of vehicle value, this repair is still reasonable, but worth considering your long-term plans.`,
+      reasoning: `At ${(costRatio * 100).toFixed(1)}% of your vehicle's value, this repair is still reasonable. Consider your long-term plans and how much longer you want to keep this vehicle.`,
       costRatio,
       threshold,
     };
@@ -169,16 +191,16 @@ function calculateRecommendation(
   if (costRatio < threshold * 1.5) {
     return {
       type: "repair_and_replace",
-      message: "Consider All Options",
-      reasoning: `This repair costs ${(costRatio * 100).toFixed(1)}% of your vehicle's value. It's worth comparing repair vs. replacement to make the best financial decision.`,
+      message: "Consider All Your Options",
+      reasoning: `This repair costs ${(costRatio * 100).toFixed(1)}% of your vehicle's estimated value. You should compare the cost of repair against the benefits of upgrading to a newer vehicle.`,
       costRatio,
       threshold,
     };
   }
   return {
     type: "replace_emphasis",
-    message: "Replacement May Be Wiser",
-    reasoning: `At ${(costRatio * 100).toFixed(1)}% of vehicle value, this repair is relatively expensive. A different vehicle might offer better long-term value.`,
+    message: "Replacement Likely More Economical",
+    reasoning: `At ${(costRatio * 100).toFixed(1)}% of your vehicle's value, this repair is quite expensive. A newer vehicle would likely offer better long-term value and reliability.`,
     costRatio,
     threshold,
   };
@@ -251,7 +273,7 @@ export default function VehicleValueAnalyzer({
 
     const est = estimateValue(vehicleMake, vehicleModel, yearNum, miles, vehicleTrim);
     const age = new Date().getFullYear() - yearNum;
-    const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles);
+    const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles, vehicleMake);
 
     setResult({ estimate: est, rec });
     onRecommendation?.(rec);
