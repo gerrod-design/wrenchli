@@ -212,7 +212,7 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
 
         {/* Progress Indicator */}
         <div className="flex items-center justify-center gap-2 py-2">
-          {[1, 2, 3].map((step) => (
+          {[1, 2].map((step) => (
             <div key={step} className="flex items-center gap-2">
               <div
                 className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors ${
@@ -223,7 +223,7 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
               >
                 {currentStep > step ? <CheckCircle className="h-4 w-4" /> : step}
               </div>
-              {step < 3 && (
+              {step < 2 && (
                 <div
                   className={`h-0.5 w-8 rounded transition-colors ${
                     currentStep > step ? "bg-accent" : "bg-muted"
@@ -368,132 +368,111 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
             </div>
           )}
 
-          {/* Step 2: Purchase Details */}
+          {/* Step 2: Purchase & Driving Profile (Optional) */}
           {currentStep === 2 && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  Purchase Information (Optional)
+                  Additional Details (Optional)
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Helps track your vehicle's financial performance
+                  Helps track finances and personalize maintenance recommendations
                 </p>
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs">Purchase Date</Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    type="date"
-                    className="pl-9"
-                    value={formData.purchase_date}
-                    onChange={(e) => updateFormData("purchase_date", e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <Label className="text-xs">Purchase Price</Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    placeholder="e.g. 25000"
-                    className="pl-9"
-                    value={formData.purchase_price}
-                    onChange={(e) => updateFormData("purchase_price", e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <Label className="text-xs">Mileage at Purchase</Label>
-                <div className="relative">
-                  <Gauge className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    placeholder="e.g. 15000"
-                    className="pl-9"
-                    value={formData.purchase_mileage}
-                    onChange={(e) => updateFormData("purchase_mileage", e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-border bg-muted/20 p-3 flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p className="font-medium text-foreground">Why we ask for purchase details</p>
-                  <p>
-                    This information helps us calculate your total cost of ownership, track depreciation,
-                    and provide better financial advice about repairs vs replacement decisions.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Driving Profile */}
-          {currentStep === 3 && (
-            <div className="space-y-4">
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  Driving Profile
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Helps personalize maintenance recommendations
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs">Driving Style</Label>
-                <RadioGroup value={formData.driving_style} onValueChange={(v) => updateFormData("driving_style", v)}>
-                  {DRIVING_STYLES.map((style) => (
-                    <div key={style.value} className="flex items-start gap-2">
-                      <RadioGroupItem value={style.value} id={`driving-${style.value}`} className="mt-0.5" />
-                      <label htmlFor={`driving-${style.value}`} className="text-xs leading-tight cursor-pointer">
-                        {style.label}
-                      </label>
+              {/* Purchase Info */}
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Purchase Info</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Purchase Date</Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        type="date"
+                        className="pl-9"
+                        value={formData.purchase_date}
+                        onChange={(e) => updateFormData("purchase_date", e.target.value)}
+                      />
                     </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs">Primary Usage</Label>
-                <RadioGroup value={formData.usage_type} onValueChange={(v) => updateFormData("usage_type", v)}>
-                  {USAGE_TYPES.map((usage) => (
-                    <div key={usage.value} className="flex items-start gap-2">
-                      <RadioGroupItem value={usage.value} id={`usage-${usage.value}`} className="mt-0.5" />
-                      <label htmlFor={`usage-${usage.value}`} className="text-xs leading-tight cursor-pointer">
-                        {usage.label}
-                      </label>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Purchase Price</Label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        type="number"
+                        placeholder="e.g. 25000"
+                        className="pl-9"
+                        value={formData.purchase_price}
+                        onChange={(e) => updateFormData("purchase_price", e.target.value)}
+                      />
                     </div>
-                  ))}
-                </RadioGroup>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Mileage at Purchase</Label>
+                  <div className="relative">
+                    <Gauge className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      type="number"
+                      placeholder="e.g. 15000"
+                      className="pl-9"
+                      value={formData.purchase_mileage}
+                      onChange={(e) => updateFormData("purchase_mileage", e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs">Expected Annual Mileage</Label>
-                <Select
-                  value={formData.annual_mileage_estimate}
-                  onValueChange={(v) => updateFormData("annual_mileage_estimate", v)}
-                >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5000">Under 5,000 miles/year</SelectItem>
-                    <SelectItem value="7500">5,000–10,000 miles/year</SelectItem>
-                    <SelectItem value="12000">10,000–15,000 miles/year (Average)</SelectItem>
-                    <SelectItem value="17500">15,000–20,000 miles/year</SelectItem>
-                    <SelectItem value="25000">Over 20,000 miles/year</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-[11px] text-muted-foreground">
-                  Used to estimate when maintenance will be due and predict future issues
-                </p>
+              {/* Driving Profile */}
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Driving Profile</p>
+                <div className="space-y-2">
+                  <Label className="text-xs">Driving Style</Label>
+                  <RadioGroup value={formData.driving_style} onValueChange={(v) => updateFormData("driving_style", v)}>
+                    {DRIVING_STYLES.map((style) => (
+                      <div key={style.value} className="flex items-start gap-2">
+                        <RadioGroupItem value={style.value} id={`driving-${style.value}`} className="mt-0.5" />
+                        <label htmlFor={`driving-${style.value}`} className="text-xs leading-tight cursor-pointer">
+                          {style.label}
+                        </label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs">Primary Usage</Label>
+                  <RadioGroup value={formData.usage_type} onValueChange={(v) => updateFormData("usage_type", v)}>
+                    {USAGE_TYPES.map((usage) => (
+                      <div key={usage.value} className="flex items-start gap-2">
+                        <RadioGroupItem value={usage.value} id={`usage-${usage.value}`} className="mt-0.5" />
+                        <label htmlFor={`usage-${usage.value}`} className="text-xs leading-tight cursor-pointer">
+                          {usage.label}
+                        </label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs">Expected Annual Mileage</Label>
+                  <Select
+                    value={formData.annual_mileage_estimate}
+                    onValueChange={(v) => updateFormData("annual_mileage_estimate", v)}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5000">Under 5,000 mi/yr</SelectItem>
+                      <SelectItem value="7500">5,000–10,000 mi/yr</SelectItem>
+                      <SelectItem value="12000">10,000–15,000 mi/yr (Avg)</SelectItem>
+                      <SelectItem value="17500">15,000–20,000 mi/yr</SelectItem>
+                      <SelectItem value="25000">Over 20,000 mi/yr</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           )}
@@ -509,7 +488,7 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
               Back
             </Button>
           )}
-          {currentStep < 3 ? (
+          {currentStep < 2 ? (
             <Button
               size="sm"
               onClick={() => setCurrentStep((p) => p + 1)}
