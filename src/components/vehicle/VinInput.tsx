@@ -60,6 +60,7 @@ export default function VinInput({ onDecoded }: Props) {
             maxLength={17}
           />
           <Button
+            type="button"
             onClick={handleDecode}
             disabled={vin.length < 17 || loading}
             className="h-12 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-semibold px-5 shrink-0"
