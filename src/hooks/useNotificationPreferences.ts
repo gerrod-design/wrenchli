@@ -4,9 +4,20 @@ import { supabase } from "@/integrations/supabase/client";
 export interface NotificationPrefs {
   email_recalls: boolean;
   inapp_recalls: boolean;
+  email_maintenance: boolean;
+  inapp_maintenance: boolean;
+  email_market_value: boolean;
+  inapp_market_value: boolean;
 }
 
-const DEFAULTS: NotificationPrefs = { email_recalls: true, inapp_recalls: true };
+const DEFAULTS: NotificationPrefs = {
+  email_recalls: true,
+  inapp_recalls: true,
+  email_maintenance: true,
+  inapp_maintenance: true,
+  email_market_value: true,
+  inapp_market_value: true,
+};
 
 export function useNotificationPreferences() {
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULTS);
@@ -27,15 +38,20 @@ export function useNotificationPreferences() {
       if (error) throw error;
 
       if (data) {
+        const d = data as any;
         setPrefs({
-          email_recalls: (data as any).email_recalls,
-          inapp_recalls: (data as any).inapp_recalls,
+          email_recalls: d.email_recalls,
+          inapp_recalls: d.inapp_recalls,
+          email_maintenance: d.email_maintenance,
+          inapp_maintenance: d.inapp_maintenance,
+          email_market_value: d.email_market_value,
+          inapp_market_value: d.inapp_market_value,
         });
       } else {
         // Create default row
         await supabase
           .from("notification_preferences" as any)
-          .insert({ user_id: user.id, email_recalls: true, inapp_recalls: true });
+          .insert({ user_id: user.id, ...DEFAULTS });
       }
     } catch (err) {
       console.warn("Failed to fetch notification preferences:", err);
