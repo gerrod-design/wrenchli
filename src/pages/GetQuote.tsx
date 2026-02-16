@@ -16,6 +16,7 @@ import CostOfOwnership from "@/components/quote/CostOfOwnership";
 import type { RecommendationLevel } from "@/components/quote/VehicleValueAnalyzer";
 import FinancePrescreen from "@/components/FinancePrescreen";
 import ContextualAdvertising from "@/components/ContextualAdvertising";
+import { captureReferralToken, getReferralToken, trackReferralPageVisit, trackReferralConversion } from "@/lib/referralTracking";
 
 const ESTIMATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-repair`;
 
@@ -47,7 +48,12 @@ export default function GetQuote() {
 
   const vehicleStr = vehicle || [year, make, model, trim].filter(Boolean).join(" ");
 
-  // State
+  // Capture referral token on mount
+  useEffect(() => {
+    captureReferralToken();
+    trackReferralPageVisit("/get-quote");
+  }, []);
+
   const [zipCode, setZipCode] = useState("");
   const [estimate, setEstimate] = useState<CostEstimate | null>(null);
   const [isEstimating, setIsEstimating] = useState(false);
@@ -168,7 +174,11 @@ export default function GetQuote() {
         financing_interested: financingInterested,
         status: "referral_requested",
         referral_requested_at: new Date().toISOString(),
+        referral_token: getReferralToken() || null,
       });
+
+      // Track referral conversion
+      trackReferralConversion();
 
       setSubmitted(true);
       toast.success("Your quote request has been submitted!");
