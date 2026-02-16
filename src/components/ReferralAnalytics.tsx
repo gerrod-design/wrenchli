@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format, subDays, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  FunnelChart, Funnel, LabelList, Cell,
 } from "recharts";
-import { Link2, ArrowRight, RefreshCw, Loader2, TrendingUp, MousePointerClick, Eye, FileText } from "lucide-react";
+import { Link2, ArrowRight, RefreshCw, Loader2, TrendingUp, MousePointerClick, Eye, FileText, CalendarIcon } from "lucide-react";
 
 interface ReferralEvent {
   id: string;
@@ -36,6 +39,8 @@ const FUNNEL_COLORS = ["hsl(var(--accent))", "#6366f1", "#10b981"];
 export default function ReferralAnalytics() {
   const [events, setEvents] = useState<ReferralEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(subDays(new Date(), 30));
+  const [dateTo, setDateTo] = useState<Date | undefined>(new Date());
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -65,8 +70,19 @@ export default function ReferralAnalytics() {
 
   useEffect(() => { fetchEvents(); }, []);
 
+  // Filter events by date range
+  const filteredEvents = useMemo(() => {
+    if (!dateFrom && !dateTo) return events;
+    return events.filter(e => {
+      const d = new Date(e.created_at);
+      const from = dateFrom ? startOfDay(dateFrom) : new Date(0);
+      const to = dateTo ? endOfDay(dateTo) : new Date();
+      return isWithinInterval(d, { start: from, end: to });
+    });
+  }, [events, dateFrom, dateTo]);
+
   // Aggregate by token
-  const tokenMap = events.reduce<Record<string, { clicks: number; visits: number; quotes: number; lastActivity: string }>>((acc, e) => {
+  const tokenMap = filteredEvents.reduce<Record<string, { clicks: number; visits: number; quotes: number; lastActivity: string }>>((acc, e) => {
     if (!acc[e.referral_token]) acc[e.referral_token] = { clicks: 0, visits: 0, quotes: 0, lastActivity: e.created_at };
     const t = acc[e.referral_token];
     if (e.event_type === "click") t.clicks++;
@@ -86,9 +102,9 @@ export default function ReferralAnalytics() {
     .sort((a, b) => b.quotes - a.quotes || b.clicks - a.clicks);
 
   // Overall funnel
-  const totalClicks = events.filter(e => e.event_type === "click").length;
-  const totalVisits = events.filter(e => e.event_type === "page_visit").length;
-  const totalQuotes = events.filter(e => e.event_type === "quote_submitted").length;
+  const totalClicks = filteredEvents.filter(e => e.event_type === "click").length;
+  const totalVisits = filteredEvents.filter(e => e.event_type === "page_visit").length;
+  const totalQuotes = filteredEvents.filter(e => e.event_type === "quote_submitted").length;
 
   const funnelData = [
     { name: "Clicks", value: totalClicks, fill: FUNNEL_COLORS[0] },
@@ -116,6 +132,44 @@ export default function ReferralAnalytics() {
 
   return (
     <div className="space-y-6">
+      {/* Date range filter */}
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-sm font-medium text-muted-foreground">Date Range:</span>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className={cn("justify-start text-left font-normal", !dateFrom && "text-muted-foreground")}>
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {dateFrom ? format(dateFrom, "MMM d, yyyy") : "Start date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus className={cn("p-3 pointer-events-auto")} />
+          </PopoverContent>
+        </Popover>
+        <span className="text-muted-foreground">→</span>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className={cn("justify-start text-left font-normal", !dateTo && "text-muted-foreground")}>
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {dateTo ? format(dateTo, "MMM d, yyyy") : "End date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus className={cn("p-3 pointer-events-auto")} />
+          </PopoverContent>
+        </Popover>
+        <div className="flex gap-1">
+          {[7, 30, 90].map(d => (
+            <Button key={d} variant="ghost" size="sm" className="text-xs" onClick={() => { setDateFrom(subDays(new Date(), d)); setDateTo(new Date()); }}>
+              {d}d
+            </Button>
+          ))}
+          <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}>
+            All
+          </Button>
+        </div>
+      </div>
+
       {/* Summary stats */}
       <div className="grid gap-4 sm:grid-cols-4">
         <div className="rounded-xl border border-border bg-card p-5 space-y-1">
