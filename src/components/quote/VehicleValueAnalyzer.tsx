@@ -95,10 +95,47 @@ const BRAND_AVERAGES: Record<string, number> = {
 const RELIABLE_BRANDS = ["Honda", "Toyota", "Mazda", "Subaru"];
 const LESS_RELIABLE_BRANDS = ["BMW", "Mercedes-Benz", "Audi", "Jaguar", "Land Rover"];
 
+/* ── Trim-level MSRP multipliers ── */
+/* When a trim is a premium/performance variant, multiply the base MSRP */
+const TRIM_MULTIPLIERS: Record<string, number> = {
+  // Jeep Grand Cherokee trims
+  "summit": 1.55, "summit 4xe": 1.70, "summit reserve": 1.65, "overland": 1.30,
+  "limited": 1.20, "trailhawk": 1.25, "l limited": 1.25, "l overland": 1.35,
+  // Toyota
+  "trd pro": 1.40, "trd off-road": 1.15, "platinum": 1.35, "xle": 1.10,
+  // Honda
+  "touring": 1.20, "sport touring": 1.25, "ex-l": 1.15, "sport": 1.08,
+  // Ford
+  "king ranch": 1.45, "lariat": 1.30, "xlt": 1.10,
+  // Chevrolet
+  "high country": 1.50, "ltz": 1.25, "rst": 1.15, "lt": 1.08,
+  // BMW
+  "m sport": 1.15, "m": 1.60, "competition": 1.70,
+  // Generic luxury/performance
+  "denali": 1.40, "srt": 1.50, "hellcat": 1.80, "gt": 1.20,
+};
+
+function getTrimMultiplier(trim?: string): number {
+  if (!trim) return 1.0;
+  const normalized = trim.toLowerCase().trim();
+  // Try exact match first
+  if (TRIM_MULTIPLIERS[normalized]) return TRIM_MULTIPLIERS[normalized];
+  // Try partial match (e.g. "Summit 4XE" contains "summit 4xe")
+  for (const [key, mult] of Object.entries(TRIM_MULTIPLIERS)) {
+    if (normalized.includes(key) || key.includes(normalized)) return mult;
+  }
+  return 1.0;
+}
+
 function estimateMSRP(make: string, model: string, year: number, trim?: string): number {
   // Try exact make-model-year lookup
   const key = `${make}-${model}-${year}`;
-  if (MSRP_DATABASE[key]) return MSRP_DATABASE[key];
+  const baseMSRP = MSRP_DATABASE[key];
+  
+  if (baseMSRP) {
+    // Apply trim multiplier to the base MSRP
+    return Math.round(baseMSRP * getTrimMultiplier(trim));
+  }
 
   // Try trim-level key (legacy compat)
   if (trim) {
@@ -106,10 +143,10 @@ function estimateMSRP(make: string, model: string, year: number, trim?: string):
     if (MSRP_DATABASE[trimKey]) return MSRP_DATABASE[trimKey];
   }
 
-  // Fall back to brand average
+  // Fall back to brand average with trim multiplier
   const base = BRAND_AVERAGES[make] ?? 30000;
   const yearAdj = (year - 2020) * 1000;
-  return Math.max(base + yearAdj, 15000);
+  return Math.max(Math.round((base + yearAdj) * getTrimMultiplier(trim)), 15000);
 }
 
 /* ── Value estimator ── */
@@ -262,6 +299,7 @@ export default function VehicleValueAnalyzer({
   const yearNum = parseInt(vehicleYear, 10);
   const vehicleLabel = [vehicleYear, vehicleMake, vehicleModel, vehicleTrim].filter(Boolean).join(" ");
   const avgRepairCost = Math.round((repairCostLow + repairCostHigh) / 2);
+  const hasRepairContext = avgRepairCost > 0;
 
   const handleAnalyze = async (e?: React.MouseEvent) => {
     if (e) {
@@ -326,19 +364,21 @@ export default function VehicleValueAnalyzer({
       </div>
 
       {/* Results */}
-      {result && styles && Icon && (
+      {result && (
         <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-          {/* Recommendation banner */}
-          <div className={cn("rounded-xl border p-4 space-y-2", styles.border, styles.bg)}>
-            <div className="flex items-center gap-2">
-              <Icon className={cn("h-5 w-5 shrink-0", styles.text)} />
-              <span className="font-heading text-base font-bold">{result.rec.message}</span>
+          {/* Recommendation banner — only show when there's a repair to compare against */}
+          {hasRepairContext && styles && Icon && (
+            <div className={cn("rounded-xl border p-4 space-y-2", styles.border, styles.bg)}>
+              <div className="flex items-center gap-2">
+                <Icon className={cn("h-5 w-5 shrink-0", styles.text)} />
+                <span className="font-heading text-base font-bold">{result.rec.message}</span>
+              </div>
+              <p className="text-sm text-muted-foreground">{result.rec.reasoning}</p>
             </div>
-            <p className="text-sm text-muted-foreground">{result.rec.reasoning}</p>
-          </div>
+          )}
 
           {/* Value breakdown */}
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className={cn("grid gap-3", hasRepairContext ? "sm:grid-cols-2" : "")}>
             <div className="rounded-lg border border-border bg-muted/20 p-4 text-center space-y-1">
               <p className="text-xs text-muted-foreground">Estimated Vehicle Value</p>
               <p className="font-heading text-2xl font-bold text-foreground">
@@ -348,15 +388,17 @@ export default function VehicleValueAnalyzer({
                 {result.estimate.confidence}% confidence
               </p>
             </div>
-            <div className="rounded-lg border border-border bg-muted/20 p-4 text-center space-y-1">
-              <p className="text-xs text-muted-foreground">Repair-to-Value Ratio</p>
-              <p className={cn("font-heading text-2xl font-bold", styles.text)}>
-                {(result.rec.costRatio * 100).toFixed(1)}%
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                {fmt(avgRepairCost)} repair on {fmt(result.estimate.estimatedValue)} vehicle
-              </p>
-            </div>
+            {hasRepairContext && (
+              <div className="rounded-lg border border-border bg-muted/20 p-4 text-center space-y-1">
+                <p className="text-xs text-muted-foreground">Repair-to-Value Ratio</p>
+                <p className={cn("font-heading text-2xl font-bold", styles?.text)}>
+                  {(result.rec.costRatio * 100).toFixed(1)}%
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {fmt(avgRepairCost)} repair on {fmt(result.estimate.estimatedValue)} vehicle
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Value breakdown details */}
@@ -378,7 +420,7 @@ export default function VehicleValueAnalyzer({
           </details>
 
           {/* Nudge toward TCO tool when replacement is worth considering */}
-          {["repair_and_replace", "replace_emphasis"].includes(result.rec.type) && (
+          {hasRepairContext && ["repair_and_replace", "replace_emphasis"].includes(result.rec.type) && (
             <div className="rounded-lg border border-accent/20 bg-accent/5 p-3 text-sm text-muted-foreground flex items-start gap-2">
               <TrendingDown className="h-4 w-4 text-accent shrink-0 mt-0.5" />
               <span>
@@ -388,7 +430,7 @@ export default function VehicleValueAnalyzer({
           )}
 
           {/* Override: let repair-recommended users still browse vehicles */}
-          {["repair_only", "repair_with_note"].includes(result.rec.type) && (
+          {hasRepairContext && ["repair_only", "repair_with_note"].includes(result.rec.type) && (
             <div className="rounded-lg border border-border bg-muted/20 p-4 flex items-center justify-between gap-4">
               <div className="space-y-0.5">
                 <p className="text-sm font-medium text-foreground">Want to explore vehicles anyway?</p>
