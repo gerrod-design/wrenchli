@@ -1,9 +1,9 @@
 {
   "schema_version": "v1",
-  "name_for_human": "Wrenchli",
+  "name_for_human": "Wrenchli Auto Assistant",
   "name_for_model": "wrenchli",
-  "description_for_human": "Get instant vehicle diagnostics, repair cost estimates, vehicle valuations, maintenance schedules, and find nearby service providers across 13 Detroit metro areas from Wrenchli's automotive AI.",
-  "description_for_model": "Use this plugin to diagnose vehicle problems, estimate repair costs, get vehicle market valuations, retrieve maintenance schedules, and find nearby service providers. For diagnostics: provide symptoms and vehicle info to get probable issues, urgency, cost estimates, and safety advice. For vehicle value: provide year, make, model, and mileage to get current market value, depreciation breakdown, and repair-vs-replace analysis. For maintenance: provide make and mileage to get brand-specific service schedules with cost estimates. For service providers: search by ZIP code or city name across 13 Detroit metro areas (Warren, Birmingham, Troy, Sterling Heights, Ann Arbor, Dearborn, Livonia, Detroit, Southfield, Royal Oak, Farmington Hills, Novi, Canton) with optional price tier and luxury vehicle specialist filtering. Always provide vehicle year, make, and model for accurate results.",
+  "description_for_human": "Get automotive diagnoses, repair cost estimates, vehicle value analysis, maintenance schedules, and find trusted local mechanics across 13 Detroit metro areas. Perfect for car problems, maintenance advice, and repair vs replace decisions.",
+  "description_for_model": "Automotive diagnostic platform that analyzes vehicle symptoms, provides repair cost estimates, vehicle value analysis with repair vs replace recommendations, maintenance schedules, and connects users with local service providers across 13 Detroit metro areas. Use when users ask about car problems, weird noises, check engine lights, repair costs, vehicle values, maintenance schedules, or finding mechanics. Can analyze symptoms, estimate costs, determine if repairs are worth it, generate brand-specific maintenance schedules, and recommend local shops. Always provide vehicle year, make, and model for accurate results.",
   "auth": {
     "type": "service_http",
     "authorization_type": "bearer",
@@ -14,6 +14,6 @@
     "url": "https://wrenchli.lovable.app/.well-known/openapi.yaml"
   },
   "logo_url": "https://wrenchli.lovable.app/favicon.ico",
-  "contact_email": "support@wrenchli.com",
+  "contact_email": "support@wrenchli.net",
   "legal_info_url": "https://wrenchli.lovable.app/about"
 }
