@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_human": "Wrenchli",
   "name_for_model": "wrenchli",
-  "description_for_human": "Get instant vehicle diagnostics, repair cost estimates, vehicle valuations, and maintenance advice from Wrenchli's automotive AI.",
-  "description_for_model": "Use this plugin to diagnose vehicle problems, estimate repair costs, and get vehicle market valuations. For diagnostics: provide symptoms and vehicle info to get probable issues, urgency, cost estimates, and safety advice. For vehicle value: provide year, make, model, and mileage to get current market value, depreciation breakdown, and repair-vs-replace analysis. Always provide vehicle year, make, and model for accurate results.",
+  "description_for_human": "Get instant vehicle diagnostics, repair cost estimates, vehicle valuations, maintenance schedules, and find nearby service providers across 13 Detroit metro areas from Wrenchli's automotive AI.",
+  "description_for_model": "Use this plugin to diagnose vehicle problems, estimate repair costs, get vehicle market valuations, retrieve maintenance schedules, and find nearby service providers. For diagnostics: provide symptoms and vehicle info to get probable issues, urgency, cost estimates, and safety advice. For vehicle value: provide year, make, model, and mileage to get current market value, depreciation breakdown, and repair-vs-replace analysis. For maintenance: provide make and mileage to get brand-specific service schedules with cost estimates. For service providers: search by ZIP code or city name across 13 Detroit metro areas (Warren, Birmingham, Troy, Sterling Heights, Ann Arbor, Dearborn, Livonia, Detroit, Southfield, Royal Oak, Farmington Hills, Novi, Canton) with optional price tier and luxury vehicle specialist filtering. Always provide vehicle year, make, and model for accurate results.",
   "auth": {
     "type": "service_http",
     "authorization_type": "bearer",
