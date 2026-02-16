@@ -12,7 +12,7 @@ import GarageVehicleCard from "@/components/garage/GarageVehicleCard";
 import GaragePrivacyNotice from "@/components/garage/GaragePrivacyNotice";
 import GarageClearDialog from "@/components/garage/GarageClearDialog";
 import MaintenanceTab from "@/components/garage/MaintenanceTab";
-import InsightsTab from "@/components/garage/InsightsTab";
+import ProactiveInsights from "@/components/ProactiveInsights";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -280,11 +280,24 @@ export default function Garage() {
 
                     {/* Insights Tab */}
                     <TabsContent value="insights" className="p-4">
-                      <InsightsTab
-                        vehicle={selected}
-                        cloudVehicle={cloudMatch}
-                        isAuthenticated={isAuthenticated}
-                      />
+                      {isAuthenticated && cloudMatch ? (
+                        <ProactiveInsights vehicle={{
+                          id: cloudMatch.id,
+                          year: cloudMatch.year,
+                          make: cloudMatch.make,
+                          model: cloudMatch.model,
+                          current_mileage: cloudMatch.current_mileage ?? undefined,
+                          driving_style: cloudMatch.driving_style ?? undefined,
+                          usage_type: cloudMatch.usage_type ?? undefined,
+                        }} />
+                      ) : (
+                        <div className="text-center py-10">
+                          <TrendingUp className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
+                          <p className="text-sm text-muted-foreground">
+                            Sign in and sync your vehicle to access proactive insights.
+                          </p>
+                        </div>
+                      )}
                     </TabsContent>
                   </Tabs>
                 </div>

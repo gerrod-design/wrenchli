@@ -315,6 +315,77 @@ export type Database = {
           },
         ]
       }
+      proactive_insights: {
+        Row: {
+          action_items: Json | null
+          clicks_count: number
+          cost_to_ignore: number | null
+          created_at: string
+          description: string
+          dismissed_at: string | null
+          expires_at: string | null
+          id: string
+          is_dismissed: boolean
+          market_data: Json | null
+          potential_savings: number | null
+          priority: string
+          title: string
+          type: string
+          updated_at: string
+          urgency_timeframe: string | null
+          vehicle_id: string
+          views_count: number
+        }
+        Insert: {
+          action_items?: Json | null
+          clicks_count?: number
+          cost_to_ignore?: number | null
+          created_at?: string
+          description: string
+          dismissed_at?: string | null
+          expires_at?: string | null
+          id: string
+          is_dismissed?: boolean
+          market_data?: Json | null
+          potential_savings?: number | null
+          priority: string
+          title: string
+          type: string
+          updated_at?: string
+          urgency_timeframe?: string | null
+          vehicle_id: string
+          views_count?: number
+        }
+        Update: {
+          action_items?: Json | null
+          clicks_count?: number
+          cost_to_ignore?: number | null
+          created_at?: string
+          description?: string
+          dismissed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_dismissed?: boolean
+          market_data?: Json | null
+          potential_savings?: number | null
+          priority?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          urgency_timeframe?: string | null
+          vehicle_id?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proactive_insights_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_requests: {
         Row: {
           cost_estimate_details: Json | null
