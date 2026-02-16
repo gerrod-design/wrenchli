@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-api-key",
 };
 
 interface DiagnoseRequest {
@@ -17,18 +18,13 @@ interface DiagnoseRequest {
   location?: string;
 }
 
-/**
- * Basic pattern-matching for fast local diagnosis.
- * Falls back to the AI-powered /diagnose function for richer results.
- */
 function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: string; model: string }) {
   const text = symptoms.join(" ").toLowerCase();
 
   if (text.includes("grinding") || text.includes("brake")) {
     return {
       issue: "Brake System Issue",
-      description:
-        "Grinding noises typically indicate worn brake pads that need replacement. This can damage rotors if not addressed promptly.",
+      description: "Grinding noises typically indicate worn brake pads that need replacement. This can damage rotors if not addressed promptly.",
       urgency: "high" as const,
       cost_estimate: { min: 200, max: 600 },
       action: "Schedule brake inspection within 48 hours",
@@ -40,8 +36,7 @@ function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: stri
   if (text.includes("check engine") || text.includes("engine light")) {
     return {
       issue: "Engine Diagnostic Needed",
-      description:
-        "Check engine light indicates a system malfunction. Could range from a loose gas cap to serious engine issues.",
+      description: "Check engine light indicates a system malfunction. Could range from a loose gas cap to serious engine issues.",
       urgency: "medium" as const,
       cost_estimate: { min: 100, max: 800 },
       action: "Get diagnostic scan to identify specific issue",
@@ -53,8 +48,7 @@ function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: stri
   if (text.includes("oil") || text.includes("leak")) {
     return {
       issue: "Oil System Issue",
-      description:
-        "Oil leaks can lead to engine damage if oil levels drop too low. Check oil level immediately.",
+      description: "Oil leaks can lead to engine damage if oil levels drop too low. Check oil level immediately.",
       urgency: "medium" as const,
       cost_estimate: { min: 50, max: 300 },
       action: "Check oil level and look for leak source",
@@ -66,8 +60,7 @@ function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: stri
   if (text.includes("overheat") || text.includes("temperature") || text.includes("coolant") || text.includes("steam")) {
     return {
       issue: "Engine Overheating",
-      description:
-        "Your engine is running hotter than it should. This can cause permanent engine damage if not addressed immediately.",
+      description: "Your engine is running hotter than it should. This can cause permanent engine damage if not addressed immediately.",
       urgency: "high" as const,
       cost_estimate: { min: 150, max: 800 },
       action: "Pull over safely and turn off the engine. Do not drive until resolved.",
@@ -79,8 +72,7 @@ function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: stri
   if (text.includes("noise") || text.includes("sound") || text.includes("rattle") || text.includes("knock")) {
     return {
       issue: "Mechanical Issue — Diagnosis Needed",
-      description:
-        "Unusual noises can indicate various mechanical issues. Professional diagnosis recommended to identify the source.",
+      description: "Unusual noises can indicate various mechanical issues. Professional diagnosis recommended to identify the source.",
       urgency: "medium" as const,
       cost_estimate: { min: 100, max: 500 },
       action: "Schedule professional inspection",
@@ -92,8 +84,7 @@ function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: stri
   if (text.includes("battery") || text.includes("won't start") || text.includes("click") || text.includes("crank")) {
     return {
       issue: "Battery or Starting System Issue",
-      description:
-        "If your vehicle won't start or you hear clicking, the most common cause is a dead or weak battery.",
+      description: "If your vehicle won't start or you hear clicking, the most common cause is a dead or weak battery.",
       urgency: "high" as const,
       cost_estimate: { min: 100, max: 500 },
       action: "Test battery voltage or jump-start the vehicle",
@@ -105,8 +96,7 @@ function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: stri
   if (text.includes("transmission") || text.includes("shifting") || text.includes("slipping")) {
     return {
       issue: "Transmission Issue",
-      description:
-        "Transmission problems can range from low fluid to serious internal damage. Address promptly to prevent costly repairs.",
+      description: "Transmission problems can range from low fluid to serious internal damage. Address promptly to prevent costly repairs.",
       urgency: "high" as const,
       cost_estimate: { min: 150, max: 3000 },
       action: "Check transmission fluid level and schedule inspection",
@@ -117,14 +107,23 @@ function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: stri
 
   return {
     issue: "Professional Diagnosis Recommended",
-    description:
-      "Multiple symptoms or unclear issue. A professional diagnostic scan will identify the specific problem.",
+    description: "Multiple symptoms or unclear issue. A professional diagnostic scan will identify the specific problem.",
     urgency: "medium" as const,
     cost_estimate: { min: 100, max: 400 },
     action: "Schedule diagnostic appointment with local mechanic",
     safety: "Safe to drive short distances unless symptoms worsen",
     diy_possible: false,
   };
+}
+
+/**
+ * Hash an API key using the Web Crypto API (SHA-256).
+ */
+async function hashApiKey(key: string): Promise<string> {
+  const encoded = new TextEncoder().encode(key);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 serve(async (req) => {
@@ -139,9 +138,82 @@ serve(async (req) => {
     });
   }
 
+  // --- API Key Authentication ---
+  const apiKey = req.headers.get("x-api-key");
+  if (!apiKey) {
+    return new Response(
+      JSON.stringify({ error: "Missing API key. Include x-api-key header." }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  const keyHash = await hashApiKey(apiKey);
+
+  // Look up the key
+  const { data: keyRecord, error: keyError } = await supabase
+    .from("api_keys")
+    .select("id, is_active, rate_limit_per_minute")
+    .eq("key_hash", keyHash)
+    .maybeSingle();
+
+  if (keyError || !keyRecord) {
+    return new Response(
+      JSON.stringify({ error: "Invalid API key." }),
+      { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  if (!keyRecord.is_active) {
+    return new Response(
+      JSON.stringify({ error: "API key is deactivated." }),
+      { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  // --- Rate Limiting ---
+  const windowStart = new Date(Date.now() - 60_000).toISOString();
+
+  const { count, error: countError } = await supabase
+    .from("api_rate_limits")
+    .select("*", { count: "exact", head: true })
+    .eq("key_hash", keyHash)
+    .gte("requested_at", windowStart);
+
+  if (countError) {
+    console.error("Rate limit check error:", countError);
+  }
+
+  const currentCount = count ?? 0;
+  const limit = keyRecord.rate_limit_per_minute;
+
+  if (currentCount >= limit) {
+    return new Response(
+      JSON.stringify({
+        error: "Rate limit exceeded.",
+        limit_per_minute: limit,
+        retry_after_seconds: 60,
+      }),
+      { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" } }
+    );
+  }
+
+  // Log this request & update last_used_at (fire and forget)
+  supabase.from("api_rate_limits").insert({ key_hash: keyHash }).then(() => {});
+  supabase.from("api_keys").update({ last_used_at: new Date().toISOString() }).eq("id", keyRecord.id).then(() => {});
+
+  // Periodically clean up old rate limit entries (1 in 20 chance)
+  if (Math.random() < 0.05) {
+    supabase.rpc("cleanup_old_rate_limits").then(() => {});
+  }
+
+  // --- Process the diagnosis request ---
   try {
     const body: DiagnoseRequest = await req.json();
-
     const { symptoms, vehicle, location } = body;
 
     if (!symptoms || !Array.isArray(symptoms) || symptoms.length === 0) {
@@ -159,7 +231,6 @@ serve(async (req) => {
     }
 
     const diagnosis = analyzeSymptoms(symptoms, vehicle);
-
     const baseUrl = "https://wrenchli.lovable.app";
 
     const response = {
