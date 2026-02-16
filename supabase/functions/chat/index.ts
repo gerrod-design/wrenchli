@@ -11,7 +11,7 @@ const MODEL = "google/gemini-3-flash-preview";
 
 const FUNCTIONS_BASE = Deno.env.get("SUPABASE_URL") + "/functions/v1";
 
-// ── Tool definitions the AI model can call ──
+// ── Tool definitions ──
 const tools = [
   {
     type: "function" as const,
@@ -23,10 +23,10 @@ const tools = [
         type: "object",
         properties: {
           codes: { type: "string", description: "OBD2 diagnostic trouble codes, e.g. 'P0420 P0171'" },
-          symptom: { type: "string", description: "Plain-language symptom description, e.g. 'car makes grinding noise when braking'" },
-          year: { type: "string", description: "Vehicle year, e.g. '2018'" },
-          make: { type: "string", description: "Vehicle make, e.g. 'Honda'" },
-          model: { type: "string", description: "Vehicle model, e.g. 'Accord'" },
+          symptom: { type: "string", description: "Plain-language symptom description" },
+          year: { type: "string", description: "Vehicle year" },
+          make: { type: "string", description: "Vehicle make" },
+          model: { type: "string", description: "Vehicle model" },
         },
         required: [],
       },
@@ -37,16 +37,16 @@ const tools = [
     function: {
       name: "estimate_repair_cost",
       description:
-        "Estimate professional repair costs for a diagnosed issue. Requires a diagnosis title and ZIP code. Returns cost range, parts/labor breakdown, and regional notes.",
+        "Estimate professional repair costs. Returns cost range, parts/labor breakdown, and regional notes.",
       parameters: {
         type: "object",
         properties: {
-          diagnosis_title: { type: "string", description: "The repair/diagnosis title, e.g. 'Worn Brake Pads'" },
-          diagnosis_code: { type: "string", description: "DTC code if applicable" },
-          vehicle_year: { type: "string" },
-          vehicle_make: { type: "string" },
-          vehicle_model: { type: "string" },
-          zip_code: { type: "string", description: "Customer ZIP code for regional pricing" },
+          diagnosis_title: { type: "string", description: "The repair/diagnosis title, e.g. 'Faulty Catalytic Converter' or 'Worn Brake Pads'. This field is REQUIRED." },
+          diagnosis_code: { type: "string", description: "DTC code if applicable, e.g. 'P0420'" },
+          vehicle_year: { type: "string", description: "Vehicle year, e.g. '2018'" },
+          vehicle_make: { type: "string", description: "Vehicle make, e.g. 'Ford'" },
+          vehicle_model: { type: "string", description: "Vehicle model, e.g. 'F-150'" },
+          zip_code: { type: "string", description: "Customer ZIP code for regional pricing. REQUIRED." },
         },
         required: ["diagnosis_title", "zip_code"],
       },
@@ -57,17 +57,17 @@ const tools = [
     function: {
       name: "estimate_vehicle_value",
       description:
-        "Estimate the current fair market value of a vehicle. Returns private-party, trade-in, and dealer retail ranges.",
+        "Estimate current fair market value. Returns private-party, trade-in, and dealer retail ranges.",
       parameters: {
         type: "object",
         properties: {
           year: { type: "number", description: "Vehicle year" },
-          make: { type: "string" },
-          model: { type: "string" },
-          trim: { type: "string" },
+          make: { type: "string", description: "Vehicle make" },
+          model: { type: "string", description: "Vehicle model" },
+          trim: { type: "string", description: "Vehicle trim" },
           mileage: { type: "number", description: "Current mileage" },
-          zipCode: { type: "string" },
-          condition: { type: "string", description: "Vehicle condition: excellent, good, average, fair, poor" },
+          zipCode: { type: "string", description: "ZIP code" },
+          condition: { type: "string", description: "Condition: excellent, good, average, fair, poor" },
         },
         required: ["year", "make", "model", "mileage"],
       },
@@ -78,12 +78,12 @@ const tools = [
     function: {
       name: "find_local_shops",
       description:
-        "Find trusted local auto repair shops near a location. Returns shop names, ratings, specialties, and pricing tiers.",
+        "Find trusted local auto repair shops near a location.",
       parameters: {
         type: "object",
         properties: {
           location: { type: "string", description: "ZIP code or city name" },
-          service_type: { type: "string", description: "Type of service needed, e.g. 'brakes', 'oil change', 'general'" },
+          service_type: { type: "string", description: "Service needed, e.g. 'brakes', 'oil change'" },
           vehicle_make: { type: "string", description: "Vehicle make for specialty matching" },
         },
         required: ["location"],
@@ -96,15 +96,18 @@ const SYSTEM_PROMPT = `You are Wrenchli's friendly AI assistant with access to p
 
 You have tools to:
 1. **diagnose_vehicle** — Analyze OBD2 codes or symptoms to identify car problems
-2. **estimate_repair_cost** — Get cost estimates for repairs (needs a diagnosis + ZIP code)
+2. **estimate_repair_cost** — Get cost estimates for repairs (needs diagnosis_title + zip_code)
 3. **estimate_vehicle_value** — Check what a vehicle is worth
 4. **find_local_shops** — Find trusted mechanics nearby
+
+IMPORTANT: When calling estimate_repair_cost, you MUST use the exact parameter names: "diagnosis_title" (not "diagnosis"), "vehicle_year" (not "year"), "vehicle_make" (not "make"), "vehicle_model" (not "model"), and "zip_code".
 
 **When to use tools:**
 - User describes a car problem, noise, warning light, or DTC code → use diagnose_vehicle
 - User asks "how much will it cost to fix…" → use estimate_repair_cost (ask for ZIP if not provided)
 - User asks "what's my car worth" or "should I repair or replace" → use estimate_vehicle_value
 - User asks for shops, mechanics, or where to get service → use find_local_shops
+- You can call multiple tools at once if the question needs both diagnosis AND cost estimate.
 
 **After getting tool results, always:**
 - Summarize the key findings in plain language
@@ -118,12 +121,12 @@ You have tools to:
 - [For Repair Shops](/for-shops) — info for shops wanting to join
 - [About Us](/about) | [FAQ](/faq) | [Contact](/contact)
 
-Keep answers concise, helpful, and friendly. If you can answer without a tool (general advice, navigation), just answer directly. If you don't know something specific, suggest the [Contact page](/contact).`;
+Keep answers concise, helpful, and friendly. If you can answer without a tool (general advice, navigation), just answer directly.`;
 
-// ── Execute a tool call by hitting the corresponding edge function ──
+// ── Execute a tool call ──
 async function executeTool(
   name: string,
-  args: Record<string, unknown>,
+  rawArgs: Record<string, unknown>,
   anonKey: string,
 ): Promise<string> {
   const headers: Record<string, string> = {
@@ -139,33 +142,50 @@ async function executeTool(
         resp = await fetch(`${FUNCTIONS_BASE}/diagnose`, {
           method: "POST",
           headers,
-          body: JSON.stringify(args),
+          body: JSON.stringify(rawArgs),
         });
         break;
 
-      case "estimate_repair_cost":
+      case "estimate_repair_cost": {
+        // Normalize argument names (model sometimes uses wrong names)
+        const args: Record<string, unknown> = { ...rawArgs };
+        if (args.diagnosis && !args.diagnosis_title) {
+          args.diagnosis_title = args.diagnosis;
+          delete args.diagnosis;
+        }
+        if (args.year && !args.vehicle_year) {
+          args.vehicle_year = String(args.year);
+          delete args.year;
+        }
+        if (args.make && !args.vehicle_make) {
+          args.vehicle_make = args.make;
+          delete args.make;
+        }
+        if (args.model && !args.vehicle_model) {
+          args.vehicle_model = args.model;
+          delete args.model;
+        }
         resp = await fetch(`${FUNCTIONS_BASE}/estimate-repair`, {
           method: "POST",
           headers,
           body: JSON.stringify(args),
         });
         break;
+      }
 
       case "estimate_vehicle_value":
         resp = await fetch(`${FUNCTIONS_BASE}/estimate-vehicle-value`, {
           method: "POST",
           headers,
-          body: JSON.stringify(args),
+          body: JSON.stringify(rawArgs),
         });
         break;
 
       case "find_local_shops": {
         const params = new URLSearchParams();
-        if (args.location) params.set("location", String(args.location));
-        if (args.service_type) params.set("service_type", String(args.service_type));
-        if (args.vehicle_make) params.set("vehicle_make", String(args.vehicle_make));
-        // Call the internal provider-search directly (no API key needed for internal call)
-        // We call the diagnose-style internal function instead of the api-providers which requires x-api-key
+        if (rawArgs.location) params.set("location", String(rawArgs.location));
+        if (rawArgs.service_type) params.set("service_type", String(rawArgs.service_type));
+        if (rawArgs.vehicle_make) params.set("vehicle_make", String(rawArgs.vehicle_make));
         resp = await fetch(`${FUNCTIONS_BASE}/vehicle-search?${params}`, {
           method: "GET",
           headers: { Authorization: `Bearer ${anonKey}` },
@@ -259,13 +279,12 @@ Deno.serve(async (req) => {
 
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
-    // Build conversation for the AI
     const aiMessages: Array<Record<string, unknown>> = [
       { role: "system", content: SYSTEM_PROMPT },
       ...messages,
     ];
 
-    // ── Turn 1: Ask model (may produce tool calls) ──
+    // ── Turn 1: Non-streaming request (may produce tool calls) ──
     const turn1Resp = await fetch(AI_GATEWAY, {
       method: "POST",
       headers: {
@@ -277,6 +296,7 @@ Deno.serve(async (req) => {
         messages: aiMessages,
         tools,
         tool_choice: "auto",
+        stream: false,
       }),
     });
 
@@ -302,39 +322,44 @@ Deno.serve(async (req) => {
       );
     }
 
-    const turn1Data = await turn1Resp.json();
+    let turn1Data;
+    try {
+      turn1Data = await turn1Resp.json();
+    } catch (e) {
+      console.error("Failed to parse Turn 1 JSON:", e);
+      // Fallback: return a plain text response
+      return new Response(
+        JSON.stringify({ error: "Failed to process AI response" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const assistantMsg = turn1Data.choices?.[0]?.message;
 
-    // If no tool calls, stream the response directly (re-request with stream: true)
+    // ── No tool calls: return content directly as SSE stream ──
     if (!assistantMsg?.tool_calls || assistantMsg.tool_calls.length === 0) {
-      // Simple case: no tools needed — re-request with streaming
-      const streamResp = await fetch(AI_GATEWAY, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
+      const content = assistantMsg?.content || "I'm sorry, I couldn't generate a response. Please try again.";
+      // Synthesize an SSE stream from the non-streamed content
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        start(controller) {
+          const chunk = JSON.stringify({
+            choices: [{ delta: { role: "assistant", content } }],
+          });
+          controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
         },
-        body: JSON.stringify({
-          model: MODEL,
-          messages: aiMessages,
-          stream: true,
-        }),
       });
-
-      if (!streamResp.ok) {
-        return new Response(
-          JSON.stringify({ error: "AI service error" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
-
-      return new Response(streamResp.body, {
+      return new Response(stream, {
         headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
       });
     }
 
     // ── Execute tool calls in parallel ──
     const toolCalls = assistantMsg.tool_calls;
+    console.log("Tool calls:", JSON.stringify(toolCalls.map((tc: { function: { name: string } }) => tc.function.name)));
+
     const toolResults = await Promise.all(
       toolCalls.map(async (tc: { id: string; function: { name: string; arguments: string } }) => {
         let args: Record<string, unknown> = {};
@@ -352,10 +377,17 @@ Deno.serve(async (req) => {
       }),
     );
 
-    // ── Turn 2: Send tool results back, stream final answer ──
+    // ── Turn 2: Send tool results, stream final text answer ──
+    // Clean assistant message: keep tool_calls but ensure content is set
+    const cleanAssistantMsg = {
+      role: "assistant",
+      content: assistantMsg.content || "",
+      tool_calls: assistantMsg.tool_calls,
+    };
+
     const turn2Messages = [
       ...aiMessages,
-      assistantMsg,
+      cleanAssistantMsg,
       ...toolResults,
     ];
 
@@ -369,6 +401,7 @@ Deno.serve(async (req) => {
         model: MODEL,
         messages: turn2Messages,
         stream: true,
+        // Do NOT pass tools — force the model to respond with text only
       }),
     });
 
