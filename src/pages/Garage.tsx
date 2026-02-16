@@ -34,6 +34,8 @@ export default function Garage() {
   const [mileageInput, setMileageInput] = useState("");
   const [updatingMileage, setUpdatingMileage] = useState(false);
   const [showAddVehicle, setShowAddVehicle] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [insightFilter, setInsightFilter] = useState<string | undefined>();
 
   const selected = vehicles[selectedIdx] as GarageVehicle | undefined;
   const cloudMatch = selected ? findCloudVehicle(selected) : undefined;
@@ -142,6 +144,11 @@ export default function Garage() {
                       onRemove={removeVehicle}
                       onRename={updateNickname}
                       onColorChange={updateColor}
+                      onRecallClick={() => {
+                        setSelectedIdx(i);
+                        setActiveTab("insights");
+                        setInsightFilter("recall");
+                      }}
                     />
                   </div>
                 </div>
@@ -156,7 +163,7 @@ export default function Garage() {
               {/* Selected vehicle detail panel */}
               {selected && (
                 <div className="rounded-xl border border-border bg-card overflow-hidden">
-                  <Tabs defaultValue="overview" className="w-full">
+                  <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); if (v !== "insights") setInsightFilter(undefined); }} className="w-full">
                     <TabsList className="w-full justify-start rounded-none border-b bg-muted/30 px-2 h-auto flex-wrap">
                       <TabsTrigger value="overview" className="text-xs gap-1.5 data-[state=active]:bg-background">
                         <BarChart3 className="h-3 w-3" /> Overview
@@ -289,7 +296,7 @@ export default function Garage() {
                           current_mileage: cloudMatch.current_mileage ?? undefined,
                           driving_style: cloudMatch.driving_style ?? undefined,
                           usage_type: cloudMatch.usage_type ?? undefined,
-                        }} />
+                        }} initialFilter={insightFilter} onFilterApplied={() => setInsightFilter(undefined)} />
                       ) : (
                         <div className="text-center py-10">
                           <TrendingUp className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
