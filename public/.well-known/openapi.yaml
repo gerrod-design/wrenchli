@@ -380,6 +380,101 @@ paths:
           description: Rate limit exceeded
       security:
         - apiKey: []
+  /api-providers:
+    get:
+      operationId: findServiceProviders
+      summary: Find nearby service providers with smart matching
+      description: Search for auto repair shops by location with optional filters for service type, price range, and vehicle make. Luxury brands are automatically matched with European/luxury specialists.
+      parameters:
+        - name: location
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ZIP code or city name (e.g. "48009" or "Birmingham")
+        - name: service_type
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Type of service needed (e.g. brakes, engine, general)
+        - name: radius_miles
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 25
+          description: Search radius in miles
+        - name: price_range
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [budget, mid, premium]
+          description: Filter by price tier
+        - name: vehicle_make
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Vehicle make for specialist matching (e.g. BMW)
+      responses:
+        "200":
+          description: List of matching service providers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  providers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        rating:
+                          type: number
+                        review_count:
+                          type: integer
+                        address:
+                          type: string
+                        phone:
+                          type: string
+                        distance_miles:
+                          type: number
+                        specialties:
+                          type: array
+                          items:
+                            type: string
+                        price_tier:
+                          type: string
+                          enum: [budget, mid, premium]
+                        response_time:
+                          type: string
+                        availability:
+                          type: string
+                          enum: [same_day, next_day, within_week]
+                        wrenchli_verified:
+                          type: boolean
+                        quote_url:
+                          type: string
+                  search_params:
+                    type: object
+                  wrenchli_services:
+                    type: object
+        "400":
+          description: Missing location parameter
+        "401":
+          description: Missing API key
+        "403":
+          description: Invalid or deactivated API key
+        "429":
+          description: Rate limit exceeded
+      security:
+        - apiKey: []
 components:
   securitySchemes:
     apiKey:
