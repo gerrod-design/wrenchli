@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import DeveloperBilling from "@/components/DeveloperBilling";
+import ApiKeyManager from "@/components/ApiKeyManager";
+import { useAuth } from "@/contexts/AuthContext";
 
 const FUNCTIONS_BASE = "https://etytcjxqqjzpalehqoib.supabase.co/functions/v1";
 const BASE_URL = `${FUNCTIONS_BASE}/api-diagnose`;
@@ -466,6 +468,7 @@ function SectionCard({ icon: Icon, title, children }: { icon: React.ElementType;
 }
 
 export default function Developers() {
+  const { user, isAdmin } = useAuth();
   return (
     <>
       <Helmet>
@@ -514,11 +517,16 @@ export default function Developers() {
             {/* Authentication */}
             <SectionCard icon={Key} title="Authentication">
               <p className="text-muted-foreground mb-4">
-                All requests require an API key passed via the <code className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono">x-api-key</code> header. Contact us to obtain your key.
+                All requests require an API key passed via the <code className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono">x-api-key</code> header.
+                {!isAdmin && " Log in with an admin account to generate keys, or contact us."}
               </p>
-              <a href="/contact" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
-                Request an API Key <ExternalLink className="h-3.5 w-3.5" />
-              </a>
+              {isAdmin ? (
+                <ApiKeyManager />
+              ) : (
+                <a href="/admin/login" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+                  Log in to manage API Keys <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
             </SectionCard>
 
             {/* Endpoint */}
