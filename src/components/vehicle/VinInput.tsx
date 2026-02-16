@@ -23,7 +23,11 @@ export default function VinInput({ onDecoded }: Props) {
     setError("");
   };
 
-  const handleDecode = async () => {
+  const handleDecode = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!isValidVin(vin)) {
       setError("VINs are exactly 17 characters and don't contain the letters I, O, or Q. Please check your entry.");
       return;
@@ -31,22 +35,24 @@ export default function VinInput({ onDecoded }: Props) {
     setLoading(true);
     setError("");
     try {
+      console.log("[VinInput] Decoding VIN:", vin);
       const vehicle = await decodeVin(vin);
+      console.log("[VinInput] Decoded result:", vehicle);
       if (!vehicle.make || !vehicle.model) {
         setError("We couldn't find complete vehicle details for that VIN. This can happen with older vehicles (pre-2000), imports, or specialty vehicles. Please use the Year/Make/Model dropdown instead.");
         return;
       }
       onDecoded(vehicle);
-    } catch (err) {
-      console.error("[VinInput] decode error:", err);
-      setError("We couldn't find vehicle details for that VIN. Please double-check and try again, or use the Year/Make/Model dropdown instead.");
+    } catch (err: any) {
+      console.error("[VinInput] decode error:", err?.message || err);
+      setError(`VIN decode failed: ${err?.message || "Network error"}. Please try again or use the Year/Make/Model dropdown.`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" onSubmit={(e) => e.preventDefault()}>
       <div>
         <label className="text-sm font-semibold text-foreground mb-1 block">
           Enter your 17-character VIN
@@ -56,6 +62,13 @@ export default function VinInput({ onDecoded }: Props) {
             placeholder="e.g., 4T1B11HK5KU123456"
             value={vin}
             onChange={(e) => handleChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                e.stopPropagation();
+                if (vin.length === 17 && !loading) handleDecode();
+              }
+            }}
             className="h-12 text-base font-mono uppercase flex-1"
             maxLength={17}
           />
@@ -76,6 +89,7 @@ export default function VinInput({ onDecoded }: Props) {
       {error && <p className="text-sm text-destructive font-medium">{error}</p>}
 
       <button
+        type="button"
         onClick={() => setShowHelp(!showHelp)}
         className="text-xs text-wrenchli-teal font-semibold hover:underline inline-flex items-center gap-1"
       >
