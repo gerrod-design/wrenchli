@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Car, MessageCircle } from "lucide-react";
+import { Menu, X, ChevronDown, Car } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import { Button } from "@/components/ui/button";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 import GarageDropdown from "@/components/garage/GarageDropdown";
@@ -147,6 +148,7 @@ export default function Navbar() {
 
         {/* Desktop CTAs - right */}
         <div className="hidden items-center gap-3 lg:flex">
+          <NotificationBell />
           <GarageDropdown />
           <Button asChild variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
             <Link to="/for-shops#apply">Partner With Us</Link>

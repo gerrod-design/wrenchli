@@ -11,3 +11,12 @@ verify_jwt = false
 
 [functions.compare-ownership]
 verify_jwt = false
+
+[functions.check-recalls]
+verify_jwt = false
+
+[functions.recommend-products]
+verify_jwt = false
+
+[functions.vehicle-search]
+verify_jwt = false
