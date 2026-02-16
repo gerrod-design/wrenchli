@@ -21,6 +21,9 @@ serve(async (req) => {
     }
 
     const sitePassword = Deno.env.get('SITE_PASSWORD');
+    console.log('SITE_PASSWORD length:', sitePassword?.length, 'input length:', password.length);
+    console.log('SITE_PASSWORD chars:', JSON.stringify(sitePassword));
+    console.log('Input chars:', JSON.stringify(password));
     if (!sitePassword) {
       console.error('SITE_PASSWORD secret not configured');
       return new Response(JSON.stringify({ valid: false, error: 'Not configured' }), {
@@ -29,7 +32,7 @@ serve(async (req) => {
       });
     }
 
-    const valid = password === sitePassword;
+    const valid = password.trim() === sitePassword.trim();
 
     return new Response(JSON.stringify({ valid }), {
       status: 200,
