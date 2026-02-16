@@ -359,6 +359,7 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
                       vehicleTrim={formData.trim}
                       repairCostLow={0}
                       repairCostHigh={0}
+                      initialMileage={formData.current_mileage}
                       onRecommendation={() => {}}
                     />
                   )}

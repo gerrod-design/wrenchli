@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,6 +27,11 @@ interface ValueEstimate {
     mileageAdjustment: number;
     regionalAdjustment: number;
   };
+  privatePartyRange?: { low: number; high: number };
+  tradeInRange?: { low: number; high: number };
+  dealerRetailRange?: { low: number; high: number };
+  factors?: string[];
+  marketTrend?: string;
 }
 
 interface Props {
@@ -35,6 +41,7 @@ interface Props {
   vehicleTrim?: string;
   repairCostLow: number;
   repairCostHigh: number;
+  initialMileage?: string;
   onRecommendation?: (rec: RecommendationLevel) => void;
 }
 
@@ -295,12 +302,21 @@ export default function VehicleValueAnalyzer({
   vehicleTrim,
   repairCostLow,
   repairCostHigh,
+  initialMileage,
   onRecommendation,
 }: Props) {
-  const [mileage, setMileage] = useState("");
+  const [mileage, setMileage] = useState(initialMileage ?? "");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ estimate: ValueEstimate; rec: RecommendationLevel } | null>(null);
+  const [aiSource, setAiSource] = useState(false);
   const browseRef = useRef<HTMLDivElement>(null);
+
+  // Sync initialMileage when it changes externally
+  useEffect(() => {
+    if (initialMileage && !mileage) {
+      setMileage(initialMileage);
+    }
+  }, [initialMileage]);
 
   const yearNum = parseInt(vehicleYear, 10);
   const vehicleLabel = [vehicleYear, vehicleMake, vehicleModel, vehicleTrim].filter(Boolean).join(" ");
@@ -316,9 +332,56 @@ export default function VehicleValueAnalyzer({
     if (!miles || miles < 0) return;
 
     setLoading(true);
-    // Small delay for perceived thoroughness
-    await new Promise((r) => setTimeout(r, 600));
+    setAiSource(false);
 
+    try {
+      // Try AI-powered valuation first
+      const { data, error } = await supabase.functions.invoke("estimate-vehicle-value", {
+        body: {
+          year: yearNum,
+          make: vehicleMake,
+          model: vehicleModel,
+          trim: vehicleTrim,
+          mileage: miles,
+        },
+      });
+
+      if (!error && data?.success && data.valuation?.fair_market_value) {
+        const v = data.valuation;
+        const est: ValueEstimate = {
+          estimatedValue: v.fair_market_value,
+          confidence: v.confidence ?? 85,
+          breakdown: {
+            baseMSRP: v.dealer_retail_high ?? v.fair_market_value,
+            ageDepreciation: (v.dealer_retail_high ?? v.fair_market_value) - v.fair_market_value,
+            mileageAdjustment: 0,
+            regionalAdjustment: 0,
+          },
+          privatePartyRange: v.private_party_low && v.private_party_high
+            ? { low: v.private_party_low, high: v.private_party_high }
+            : undefined,
+          tradeInRange: v.trade_in_low && v.trade_in_high
+            ? { low: v.trade_in_low, high: v.trade_in_high }
+            : undefined,
+          dealerRetailRange: v.dealer_retail_low && v.dealer_retail_high
+            ? { low: v.dealer_retail_low, high: v.dealer_retail_high }
+            : undefined,
+          factors: v.factors ?? [],
+          marketTrend: v.market_trend,
+        };
+        const age = new Date().getFullYear() - yearNum;
+        const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles, vehicleMake);
+        setResult({ estimate: est, rec });
+        setAiSource(true);
+        onRecommendation?.(rec);
+        setLoading(false);
+        return;
+      }
+    } catch (err) {
+      console.warn("AI valuation failed, falling back to local estimate:", err);
+    }
+
+    // Fallback to local estimation
     const est = estimateValue(vehicleMake, vehicleModel, yearNum, miles, vehicleTrim);
     const age = new Date().getFullYear() - yearNum;
     const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles, vehicleMake);
@@ -386,12 +449,13 @@ export default function VehicleValueAnalyzer({
           {/* Value breakdown */}
           <div className={cn("grid gap-3", hasRepairContext ? "sm:grid-cols-2" : "")}>
             <div className="rounded-lg border border-border bg-muted/20 p-4 text-center space-y-1">
-              <p className="text-xs text-muted-foreground">Estimated Vehicle Value</p>
+              <p className="text-xs text-muted-foreground">Fair Market Value</p>
               <p className="font-heading text-2xl font-bold text-foreground">
                 {fmt(result.estimate.estimatedValue)}
               </p>
               <p className="text-[11px] text-muted-foreground">
                 {result.estimate.confidence}% confidence
+                {aiSource && " · AI-powered estimate"}
               </p>
             </div>
             {hasRepairContext && (
@@ -407,23 +471,66 @@ export default function VehicleValueAnalyzer({
             )}
           </div>
 
-          {/* Value breakdown details */}
-          <details className="group text-xs">
-            <summary className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
-              <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
-              Value breakdown
-            </summary>
-            <div className="mt-2 rounded-lg bg-muted/30 p-3 space-y-1.5">
-              <Row label="Est. original MSRP" value={fmt(result.estimate.breakdown.baseMSRP)} />
-              <Row label="Age depreciation" value={`-${fmt(result.estimate.breakdown.ageDepreciation)}`} negative />
-              <Row
-                label="Mileage adjustment"
-                value={`${result.estimate.breakdown.mileageAdjustment > 0 ? "-" : "+"}${fmt(Math.abs(result.estimate.breakdown.mileageAdjustment))}`}
-                negative={result.estimate.breakdown.mileageAdjustment > 0}
-              />
-              <Row label="Regional adjustment" value={`-${fmt(result.estimate.breakdown.regionalAdjustment)}`} negative />
+          {/* Price ranges — show when AI data is available */}
+          {aiSource && (result.estimate.privatePartyRange || result.estimate.tradeInRange) && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {result.estimate.tradeInRange && (
+                <div className="rounded-lg border border-border bg-muted/10 p-3 text-center space-y-0.5">
+                  <p className="text-[11px] text-muted-foreground font-medium">Trade-In Value</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {fmt(result.estimate.tradeInRange.low)} – {fmt(result.estimate.tradeInRange.high)}
+                  </p>
+                </div>
+              )}
+              {result.estimate.privatePartyRange && (
+                <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 text-center space-y-0.5">
+                  <p className="text-[11px] text-muted-foreground font-medium">Private Party</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {fmt(result.estimate.privatePartyRange.low)} – {fmt(result.estimate.privatePartyRange.high)}
+                  </p>
+                </div>
+              )}
+              {result.estimate.dealerRetailRange && (
+                <div className="rounded-lg border border-border bg-muted/10 p-3 text-center space-y-0.5">
+                  <p className="text-[11px] text-muted-foreground font-medium">Dealer Retail</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {fmt(result.estimate.dealerRetailRange.low)} – {fmt(result.estimate.dealerRetailRange.high)}
+                  </p>
+                </div>
+              )}
             </div>
-          </details>
+          )}
+
+          {/* Market factors */}
+          {aiSource && result.estimate.factors && result.estimate.factors.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {result.estimate.factors.map((factor, i) => (
+                <span key={i} className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-[11px] text-muted-foreground">
+                  {factor}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Value breakdown details — show for local estimates */}
+          {!aiSource && (
+            <details className="group text-xs">
+              <summary className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
+                Value breakdown
+              </summary>
+              <div className="mt-2 rounded-lg bg-muted/30 p-3 space-y-1.5">
+                <Row label="Est. original MSRP" value={fmt(result.estimate.breakdown.baseMSRP)} />
+                <Row label="Age depreciation" value={`-${fmt(result.estimate.breakdown.ageDepreciation)}`} negative />
+                <Row
+                  label="Mileage adjustment"
+                  value={`${result.estimate.breakdown.mileageAdjustment > 0 ? "-" : "+"}${fmt(Math.abs(result.estimate.breakdown.mileageAdjustment))}`}
+                  negative={result.estimate.breakdown.mileageAdjustment > 0}
+                />
+                <Row label="Regional adjustment" value={`-${fmt(result.estimate.breakdown.regionalAdjustment)}`} negative />
+              </div>
+            </details>
+          )}
 
           {/* Nudge toward TCO tool when replacement is worth considering */}
           {hasRepairContext && ["repair_and_replace", "replace_emphasis"].includes(result.rec.type) && (
@@ -470,7 +577,9 @@ export default function VehicleValueAnalyzer({
           )}
 
           <p className="text-[11px] text-muted-foreground text-center italic">
-            This is an estimate based on general depreciation curves and brand averages. Actual market value may vary.
+            {aiSource
+              ? "AI-powered estimate based on current market data, comparable sales, and vehicle condition factors. Not a substitute for a professional appraisal."
+              : "Estimate based on general depreciation curves and brand averages. Actual market value may vary."}
           </p>
         </div>
       )}
