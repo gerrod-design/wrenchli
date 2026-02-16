@@ -279,6 +279,107 @@ paths:
           description: Rate limit exceeded
       security:
         - apiKey: []
+  /api-maintenance-schedule:
+    post:
+      operationId: getMaintenanceSchedule
+      summary: Get vehicle maintenance schedule and upcoming services
+      description: Provide vehicle make and current mileage to receive a full maintenance schedule with brand-specific adjustments, upcoming service items sorted by urgency, and cost estimates. Optionally provide last service records to calculate accurate due dates.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - vehicle
+              properties:
+                vehicle:
+                  type: object
+                  required:
+                    - make
+                    - mileage
+                  properties:
+                    make:
+                      type: string
+                      description: Vehicle manufacturer (e.g. Toyota, BMW, Tesla)
+                    model:
+                      type: string
+                      description: Vehicle model (e.g. Camry, 3 Series)
+                    year:
+                      type: integer
+                      description: Vehicle model year
+                    mileage:
+                      type: integer
+                      description: Current odometer reading in miles (0–500000)
+                last_services:
+                  type: array
+                  description: Optional array of last service records for accurate due-date calculation
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: Service type key (e.g. oil_change, brake_inspection)
+                      mileage:
+                        type: integer
+                        description: Mileage when service was last performed
+      responses:
+        "200":
+          description: Maintenance schedule with upcoming services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vehicle_summary:
+                    type: object
+                  full_schedule:
+                    type: array
+                    items:
+                      type: object
+                  upcoming_services:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        label:
+                          type: string
+                        due_mileage:
+                          type: integer
+                        miles_until_due:
+                          type: integer
+                        priority:
+                          type: string
+                          enum: [overdue, urgent, soon, upcoming]
+                        estimated_cost_low:
+                          type: number
+                        estimated_cost_high:
+                          type: number
+                  summary:
+                    type: object
+                    properties:
+                      total_items:
+                        type: integer
+                      overdue_count:
+                        type: integer
+                      urgent_count:
+                        type: integer
+                      estimated_total_cost_low:
+                        type: number
+                      estimated_total_cost_high:
+                        type: number
+        "400":
+          description: Invalid request
+        "401":
+          description: Missing API key
+        "403":
+          description: Invalid or deactivated API key
+        "429":
+          description: Rate limit exceeded
+      security:
+        - apiKey: []
 components:
   securitySchemes:
     apiKey:

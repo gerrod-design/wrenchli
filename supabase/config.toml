@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.api-vehicle-value]
 verify_jwt = false
+
+[functions.api-maintenance-schedule]
+verify_jwt = false

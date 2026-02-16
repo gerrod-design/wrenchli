@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign } from "lucide-react";
+import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,132 @@ const FUNCTIONS_BASE = "https://etytcjxqqjzpalehqoib.supabase.co/functions/v1";
 const BASE_URL = `${FUNCTIONS_BASE}/api-diagnose`;
 const ESTIMATE_URL = `${FUNCTIONS_BASE}/api-estimate-repair`;
 const VALUE_URL = `${FUNCTIONS_BASE}/api-vehicle-value`;
+const MAINT_URL = `${FUNCTIONS_BASE}/api-maintenance-schedule`;
+
+const maintCurlExample = `curl -X POST "${MAINT_URL}" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "vehicle": {
+      "make": "Toyota",
+      "model": "Camry",
+      "year": 2019,
+      "mileage": 47000
+    },
+    "last_services": [
+      { "type": "oil_change", "mileage": 45000 },
+      { "type": "tire_rotation", "mileage": 42000 }
+    ]
+  }'`;
+
+const maintPythonExample = `import requests
+
+API_KEY = "YOUR_API_KEY"
+URL = "${MAINT_URL}"
+
+response = requests.post(
+    URL,
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": API_KEY,
+    },
+    json={
+        "vehicle": {
+            "make": "Toyota",
+            "model": "Camry",
+            "year": 2019,
+            "mileage": 47000,
+        },
+        "last_services": [
+            {"type": "oil_change", "mileage": 45000},
+            {"type": "tire_rotation", "mileage": 42000},
+        ],
+    },
+)
+
+data = response.json()
+print(f"Upcoming items: {data['summary']['total_items']}")
+for svc in data['upcoming_services']:
+    if svc['priority'] in ('overdue', 'urgent'):
+        print(f"  ⚠ {svc['label']}: {svc['priority']} ({svc['miles_until_due']} mi)")`;
+
+const maintJsExample = `const API_KEY = "YOUR_API_KEY";
+const URL = "${MAINT_URL}";
+
+const response = await fetch(URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    vehicle: { make: "Toyota", model: "Camry", year: 2019, mileage: 47000 },
+    last_services: [
+      { type: "oil_change", mileage: 45000 },
+      { type: "tire_rotation", mileage: 42000 },
+    ],
+  }),
+});
+
+const data = await response.json();
+console.log(\`Upcoming: \${data.summary.total_items} items\`);
+data.upcoming_services
+  .filter(s => s.priority === "overdue" || s.priority === "urgent")
+  .forEach(s => console.log(\`  ⚠ \${s.label}: \${s.priority}\`));`;
+
+const maintSampleResponse = `{
+  "vehicle_summary": {
+    "make": "Toyota",
+    "model": "Camry",
+    "year": 2019,
+    "mileage": 47000
+  },
+  "full_schedule": [
+    {
+      "type": "oil_change",
+      "label": "Oil Change",
+      "interval_miles": 5000,
+      "interval_months": 6,
+      "estimated_cost_low": 30,
+      "estimated_cost_high": 75,
+      "priority": "essential",
+      "description": "Replace engine oil and filter..."
+    }
+  ],
+  "upcoming_services": [
+    {
+      "type": "tire_rotation",
+      "label": "Tire Rotation",
+      "due_mileage": 49500,
+      "miles_until_due": 2500,
+      "priority": "soon",
+      "estimated_cost_low": 25,
+      "estimated_cost_high": 50,
+      "description": "Even out tire wear..."
+    },
+    {
+      "type": "oil_change",
+      "label": "Oil Change",
+      "due_mileage": 50000,
+      "miles_until_due": 3000,
+      "priority": "upcoming",
+      "estimated_cost_low": 30,
+      "estimated_cost_high": 75,
+      "description": "Replace engine oil and filter..."
+    }
+  ],
+  "summary": {
+    "total_items": 10,
+    "overdue_count": 0,
+    "urgent_count": 0,
+    "estimated_total_cost_low": 535,
+    "estimated_total_cost_high": 1375
+  },
+  "wrenchli_services": {
+    "garage_url": "https://wrenchli.lovable.app/garage",
+    "vehicle_insights_url": "https://wrenchli.lovable.app/vehicle-insights"
+  }
+}`;
 
 const valueCurlExample = `curl -X POST "${VALUE_URL}" \\
   -H "Content-Type: application/json" \\
@@ -524,6 +650,84 @@ export default function Developers() {
 
               <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 p-4 text-sm text-muted-foreground">
                 <strong className="text-foreground">💡 Tip:</strong> Omit <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">repair_cost</code> to get a pure valuation without the repair-vs-replace analysis. The <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">trade_vs_repair</code> field will be absent from the response.
+              </div>
+            </SectionCard>
+
+            {/* Maintenance Schedule Endpoint */}
+            <div className="pt-4 border-t border-border">
+              <Badge variant="secondary" className="mb-4 text-xs font-medium tracking-wide uppercase">
+                Endpoint #4
+              </Badge>
+            </div>
+
+            <SectionCard icon={Wrench} title="Maintenance Schedule Lookup">
+              <div className="rounded-lg bg-muted p-4 font-mono text-sm mb-4">
+                <span className="font-semibold text-accent-foreground bg-accent/20 px-2 py-0.5 rounded mr-2">POST</span>
+                <span className="text-foreground break-all">/api-maintenance-schedule</span>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                Get a full maintenance schedule with brand-specific adjustments (e.g. BMW extended oil intervals, Tesla EV exclusions), upcoming service items sorted by urgency, and cost estimates. Provide optional last-service records for accurate due-date calculation.
+              </p>
+
+              <h3 className="font-semibold text-foreground mb-2">Request Body</h3>
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-border text-left">
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Field</th>
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Type</th>
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Required</th>
+                      <th className="py-2 font-medium text-muted-foreground">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-foreground">
+                    {[
+                      ["vehicle.make", "string", "Yes", "Manufacturer (e.g. Toyota, BMW, Tesla)"],
+                      ["vehicle.mileage", "number", "Yes", "Current odometer reading (0–500,000)"],
+                      ["vehicle.model", "string", "No", "Model name (e.g. Camry)"],
+                      ["vehicle.year", "number", "No", "Model year"],
+                      ["last_services", "array", "No", "Array of {type, mileage} for last service records"],
+                    ].map(([field, type, req, desc]) => (
+                      <tr key={field} className="border-b border-border/50">
+                        <td className="py-2 pr-4 font-mono text-xs">{field}</td>
+                        <td className="py-2 pr-4 font-mono text-xs text-muted-foreground">{type}</td>
+                        <td className="py-2 pr-4">
+                          {req === "Yes" ? (
+                            <Badge variant="default" className="text-[10px] px-1.5 py-0">Required</Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">Optional</span>
+                          )}
+                        </td>
+                        <td className="py-2 text-muted-foreground">{desc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <h3 className="font-semibold text-foreground mb-2">Code Examples</h3>
+              <Tabs defaultValue="curl" className="w-full mb-6">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="curl">cURL</TabsTrigger>
+                  <TabsTrigger value="python">Python</TabsTrigger>
+                  <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+                </TabsList>
+                <TabsContent value="curl">
+                  <CodeBlock code={maintCurlExample} language="bash" />
+                </TabsContent>
+                <TabsContent value="python">
+                  <CodeBlock code={maintPythonExample} language="python" />
+                </TabsContent>
+                <TabsContent value="javascript">
+                  <CodeBlock code={maintJsExample} language="javascript" />
+                </TabsContent>
+              </Tabs>
+
+              <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
+              <CodeBlock code={maintSampleResponse} language="json" />
+
+              <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 p-4 text-sm text-muted-foreground">
+                <strong className="text-foreground">💡 Tip:</strong> Omit <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">last_services</code> to get the full schedule with all items calculated from 0 miles. The <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">priority</code> field uses: <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">overdue</code>, <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">urgent</code> (≤1,000 mi), <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">soon</code> (≤3,000 mi), <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">upcoming</code>.
               </div>
             </SectionCard>
 
