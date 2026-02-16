@@ -53,6 +53,7 @@ const VehicleReplacementSection = ({
   trackCtx: TrackingContext;
 }) => (
   <section
+    id="vehicle-replacement-section"
     aria-labelledby="upgrade-section-heading"
     className="bg-gradient-to-r from-ad-success-bg to-ad-success-bg-end rounded-2xl p-6 border border-ad-success-border"
   >
