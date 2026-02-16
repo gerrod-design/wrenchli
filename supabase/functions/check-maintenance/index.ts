@@ -43,6 +43,7 @@ Deno.serve(async (req) => {
     }
 
     let totalAlerts = 0;
+    const newMaintenanceAlerts: { userId: string; vehicleName: string; serviceLabel: string; priority: string; milesText: string; costLow: number; costHigh: number; summary: string }[] = [];
 
     for (const vehicle of vehicles) {
       try {
@@ -120,18 +121,89 @@ Deno.serve(async (req) => {
               summary,
             });
 
-          if (!insertErr) totalAlerts++;
+          if (!insertErr) {
+            totalAlerts++;
+            // Queue email for this alert
+            newMaintenanceAlerts.push({
+              userId: vehicle.user_id,
+              vehicleName,
+              serviceLabel: item.label,
+              priority,
+              milesText: milesUntilDue < 0
+                ? `${Math.abs(milesUntilDue).toLocaleString()} miles overdue`
+                : `due in ${milesUntilDue.toLocaleString()} miles`,
+              costLow: item.costLow,
+              costHigh: item.costHigh,
+              summary,
+            });
+          }
         }
       } catch (err) {
         console.warn(`Failed to check maintenance for vehicle ${vehicle.id}:`, err);
       }
     }
 
+    // Send email notifications
+    let emailsSent = 0;
+    const byUser = new Map<string, typeof newMaintenanceAlerts>();
+    for (const alert of newMaintenanceAlerts) {
+      if (!byUser.has(alert.userId)) byUser.set(alert.userId, []);
+      byUser.get(alert.userId)!.push(alert);
+    }
+
+    for (const [userId, alerts] of byUser) {
+      try {
+        const { data: prefData } = await supabase
+          .from("notification_preferences")
+          .select("email_maintenance")
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if ((prefData?.email_maintenance ?? true) === false) continue;
+
+        const { data: userData } = await supabase.auth.admin.getUserById(userId);
+        const email = userData?.user?.email;
+        if (!email) continue;
+
+        // Send one email per maintenance alert
+        for (const alert of alerts) {
+          try {
+            await fetch(`${supabaseUrl}/functions/v1/send-alert-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${serviceRoleKey}`,
+              },
+              body: JSON.stringify({
+                to: email,
+                alertData: {
+                  type: "maintenance",
+                  vehicleName: alert.vehicleName,
+                  serviceLabel: alert.serviceLabel,
+                  priority: alert.priority,
+                  milesText: alert.milesText,
+                  costLow: alert.costLow,
+                  costHigh: alert.costHigh,
+                  summary: alert.summary,
+                },
+              }),
+            });
+            emailsSent++;
+          } catch (e) {
+            console.warn(`Failed to send maintenance email to ${email}:`, e);
+          }
+        }
+      } catch (err) {
+        console.warn(`Failed to notify user ${userId}:`, err);
+      }
+    }
+
     return new Response(
       JSON.stringify({
-        message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} maintenance alerts`,
+        message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} maintenance alerts, sent ${emailsSent} emails`,
         checked: vehicles.length,
         newAlerts: totalAlerts,
+        emailsSent,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
