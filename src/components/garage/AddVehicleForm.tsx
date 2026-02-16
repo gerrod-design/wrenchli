@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Dialog,
   DialogContent,
@@ -409,36 +409,30 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
 
               <div className="space-y-2">
                 <Label className="text-xs">Driving Style</Label>
-                {DRIVING_STYLES.map((style) => (
-                  <div key={style.value} className="flex items-start gap-2">
-                    <Checkbox
-                      checked={formData.driving_style === style.value}
-                      onCheckedChange={(checked) => {
-                        if (checked) updateFormData("driving_style", style.value);
-                      }}
-                    />
-                    <label className="text-xs leading-tight cursor-pointer">
-                      {style.label}
-                    </label>
-                  </div>
-                ))}
+                <RadioGroup value={formData.driving_style} onValueChange={(v) => updateFormData("driving_style", v)}>
+                  {DRIVING_STYLES.map((style) => (
+                    <div key={style.value} className="flex items-start gap-2">
+                      <RadioGroupItem value={style.value} id={`driving-${style.value}`} className="mt-0.5" />
+                      <label htmlFor={`driving-${style.value}`} className="text-xs leading-tight cursor-pointer">
+                        {style.label}
+                      </label>
+                    </div>
+                  ))}
+                </RadioGroup>
               </div>
 
               <div className="space-y-2">
                 <Label className="text-xs">Primary Usage</Label>
-                {USAGE_TYPES.map((usage) => (
-                  <div key={usage.value} className="flex items-start gap-2">
-                    <Checkbox
-                      checked={formData.usage_type === usage.value}
-                      onCheckedChange={(checked) => {
-                        if (checked) updateFormData("usage_type", usage.value);
-                      }}
-                    />
-                    <label className="text-xs leading-tight cursor-pointer">
-                      {usage.label}
-                    </label>
-                  </div>
-                ))}
+                <RadioGroup value={formData.usage_type} onValueChange={(v) => updateFormData("usage_type", v)}>
+                  {USAGE_TYPES.map((usage) => (
+                    <div key={usage.value} className="flex items-start gap-2">
+                      <RadioGroupItem value={usage.value} id={`usage-${usage.value}`} className="mt-0.5" />
+                      <label htmlFor={`usage-${usage.value}`} className="text-xs leading-tight cursor-pointer">
+                        {usage.label}
+                      </label>
+                    </div>
+                  ))}
+                </RadioGroup>
               </div>
 
               <div className="space-y-1">
