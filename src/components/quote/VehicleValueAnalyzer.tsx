@@ -379,6 +379,7 @@ export default function VehicleValueAnalyzer({
       }
     } catch (err) {
       console.warn("AI valuation failed, falling back to local estimate:", err);
+      // Continue to local fallback below
     }
 
     // Fallback to local estimation
