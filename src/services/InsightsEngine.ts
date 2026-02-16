@@ -79,6 +79,9 @@ export class InsightsEngine {
       const financialInsights = await this.generateFinancialInsights(vehicle);
       insights.push(...financialInsights);
 
+      const recallInsights = await this.generateRecallInsights(vehicle);
+      insights.push(...recallInsights);
+
       return insights.sort((a, b) => {
         const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
         return priorityOrder[b.priority] - priorityOrder[a.priority];
@@ -241,6 +244,70 @@ export class InsightsEngine {
         created_at: new Date().toISOString(),
         is_dismissed: false,
       });
+    }
+
+    return insights;
+  }
+
+  private static async generateRecallInsights(vehicle: Vehicle): Promise<ProactiveInsight[]> {
+    const insights: ProactiveInsight[] = [];
+
+    try {
+      const response = await fetch(
+        `https://api.nhtsa.gov/recalls/recallsByVehicle?make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}&modelYear=${vehicle.year}`
+      );
+
+      if (!response.ok) {
+        console.warn("NHTSA API returned status:", response.status);
+        return [];
+      }
+
+      const data = await response.json();
+      const recalls = data?.results || [];
+
+      if (recalls.length === 0) return [];
+
+      // Group by component for cleaner presentation
+      const recentRecalls = recalls.slice(0, 5); // Show up to 5 most relevant
+
+      recentRecalls.forEach((recall: any, index: number) => {
+        const component = recall.Component || "Unknown Component";
+        const summary = recall.Summary || "No details available.";
+        const consequence = recall.Consequence || "";
+        const remedy = recall.Remedy || "Contact your dealer for details.";
+        const campaignNumber = recall.NHTSACampaignNumber || `recall_${index}`;
+
+        insights.push({
+          id: `recall_${campaignNumber}_${vehicle.id}`,
+          vehicle_id: vehicle.id,
+          type: "recall",
+          priority: consequence.toLowerCase().includes("fire") ||
+                    consequence.toLowerCase().includes("crash") ||
+                    consequence.toLowerCase().includes("injury")
+            ? "urgent"
+            : "high",
+          title: `Safety Recall: ${component}`,
+          description: `${summary}${consequence ? ` Consequence: ${consequence}` : ""}`,
+          action_items: [
+            "Contact your dealer immediately",
+            `Reference campaign #${campaignNumber}`,
+            remedy !== "Contact your dealer for details." ? remedy : "Schedule recall service (free of charge)",
+            "Check NHTSA.gov for updates",
+          ],
+          cost_to_ignore: undefined,
+          potential_savings: undefined,
+          urgency_timeframe: "immediately",
+          market_data: {
+            similar_vehicles_affected: recall.PotentialNumberofUnitsAffected
+              ? parseInt(recall.PotentialNumberofUnitsAffected)
+              : undefined,
+          },
+          created_at: new Date().toISOString(),
+          is_dismissed: false,
+        });
+      });
+    } catch (error) {
+      console.warn("Failed to fetch NHTSA recall data:", error);
     }
 
     return insights;
