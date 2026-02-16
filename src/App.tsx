@@ -26,6 +26,7 @@ import Investors from "./pages/Investors";
 import GetQuote from "./pages/GetQuote";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import NotificationSettings from "./pages/NotificationSettings";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ function AnimatedRoutes() {
           <Route path="/garage" element={<Garage />} />
           <Route path="/investors" element={<Investors />} />
           <Route path="/get-quote" element={<GetQuote />} />
+          <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>

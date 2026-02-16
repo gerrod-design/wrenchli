@@ -28,6 +28,20 @@ export function useRecallAlerts() {
         return;
       }
 
+      // Check if in-app notifications are enabled
+      const { data: prefData } = await supabase
+        .from("notification_preferences" as any)
+        .select("inapp_recalls")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      const inappEnabled = (prefData as any)?.inapp_recalls ?? true;
+      if (!inappEnabled) {
+        setAlerts([]);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("recall_alerts" as any)
         .select("*")

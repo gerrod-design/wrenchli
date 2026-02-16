@@ -78,13 +78,20 @@ export default function NotificationBell() {
               </li>
             ))}
           </ul>
-          <div className="border-t border-border px-4 py-2">
+          <div className="flex items-center justify-between border-t border-border px-4 py-2">
             <Link
               to="/garage"
               onClick={() => setOpen(false)}
               className="text-xs font-medium text-accent hover:underline"
             >
               View all in Garage →
+            </Link>
+            <Link
+              to="/settings/notifications"
+              onClick={() => setOpen(false)}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              Settings
             </Link>
           </div>
         </div>
