@@ -12,12 +12,13 @@ import {
 } from "recharts";
 import {
   LogOut, CreditCard, FileText, Users, Store, TrendingUp,
-  Loader2, RefreshCw, DollarSign, Mail, BarChart3,
+  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity,
 } from "lucide-react";
 import { Key } from "lucide-react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import OptimizationEngine from "@/components/OptimizationEngine";
 import ApiKeyManager from "@/components/ApiKeyManager";
+import ApiUsageAnalytics from "@/components/ApiUsageAnalytics";
 
 interface FinanceSelection {
   id: string;
@@ -291,13 +292,14 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="finance" className="w-full">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-9">
             <TabsTrigger value="finance"><CreditCard className="h-4 w-4 mr-1.5 hidden sm:inline" />Finance</TabsTrigger>
             <TabsTrigger value="quotes"><FileText className="h-4 w-4 mr-1.5 hidden sm:inline" />Quotes</TabsTrigger>
             <TabsTrigger value="waitlist"><Users className="h-4 w-4 mr-1.5 hidden sm:inline" />Waitlist</TabsTrigger>
             <TabsTrigger value="shops"><Store className="h-4 w-4 mr-1.5 hidden sm:inline" />Shops</TabsTrigger>
             <TabsTrigger value="contacts"><Mail className="h-4 w-4 mr-1.5 hidden sm:inline" />Contacts</TabsTrigger>
             <TabsTrigger value="api-keys"><Key className="h-4 w-4 mr-1.5 hidden sm:inline" />API Keys</TabsTrigger>
+            <TabsTrigger value="api-usage"><Activity className="h-4 w-4 mr-1.5 hidden sm:inline" />API Usage</TabsTrigger>
             <TabsTrigger value="analytics"><BarChart3 className="h-4 w-4 mr-1.5 hidden sm:inline" />Analytics</TabsTrigger>
             <TabsTrigger value="optimization"><TrendingUp className="h-4 w-4 mr-1.5 hidden sm:inline" />Optimize</TabsTrigger>
           </TabsList>
@@ -315,6 +317,11 @@ export default function AdminDashboard() {
           {/* API Keys Tab */}
           <TabsContent value="api-keys" className="mt-6">
             <ApiKeyManager />
+          </TabsContent>
+
+          {/* API Usage Tab */}
+          <TabsContent value="api-usage" className="mt-6">
+            <ApiUsageAnalytics />
           </TabsContent>
 
           {/* Finance Tab */}

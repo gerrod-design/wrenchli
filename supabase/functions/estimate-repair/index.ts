@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,6 +13,11 @@ serve(async (req) => {
   }
 
   try {
+    const requestStart = Date.now();
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
     let body: unknown;
     try {
       body = await req.json();
@@ -170,6 +176,25 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
     }
 
     const estimate = JSON.parse(toolCall.function.arguments);
+
+    // Log request (fire and forget)
+    supabase.from("api_request_logs").insert({
+      endpoint: "estimate-repair",
+      key_hash: "direct",
+      diagnosis_title: safeTitle,
+      diagnosis_code: safeCode || null,
+      vehicle_year: safeYear || null,
+      vehicle_make: safeMake || null,
+      vehicle_model: safeModel || null,
+      vehicle_trim: safeTrim || null,
+      zip_code: zipClean,
+      response_status: 200,
+      response_time_ms: Date.now() - requestStart,
+      cost_low: estimate.cost_low,
+      cost_high: estimate.cost_high,
+      metro_area: estimate.metro_area || null,
+    }).then(() => {});
+
     return new Response(JSON.stringify(estimate), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

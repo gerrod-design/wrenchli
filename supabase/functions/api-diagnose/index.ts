@@ -212,6 +212,7 @@ serve(async (req) => {
   }
 
   // --- Process the diagnosis request ---
+  const requestStart = Date.now();
   try {
     const body: DiagnoseRequest = await req.json();
     const { symptoms, vehicle, location } = body;
@@ -250,6 +251,21 @@ serve(async (req) => {
         find_shops_url: `${baseUrl}/for-shops`,
       },
     };
+
+    // Log request (fire and forget)
+    supabase.from("api_request_logs").insert({
+      endpoint: "api-diagnose",
+      key_hash: keyHash,
+      diagnosis_title: diagnosis.issue,
+      vehicle_year: String(vehicle.year),
+      vehicle_make: vehicle.make,
+      vehicle_model: vehicle.model,
+      zip_code: location || null,
+      response_status: 200,
+      response_time_ms: Date.now() - requestStart,
+      cost_low: diagnosis.cost_estimate.min,
+      cost_high: diagnosis.cost_estimate.max,
+    }).then(() => {});
 
     return new Response(JSON.stringify(response), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
