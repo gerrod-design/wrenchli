@@ -315,6 +315,33 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_recalls: boolean
+          id: string
+          inapp_recalls: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_recalls?: boolean
+          id?: string
+          inapp_recalls?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_recalls?: boolean
+          id?: string
+          inapp_recalls?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       proactive_insights: {
         Row: {
           action_items: Json | null

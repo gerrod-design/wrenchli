@@ -117,6 +117,17 @@ Deno.serve(async (req) => {
 
       for (const [userId, vehicleAlerts] of byUser) {
         try {
+          // Check user notification preferences
+          const { data: prefData } = await supabase
+            .from("notification_preferences")
+            .select("email_recalls")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+          // Default to true if no preferences set
+          const emailEnabled = prefData?.email_recalls ?? true;
+          if (!emailEnabled) continue;
+
           // Get user email
           const { data: userData } = await supabase.auth.admin.getUserById(userId);
           const email = userData?.user?.email;
