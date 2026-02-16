@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: Wrenchli API
-  description: AI-powered vehicle diagnostics, repair cost estimation, and vehicle valuation. Analyze symptoms, get repair cost estimates, urgency ratings, vehicle market values, and actionable recommendations.
-  version: 1.2.0
+  description: AI-powered vehicle diagnostics, repair cost estimation, vehicle valuation, maintenance scheduling, and service provider search across 13 Detroit metro areas. Analyze symptoms, get repair cost estimates, urgency ratings, vehicle market values, and actionable recommendations.
+  version: 1.3.0
 servers:
   - url: https://etytcjxqqjzpalehqoib.supabase.co/functions/v1
 paths:
@@ -384,14 +384,24 @@ paths:
     get:
       operationId: findServiceProviders
       summary: Find nearby service providers with smart matching
-      description: Search for auto repair shops by location with optional filters for service type, price range, and vehicle make. Luxury brands are automatically matched with European/luxury specialists.
+      description: >
+        Search for auto repair shops by location with optional filters for service type, price range, and vehicle make.
+        Luxury brands (BMW, Mercedes-Benz, Audi, Lexus) are automatically matched with European/luxury specialists.
+        Coverage includes 39 curated providers across 13 Detroit metro areas:
+        Warren (48091), Birmingham (48009), Troy (48084), Sterling Heights (48315),
+        Ann Arbor (48104), Dearborn (48124), Livonia (48150), Detroit (48201),
+        Southfield (48075), Royal Oak (48067), Farmington Hills (48334),
+        Novi (48375), and Canton (48187). Each area includes budget, mid, and premium tier shops.
       parameters:
         - name: location
           in: query
           required: true
           schema:
             type: string
-          description: ZIP code or city name (e.g. "48009" or "Birmingham")
+          description: >
+            ZIP code or city name. Supported ZIP codes: 48091, 48009, 48084, 48315, 48104,
+            48124, 48150, 48201, 48075, 48067, 48334, 48375, 48187.
+            City names also accepted (e.g. "Birmingham", "Royal Oak", "Farmington Hills").
         - name: service_type
           in: query
           required: false
