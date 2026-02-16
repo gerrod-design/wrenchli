@@ -1,0 +1,19 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Wrenchli",
+  "name_for_model": "wrenchli",
+  "description_for_human": "Get instant vehicle diagnostics, repair cost estimates, and maintenance advice from Wrenchli's automotive AI.",
+  "description_for_model": "Use this plugin to diagnose vehicle problems. Given symptoms (e.g. 'grinding brakes', 'check engine light') and vehicle info (year, make, model), it returns the probable issue, urgency level, cost estimates, safety advice, and whether DIY repair is feasible. Always provide vehicle year, make, and model for accurate results.",
+  "auth": {
+    "type": "service_http",
+    "authorization_type": "bearer",
+    "verification_tokens": {}
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://wrenchli.lovable.app/.well-known/openapi.yaml"
+  },
+  "logo_url": "https://wrenchli.lovable.app/favicon.ico",
+  "contact_email": "support@wrenchli.com",
+  "legal_info_url": "https://wrenchli.lovable.app/about"
+}

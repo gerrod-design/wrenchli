@@ -1,0 +1,107 @@
+openapi: 3.1.0
+info:
+  title: Wrenchli Diagnostic API
+  description: AI-powered vehicle diagnostics. Analyze symptoms, get repair cost estimates, urgency ratings, and actionable recommendations.
+  version: 1.0.0
+servers:
+  - url: https://etytcjxqqjzpalehqoib.supabase.co/functions/v1
+paths:
+  /api-diagnose:
+    post:
+      operationId: diagnoseVehicle
+      summary: Diagnose vehicle problems from symptoms
+      description: Provide vehicle symptoms and vehicle info to receive a structured diagnosis with urgency, cost estimates, safety advice, and repair recommendations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - symptoms
+                - vehicle
+              properties:
+                symptoms:
+                  type: array
+                  items:
+                    type: string
+                  description: List of symptoms the vehicle is experiencing (e.g. "grinding noise when braking", "check engine light on")
+                vehicle:
+                  type: object
+                  required:
+                    - year
+                    - make
+                    - model
+                  properties:
+                    year:
+                      type: integer
+                      description: Vehicle model year
+                    make:
+                      type: string
+                      description: Vehicle manufacturer (e.g. Toyota, Ford)
+                    model:
+                      type: string
+                      description: Vehicle model (e.g. Camry, F-150)
+                    mileage:
+                      type: integer
+                      description: Current odometer reading in miles
+                location:
+                  type: string
+                  description: ZIP code or city for localized shop recommendations
+      responses:
+        "200":
+          description: Successful diagnosis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  diagnosis:
+                    type: object
+                    properties:
+                      probable_issue:
+                        type: string
+                      description:
+                        type: string
+                      urgency:
+                        type: string
+                        enum: [low, medium, high]
+                      cost_estimate:
+                        type: object
+                        properties:
+                          min:
+                            type: number
+                          max:
+                            type: number
+                  recommendations:
+                    type: object
+                    properties:
+                      immediate_action:
+                        type: string
+                      safety_advice:
+                        type: string
+                      diy_feasible:
+                        type: boolean
+                  wrenchli_services:
+                    type: object
+                    properties:
+                      get_quotes_url:
+                        type: string
+                      find_shops_url:
+                        type: string
+        "400":
+          description: Invalid request
+        "401":
+          description: Missing API key
+        "403":
+          description: Invalid or deactivated API key
+        "429":
+          description: Rate limit exceeded
+      security:
+        - apiKey: []
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
