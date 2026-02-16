@@ -1,5 +1,9 @@
+import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, AlertTriangle, Shield, DollarSign, Clock } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { GarageVehicle } from "@/hooks/useGarage";
 import type { CloudVehicle } from "@/hooks/useGarageSync";
 
@@ -27,6 +31,41 @@ const KNOWN_ISSUES: Record<string, { minMiles: number; maxMiles: number; issue: 
 };
 
 export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: Props) {
+  // Fetch maintenance cost data for chart
+  const [costData, setCostData] = useState<{ month: string; cost: number }[]>([]);
+  const [loadingCosts, setLoadingCosts] = useState(false);
+
+  useEffect(() => {
+    if (!cloudVehicle || !isAuthenticated) return;
+    setLoadingCosts(true);
+    supabase
+      .from("maintenance_records")
+      .select("service_date, cost")
+      .eq("vehicle_id", cloudVehicle.id)
+      .not("cost", "is", null)
+      .order("service_date", { ascending: true })
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          // Group by month
+          const grouped: Record<string, number> = {};
+          data.forEach((r) => {
+            const d = new Date(r.service_date);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+            grouped[key] = (grouped[key] || 0) + Number(r.cost);
+          });
+          setCostData(
+            Object.entries(grouped).map(([month, cost]) => ({
+              month: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "2-digit" }),
+              cost: Math.round(cost),
+            }))
+          );
+        } else {
+          setCostData([]);
+        }
+        setLoadingCosts(false);
+      });
+  }, [cloudVehicle, isAuthenticated]);
+
   const year = parseInt(vehicle.year);
   const age = new Date().getFullYear() - year;
   const mileage = cloudVehicle?.current_mileage;
@@ -109,7 +148,38 @@ export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: 
         </div>
       )}
 
-      {/* Cost projection */}
+      {/* Maintenance Cost Chart */}
+      {isAuthenticated && cloudVehicle && (
+        <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <h4 className="text-sm font-semibold">Maintenance Spending</h4>
+          </div>
+          {loadingCosts ? (
+            <Skeleton className="h-40 w-full" />
+          ) : costData.length > 0 ? (
+            <div className="h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={costData} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
+                  <XAxis dataKey="month" tick={{ fontSize: 10 }} className="fill-muted-foreground" />
+                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} className="fill-muted-foreground" />
+                  <Tooltip
+                    contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }}
+                    formatter={(value: number) => [`$${value}`, "Cost"]}
+                  />
+                  <Bar dataKey="cost" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground text-center py-6 italic">
+              No maintenance records with costs yet. Add service records to see spending trends.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="rounded-xl border border-border bg-card p-4 space-y-2">
         <div className="flex items-center gap-2">
           <DollarSign className="h-4 w-4 text-muted-foreground" />
