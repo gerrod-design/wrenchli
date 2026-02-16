@@ -263,7 +263,11 @@ export default function VehicleValueAnalyzer({
   const vehicleLabel = [vehicleYear, vehicleMake, vehicleModel, vehicleTrim].filter(Boolean).join(" ");
   const avgRepairCost = Math.round((repairCostLow + repairCostHigh) / 2);
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     const miles = parseInt(mileage.replace(/\D/g, ""), 10);
     if (!miles || miles < 0) return;
 
@@ -298,10 +302,17 @@ export default function VehicleValueAnalyzer({
             onChange={(e) => setMileage(e.target.value.replace(/[^\d]/g, ""))}
             className="h-11"
             inputMode="numeric"
-            onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                e.stopPropagation();
+                handleAnalyze();
+              }
+            }}
           />
         </div>
         <Button
+          type="button"
           onClick={handleAnalyze}
           disabled={loading || !mileage.trim()}
           className="h-11 shrink-0 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
