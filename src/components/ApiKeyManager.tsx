@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { format, subDays, differenceInDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +14,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Key, Plus, Copy, Check, Loader2, RefreshCw, BarChart3, Download } from "lucide-react";
+import { Key, Plus, Copy, Check, Loader2, RefreshCw, BarChart3, Download, CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -74,6 +78,8 @@ export default function ApiKeyManager() {
   const [revealedKey, setRevealedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [usageData, setUsageData] = useState<UsageRecord[]>([]);
+  const [dateFrom, setDateFrom] = useState<Date>(subDays(new Date(), 7));
+  const [dateTo, setDateTo] = useState<Date>(new Date());
 
   const getHeaders = useCallback(() => {
     const tokenKey = Object.keys(localStorage).find(
@@ -100,12 +106,16 @@ export default function ApiKeyManager() {
     setLoading(true);
     try {
       const { headers, supabaseUrl } = getHeaders();
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const fromIso = dateFrom.toISOString();
+      // dateTo end of day
+      const toEnd = new Date(dateTo);
+      toEnd.setHours(23, 59, 59, 999);
+      const toIso = toEnd.toISOString();
 
       const [keysRes, usageRes] = await Promise.all([
         fetch(`${supabaseUrl}/rest/v1/api_keys?select=*&order=created_at.desc`, { headers }),
         fetch(
-          `${supabaseUrl}/rest/v1/api_rate_limits?select=key_hash,requested_at&requested_at=gte.${sevenDaysAgo}&order=requested_at.asc`,
+          `${supabaseUrl}/rest/v1/api_rate_limits?select=key_hash,requested_at&requested_at=gte.${fromIso}&requested_at=lte.${toIso}&order=requested_at.asc`,
           { headers }
         ),
       ]);
@@ -123,25 +133,25 @@ export default function ApiKeyManager() {
     } finally {
       setLoading(false);
     }
-  }, [getHeaders]);
+  }, [getHeaders, dateFrom, dateTo]);
 
-  // Build chart data: one entry per day, with a bar per key
+  // Build chart data: one entry per day across the selected range
   const chartData = useMemo(() => {
     if (keys.length === 0) return [];
 
     const keyHashToName = new Map(keys.map((k) => [k.key_hash, k.name]));
     const dayMap = new Map<string, Record<string, number>>();
 
-    // Initialize last 7 days
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-      const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const totalDays = Math.max(1, differenceInDays(dateTo, dateFrom) + 1);
+    for (let i = totalDays - 1; i >= 0; i--) {
+      const d = subDays(dateTo, i);
+      const label = format(d, "MMM d");
       dayMap.set(label, {});
     }
 
     for (const record of usageData) {
       const d = new Date(record.requested_at);
-      const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const label = format(d, "MMM d");
       const name = keyHashToName.get(record.key_hash) || record.key_hash.slice(0, 8);
       if (dayMap.has(label)) {
         const entry = dayMap.get(label)!;
@@ -165,7 +175,7 @@ export default function ApiKeyManager() {
     return Array.from(names);
   }, [chartData]);
 
-  const totalRequests7d = usageData.length;
+  const totalRequestsInRange = usageData.length;
 
   // Count today's requests per key_hash
   const todayCounts = useMemo(() => {
@@ -331,13 +341,86 @@ export default function ApiKeyManager() {
 
       {/* Usage Chart */}
       <div className="rounded-xl border border-border bg-card p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h4 className="font-heading font-semibold flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-accent" /> Requests — Last 7 Days
-          </h4>
-          <Badge variant="outline" className="text-xs">
-            {totalRequests7d.toLocaleString()} total
-          </Badge>
+        <div className="flex flex-col gap-3 mb-4">
+          <div className="flex items-center justify-between">
+            <h4 className="font-heading font-semibold flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-accent" /> API Usage
+            </h4>
+            <Badge variant="outline" className="text-xs">
+              {totalRequestsInRange.toLocaleString()} total
+            </Badge>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Quick presets */}
+            {[
+              { label: "7d", days: 7 },
+              { label: "14d", days: 14 },
+              { label: "30d", days: 30 },
+              { label: "90d", days: 90 },
+            ].map((preset) => (
+              <Button
+                key={preset.label}
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-7 text-xs",
+                  differenceInDays(dateTo, dateFrom) + 1 === preset.days &&
+                    "bg-accent text-accent-foreground hover:bg-accent/90"
+                )}
+                onClick={() => {
+                  setDateFrom(subDays(new Date(), preset.days));
+                  setDateTo(new Date());
+                }}
+              >
+                {preset.label}
+              </Button>
+            ))}
+
+            <span className="text-muted-foreground text-xs mx-1">|</span>
+
+            {/* From date */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+                  <CalendarIcon className="h-3 w-3" />
+                  {format(dateFrom, "MMM d, yyyy")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={(d) => d && setDateFrom(d)}
+                  disabled={(d) => d > dateTo || d > new Date()}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-muted-foreground text-xs">→</span>
+
+            {/* To date */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+                  <CalendarIcon className="h-3 w-3" />
+                  {format(dateTo, "MMM d, yyyy")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={(d) => d && setDateTo(d)}
+                  disabled={(d) => d < dateFrom || d > new Date()}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
         {chartKeyNames.length > 0 ? (
           <ResponsiveContainer width="100%" height={220}>
