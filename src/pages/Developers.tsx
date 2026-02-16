@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign, Wrench } from "lucide-react";
+import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign, Wrench, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ const BASE_URL = `${FUNCTIONS_BASE}/api-diagnose`;
 const ESTIMATE_URL = `${FUNCTIONS_BASE}/api-estimate-repair`;
 const VALUE_URL = `${FUNCTIONS_BASE}/api-vehicle-value`;
 const MAINT_URL = `${FUNCTIONS_BASE}/api-maintenance-schedule`;
+const PROVIDERS_URL = `${FUNCTIONS_BASE}/api-providers`;
 
 const maintCurlExample = `curl -X POST "${MAINT_URL}" \\
   -H "Content-Type: application/json" \\
@@ -81,6 +82,78 @@ console.log(\`Upcoming: \${data.summary.total_items} items\`);
 data.upcoming_services
   .filter(s => s.priority === "overdue" || s.priority === "urgent")
   .forEach(s => console.log(\`  ⚠ \${s.label}: \${s.priority}\`));`;
+
+const providersCurlExample = `curl "${PROVIDERS_URL}?location=48009&vehicle_make=BMW&service_type=brakes" \\
+  -H "x-api-key: YOUR_API_KEY"`;
+
+const providersPythonExample = `import requests
+
+API_KEY = "YOUR_API_KEY"
+URL = "${PROVIDERS_URL}"
+
+response = requests.get(
+    URL,
+    headers={"x-api-key": API_KEY},
+    params={
+        "location": "48009",
+        "vehicle_make": "BMW",
+        "service_type": "brakes",
+    },
+)
+
+data = response.json()
+for shop in data["providers"]:
+    verified = "✓" if shop["wrenchli_verified"] else ""
+    print(f"{verified} {shop['name']} — {shop['rating']}★ ({shop['price_tier']})")`;
+
+const providersJsExample = `const API_KEY = "YOUR_API_KEY";
+const params = new URLSearchParams({
+  location: "48009",
+  vehicle_make: "BMW",
+  service_type: "brakes",
+});
+
+const response = await fetch(\`${PROVIDERS_URL}?\${params}\`, {
+  headers: { "x-api-key": API_KEY },
+});
+
+const data = await response.json();
+data.providers.forEach(shop => {
+  const badge = shop.wrenchli_verified ? "✓" : "";
+  console.log(\`\${badge} \${shop.name} — \${shop.rating}★ (\${shop.price_tier})\`);
+});`;
+
+const providersSampleResponse = `{
+  "providers": [
+    {
+      "id": "birmingham_auto_europe",
+      "name": "Auto Europe",
+      "rating": 4.9,
+      "review_count": 156,
+      "address": "677 S Eton St, Birmingham, MI 48009",
+      "phone": "(248) 645-6300",
+      "distance_miles": 0,
+      "specialties": ["european", "luxury", "bmw", "mercedes", "audi"],
+      "price_tier": "premium",
+      "response_time": "1 hour",
+      "availability": "next_day",
+      "wrenchli_verified": true,
+      "quote_url": "https://wrenchli.lovable.app/vehicle-insights?shop=birmingham_auto_europe"
+    }
+  ],
+  "search_params": {
+    "location": "48009",
+    "service_type": "brakes",
+    "radius_miles": 25,
+    "vehicle_make": "BMW",
+    "results_count": 2
+  },
+  "wrenchli_services": {
+    "compare_quotes_url": "https://wrenchli.lovable.app/vehicle-insights?location=48009&service=brakes",
+    "book_service_url": "https://wrenchli.lovable.app/for-shops",
+    "get_more_options_url": "https://wrenchli.lovable.app/vehicle-insights?location=48009"
+  }
+}`;
 
 const maintSampleResponse = `{
   "vehicle_summary": {
@@ -728,6 +801,84 @@ export default function Developers() {
 
               <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 p-4 text-sm text-muted-foreground">
                 <strong className="text-foreground">💡 Tip:</strong> Omit <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">last_services</code> to get the full schedule with all items calculated from 0 miles. The <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">priority</code> field uses: <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">overdue</code>, <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">urgent</code> (≤1,000 mi), <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">soon</code> (≤3,000 mi), <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">upcoming</code>.
+              </div>
+            </SectionCard>
+
+            {/* Service Providers Endpoint */}
+            <div className="pt-4 border-t border-border">
+              <Badge variant="secondary" className="mb-4 text-xs font-medium tracking-wide uppercase">
+                Endpoint #5
+              </Badge>
+            </div>
+
+            <SectionCard icon={MapPin} title="Service Provider Search">
+              <div className="rounded-lg bg-muted p-4 font-mono text-sm mb-4">
+                <span className="font-semibold text-accent-foreground bg-accent/20 px-2 py-0.5 rounded mr-2">GET</span>
+                <span className="text-foreground break-all">/api-providers?location=48009</span>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                Find nearby auto repair shops with smart matching. Luxury brands (BMW, Mercedes, Audi, Lexus) are automatically matched with European/luxury specialists. Filter by price tier, service type, and search radius.
+              </p>
+
+              <h3 className="font-semibold text-foreground mb-2">Query Parameters</h3>
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-border text-left">
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Param</th>
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Type</th>
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Required</th>
+                      <th className="py-2 font-medium text-muted-foreground">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-foreground">
+                    {[
+                      ["location", "string", "Yes", "ZIP code or city name (e.g. \"48009\", \"Birmingham\")"],
+                      ["service_type", "string", "No", "Service needed (e.g. brakes, engine, general)"],
+                      ["radius_miles", "number", "No", "Search radius in miles (default: 25)"],
+                      ["price_range", "string", "No", "Filter: budget, mid, or premium"],
+                      ["vehicle_make", "string", "No", "Vehicle make for specialist matching (e.g. BMW)"],
+                    ].map(([field, type, req, desc]) => (
+                      <tr key={field} className="border-b border-border/50">
+                        <td className="py-2 pr-4 font-mono text-xs">{field}</td>
+                        <td className="py-2 pr-4 font-mono text-xs text-muted-foreground">{type}</td>
+                        <td className="py-2 pr-4">
+                          {req === "Yes" ? (
+                            <Badge variant="default" className="text-[10px] px-1.5 py-0">Required</Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">Optional</span>
+                          )}
+                        </td>
+                        <td className="py-2 text-muted-foreground">{desc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <h3 className="font-semibold text-foreground mb-2">Code Examples</h3>
+              <Tabs defaultValue="curl" className="w-full mb-6">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="curl">cURL</TabsTrigger>
+                  <TabsTrigger value="python">Python</TabsTrigger>
+                  <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+                </TabsList>
+                <TabsContent value="curl">
+                  <CodeBlock code={providersCurlExample} language="bash" />
+                </TabsContent>
+                <TabsContent value="python">
+                  <CodeBlock code={providersPythonExample} language="python" />
+                </TabsContent>
+                <TabsContent value="javascript">
+                  <CodeBlock code={providersJsExample} language="javascript" />
+                </TabsContent>
+              </Tabs>
+
+              <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
+              <CodeBlock code={providersSampleResponse} language="json" />
+
+              <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 p-4 text-sm text-muted-foreground">
+                <strong className="text-foreground">💡 Tip:</strong> Pass <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">vehicle_make=BMW</code> to automatically prioritize European/luxury specialists. Use <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">price_range=budget</code> to find the most affordable options.
               </div>
             </SectionCard>
 

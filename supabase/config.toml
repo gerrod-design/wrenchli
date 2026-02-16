@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.api-maintenance-schedule]
 verify_jwt = false
+
+[functions.api-providers]
+verify_jwt = false
