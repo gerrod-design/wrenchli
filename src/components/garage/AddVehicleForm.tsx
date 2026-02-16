@@ -27,8 +27,11 @@ import {
   User,
   CheckCircle,
   AlertCircle,
+  Keyboard,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import type { DecodedVehicle } from "@/lib/vinDecoder";
+import VinInput from "@/components/vehicle/VinInput";
 import { supabase } from "@/integrations/supabase/client";
 import { useGarage } from "@/hooks/useGarage";
 import { toast } from "sonner";
@@ -84,6 +87,7 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showValueAnalysis, setShowValueAnalysis] = useState(false);
+  const [vinMode, setVinMode] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     year: "",
     make: "",
@@ -98,6 +102,18 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
     annual_mileage_estimate: "12000",
     usage_type: "commuter",
   });
+
+  const handleVinDecoded = (vehicle: DecodedVehicle) => {
+    setFormData((prev) => ({
+      ...prev,
+      year: vehicle.year || prev.year,
+      make: vehicle.make || prev.make,
+      model: vehicle.model || prev.model,
+      trim: vehicle.trim || prev.trim,
+    }));
+    setVinMode(false);
+    toast.success(`Decoded: ${[vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ")}`);
+  };
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -163,6 +179,7 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
 
   const handleClose = () => {
     setCurrentStep(1);
+    setVinMode(false);
     setShowValueAnalysis(false);
     setFormData({
       year: "", make: "", model: "", trim: "",
@@ -221,50 +238,68 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
                 Vehicle Information
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Year *</Label>
-                  <Select value={formData.year} onValueChange={(v) => updateFormData("year", v)}>
-                    <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
-                    <SelectContent>
-                      {YEARS.map((y) => (
-                        <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              {/* VIN toggle */}
+              <button
+                type="button"
+                onClick={() => setVinMode(!vinMode)}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline"
+              >
+                <Keyboard className="h-3.5 w-3.5" />
+                {vinMode ? "Use Year/Make/Model instead" : "Have a VIN? Auto-fill with VIN"}
+              </button>
 
-                <div className="space-y-1">
-                  <Label className="text-xs">Make *</Label>
-                  <Select value={formData.make} onValueChange={(v) => updateFormData("make", v)}>
-                    <SelectTrigger><SelectValue placeholder="Make" /></SelectTrigger>
-                    <SelectContent>
-                      {POPULAR_MAKES.map((m) => (
-                        <SelectItem key={m} value={m}>{m}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {vinMode && (
+                <div className="rounded-lg border border-accent/20 bg-accent/5 p-3">
+                  <VinInput onDecoded={handleVinDecoded} />
                 </div>
-              </div>
+              )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Model *</Label>
-                  <Input
-                    placeholder="e.g. Civic, Camry"
-                    value={formData.model}
-                    onChange={(e) => updateFormData("model", e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Trim (Optional)</Label>
-                  <Input
-                    placeholder="e.g. LX, Sport"
-                    value={formData.trim}
-                    onChange={(e) => updateFormData("trim", e.target.value)}
-                  />
-                </div>
-              </div>
+              {!vinMode && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Year *</Label>
+                      <Select value={formData.year} onValueChange={(v) => updateFormData("year", v)}>
+                        <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
+                        <SelectContent>
+                          {YEARS.map((y) => (
+                            <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Make *</Label>
+                      <Select value={formData.make} onValueChange={(v) => updateFormData("make", v)}>
+                        <SelectTrigger><SelectValue placeholder="Make" /></SelectTrigger>
+                        <SelectContent>
+                          {POPULAR_MAKES.map((m) => (
+                            <SelectItem key={m} value={m}>{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Model *</Label>
+                      <Input
+                        placeholder="e.g. Civic, Camry"
+                        value={formData.model}
+                        onChange={(e) => updateFormData("model", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Trim (Optional)</Label>
+                      <Input
+                        placeholder="e.g. LX, Sport"
+                        value={formData.trim}
+                        onChange={(e) => updateFormData("trim", e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="space-y-1">
                 <Label className="text-xs">Current Mileage *</Label>
