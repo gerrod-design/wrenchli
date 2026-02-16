@@ -22,10 +22,18 @@ export function sanitizeVin(input: string): string {
 }
 
 export async function decodeVin(vin: string): Promise<DecodedVehicle> {
-  const resp = await fetch(
-    `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json`
-  );
-  if (!resp.ok) throw new Error("Failed to reach NHTSA API");
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+  const resp = await fetch(`${supabaseUrl}/functions/v1/decode-vin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": supabaseKey,
+    },
+    body: JSON.stringify({ vin }),
+  });
+  if (!resp.ok) throw new Error("Failed to reach VIN decode service");
 
   const data = await resp.json();
   const result = data.Results?.[0];
