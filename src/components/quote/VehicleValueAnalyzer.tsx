@@ -37,7 +37,37 @@ interface Props {
   onRecommendation?: (rec: RecommendationLevel) => void;
 }
 
-/* ── Fallback MSRP lookup ── */
+/* ── Trim-level MSRP database ── */
+const MSRP_DATABASE: Record<string, number> = {
+  "Honda-Accord-2019-LX": 24020, "Honda-Accord-2020-LX": 24970,
+  "Honda-Accord-2021-LX": 25470, "Honda-Accord-2022-LX": 27615,
+  "Honda-Civic-2019-LX": 20345, "Honda-Civic-2020-LX": 21050,
+  "Honda-Civic-2021-LX": 21700, "Honda-Civic-2022-LX": 22550,
+  "Honda-CR-V-2019-LX": 25350, "Honda-CR-V-2020-LX": 25850,
+  "Toyota-Camry-2019-LE": 24095, "Toyota-Camry-2020-LE": 24425,
+  "Toyota-Camry-2021-LE": 25045, "Toyota-Camry-2022-LE": 25945,
+  "Toyota-Corolla-2019-LE": 19600, "Toyota-Corolla-2020-LE": 20025,
+  "Toyota-RAV4-2019-LE": 26545, "Toyota-RAV4-2020-LE": 26950,
+  "Ford-F-150-2019-XL": 28155, "Ford-F-150-2020-XL": 28940,
+  "Ford-F-150-2021-XL": 29290, "Ford-F-150-2022-XL": 30165,
+  "Ford-Escape-2019-S": 25200, "Ford-Escape-2020-S": 25980,
+  "Chevrolet-Silverado 1500-2019-WT": 29795, "Chevrolet-Silverado 1500-2020-WT": 29300,
+  "Chevrolet-Equinox-2019-L": 24995, "Chevrolet-Equinox-2020-L": 25800,
+  "Nissan-Altima-2019-S": 24100, "Nissan-Altima-2020-S": 24300,
+  "Nissan-Rogue-2019-S": 26260, "Nissan-Rogue-2020-S": 26750,
+  "Hyundai-Elantra-2019-SE": 17985, "Hyundai-Elantra-2020-SE": 19650,
+  "Hyundai-Tucson-2019-SE": 23550, "Hyundai-Tucson-2020-SE": 23550,
+  "Kia-Forte-2019-FE": 17690, "Kia-Forte-2020-FE": 17890,
+  "Kia-Sorento-2019-L": 26290, "Kia-Sorento-2020-L": 27060,
+  "Subaru-Outback-2019-2.5i": 26795, "Subaru-Outback-2020-Base": 27655,
+  "Mazda-CX-5-2019-Sport": 25345, "Mazda-CX-5-2020-Sport": 25190,
+  "Jeep-Grand Cherokee-2019-Laredo": 32195, "Jeep-Grand Cherokee-2020-Laredo": 33090,
+  "BMW-3 Series-2019-330i": 40250, "BMW-3 Series-2020-330i": 41250,
+  "Mercedes-Benz-C-Class-2019-C 300": 41400, "Mercedes-Benz-C-Class-2020-C 300": 42650,
+  "Tesla-Model 3-2019-Standard Range Plus": 35000, "Tesla-Model 3-2020-Standard Range Plus": 37990,
+};
+
+/* ── Brand-average fallback ── */
 const BRAND_AVERAGES: Record<string, number> = {
   Honda: 28000, Toyota: 29000, Ford: 32000, Chevrolet: 31000,
   BMW: 45000, Mercedes: 52000, "Mercedes-Benz": 52000, Audi: 48000,
@@ -48,17 +78,28 @@ const BRAND_AVERAGES: Record<string, number> = {
   Volvo: 42000, Tesla: 45000, Chrysler: 30000,
 };
 
-function estimateMSRP(make: string, year: number): number {
+function estimateMSRP(make: string, model: string, year: number, trim?: string): number {
+  // Try trim-level lookup first
+  if (trim) {
+    const trimKey = `${make}-${model}-${year}-${trim}`;
+    if (MSRP_DATABASE[trimKey]) return MSRP_DATABASE[trimKey];
+  }
+  // Try without trim (first matching entry for make-model-year)
+  const prefix = `${make}-${model}-${year}-`;
+  const match = Object.keys(MSRP_DATABASE).find((k) => k.startsWith(prefix));
+  if (match) return MSRP_DATABASE[match];
+
+  // Fall back to brand average
   const base = BRAND_AVERAGES[make] ?? 30000;
   const yearAdj = (year - 2020) * 1000;
   return Math.max(base + yearAdj, 15000);
 }
 
 /* ── Value estimator ── */
-function estimateValue(make: string, year: number, mileage: number): ValueEstimate {
+function estimateValue(make: string, model: string, year: number, mileage: number, trim?: string): ValueEstimate {
   const currentYear = new Date().getFullYear();
   const age = currentYear - year;
-  const baseMSRP = estimateMSRP(make, year);
+  const baseMSRP = estimateMSRP(make, model, year, trim);
 
   // Depreciation curve
   let depRate = 0;
@@ -208,7 +249,7 @@ export default function VehicleValueAnalyzer({
     // Small delay for perceived thoroughness
     await new Promise((r) => setTimeout(r, 600));
 
-    const est = estimateValue(vehicleMake, yearNum, miles);
+    const est = estimateValue(vehicleMake, vehicleModel, yearNum, miles, vehicleTrim);
     const age = new Date().getFullYear() - yearNum;
     const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles);
 
@@ -310,6 +351,29 @@ export default function VehicleValueAnalyzer({
               <span>
                 Use the <strong className="text-foreground">Repair vs. Replace</strong> comparison below to run a full 3-year cost-of-ownership analysis.
               </span>
+            </div>
+          )}
+
+          {/* Override: let repair-recommended users still browse vehicles */}
+          {["repair_only", "repair_with_note"].includes(result.rec.type) && (
+            <div className="rounded-lg border border-border bg-muted/20 p-4 flex items-center justify-between gap-4">
+              <div className="space-y-0.5">
+                <p className="text-sm font-medium text-foreground">Want to explore vehicles anyway?</p>
+                <p className="text-xs text-muted-foreground">
+                  Sometimes it's worth seeing what's available, regardless of the math.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={() => {
+                  onRecommendation?.({ ...result.rec, type: "repair_and_replace" });
+                }}
+              >
+                <Car className="mr-1.5 h-3.5 w-3.5" />
+                Browse Vehicles
+              </Button>
             </div>
           )}
 
