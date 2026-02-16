@@ -24,5 +24,11 @@ verify_jwt = false
 [functions.send-alert-email]
 verify_jwt = false
 
+[functions.api-diagnose]
+verify_jwt = false
+
 [functions.api-estimate-repair]
+verify_jwt = false
+
+[functions.api-vehicle-value]
 verify_jwt = false
