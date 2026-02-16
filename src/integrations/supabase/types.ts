@@ -256,6 +256,62 @@ export type Database = {
           },
         ]
       }
+      maintenance_alerts: {
+        Row: {
+          created_at: string
+          current_mileage: number
+          due_mileage: number
+          estimated_cost_high: number | null
+          estimated_cost_low: number | null
+          id: string
+          is_read: boolean
+          miles_until_due: number
+          priority: string
+          service_label: string
+          service_type: string
+          summary: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_mileage: number
+          due_mileage: number
+          estimated_cost_high?: number | null
+          estimated_cost_low?: number | null
+          id?: string
+          is_read?: boolean
+          miles_until_due: number
+          priority: string
+          service_label: string
+          service_type: string
+          summary: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          current_mileage?: number
+          due_mileage?: number
+          estimated_cost_high?: number | null
+          estimated_cost_low?: number | null
+          id?: string
+          is_read?: boolean
+          miles_until_due?: number
+          priority?: string
+          service_label?: string
+          service_type?: string
+          summary?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_alerts_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_records: {
         Row: {
           cost: number | null
