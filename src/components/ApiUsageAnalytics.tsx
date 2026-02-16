@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, Activity, Globe, Stethoscope, Clock, Zap } from "lucide-react";
+import { Loader2, RefreshCw, Activity, Globe, Stethoscope, Clock, Zap, DollarSign, Car } from "lucide-react";
 
 const COLORS = ["hsl(var(--accent))", "#10b981", "#6366f1", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6"];
 
@@ -87,11 +87,12 @@ export default function ApiUsageAnalytics() {
   // --- Computed analytics ---
 
   // Daily volume (last 30 days)
-  const dailyMap: Record<string, { diagnose: number; estimate: number }> = {};
+  const dailyMap: Record<string, { diagnose: number; estimate: number; value: number }> = {};
   logs.forEach(l => {
     const day = new Date(l.created_at).toISOString().slice(0, 10);
-    if (!dailyMap[day]) dailyMap[day] = { diagnose: 0, estimate: 0 };
+    if (!dailyMap[day]) dailyMap[day] = { diagnose: 0, estimate: 0, value: 0 };
     if (l.endpoint === "api-diagnose") dailyMap[day].diagnose++;
+    else if (l.endpoint === "api-vehicle-value") dailyMap[day].value++;
     else dailyMap[day].estimate++;
   });
   const dailyVolume = Object.entries(dailyMap)
@@ -101,8 +102,26 @@ export default function ApiUsageAnalytics() {
       date: new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
       Diagnose: counts.diagnose,
       Estimate: counts.estimate,
-      Total: counts.diagnose + counts.estimate,
+      Valuation: counts.value,
+      Total: counts.diagnose + counts.estimate + counts.value,
     }));
+
+  // Vehicle Value endpoint analytics
+  const valueLogs = logs.filter(l => l.endpoint === "api-vehicle-value");
+  const valueRecCounts: Record<string, number> = {};
+  valueLogs.forEach(l => {
+    const rec = l.diagnosis_title || "no_repair_cost";
+    valueRecCounts[rec] = (valueRecCounts[rec] || 0) + 1;
+  });
+  const valueRecData = Object.entries(valueRecCounts).map(([name, value]) => ({
+    name: name.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+    value,
+  }));
+  const avgVehicleValue = valueLogs.length
+    ? Math.round(valueLogs.filter(l => l.cost_low != null).reduce((s, l) => s + (l.cost_low || 0), 0) / valueLogs.filter(l => l.cost_low != null).length)
+    : 0;
+  const valueWithRepair = valueLogs.filter(l => l.cost_high != null).length;
+  const valueWithoutRepair = valueLogs.length - valueWithRepair;
 
   // Endpoint split
   const endpointCounts = logs.reduce<Record<string, number>>((a, l) => {
@@ -170,11 +189,12 @@ export default function ApiUsageAnalytics() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
         <KpiCard icon={Activity} label="Total Requests" value={logs.length.toLocaleString()} />
         <KpiCard icon={Zap} label="Success Rate" value={`${successRate}%`} />
         <KpiCard icon={Clock} label="Avg Response" value={`${avgResponseTime}ms`} sub={`P95: ${p95}ms`} />
         <KpiCard icon={Stethoscope} label="Unique Diagnoses" value={Object.keys(diagCounts).length.toString()} />
+        <KpiCard icon={Car} label="Valuations" value={valueLogs.length.toLocaleString()} sub={avgVehicleValue ? `Avg value: $${avgVehicleValue.toLocaleString()}` : undefined} />
         <KpiCard icon={Globe} label="Regions Served" value={Object.keys(geoCounts).length.toString()} sub={avgEstimate ? `Avg est: $${avgEstimate}` : undefined} />
       </div>
 
@@ -190,6 +210,7 @@ export default function ApiUsageAnalytics() {
               <Tooltip />
               <Area type="monotone" dataKey="Diagnose" stackId="1" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
               <Area type="monotone" dataKey="Estimate" stackId="1" stroke="hsl(var(--accent))" fill="hsl(var(--accent))" fillOpacity={0.6} />
+              <Area type="monotone" dataKey="Valuation" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
               <Legend />
             </AreaChart>
           </ResponsiveContainer>
@@ -242,6 +263,69 @@ export default function ApiUsageAnalytics() {
           ) : <p className="text-sm text-muted-foreground">No geographic data yet</p>}
         </div>
       </div>
+
+      {/* Vehicle Value Insights */}
+      {valueLogs.length > 0 && (
+        <div className="rounded-xl border border-accent/30 bg-accent/5 p-6 space-y-5">
+          <h3 className="font-heading font-semibold flex items-center gap-2">
+            <DollarSign className="h-4 w-4 text-accent" /> Vehicle Value API Insights
+            <Badge variant="outline" className="ml-2 text-xs">{valueLogs.length} requests</Badge>
+          </h3>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Recommendation distribution */}
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-3">Recommendation Distribution</h4>
+              {valueRecData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie data={valueRecData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                      {valueRecData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : <p className="text-sm text-muted-foreground">No recommendation data yet</p>}
+            </div>
+            {/* Value usage stats */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-medium text-muted-foreground">Usage Breakdown</h4>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-border bg-card p-4 text-center space-y-1">
+                  <p className="text-xs text-muted-foreground">Avg Vehicle Value</p>
+                  <p className="font-heading text-xl font-bold">${avgVehicleValue.toLocaleString()}</p>
+                </div>
+                <div className="rounded-lg border border-border bg-card p-4 text-center space-y-1">
+                  <p className="text-xs text-muted-foreground">With Repair Cost</p>
+                  <p className="font-heading text-xl font-bold">{valueWithRepair}</p>
+                  <p className="text-[11px] text-muted-foreground">{valueLogs.length ? Math.round((valueWithRepair / valueLogs.length) * 100) : 0}% include repair analysis</p>
+                </div>
+              </div>
+              {/* Top valued vehicles */}
+              {(() => {
+                const valVehicles: Record<string, number> = {};
+                valueLogs.forEach(l => {
+                  const v = [l.vehicle_year, l.vehicle_make, l.vehicle_model].filter(Boolean).join(" ");
+                  if (v) valVehicles[v] = (valVehicles[v] || 0) + 1;
+                });
+                const topVal = Object.entries(valVehicles).sort(([, a], [, b]) => b - a).slice(0, 5);
+                return topVal.length > 0 ? (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">Top Valued Vehicles</p>
+                    <div className="space-y-1.5">
+                      {topVal.map(([name, count]) => (
+                        <div key={name} className="flex justify-between items-center text-sm">
+                          <span className="truncate">{name}</span>
+                          <Badge variant="secondary" className="text-xs shrink-0 ml-2">{count}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Top Vehicles */}
       {topVehicles.length > 0 && (
