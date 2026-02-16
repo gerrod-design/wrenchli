@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Key, Plus, Copy, Check, Loader2, RefreshCw, BarChart3 } from "lucide-react";
+import { Key, Plus, Copy, Check, Loader2, RefreshCw, BarChart3, Download } from "lucide-react";
 import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -266,6 +266,29 @@ export default function ApiKeyManager() {
         })
       : "Never";
 
+  const exportCsv = useCallback(() => {
+    const keyHashToName = new Map(keys.map((k) => [k.key_hash, k.name]));
+
+    const rows: string[][] = [["Timestamp", "Key Name", "Key Hash (first 12)"]];
+    for (const r of usageData) {
+      rows.push([
+        new Date(r.requested_at).toISOString(),
+        keyHashToName.get(r.key_hash) || "Unknown",
+        r.key_hash.slice(0, 12),
+      ]);
+    }
+
+    const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `wrenchli-api-usage-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${usageData.length} records`);
+  }, [keys, usageData]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -287,6 +310,9 @@ export default function ApiKeyManager() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="ghost" size="sm" onClick={exportCsv} disabled={usageData.length === 0}>
+            <Download className="h-4 w-4 mr-1" /> Export CSV
+          </Button>
           <Button variant="ghost" size="sm" onClick={fetchKeys}>
             <RefreshCw className="h-4 w-4" />
           </Button>
