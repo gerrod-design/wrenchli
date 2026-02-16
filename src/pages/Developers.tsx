@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign, Wrench, MapPin } from "lucide-react";
+import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign, Wrench, MapPin, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import DeveloperBilling from "@/components/DeveloperBilling";
 
 const FUNCTIONS_BASE = "https://etytcjxqqjzpalehqoib.supabase.co/functions/v1";
 const BASE_URL = `${FUNCTIONS_BASE}/api-diagnose`;
@@ -500,6 +501,14 @@ export default function Developers() {
               </div>
             ))}
           </div>
+
+          {/* Pricing & Billing */}
+          <SectionCard icon={CreditCard} title="API Pricing">
+            <p className="text-muted-foreground mb-6">
+              Choose the plan that fits your integration needs. All plans include access to all 5 endpoints.
+            </p>
+            <DeveloperBilling />
+          </SectionCard>
 
           <div className="space-y-8">
             {/* Authentication */}
