@@ -318,24 +318,36 @@ export type Database = {
       notification_preferences: {
         Row: {
           created_at: string
+          email_maintenance: boolean
+          email_market_value: boolean
           email_recalls: boolean
           id: string
+          inapp_maintenance: boolean
+          inapp_market_value: boolean
           inapp_recalls: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          email_maintenance?: boolean
+          email_market_value?: boolean
           email_recalls?: boolean
           id?: string
+          inapp_maintenance?: boolean
+          inapp_market_value?: boolean
           inapp_recalls?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          email_maintenance?: boolean
+          email_market_value?: boolean
           email_recalls?: boolean
           id?: string
+          inapp_maintenance?: boolean
+          inapp_market_value?: boolean
           inapp_recalls?: boolean
           updated_at?: string
           user_id?: string
