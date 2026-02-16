@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -155,29 +156,33 @@ function estimateValue(make: string, model: string, year: number, mileage: numbe
   const age = currentYear - year;
   const baseMSRP = estimateMSRP(make, model, year, trim);
 
-  // Depreciation curve
+  // Realistic depreciation curve (industry-standard declining rate)
+  // Year 1: ~20%, Year 2: ~10%, Year 3: ~8%, Years 4-7: ~6%/yr, 8+: ~4%/yr
   let depRate = 0;
   if (age >= 1) depRate += 0.20;
-  if (age >= 2) depRate += 0.15;
-  if (age >= 3) depRate += Math.min(age - 2, 5) * 0.10;
-  if (age > 7) depRate += (age - 7) * 0.05;
-  const ageDepreciation = baseMSRP * Math.min(depRate, 0.85);
+  if (age >= 2) depRate += 0.10;
+  if (age >= 3) depRate += 0.08;
+  if (age >= 4) depRate += Math.min(age - 3, 4) * 0.06; // years 4-7
+  if (age > 7) depRate += Math.min(age - 7, 8) * 0.04;  // years 8-15
+  const ageDepreciation = baseMSRP * Math.min(depRate, 0.82);
 
-  // Mileage adjustment ($0.15 per mile above/below expected 12k/yr)
-  const expectedMileage = age * 12000;
-  const mileageAdjustment = (mileage - expectedMileage) * 0.15;
+  // Mileage adjustment — only penalize excess miles, not below-average
+  const expectedMileage = Math.max(age, 1) * 12000;
+  const excessMiles = mileage - expectedMileage;
+  // $0.08/mile for excess (gentler), $0.04/mile credit for low mileage
+  const mileageAdjustment = excessMiles > 0 ? excessMiles * 0.08 : excessMiles * 0.04;
 
   // Regional adjustment (slight below-average)
-  const regionalAdjustment = baseMSRP * 0.02;
+  const regionalAdjustment = baseMSRP * 0.01;
 
   const estimatedValue = Math.max(
     Math.round(baseMSRP - ageDepreciation - mileageAdjustment - regionalAdjustment),
-    500,
+    1500,
   );
 
   return {
     estimatedValue,
-    confidence: 85,
+    confidence: 82,
     breakdown: {
       baseMSRP: Math.round(baseMSRP),
       ageDepreciation: Math.round(ageDepreciation),
@@ -295,6 +300,7 @@ export default function VehicleValueAnalyzer({
   const [mileage, setMileage] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ estimate: ValueEstimate; rec: RecommendationLevel } | null>(null);
+  const browseRef = useRef<HTMLDivElement>(null);
 
   const yearNum = parseInt(vehicleYear, 10);
   const vehicleLabel = [vehicleYear, vehicleMake, vehicleModel, vehicleTrim].filter(Boolean).join(" ");
@@ -442,8 +448,19 @@ export default function VehicleValueAnalyzer({
                 variant="outline"
                 size="sm"
                 className="shrink-0"
-                onClick={() => {
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   onRecommendation?.({ ...result.rec, type: "repair_and_replace" });
+                  toast.success("Vehicle listings unlocked — scroll down to browse!");
+                  // Scroll the replacement section into view
+                  setTimeout(() => {
+                    const section = document.getElementById("vehicle-replacement-section");
+                    if (section) {
+                      section.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 200);
                 }}
               >
                 <Car className="mr-1.5 h-3.5 w-3.5" />
