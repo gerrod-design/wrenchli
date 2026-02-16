@@ -104,15 +104,20 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
   });
 
   const handleVinDecoded = (vehicle: DecodedVehicle) => {
+    // NHTSA returns uppercase makes (e.g. "JEEP") — match to our title-case list
+    const normalizedMake = POPULAR_MAKES.find(
+      (m) => m.toLowerCase() === (vehicle.make || "").toLowerCase()
+    ) || vehicle.make || "";
+
     setFormData((prev) => ({
       ...prev,
       year: vehicle.year || prev.year,
-      make: vehicle.make || prev.make,
+      make: normalizedMake || prev.make,
       model: vehicle.model || prev.model,
       trim: vehicle.trim || prev.trim,
     }));
     setVinMode(false);
-    toast.success(`Decoded: ${[vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ")}`);
+    toast.success(`Decoded: ${[vehicle.year, normalizedMake, vehicle.model].filter(Boolean).join(" ")}`);
   };
 
   const updateFormData = (field: keyof FormData, value: string) => {

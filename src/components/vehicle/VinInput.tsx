@@ -37,8 +37,9 @@ export default function VinInput({ onDecoded }: Props) {
         return;
       }
       onDecoded(vehicle);
-    } catch {
-      setError("We couldn't find vehicle details for that VIN. This can happen with very new vehicles, imports, or specialty vehicles. Please use the Year/Make/Model dropdown instead.");
+    } catch (err) {
+      console.error("[VinInput] decode error:", err);
+      setError("We couldn't find vehicle details for that VIN. Please double-check and try again, or use the Year/Make/Model dropdown instead.");
     } finally {
       setLoading(false);
     }
