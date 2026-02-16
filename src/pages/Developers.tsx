@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
-const BASE_URL = "https://etytcjxqqjzpalehqoib.supabase.co/functions/v1/api-diagnose";
+const FUNCTIONS_BASE = "https://etytcjxqqjzpalehqoib.supabase.co/functions/v1";
+const BASE_URL = `${FUNCTIONS_BASE}/api-diagnose`;
+const ESTIMATE_URL = `${FUNCTIONS_BASE}/api-estimate-repair`;
 
 const curlExample = `curl -X POST "${BASE_URL}" \\
   -H "Content-Type: application/json" \\
@@ -91,6 +93,31 @@ const sampleResponse = `{
     "get_quotes_url": "https://wrenchli.lovable.app/vehicle-insights?...",
     "find_shops_url": "https://wrenchli.lovable.app/for-shops"
   }
+}`;
+
+const estimateCurlExample = `curl -X POST "${ESTIMATE_URL}" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "diagnosis_title": "Worn Brake Pads",
+    "diagnosis_code": "",
+    "vehicle_year": "2019",
+    "vehicle_make": "Toyota",
+    "vehicle_model": "Camry",
+    "zip_code": "48201",
+    "urgency": "high"
+  }'`;
+
+const estimateSampleResponse = `{
+  "metro_area": "Detroit Metro Area",
+  "cost_low": 200,
+  "cost_high": 450,
+  "parts_estimate": "$80–$150",
+  "labor_estimate": "$120–$300",
+  "labor_hours": "1.5–2.5 hours",
+  "regional_notes": "Detroit area labor rates average $95–$130/hr",
+  "what_to_expect": "Technician will replace worn brake pads and inspect rotors for damage.",
+  "warranty_note": "Most shops offer 12-month/12,000-mile warranty on brake work"
 }`;
 
 function CodeBlock({ code, language }: { code: string; language: string }) {
@@ -253,6 +280,71 @@ export default function Developers() {
             {/* Sample Response */}
             <SectionCard icon={Terminal} title="Sample Response">
               <CodeBlock code={sampleResponse} language="json" />
+            </SectionCard>
+
+            {/* Estimate Repair Endpoint */}
+            <div className="pt-4 border-t border-border">
+              <Badge variant="secondary" className="mb-4 text-xs font-medium tracking-wide uppercase">
+                Endpoint #2
+              </Badge>
+            </div>
+
+            <SectionCard icon={Terminal} title="Repair Cost Estimate">
+              <div className="rounded-lg bg-muted p-4 font-mono text-sm mb-4">
+                <span className="font-semibold text-accent-foreground bg-accent/20 px-2 py-0.5 rounded mr-2">POST</span>
+                <span className="text-foreground break-all">/api-estimate-repair</span>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                Get an AI-powered, ZIP-code-localized repair cost estimate with parts/labor breakdown. Uses the same API key authentication.
+              </p>
+
+              <h3 className="font-semibold text-foreground mb-2">Request Body</h3>
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-border text-left">
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Field</th>
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Type</th>
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Required</th>
+                      <th className="py-2 font-medium text-muted-foreground">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-foreground">
+                    {[
+                      ["diagnosis_title", "string", "Yes", "The diagnosed issue (e.g. \"Worn Brake Pads\")"],
+                      ["zip_code", "string", "Yes", "5-digit US ZIP code for localized pricing"],
+                      ["diagnosis_code", "string", "No", "DTC code if applicable (e.g. P0420)"],
+                      ["vehicle_year", "string", "No", "Vehicle model year"],
+                      ["vehicle_make", "string", "No", "Vehicle manufacturer"],
+                      ["vehicle_model", "string", "No", "Vehicle model"],
+                      ["vehicle_trim", "string", "No", "Vehicle trim level"],
+                      ["diy_feasibility", "string", "No", "DIY difficulty (easy, moderate, advanced)"],
+                      ["urgency", "string", "No", "Urgency level (low, medium, high)"],
+                    ].map(([field, type, req, desc]) => (
+                      <tr key={field} className="border-b border-border/50">
+                        <td className="py-2 pr-4 font-mono text-xs">{field}</td>
+                        <td className="py-2 pr-4 font-mono text-xs text-muted-foreground">{type}</td>
+                        <td className="py-2 pr-4">
+                          {req === "Yes" ? (
+                            <Badge variant="default" className="text-[10px] px-1.5 py-0">Required</Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">Optional</span>
+                          )}
+                        </td>
+                        <td className="py-2 text-muted-foreground">{desc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <h3 className="font-semibold text-foreground mb-2">Example Request</h3>
+              <div className="mb-6">
+                <CodeBlock code={estimateCurlExample} language="bash" />
+              </div>
+
+              <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
+              <CodeBlock code={estimateSampleResponse} language="json" />
             </SectionCard>
 
             {/* Error Codes */}

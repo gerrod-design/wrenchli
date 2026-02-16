@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Wrenchli Diagnostic API
-  description: AI-powered vehicle diagnostics. Analyze symptoms, get repair cost estimates, urgency ratings, and actionable recommendations.
-  version: 1.0.0
+  title: Wrenchli API
+  description: AI-powered vehicle diagnostics and repair cost estimation. Analyze symptoms, get repair cost estimates, urgency ratings, and actionable recommendations.
+  version: 1.1.0
 servers:
   - url: https://etytcjxqqjzpalehqoib.supabase.co/functions/v1
 paths:
@@ -25,7 +25,7 @@ paths:
                   type: array
                   items:
                     type: string
-                  description: List of symptoms the vehicle is experiencing (e.g. "grinding noise when braking", "check engine light on")
+                  description: List of symptoms (e.g. "grinding noise when braking")
                 vehicle:
                   type: object
                   required:
@@ -89,6 +89,84 @@ paths:
                         type: string
                       find_shops_url:
                         type: string
+        "400":
+          description: Invalid request
+        "401":
+          description: Missing API key
+        "403":
+          description: Invalid or deactivated API key
+        "429":
+          description: Rate limit exceeded
+      security:
+        - apiKey: []
+  /api-estimate-repair:
+    post:
+      operationId: estimateRepairCost
+      summary: Get AI-powered repair cost estimate
+      description: Provide a diagnosis and vehicle info with a ZIP code to receive a localized repair cost estimate with parts/labor breakdown.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - diagnosis_title
+                - zip_code
+              properties:
+                diagnosis_title:
+                  type: string
+                  description: The diagnosed issue (e.g. "Worn Brake Pads")
+                diagnosis_code:
+                  type: string
+                  description: DTC code if applicable (e.g. "P0420")
+                vehicle_year:
+                  type: string
+                  description: Vehicle model year
+                vehicle_make:
+                  type: string
+                  description: Vehicle manufacturer
+                vehicle_model:
+                  type: string
+                  description: Vehicle model
+                vehicle_trim:
+                  type: string
+                  description: Vehicle trim level
+                zip_code:
+                  type: string
+                  description: 5-digit US ZIP code for localized pricing
+                diy_feasibility:
+                  type: string
+                  description: DIY difficulty (easy, moderate, advanced)
+                urgency:
+                  type: string
+                  description: Urgency level (low, medium, high)
+      responses:
+        "200":
+          description: Successful cost estimate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metro_area:
+                    type: string
+                  cost_low:
+                    type: number
+                  cost_high:
+                    type: number
+                  parts_estimate:
+                    type: string
+                  labor_estimate:
+                    type: string
+                  labor_hours:
+                    type: string
+                  regional_notes:
+                    type: string
+                  what_to_expect:
+                    type: string
+                  warranty_note:
+                    type: string
         "400":
           description: Invalid request
         "401":
