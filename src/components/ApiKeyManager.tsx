@@ -167,6 +167,19 @@ export default function ApiKeyManager() {
 
   const totalRequests7d = usageData.length;
 
+  // Count today's requests per key_hash
+  const todayCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    const todayStr = new Date().toLocaleDateString("en-US");
+    for (const record of usageData) {
+      const recordDay = new Date(record.requested_at).toLocaleDateString("en-US");
+      if (recordDay === todayStr) {
+        counts.set(record.key_hash, (counts.get(record.key_hash) || 0) + 1);
+      }
+    }
+    return counts;
+  }, [usageData]);
+
   useEffect(() => {
     fetchKeys();
   }, [fetchKeys]);
@@ -357,6 +370,9 @@ export default function ApiKeyManager() {
                 Last Used
               </th>
               <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                Today
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                 Active
               </th>
             </tr>
@@ -393,6 +409,11 @@ export default function ApiKeyManager() {
                   {fmtDate(key.last_used_at)}
                 </td>
                 <td className="px-4 py-3">
+                  <span className="font-mono text-sm font-semibold">
+                    {todayCounts.get(key.key_hash) || 0}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
                   <Switch
                     checked={key.is_active}
                     onCheckedChange={() => toggleActive(key)}
@@ -403,7 +424,7 @@ export default function ApiKeyManager() {
             {keys.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   className="px-4 py-8 text-center text-muted-foreground"
                 >
                   No API keys yet. Create one to get started.
