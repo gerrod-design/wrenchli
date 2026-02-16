@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink } from "lucide-react";
+import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,107 @@ import { Badge } from "@/components/ui/badge";
 const FUNCTIONS_BASE = "https://etytcjxqqjzpalehqoib.supabase.co/functions/v1";
 const BASE_URL = `${FUNCTIONS_BASE}/api-diagnose`;
 const ESTIMATE_URL = `${FUNCTIONS_BASE}/api-estimate-repair`;
+const VALUE_URL = `${FUNCTIONS_BASE}/api-vehicle-value`;
+
+const valueCurlExample = `curl -X POST "${VALUE_URL}" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "vehicle": {
+      "year": 2020,
+      "make": "Toyota",
+      "model": "Camry",
+      "mileage": 45000,
+      "zipCode": "90210"
+    },
+    "repair_cost": 1500
+  }'`;
+
+const valuePythonExample = `import requests
+
+API_KEY = "YOUR_API_KEY"
+URL = "${VALUE_URL}"
+
+response = requests.post(
+    URL,
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": API_KEY,
+    },
+    json={
+        "vehicle": {
+            "year": 2020,
+            "make": "Toyota",
+            "model": "Camry",
+            "mileage": 45000,
+            "zipCode": "90210",
+        },
+        "repair_cost": 1500,
+    },
+)
+
+data = response.json()
+print(f"Vehicle Value: \${data['current_value']:,}")
+print(f"Trend: {data['market_analysis']['trend']}")
+if data['market_analysis'].get('trade_vs_repair'):
+    rec = data['market_analysis']['trade_vs_repair']
+    print(f"Recommendation: {rec['recommendation']}")
+    print(f"Repair is {rec['repair_percentage']}% of vehicle value")`;
+
+const valueJsExample = `const API_KEY = "YOUR_API_KEY";
+const URL = "${VALUE_URL}";
+
+const response = await fetch(URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": API_KEY,
+  },
+  body: JSON.stringify({
+    vehicle: {
+      year: 2020,
+      make: "Toyota",
+      model: "Camry",
+      mileage: 45000,
+      zipCode: "90210",
+    },
+    repair_cost: 1500,
+  }),
+});
+
+const data = await response.json();
+console.log(\`Vehicle Value: $\${data.current_value.toLocaleString()}\`);
+console.log(\`Market Trend: \${data.market_analysis.trend}\`);
+if (data.market_analysis.trade_vs_repair) {
+  const rec = data.market_analysis.trade_vs_repair;
+  console.log(\`Recommendation: \${rec.recommendation}\`);
+  console.log(\`Repair is \${rec.repair_percentage}% of vehicle value\`);
+}`;
+
+const valueSampleResponse = `{
+  "current_value": 9592,
+  "confidence": 85,
+  "value_breakdown": {
+    "base_msrp": 24095,
+    "age_depreciation": 18071,
+    "mileage_adjustment": -4050,
+    "regional_adjustment": 482
+  },
+  "market_analysis": {
+    "trend": "stable",
+    "optimal_sell_window": true,
+    "trade_vs_repair": {
+      "repair_percentage": 16,
+      "recommendation": "repair_recommended",
+      "reasoning": "At 16% of vehicle value, repair is still the better financial choice..."
+    }
+  },
+  "wrenchli_services": {
+    "detailed_analysis_url": "https://wrenchli.lovable.app/garage",
+    "get_quotes_url": "https://wrenchli.lovable.app/vehicle-insights?year=2020&make=Toyota&model=Camry",
+    "garage_management_url": "https://wrenchli.lovable.app/garage"
+  }
+}`;
 
 const curlExample = `curl -X POST "${BASE_URL}" \\
   -H "Content-Type: application/json" \\
@@ -345,6 +446,85 @@ export default function Developers() {
 
               <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
               <CodeBlock code={estimateSampleResponse} language="json" />
+            </SectionCard>
+
+            {/* Vehicle Value Endpoint */}
+            <div className="pt-4 border-t border-border">
+              <Badge variant="secondary" className="mb-4 text-xs font-medium tracking-wide uppercase">
+                Endpoint #3
+              </Badge>
+            </div>
+
+            <SectionCard icon={DollarSign} title="Vehicle Value & Repair-vs-Replace">
+              <div className="rounded-lg bg-muted p-4 font-mono text-sm mb-4">
+                <span className="font-semibold text-accent-foreground bg-accent/20 px-2 py-0.5 rounded mr-2">POST</span>
+                <span className="text-foreground break-all">/api-vehicle-value</span>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                Get an instant vehicle market valuation with depreciation breakdown, market trend analysis, and an optional repair-vs-replace recommendation when a repair cost is provided. Uses the same API key authentication.
+              </p>
+
+              <h3 className="font-semibold text-foreground mb-2">Request Body</h3>
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-border text-left">
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Field</th>
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Type</th>
+                      <th className="py-2 pr-4 font-medium text-muted-foreground">Required</th>
+                      <th className="py-2 font-medium text-muted-foreground">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-foreground">
+                    {[
+                      ["vehicle.year", "number", "Yes", "Model year (1990–current+1)"],
+                      ["vehicle.make", "string", "Yes", "Manufacturer (e.g. Toyota)"],
+                      ["vehicle.model", "string", "Yes", "Model name (e.g. Camry)"],
+                      ["vehicle.mileage", "number", "Yes", "Current odometer reading (0–500,000)"],
+                      ["vehicle.zipCode", "string", "No", "5-digit ZIP code for regional context"],
+                      ["repair_cost", "number", "No", "Repair cost to trigger repair-vs-replace analysis"],
+                    ].map(([field, type, req, desc]) => (
+                      <tr key={field} className="border-b border-border/50">
+                        <td className="py-2 pr-4 font-mono text-xs">{field}</td>
+                        <td className="py-2 pr-4 font-mono text-xs text-muted-foreground">{type}</td>
+                        <td className="py-2 pr-4">
+                          {req === "Yes" ? (
+                            <Badge variant="default" className="text-[10px] px-1.5 py-0">Required</Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">Optional</span>
+                          )}
+                        </td>
+                        <td className="py-2 text-muted-foreground">{desc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <h3 className="font-semibold text-foreground mb-2">Code Examples</h3>
+              <Tabs defaultValue="curl" className="w-full mb-6">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="curl">cURL</TabsTrigger>
+                  <TabsTrigger value="python">Python</TabsTrigger>
+                  <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+                </TabsList>
+                <TabsContent value="curl">
+                  <CodeBlock code={valueCurlExample} language="bash" />
+                </TabsContent>
+                <TabsContent value="python">
+                  <CodeBlock code={valuePythonExample} language="python" />
+                </TabsContent>
+                <TabsContent value="javascript">
+                  <CodeBlock code={valueJsExample} language="javascript" />
+                </TabsContent>
+              </Tabs>
+
+              <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
+              <CodeBlock code={valueSampleResponse} language="json" />
+
+              <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 p-4 text-sm text-muted-foreground">
+                <strong className="text-foreground">💡 Tip:</strong> Omit <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">repair_cost</code> to get a pure valuation without the repair-vs-replace analysis. The <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">trade_vs_repair</code> field will be absent from the response.
+              </div>
             </SectionCard>
 
             {/* Error Codes */}
