@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+
+import AddVehicleForm from "@/components/garage/AddVehicleForm";
 import {
   Car, Plus, Cloud, CloudOff, RefreshCw, BarChart3,
   Wrench, TrendingUp, Settings, Gauge,
@@ -32,6 +33,7 @@ export default function Garage() {
   const [maintenanceRecords, setMaintenanceRecords] = useState<any[]>([]);
   const [mileageInput, setMileageInput] = useState("");
   const [updatingMileage, setUpdatingMileage] = useState(false);
+  const [showAddVehicle, setShowAddVehicle] = useState(false);
 
   const selected = vehicles[selectedIdx] as GarageVehicle | undefined;
   const cloudMatch = selected ? findCloudVehicle(selected) : undefined;
@@ -116,12 +118,10 @@ export default function Garage() {
               <Car className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
               <h2 className="font-heading text-lg font-semibold">No vehicles saved yet</h2>
               <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
-                Identify a vehicle on the Vehicle Insights page and save it for quick access next time.
+                Add a vehicle to get started with maintenance tracking and market insights.
               </p>
-              <Button asChild className="mt-6 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90">
-                <Link to="/vehicle-insights">
-                  <Plus className="mr-2 h-4 w-4" /> Add a Vehicle
-                </Link>
+              <Button onClick={() => setShowAddVehicle(true)} className="mt-6 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90">
+                <Plus className="mr-2 h-4 w-4" /> Add a Vehicle
               </Button>
             </div>
           ) : (
@@ -148,10 +148,8 @@ export default function Garage() {
               ))}
 
               {vehicles.length < 5 && (
-                <Button asChild variant="outline" className="w-full h-12 border-dashed">
-                  <Link to="/vehicle-insights">
-                    <Plus className="mr-2 h-4 w-4" /> Add Another Vehicle
-                  </Link>
+                <Button variant="outline" className="w-full h-12 border-dashed" onClick={() => setShowAddVehicle(true)}>
+                  <Plus className="mr-2 h-4 w-4" /> Add Another Vehicle
                 </Button>
               )}
 
@@ -307,6 +305,15 @@ export default function Garage() {
           )}
         </div>
       </section>
+
+      <AddVehicleForm
+        isOpen={showAddVehicle}
+        onClose={() => setShowAddVehicle(false)}
+        onVehicleAdded={() => {
+          setShowAddVehicle(false);
+          if (isAuthenticated) fetchCloudVehicles();
+        }}
+      />
     </main>
   );
 }
