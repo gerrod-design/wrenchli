@@ -2,15 +2,16 @@ import { useState, useEffect, FormEvent } from "react";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
-const SITE_PASSWORD = "wrenchli2026";
 const STORAGE_KEY = "wrenchli_site_access";
 
 export default function SitePasswordGate({ children }: { children: React.ReactNode }) {
   const [unlocked, setUnlocked] = useState(false);
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem(STORAGE_KEY) === "granted") {
@@ -18,14 +19,28 @@ export default function SitePasswordGate({ children }: { children: React.ReactNo
     }
   }, []);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (value === SITE_PASSWORD) {
-      sessionStorage.setItem(STORAGE_KEY, "granted");
-      setUnlocked(true);
-    } else {
+    setLoading(true);
+    setError(false);
+
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("verify-site-password", {
+        body: { password: value },
+      });
+
+      if (fnError || !data?.valid) {
+        setError(true);
+        setTimeout(() => setError(false), 2000);
+      } else {
+        sessionStorage.setItem(STORAGE_KEY, "granted");
+        setUnlocked(true);
+      }
+    } catch {
       setError(true);
       setTimeout(() => setError(false), 2000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,13 +69,14 @@ export default function SitePasswordGate({ children }: { children: React.ReactNo
               onChange={(e) => setValue(e.target.value)}
               className="pl-10 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 focus-visible:ring-accent"
               autoFocus
+              disabled={loading}
             />
           </div>
           {error && (
             <p className="text-sm text-destructive">Incorrect password. Try again.</p>
           )}
-          <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-            Enter Site
+          <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loading}>
+            {loading ? "Verifying…" : "Enter Site"}
           </Button>
         </form>
 
