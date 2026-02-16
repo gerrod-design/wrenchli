@@ -1,15 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-/** Convert markdown links [text](url) to <a> tags, escaping HTML otherwise */
-function markdownLinks(text: string): string {
-  const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  return escaped.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" class="underline font-medium hover:opacity-80" target="_self">$1</a>'
-  );
-}
+import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -186,18 +178,23 @@ export default function ChatBot() {
                   className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-xl px-3 py-2 text-sm whitespace-pre-wrap ${
+                    className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                       m.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground"
+                        ? "bg-primary text-primary-foreground whitespace-pre-wrap"
+                        : "bg-secondary text-secondary-foreground prose prose-sm prose-neutral dark:prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1 [&_h2]:text-sm [&_h2]:font-bold [&_h2]:mt-2 [&_h2]:mb-1 [&_a]:text-primary [&_a]:underline [&_a]:font-medium"
                     }`}
-                    dangerouslySetInnerHTML={
-                      m.role === "assistant"
-                        ? { __html: markdownLinks(m.content) }
-                        : undefined
-                    }
                   >
-                    {m.role === "user" ? m.content : undefined}
+                    {m.role === "user" ? m.content : (
+                      <ReactMarkdown
+                        components={{
+                          a: ({ href, children }) => (
+                            <a href={href} className="text-primary underline font-medium hover:opacity-80">{children}</a>
+                          ),
+                        }}
+                      >
+                        {m.content}
+                      </ReactMarkdown>
+                    )}
                   </div>
                 </div>
               ))}
