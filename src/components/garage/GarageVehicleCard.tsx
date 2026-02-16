@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
-import { MoreHorizontal, Trash2, Edit2, Search, Palette, ChevronDown, ChevronUp, Clock } from "lucide-react";
+import { MoreHorizontal, Trash2, Edit2, Search, Palette, ChevronDown, ChevronUp, Clock, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import type { GarageVehicle } from "@/hooks/useGarage";
 import VehicleSilhouette, { DEFAULT_COLOR } from "@/components/vehicle/VehicleSilhouette";
 import VehicleColorPicker from "@/components/vehicle/VehicleColorPicker";
+import { useRecallCount } from "@/hooks/useRecallCount";
 
 interface Props {
   vehicle: GarageVehicle;
@@ -40,6 +42,8 @@ export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRenam
 
   const displayName = [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" ");
   const details = [vehicle.engine, vehicle.transmission].filter(Boolean).join(" • ");
+  const { count: recallCount } = useRecallCount(vehicle.make, vehicle.model, vehicle.year);
+
   const history = vehicle.diagnosticHistory || [];
 
   const diagParams = new URLSearchParams({
@@ -89,7 +93,15 @@ export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRenam
                   {vehicle.nickname}
                 </span>
               )}
-              <p className="text-xs text-muted-foreground truncate">{displayName}</p>
+              <p className="text-xs text-muted-foreground truncate flex items-center gap-1.5">
+                {displayName}
+                {recallCount != null && recallCount > 0 && (
+                  <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 gap-0.5 shrink-0">
+                    <AlertTriangle className="h-2.5 w-2.5" />
+                    {recallCount} recall{recallCount !== 1 ? "s" : ""}
+                  </Badge>
+                )}
+              </p>
               {details && <p className="text-[11px] text-muted-foreground truncate">{details}</p>}
               <p className="text-[11px] text-muted-foreground/60 mt-0.5">Last used: {timeAgo(vehicle.lastUsed)}</p>
             </div>
