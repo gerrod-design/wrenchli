@@ -256,6 +256,65 @@ export type Database = {
           },
         ]
       }
+      maintenance_records: {
+        Row: {
+          cost: number | null
+          created_at: string
+          description: string | null
+          id: string
+          mileage_at_service: number | null
+          next_service_due_date: string | null
+          next_service_due_mileage: number | null
+          notes: string | null
+          service_date: string
+          service_type: string
+          shop_location: string | null
+          shop_name: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          mileage_at_service?: number | null
+          next_service_due_date?: string | null
+          next_service_due_mileage?: number | null
+          notes?: string | null
+          service_date: string
+          service_type: string
+          shop_location?: string | null
+          shop_name?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          mileage_at_service?: number | null
+          next_service_due_date?: string | null
+          next_service_due_mileage?: number | null
+          notes?: string | null
+          service_date?: string
+          service_type?: string
+          shop_location?: string | null
+          shop_name?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_requests: {
         Row: {
           cost_estimate_details: Json | null
@@ -420,6 +479,137 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_vehicles: {
+        Row: {
+          annual_mileage_estimate: number | null
+          body_type: string | null
+          color: string | null
+          created_at: string
+          current_mileage: number | null
+          drive_type: string | null
+          driving_style: string | null
+          engine: string | null
+          fuel_type: string | null
+          id: string
+          is_active: boolean | null
+          last_mileage_update: string | null
+          location_zip: string | null
+          make: string
+          model: string
+          nickname: string | null
+          purchase_date: string | null
+          purchase_mileage: number | null
+          purchase_price: number | null
+          transmission: string | null
+          trim: string | null
+          updated_at: string
+          usage_type: string | null
+          user_id: string
+          vin: string | null
+          year: number
+        }
+        Insert: {
+          annual_mileage_estimate?: number | null
+          body_type?: string | null
+          color?: string | null
+          created_at?: string
+          current_mileage?: number | null
+          drive_type?: string | null
+          driving_style?: string | null
+          engine?: string | null
+          fuel_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_mileage_update?: string | null
+          location_zip?: string | null
+          make: string
+          model: string
+          nickname?: string | null
+          purchase_date?: string | null
+          purchase_mileage?: number | null
+          purchase_price?: number | null
+          transmission?: string | null
+          trim?: string | null
+          updated_at?: string
+          usage_type?: string | null
+          user_id: string
+          vin?: string | null
+          year: number
+        }
+        Update: {
+          annual_mileage_estimate?: number | null
+          body_type?: string | null
+          color?: string | null
+          created_at?: string
+          current_mileage?: number | null
+          drive_type?: string | null
+          driving_style?: string | null
+          engine?: string | null
+          fuel_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_mileage_update?: string | null
+          location_zip?: string | null
+          make?: string
+          model?: string
+          nickname?: string | null
+          purchase_date?: string | null
+          purchase_mileage?: number | null
+          purchase_price?: number | null
+          transmission?: string | null
+          trim?: string | null
+          updated_at?: string
+          usage_type?: string | null
+          user_id?: string
+          vin?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
+      vehicle_value_history: {
+        Row: {
+          confidence_score: number | null
+          cost_ratio: number | null
+          estimated_value: number
+          id: string
+          recommendation_type: string | null
+          recorded_at: string
+          repair_cost_context: number | null
+          source: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          cost_ratio?: number | null
+          estimated_value: number
+          id?: string
+          recommendation_type?: string | null
+          recorded_at?: string
+          repair_cost_context?: number | null
+          source?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          cost_ratio?: number | null
+          estimated_value?: number
+          id?: string
+          recommendation_type?: string | null
+          recorded_at?: string
+          repair_cost_context?: number | null
+          source?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_value_history_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waitlist_signups: {
         Row: {
