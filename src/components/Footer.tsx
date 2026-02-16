@@ -11,6 +11,7 @@ const footerLinks = {
     { label: "Investors", to: "/investors" },
     { label: "Careers", to: "/about", badge: "Coming Soon" },
     { label: "Contact", to: "/contact" },
+    { label: "Developers", to: "/developers" },
   ],
   "For Vehicle Owners": [
     { label: "How It Works", to: "/for-car-owners" },
