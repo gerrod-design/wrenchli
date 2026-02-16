@@ -2,6 +2,15 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+/** Convert markdown links [text](url) to <a> tags, escaping HTML otherwise */
+function markdownLinks(text: string): string {
+  const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return escaped.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    '<a href="$2" class="underline font-medium hover:opacity-80" target="_self">$1</a>'
+  );
+}
+
 type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
@@ -182,8 +191,13 @@ export default function ChatBot() {
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary text-secondary-foreground"
                     }`}
+                    dangerouslySetInnerHTML={
+                      m.role === "assistant"
+                        ? { __html: markdownLinks(m.content) }
+                        : undefined
+                    }
                   >
-                    {m.content}
+                    {m.role === "user" ? m.content : undefined}
                   </div>
                 </div>
               ))}

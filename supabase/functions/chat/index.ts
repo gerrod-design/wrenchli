@@ -104,7 +104,20 @@ serve(async (req) => {
 - Vehicle maintenance tips and general vehicle care advice
 - Wrenchli's vehicle insights and diagnostics features
 
-Keep answers concise, helpful, and friendly. If you don't know something specific about Wrenchli, suggest the user visit the Contact page or join the waitlist. Do not make up pricing or specific features that aren't mentioned.`,
+When users ask about a feature or want to navigate somewhere, include a markdown link to the relevant page. Here are the available pages:
+- **Home**: [wrenchli.net/](/)
+- **Vehicle Insights / DIY Diagnosis**: [wrenchli.net/vehicle-insights](/vehicle-insights) — enter symptoms or codes to get a diagnosis
+- **Get a Quote**: [wrenchli.net/get-quote](/get-quote) — request repair quotes from local shops
+- **My Garage**: [wrenchli.net/garage](/garage) — save and manage your vehicles
+- **For Car Owners**: [wrenchli.net/for-car-owners](/for-car-owners) — learn how Wrenchli helps owners
+- **For Repair Shops**: [wrenchli.net/for-shops](/for-shops) — info for shops wanting to join
+- **About Us**: [wrenchli.net/about](/about)
+- **FAQ**: [wrenchli.net/faq](/faq) — frequently asked questions
+- **Contact**: [wrenchli.net/contact](/contact) — get in touch with the team
+- **Investors**: [wrenchli.net/investors](/investors)
+- **Developers / API**: [wrenchli.net/developers](/developers)
+
+Always use the short relative path in markdown links, e.g. [Get a Quote](/get-quote). Keep answers concise, helpful, and friendly. If you don't know something specific about Wrenchli, suggest the user visit the [Contact page](/contact) or join the waitlist. Do not make up pricing or specific features that aren't mentioned.`,
             },
             ...messages,
           ],
