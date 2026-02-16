@@ -170,6 +170,57 @@ export type Database = {
         }
         Relationships: []
       }
+      api_keys: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          key_hash: string
+          last_used_at: string | null
+          name: string
+          owner_email: string | null
+          rate_limit_per_minute: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_hash: string
+          last_used_at?: string | null
+          name: string
+          owner_email?: string | null
+          rate_limit_per_minute?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_hash?: string
+          last_used_at?: string | null
+          name?: string
+          owner_email?: string | null
+          rate_limit_per_minute?: number
+        }
+        Relationships: []
+      }
+      api_rate_limits: {
+        Row: {
+          id: string
+          key_hash: string
+          requested_at: string
+        }
+        Insert: {
+          id?: string
+          key_hash: string
+          requested_at?: string
+        }
+        Update: {
+          id?: string
+          key_hash?: string
+          requested_at?: string
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string
@@ -897,6 +948,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
