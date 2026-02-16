@@ -335,7 +335,10 @@ export default function VehicleValueAnalyzer({
     setAiSource(false);
 
     try {
-      // Try AI-powered valuation first
+      // Try AI-powered valuation with a timeout to prevent infinite loading
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
       const { data, error } = await supabase.functions.invoke("estimate-vehicle-value", {
         body: {
           year: yearNum,
@@ -345,6 +348,8 @@ export default function VehicleValueAnalyzer({
           mileage: miles,
         },
       });
+
+      clearTimeout(timeout);
 
       if (!error && data?.success && data.valuation?.fair_market_value) {
         const v = data.valuation;
@@ -377,9 +382,10 @@ export default function VehicleValueAnalyzer({
         setLoading(false);
         return;
       }
+      // If AI returned an error or incomplete data, log it and fall through
+      if (error) console.warn("AI valuation error:", error);
     } catch (err) {
       console.warn("AI valuation failed, falling back to local estimate:", err);
-      // Continue to local fallback below
     }
 
     // Fallback to local estimation
