@@ -31,9 +31,10 @@ export async function decodeVin(vin: string): Promise<DecodedVehicle> {
   const result = data.Results?.[0];
   if (!result) throw new Error("No results returned");
 
-  const errorCode = result.ErrorCode;
-  // ErrorCode "0" means success; anything else with no Make means a bad VIN
-  if (errorCode !== "0" && !result.Make) {
+  const errorCode = result.ErrorCode || "";
+  const errorCodes = errorCode.split(",").map((c: string) => c.trim());
+  // ErrorCode "0" means success; if none of the codes is "0" and no Make, it's a bad VIN
+  if (!errorCodes.includes("0") && !result.Make) {
     throw new Error("Invalid VIN — could not decode");
   }
 
