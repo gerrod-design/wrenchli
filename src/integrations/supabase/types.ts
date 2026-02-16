@@ -315,6 +315,50 @@ export type Database = {
           },
         ]
       }
+      market_value_alerts: {
+        Row: {
+          change_direction: string
+          change_percent: number
+          created_at: string
+          current_value: number
+          id: string
+          is_read: boolean
+          previous_value: number
+          summary: string
+          vehicle_id: string
+        }
+        Insert: {
+          change_direction: string
+          change_percent: number
+          created_at?: string
+          current_value: number
+          id?: string
+          is_read?: boolean
+          previous_value: number
+          summary: string
+          vehicle_id: string
+        }
+        Update: {
+          change_direction?: string
+          change_percent?: number
+          created_at?: string
+          current_value?: number
+          id?: string
+          is_read?: boolean
+          previous_value?: number
+          summary?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_value_alerts_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           created_at: string
