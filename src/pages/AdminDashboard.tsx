@@ -12,13 +12,14 @@ import {
 } from "recharts";
 import {
   LogOut, CreditCard, FileText, Users, Store, TrendingUp,
-  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity,
+  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2,
 } from "lucide-react";
 import { Key } from "lucide-react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import OptimizationEngine from "@/components/OptimizationEngine";
 import ApiKeyManager from "@/components/ApiKeyManager";
 import ApiUsageAnalytics from "@/components/ApiUsageAnalytics";
+import ReferralAnalytics from "@/components/ReferralAnalytics";
 
 interface FinanceSelection {
   id: string;
@@ -292,9 +293,10 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="finance" className="w-full">
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="finance"><CreditCard className="h-4 w-4 mr-1.5 hidden sm:inline" />Finance</TabsTrigger>
             <TabsTrigger value="quotes"><FileText className="h-4 w-4 mr-1.5 hidden sm:inline" />Quotes</TabsTrigger>
+            <TabsTrigger value="referrals"><Link2 className="h-4 w-4 mr-1.5 hidden sm:inline" />Referrals</TabsTrigger>
             <TabsTrigger value="waitlist"><Users className="h-4 w-4 mr-1.5 hidden sm:inline" />Waitlist</TabsTrigger>
             <TabsTrigger value="shops"><Store className="h-4 w-4 mr-1.5 hidden sm:inline" />Shops</TabsTrigger>
             <TabsTrigger value="contacts"><Mail className="h-4 w-4 mr-1.5 hidden sm:inline" />Contacts</TabsTrigger>
@@ -404,6 +406,11 @@ export default function AdminDashboard() {
                 <Badge variant="outline" className="text-xs">{q.status}</Badge>,
               ])}
             />
+          </TabsContent>
+
+          {/* Referrals Tab */}
+          <TabsContent value="referrals" className="mt-6">
+            <ReferralAnalytics />
           </TabsContent>
 
           {/* Waitlist Tab */}
