@@ -335,67 +335,67 @@ export default function VehicleValueAnalyzer({
     setAiSource(false);
 
     try {
-      // Try AI-powered valuation with a timeout to prevent infinite loading
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000);
-
-      const { data, error } = await supabase.functions.invoke("estimate-vehicle-value", {
-        body: {
-          year: yearNum,
-          make: vehicleMake,
-          model: vehicleModel,
-          trim: vehicleTrim,
-          mileage: miles,
-        },
-      });
-
-      clearTimeout(timeout);
-
-      if (!error && data?.success && data.valuation?.fair_market_value) {
-        const v = data.valuation;
-        const est: ValueEstimate = {
-          estimatedValue: v.fair_market_value,
-          confidence: v.confidence ?? 85,
-          breakdown: {
-            baseMSRP: v.dealer_retail_high ?? v.fair_market_value,
-            ageDepreciation: (v.dealer_retail_high ?? v.fair_market_value) - v.fair_market_value,
-            mileageAdjustment: 0,
-            regionalAdjustment: 0,
+      // Try AI-powered valuation with a hard 12s timeout via Promise.race
+      try {
+        const aiPromise = supabase.functions.invoke("estimate-vehicle-value", {
+          body: {
+            year: yearNum,
+            make: vehicleMake,
+            model: vehicleModel,
+            trim: vehicleTrim,
+            mileage: miles,
           },
-          privatePartyRange: v.private_party_low && v.private_party_high
-            ? { low: v.private_party_low, high: v.private_party_high }
-            : undefined,
-          tradeInRange: v.trade_in_low && v.trade_in_high
-            ? { low: v.trade_in_low, high: v.trade_in_high }
-            : undefined,
-          dealerRetailRange: v.dealer_retail_low && v.dealer_retail_high
-            ? { low: v.dealer_retail_low, high: v.dealer_retail_high }
-            : undefined,
-          factors: v.factors ?? [],
-          marketTrend: v.market_trend,
-        };
-        const age = new Date().getFullYear() - yearNum;
-        const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles, vehicleMake);
-        setResult({ estimate: est, rec });
-        setAiSource(true);
-        onRecommendation?.(rec);
-        setLoading(false);
-        return;
+        });
+        const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: new Error("Timeout") }), 12000)
+        );
+
+        const { data, error } = await Promise.race([aiPromise, timeoutPromise]);
+
+        if (!error && data?.success && data.valuation?.fair_market_value) {
+          const v = data.valuation;
+          const est: ValueEstimate = {
+            estimatedValue: v.fair_market_value,
+            confidence: v.confidence ?? 85,
+            breakdown: {
+              baseMSRP: v.dealer_retail_high ?? v.fair_market_value,
+              ageDepreciation: (v.dealer_retail_high ?? v.fair_market_value) - v.fair_market_value,
+              mileageAdjustment: 0,
+              regionalAdjustment: 0,
+            },
+            privatePartyRange: v.private_party_low && v.private_party_high
+              ? { low: v.private_party_low, high: v.private_party_high }
+              : undefined,
+            tradeInRange: v.trade_in_low && v.trade_in_high
+              ? { low: v.trade_in_low, high: v.trade_in_high }
+              : undefined,
+            dealerRetailRange: v.dealer_retail_low && v.dealer_retail_high
+              ? { low: v.dealer_retail_low, high: v.dealer_retail_high }
+              : undefined,
+            factors: v.factors ?? [],
+            marketTrend: v.market_trend,
+          };
+          const age = new Date().getFullYear() - yearNum;
+          const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles, vehicleMake);
+          setResult({ estimate: est, rec });
+          setAiSource(true);
+          onRecommendation?.(rec);
+          return;
+        }
+        if (error) console.warn("AI valuation error:", error);
+      } catch (err) {
+        console.warn("AI valuation failed, falling back to local estimate:", err);
       }
-      // If AI returned an error or incomplete data, log it and fall through
-      if (error) console.warn("AI valuation error:", error);
-    } catch (err) {
-      console.warn("AI valuation failed, falling back to local estimate:", err);
+
+      // Fallback to local estimation
+      const est = estimateValue(vehicleMake, vehicleModel, yearNum, miles, vehicleTrim);
+      const age = new Date().getFullYear() - yearNum;
+      const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles, vehicleMake);
+      setResult({ estimate: est, rec });
+      onRecommendation?.(rec);
+    } finally {
+      setLoading(false);
     }
-
-    // Fallback to local estimation
-    const est = estimateValue(vehicleMake, vehicleModel, yearNum, miles, vehicleTrim);
-    const age = new Date().getFullYear() - yearNum;
-    const rec = calculateRecommendation(avgRepairCost, est.estimatedValue, age, miles, vehicleMake);
-
-    setResult({ estimate: est, rec });
-    onRecommendation?.(rec);
-    setLoading(false);
   };
 
   const styles = result ? REC_STYLES[result.rec.type] : null;
