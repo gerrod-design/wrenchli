@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -11,8 +11,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Key, Plus, Copy, Check, Loader2, RefreshCw } from "lucide-react";
+import { Key, Plus, Copy, Check, Loader2, RefreshCw, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from "recharts";
 
 interface ApiKey {
   id: string;
@@ -44,6 +47,22 @@ async function hashKey(key: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+interface UsageRecord {
+  key_hash: string;
+  requested_at: string;
+}
+
+const USAGE_COLORS = [
+  "hsl(var(--accent))",
+  "#10b981",
+  "#6366f1",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+  "#14b8a6",
+];
+
 export default function ApiKeyManager() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +73,7 @@ export default function ApiKeyManager() {
   const [newRateLimit, setNewRateLimit] = useState(30);
   const [revealedKey, setRevealedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [usageData, setUsageData] = useState<UsageRecord[]>([]);
 
   const getHeaders = useCallback(() => {
     const tokenKey = Object.keys(localStorage).find(
@@ -80,19 +100,72 @@ export default function ApiKeyManager() {
     setLoading(true);
     try {
       const { headers, supabaseUrl } = getHeaders();
-      const res = await fetch(
-        `${supabaseUrl}/rest/v1/api_keys?select=*&order=created_at.desc`,
-        { headers }
-      );
-      if (!res.ok) throw new Error("Failed to fetch API keys");
-      const data = await res.json();
-      setKeys(data);
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+      const [keysRes, usageRes] = await Promise.all([
+        fetch(`${supabaseUrl}/rest/v1/api_keys?select=*&order=created_at.desc`, { headers }),
+        fetch(
+          `${supabaseUrl}/rest/v1/api_rate_limits?select=key_hash,requested_at&requested_at=gte.${sevenDaysAgo}&order=requested_at.asc`,
+          { headers }
+        ),
+      ]);
+
+      if (!keysRes.ok) throw new Error("Failed to fetch API keys");
+      const keysData = await keysRes.json();
+      setKeys(keysData);
+
+      if (usageRes.ok) {
+        const usage = await usageRes.json();
+        setUsageData(usage);
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to load API keys");
     } finally {
       setLoading(false);
     }
   }, [getHeaders]);
+
+  // Build chart data: one entry per day, with a bar per key
+  const chartData = useMemo(() => {
+    if (keys.length === 0) return [];
+
+    const keyHashToName = new Map(keys.map((k) => [k.key_hash, k.name]));
+    const dayMap = new Map<string, Record<string, number>>();
+
+    // Initialize last 7 days
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      dayMap.set(label, {});
+    }
+
+    for (const record of usageData) {
+      const d = new Date(record.requested_at);
+      const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const name = keyHashToName.get(record.key_hash) || record.key_hash.slice(0, 8);
+      if (dayMap.has(label)) {
+        const entry = dayMap.get(label)!;
+        entry[name] = (entry[name] || 0) + 1;
+      }
+    }
+
+    return Array.from(dayMap.entries()).map(([day, counts]) => ({
+      day,
+      ...counts,
+    }));
+  }, [usageData, keys]);
+
+  const chartKeyNames = useMemo(() => {
+    const names = new Set<string>();
+    for (const entry of chartData) {
+      Object.keys(entry).forEach((k) => {
+        if (k !== "day") names.add(k);
+      });
+    }
+    return Array.from(names);
+  }, [chartData]);
+
+  const totalRequests7d = usageData.length;
 
   useEffect(() => {
     fetchKeys();
@@ -215,6 +288,49 @@ export default function ApiKeyManager() {
             <Plus className="h-4 w-4 mr-1" /> Create Key
           </Button>
         </div>
+      </div>
+
+      {/* Usage Chart */}
+      <div className="rounded-xl border border-border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="font-heading font-semibold flex items-center gap-2">
+            <BarChart3 className="h-4 w-4 text-accent" /> Requests — Last 7 Days
+          </h4>
+          <Badge variant="outline" className="text-xs">
+            {totalRequests7d.toLocaleString()} total
+          </Badge>
+        </div>
+        {chartKeyNames.length > 0 ? (
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                }}
+              />
+              <Legend />
+              {chartKeyNames.map((name, i) => (
+                <Bar
+                  key={name}
+                  dataKey={name}
+                  fill={USAGE_COLORS[i % USAGE_COLORS.length]}
+                  radius={[3, 3, 0, 0]}
+                  stackId="usage"
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className="text-center text-sm text-muted-foreground py-8">
+            No API requests in the last 7 days
+          </p>
+        )}
       </div>
 
       {/* Keys Table */}
