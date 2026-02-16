@@ -15,6 +15,7 @@ interface Props {
   onRemove: (garageId: string) => void;
   onRename: (garageId: string, nickname: string) => void;
   onColorChange?: (garageId: string, color: string) => void;
+  onRecallClick?: () => void;
 }
 
 function timeAgo(iso: string): string {
@@ -33,7 +34,7 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
-export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRename, onColorChange }: Props) {
+export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRename, onColorChange, onRecallClick }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const [changingColor, setChangingColor] = useState(false);
@@ -96,10 +97,15 @@ export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRenam
               <p className="text-xs text-muted-foreground truncate flex items-center gap-1.5">
                 {displayName}
                 {recallCount != null && recallCount > 0 && (
-                  <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 gap-0.5 shrink-0">
-                    <AlertTriangle className="h-2.5 w-2.5" />
-                    {recallCount} recall{recallCount !== 1 ? "s" : ""}
-                  </Badge>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onRecallClick?.(); }}
+                    className="shrink-0"
+                  >
+                    <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 gap-0.5 cursor-pointer hover:bg-destructive/80 transition-colors">
+                      <AlertTriangle className="h-2.5 w-2.5" />
+                      {recallCount} recall{recallCount !== 1 ? "s" : ""}
+                    </Badge>
+                  </button>
                 )}
               </p>
               {details && <p className="text-[11px] text-muted-foreground truncate">{details}</p>}

@@ -147,10 +147,18 @@ function InsightCard({
   );
 }
 
-export default function ProactiveInsights({ vehicle }: { vehicle: Vehicle }) {
+export default function ProactiveInsights({ vehicle, initialFilter, onFilterApplied }: { vehicle: Vehicle; initialFilter?: string; onFilterApplied?: () => void }) {
   const [insights, setInsights] = useState<ProactiveInsight[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [activeSubTab, setActiveSubTab] = useState("all");
+
+  useEffect(() => {
+    if (initialFilter) {
+      setActiveSubTab(initialFilter);
+      onFilterApplied?.();
+    }
+  }, [initialFilter]);
 
   useEffect(() => {
     loadInsights();
@@ -292,11 +300,17 @@ export default function ProactiveInsights({ vehicle }: { vehicle: Vehicle }) {
 
       {/* Tabbed insights */}
       {otherInsights.length > 0 && (
-        <Tabs defaultValue="all" className="w-full">
+        <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
           <TabsList className="w-full h-auto flex-wrap justify-start">
             <TabsTrigger value="all" className="text-xs">
               All ({otherInsights.length})
             </TabsTrigger>
+            {grouped.recall && (
+              <TabsTrigger value="recall" className="text-xs">
+                <AlertTriangle className="h-3 w-3 mr-0.5 text-destructive" />
+                Recalls ({grouped.recall.length})
+              </TabsTrigger>
+            )}
             {grouped.maintenance && (
               <TabsTrigger value="maintenance" className="text-xs">
                 Maintenance ({grouped.maintenance.length})
@@ -327,11 +341,9 @@ export default function ProactiveInsights({ vehicle }: { vehicle: Vehicle }) {
 
           {Object.entries(grouped).map(([type, typeInsights]) => (
             <TabsContent key={type} value={type} className="space-y-3 mt-4">
-              {typeInsights
-                .filter((i) => i.priority !== "urgent" && i.priority !== "high")
-                .map((insight) => (
-                  <InsightCard key={insight.id} insight={insight} onDismiss={dismissInsight} />
-                ))}
+              {typeInsights.map((insight) => (
+                <InsightCard key={insight.id} insight={insight} onDismiss={dismissInsight} />
+              ))}
             </TabsContent>
           ))}
         </Tabs>
