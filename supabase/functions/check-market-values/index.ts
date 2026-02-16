@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
     }
 
     let totalAlerts = 0;
+    const newValueAlerts: { userId: string; vehicleName: string; previousValue: number; currentValue: number; changePercent: number; changeDirection: string; summary: string }[] = [];
 
     for (const vehicle of vehicles) {
       try {
@@ -91,17 +92,83 @@ Deno.serve(async (req) => {
             summary,
           });
 
-        if (!insertErr) totalAlerts++;
+        if (!insertErr) {
+          totalAlerts++;
+          // Queue email
+          newValueAlerts.push({
+            userId: vehicle.user_id,
+            vehicleName,
+            previousValue: previous,
+            currentValue: current,
+            changePercent: absChange,
+            changeDirection: direction,
+            summary,
+          });
+        }
       } catch (err) {
         console.warn(`Failed to check market value for vehicle ${vehicle.id}:`, err);
       }
     }
 
+    // Send email notifications
+    let emailsSent = 0;
+    const byUser = new Map<string, typeof newValueAlerts>();
+    for (const alert of newValueAlerts) {
+      if (!byUser.has(alert.userId)) byUser.set(alert.userId, []);
+      byUser.get(alert.userId)!.push(alert);
+    }
+
+    for (const [userId, alerts] of byUser) {
+      try {
+        const { data: prefData } = await supabase
+          .from("notification_preferences")
+          .select("email_market_value")
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if ((prefData?.email_market_value ?? true) === false) continue;
+
+        const { data: userData } = await supabase.auth.admin.getUserById(userId);
+        const email = userData?.user?.email;
+        if (!email) continue;
+
+        for (const alert of alerts) {
+          try {
+            await fetch(`${supabaseUrl}/functions/v1/send-alert-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${serviceRoleKey}`,
+              },
+              body: JSON.stringify({
+                to: email,
+                alertData: {
+                  type: "market_value",
+                  vehicleName: alert.vehicleName,
+                  previousValue: alert.previousValue,
+                  currentValue: alert.currentValue,
+                  changePercent: alert.changePercent,
+                  changeDirection: alert.changeDirection,
+                  summary: alert.summary,
+                },
+              }),
+            });
+            emailsSent++;
+          } catch (e) {
+            console.warn(`Failed to send market value email to ${email}:`, e);
+          }
+        }
+      } catch (err) {
+        console.warn(`Failed to notify user ${userId}:`, err);
+      }
+    }
+
     return new Response(
       JSON.stringify({
-        message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} market value alerts`,
+        message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} market value alerts, sent ${emailsSent} emails`,
         checked: vehicles.length,
         newAlerts: totalAlerts,
+        emailsSent,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
