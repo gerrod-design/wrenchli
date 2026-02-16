@@ -305,6 +305,45 @@ export type Database = {
         }
         Relationships: []
       }
+      developer_accounts: {
+        Row: {
+          billing_cycle_start: string
+          company_name: string | null
+          created_at: string
+          current_month_calls: number
+          id: string
+          monthly_call_limit: number
+          stripe_customer_id: string | null
+          subscription_tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_cycle_start?: string
+          company_name?: string | null
+          created_at?: string
+          current_month_calls?: number
+          id?: string
+          monthly_call_limit?: number
+          stripe_customer_id?: string | null
+          subscription_tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_cycle_start?: string
+          company_name?: string | null
+          created_at?: string
+          current_month_calls?: number
+          id?: string
+          monthly_call_limit?: number
+          stripe_customer_id?: string | null
+          subscription_tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       finance_selections: {
         Row: {
           apr: number
@@ -651,6 +690,7 @@ export type Database = {
           id: string
           metro_area: string | null
           referral_requested_at: string | null
+          referral_token: string | null
           status: string
           updated_at: string
           vehicle_make: string | null
@@ -676,6 +716,7 @@ export type Database = {
           id?: string
           metro_area?: string | null
           referral_requested_at?: string | null
+          referral_token?: string | null
           status?: string
           updated_at?: string
           vehicle_make?: string | null
@@ -701,6 +742,7 @@ export type Database = {
           id?: string
           metro_area?: string | null
           referral_requested_at?: string | null
+          referral_token?: string | null
           status?: string
           updated_at?: string
           vehicle_make?: string | null
@@ -757,6 +799,68 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_events: {
+        Row: {
+          created_at: string
+          diagnosis_title: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          quote_request_id: string | null
+          referral_token: string
+          shop_id: string | null
+          shop_name: string | null
+          source: string
+          source_key_hash: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          created_at?: string
+          diagnosis_title?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          quote_request_id?: string | null
+          referral_token: string
+          shop_id?: string | null
+          shop_name?: string | null
+          source?: string
+          source_key_hash?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          created_at?: string
+          diagnosis_title?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          quote_request_id?: string | null
+          referral_token?: string
+          shop_id?: string | null
+          shop_name?: string | null
+          source?: string
+          source_key_hash?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_events_quote_request_id_fkey"
+            columns: ["quote_request_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
             referencedColumns: ["id"]
           },
         ]
