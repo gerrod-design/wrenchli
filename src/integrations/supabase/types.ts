@@ -464,6 +464,56 @@ export type Database = {
         }
         Relationships: []
       }
+      recall_alerts: {
+        Row: {
+          campaign_number: string
+          component: string
+          consequence: string | null
+          created_at: string
+          email_sent: boolean
+          id: string
+          is_read: boolean
+          priority: string
+          remedy: string | null
+          summary: string
+          vehicle_id: string
+        }
+        Insert: {
+          campaign_number: string
+          component: string
+          consequence?: string | null
+          created_at?: string
+          email_sent?: boolean
+          id?: string
+          is_read?: boolean
+          priority?: string
+          remedy?: string | null
+          summary: string
+          vehicle_id: string
+        }
+        Update: {
+          campaign_number?: string
+          component?: string
+          consequence?: string | null
+          created_at?: string
+          email_sent?: boolean
+          id?: string
+          is_read?: boolean
+          priority?: string
+          remedy?: string | null
+          summary?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recall_alerts_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_applications: {
         Row: {
           city: string | null
