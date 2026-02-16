@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
   title: Wrenchli API
-  description: AI-powered vehicle diagnostics and repair cost estimation. Analyze symptoms, get repair cost estimates, urgency ratings, and actionable recommendations.
-  version: 1.1.0
+  description: AI-powered vehicle diagnostics, repair cost estimation, and vehicle valuation. Analyze symptoms, get repair cost estimates, urgency ratings, vehicle market values, and actionable recommendations.
+  version: 1.2.0
 servers:
   - url: https://etytcjxqqjzpalehqoib.supabase.co/functions/v1
 paths:
@@ -167,6 +167,108 @@ paths:
                     type: string
                   warranty_note:
                     type: string
+        "400":
+          description: Invalid request
+        "401":
+          description: Missing API key
+        "403":
+          description: Invalid or deactivated API key
+        "429":
+          description: Rate limit exceeded
+      security:
+        - apiKey: []
+  /api-vehicle-value:
+    post:
+      operationId: getVehicleValue
+      summary: Get vehicle market value and repair-vs-replace analysis
+      description: Provide vehicle details and mileage to receive an estimated market value with depreciation breakdown, market trend analysis, and optional repair-vs-replace recommendation when a repair cost is included.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - vehicle
+              properties:
+                vehicle:
+                  type: object
+                  required:
+                    - year
+                    - make
+                    - model
+                    - mileage
+                  properties:
+                    year:
+                      type: integer
+                      description: Vehicle model year (1990–current+1)
+                    make:
+                      type: string
+                      description: Vehicle manufacturer (e.g. Honda, Toyota)
+                    model:
+                      type: string
+                      description: Vehicle model (e.g. Accord, Camry)
+                    mileage:
+                      type: integer
+                      description: Current odometer reading in miles (0–500000)
+                    zipCode:
+                      type: string
+                      description: 5-digit US ZIP code for regional context
+                repair_cost:
+                  type: number
+                  description: Optional repair cost to trigger repair-vs-replace analysis
+      responses:
+        "200":
+          description: Vehicle valuation with optional repair analysis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current_value:
+                    type: number
+                    description: Estimated current market value in USD
+                  confidence:
+                    type: integer
+                    description: Confidence score (0–100)
+                  value_breakdown:
+                    type: object
+                    properties:
+                      base_msrp:
+                        type: number
+                      age_depreciation:
+                        type: number
+                      mileage_adjustment:
+                        type: number
+                      regional_adjustment:
+                        type: number
+                  market_analysis:
+                    type: object
+                    properties:
+                      trend:
+                        type: string
+                        enum: [up, down, stable]
+                      optimal_sell_window:
+                        type: boolean
+                      trade_vs_repair:
+                        type: object
+                        properties:
+                          repair_percentage:
+                            type: integer
+                          recommendation:
+                            type: string
+                            enum: [repair_recommended, consider_replacement, replace_recommended]
+                          reasoning:
+                            type: string
+                  wrenchli_services:
+                    type: object
+                    properties:
+                      detailed_analysis_url:
+                        type: string
+                      get_quotes_url:
+                        type: string
+                      garage_management_url:
+                        type: string
         "400":
           description: Invalid request
         "401":
