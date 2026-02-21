@@ -1,108 +1,235 @@
+import { useState } from "react";
 import SEO from "@/components/SEO";
-import WaitlistForm from "@/components/WaitlistForm";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { CheckCircle, Store } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Wrench, Car, TrendingUp, Shield } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const benefits = [
-  { icon: Wrench, title: "Free AI Diagnostics", desc: "Unlimited access to Wrenchli's AI-powered vehicle diagnosis during the pilot." },
-  { icon: Car, title: "Garage & Maintenance Tracking", desc: "Save your vehicles, track maintenance history, and get proactive alerts." },
-  { icon: TrendingUp, title: "Market Value Monitoring", desc: "Real-time tracking of your vehicle's value with buy/sell recommendations." },
-  { icon: Shield, title: "Recall Alerts", desc: "Instant notifications when safety recalls affect your vehicle." },
+  "Weekly predictive maintenance alerts for vehicles in your area",
+  "Know which customers need service BEFORE they call",
+  "Data-driven customer acquisition (not cold calls)",
+  "Backed by State of Michigan Economic Development",
+  "University research partnership validation",
+  "3-month pilot with performance tracking",
 ];
 
+const bayOptions = ["1-3 bays", "4-6 bays", "7-10 bays", "10+ bays"];
+
 export default function Pilot() {
+  const [form, setForm] = useState({
+    shopName: "", ownerName: "", email: "", phone: "", location: "", bays: "", message: "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.email || !form.shopName) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.from("shop_applications").insert({
+        shop_name: form.shopName,
+        owner_name: form.ownerName || null,
+        email: form.email,
+        phone: form.phone || null,
+        city: form.location || null,
+        state: "Michigan",
+        message: `PILOT APPLICATION: Bays: ${form.bays || 'Not specified'}. ${form.message || 'No additional notes'}`,
+      });
+      if (error) throw error;
+      toast({
+        title: "Application received! 🎯",
+        description: "We'll contact you within 2 business days about the pilot program.",
+      });
+      setForm({ shopName: "", ownerName: "", email: "", phone: "", location: "", bays: "", message: "" });
+    } catch {
+      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="Pilot Program"
-        description="Join Wrenchli's pilot program in Detroit. Get free AI-powered vehicle diagnostics, maintenance tracking, and repair cost estimates."
+        title="Michigan Pilot Program"
+        description="Join Wrenchli's Michigan repair shop pilot. Get weekly predictive maintenance alerts for vehicles in your area."
         path="/pilot"
       />
 
       {/* Hero */}
       <section className="relative bg-primary text-primary-foreground py-20 md:py-28">
         <div className="container-wrenchli text-center max-w-3xl mx-auto">
-          <span className="inline-block rounded-full bg-accent/20 text-accent px-4 py-1.5 text-sm font-semibold mb-6">
-            Now accepting pilot members
-          </span>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            Join the Wrenchli Pilot Program
-          </h1>
-          <p className="text-lg md:text-xl text-primary-foreground/70 mb-10 leading-relaxed">
-            Be among the first to experience AI-powered vehicle care. Free access for early members in the Detroit metro area.
-          </p>
-          <div className="max-w-xl mx-auto">
-            <WaitlistForm source="pilot" />
+          <SectionReveal>
+            <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 text-accent px-4 py-1.5 text-sm font-semibold mb-6">
+              <Store className="h-4 w-4" />
+              Michigan Pilot Program
+            </span>
+            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-6 leading-tight">
+              Know Which Customers Need Service BEFORE They Call
+            </h1>
+            <p className="text-lg md:text-xl text-primary-foreground/70 mb-10 leading-relaxed">
+              Join Michigan's repair shop modernization pilot. Get weekly predictive maintenance alerts for vehicles in your area.
+            </p>
+            <div className="inline-flex flex-col items-center rounded-xl bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 px-8 py-5">
+              <p className="text-sm text-primary-foreground/60 mb-1">3-Month Pilot</p>
+              <p className="text-3xl font-heading font-bold">$500</p>
+              <p className="text-sm text-primary-foreground/60">or FREE for select shops</p>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
+
+      {/* Backed By */}
+      <section className="bg-accent py-6">
+        <div className="container-wrenchli text-center">
+          <p className="text-xs uppercase tracking-widest text-accent-foreground/60 mb-3">Pilot Supported By</p>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-accent-foreground">
+            <div className="text-lg font-semibold">State of Michigan Economic Development</div>
+            <div className="hidden sm:block w-px h-8 bg-accent-foreground/30" />
+            <div className="text-lg font-semibold">University Research Partners</div>
           </div>
         </div>
       </section>
 
-      {/* Benefits */}
-      <section className="py-16 md:py-24">
-        <div className="container-wrenchli">
+      {/* What You Get */}
+      <section className="py-16 md:py-24 bg-background">
+        <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
-            <h2 className="font-heading text-3xl font-bold text-center mb-4">What Pilot Members Get</h2>
-            <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
-              Everything you need to stay ahead of vehicle issues — completely free during the pilot.
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl mb-4">
+              What's Included in the Pilot
+            </h2>
+            <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
+              3-month pilot program starting March 2026. We track performance and you keep the data.
             </p>
           </SectionReveal>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {benefits.map((b, i) => (
-              <SectionReveal key={b.title} delay={i * 100}>
-                <Card className="h-full border-border/50 hover:shadow-md transition-shadow">
-                  <CardContent className="p-6 flex flex-col items-start gap-3">
-                    <div className="rounded-lg bg-accent/10 p-2.5">
-                      <b.icon className="h-6 w-6 text-accent" />
-                    </div>
-                    <h3 className="font-semibold text-lg">{b.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{b.desc}</p>
-                  </CardContent>
-                </Card>
+
+          <div className="space-y-4">
+            {benefits.map((benefit, i) => (
+              <SectionReveal key={benefit} delay={i * 80}>
+                <div className="flex items-start gap-4 p-4 rounded-lg border border-border bg-card">
+                  <CheckCircle className="h-6 w-6 text-accent shrink-0 mt-0.5" />
+                  <p className="text-base">{benefit}</p>
+                </div>
               </SectionReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="py-16 md:py-24 bg-muted/30">
+      {/* How It Works */}
+      <section className="py-16 md:py-24 bg-secondary">
         <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
-            <h2 className="font-heading text-3xl font-bold text-center mb-12">How It Works</h2>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl mb-10">
+              How the Pilot Works
+            </h2>
           </SectionReveal>
-          {[
-            { step: "1", title: "Sign up above", desc: "Enter your name and email to reserve your spot." },
-            { step: "2", title: "Get early access", desc: "We'll send you an invite when your spot opens up." },
-            { step: "3", title: "Start diagnosing", desc: "Enter your vehicle info and describe any symptoms — Wrenchli handles the rest." },
-          ].map((item, i) => (
-            <SectionReveal key={item.step} delay={i * 120}>
-              <div className="flex gap-5 items-start mb-8">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-bold text-lg">
-                  {item.step}
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              { step: 1, title: "Apply & Get Approved", desc: "Submit application, we review within 2 business days" },
+              { step: 2, title: "Receive Weekly Alerts", desc: "Get predictive maintenance alerts for vehicles in your area" },
+              { step: 3, title: "Track Performance", desc: "We measure customer acquisition, you keep the data" },
+            ].map((item, i) => (
+              <SectionReveal key={item.step} delay={i * 100}>
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground font-heading font-bold text-lg">
+                    {item.step}
+                  </div>
+                  <h3 className="font-heading text-base font-semibold mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.desc}</p>
-                </div>
-              </div>
-            </SectionReveal>
-          ))}
+              </SectionReveal>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-16 md:py-24">
-        <div className="container-wrenchli text-center max-w-2xl mx-auto">
+      {/* Application Form */}
+      <section className="py-16 md:py-24 bg-background">
+        <div className="container-wrenchli max-w-lg">
           <SectionReveal>
-            <CheckCircle className="h-12 w-12 text-accent mx-auto mb-5" />
-            <h2 className="font-heading text-3xl font-bold mb-4">Spots Are Limited</h2>
-            <p className="text-muted-foreground mb-8">
-              We're rolling out in waves across Detroit. Join now to secure your place.
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl mb-3">
+              Apply for Pilot Program
+            </h2>
+            <p className="text-center text-muted-foreground mb-8">
+              Limited to 50-100 Michigan shops. Apply now to secure your spot.
             </p>
-            <div className="max-w-xl mx-auto">
-              <WaitlistForm source="pilot-bottom" />
-            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                placeholder="Shop name *"
+                required
+                value={form.shopName}
+                onChange={(e) => setForm({ ...form, shopName: e.target.value })}
+                className="h-12 text-base"
+                maxLength={100}
+              />
+              <Input
+                placeholder="Your name"
+                value={form.ownerName}
+                onChange={(e) => setForm({ ...form, ownerName: e.target.value })}
+                className="h-12 text-base"
+                maxLength={100}
+              />
+              <Input
+                type="email"
+                placeholder="Email *"
+                required
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="h-12 text-base"
+                maxLength={255}
+              />
+              <Input
+                type="tel"
+                placeholder="Phone"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                className="h-12 text-base"
+                maxLength={20}
+              />
+              <Input
+                placeholder="City / Location (Michigan) *"
+                required
+                value={form.location}
+                onChange={(e) => setForm({ ...form, location: e.target.value })}
+                className="h-12 text-base"
+                maxLength={100}
+              />
+              <select
+                value={form.bays}
+                onChange={(e) => setForm({ ...form, bays: e.target.value })}
+                className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="">Number of Bays</option>
+                {bayOptions.map((b) => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
+              <textarea
+                placeholder="Anything else we should know?"
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                rows={3}
+                maxLength={1000}
+                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+              />
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-base"
+              >
+                {loading ? "Submitting..." : "Apply to Pilot Program"}
+              </Button>
+            </form>
+
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              Questions? Email pilot@wrenchli.net or call (313) XXX-XXXX
+            </p>
           </SectionReveal>
         </div>
       </section>
