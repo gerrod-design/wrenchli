@@ -30,6 +30,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotificationSettings from "./pages/NotificationSettings";
 import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
+import Pilot from "./pages/Pilot";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ function AnimatedRoutes() {
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/developers" element={<Developers />} />
           <Route path="/developers/gpt-actions" element={<CustomGPTGuide />} />
+          <Route path="/pilot" element={<Pilot />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
