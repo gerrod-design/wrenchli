@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroShops from "@/assets/hero-shops.jpg";
 import { supabase } from "@/integrations/supabase/client";
@@ -113,6 +114,18 @@ export default function ForShops() {
         description="Grow your shop with pre-qualified leads, modern software, and embedded financing. $299/mo all-in-one platform for independent repair shops."
         path="/for-shops"
       />
+      {/* Pilot Banner */}
+      <div className="bg-accent/10 border-b border-accent/20 py-3">
+        <div className="container-wrenchli text-center">
+          <p className="text-sm">
+            <strong>Michigan shops:</strong> Join our pilot program starting March 2026.{' '}
+            <Link to="/pilot" className="text-accent font-semibold hover:underline">
+              Learn more →
+            </Link>
+          </p>
+        </div>
+      </div>
+
       {/* Hero */}
       <section className="relative bg-primary text-primary-foreground section-padding overflow-hidden">
         <img src={heroShops} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden="true" />
