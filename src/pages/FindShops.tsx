@@ -31,6 +31,19 @@ const PRICE_TIERS = [
   { value: "premium", label: "$$$ — Premium" },
 ];
 
+const VEHICLE_MAKES = [
+  { value: "any", label: "Any Vehicle" },
+  { value: "BMW", label: "BMW" },
+  { value: "Mercedes-Benz", label: "Mercedes-Benz" },
+  { value: "Audi", label: "Audi" },
+  { value: "Lexus", label: "Lexus" },
+  { value: "Ford", label: "Ford" },
+  { value: "Chevrolet", label: "Chevrolet" },
+  { value: "Toyota", label: "Toyota" },
+  { value: "Honda", label: "Honda" },
+  { value: "Volkswagen", label: "Volkswagen" },
+];
+
 export default function FindShops() {
   const [zipCode, setZipCode] = useState("");
   const [serviceType, setServiceType] = useState("general");
