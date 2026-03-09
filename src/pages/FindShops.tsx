@@ -7,49 +7,8 @@ import { Search, MapPin, Loader2 } from "lucide-react";
 import ShopMap from "@/components/shops/ShopMap";
 import ShopList from "@/components/shops/ShopList";
 import { type Shop } from "@/components/shops/ShopCard";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-const geocodeZipCode = async (zipCode: string): Promise<{ lat: number; lng: number }> => {
-  const mockCoordinates: Record<string, { lat: number; lng: number }> = {
-    "48201": { lat: 42.3314, lng: -83.0458 },
-    "48091": { lat: 42.4897, lng: -83.0148 },
-    "48084": { lat: 42.5803, lng: -83.1458 },
-    "48009": { lat: 42.5467, lng: -83.2113 },
-    "48315": { lat: 42.5803, lng: -83.0302 },
-  };
-  return mockCoordinates[zipCode] || { lat: 42.3314, lng: -83.0458 };
-};
-
-const generateMockShops = (zipCode: string): Shop[] => {
-  const baseCoords = { lat: 42.3314, lng: -83.0458 };
-  const baseShops = [
-    { name: "AutoCare Express", specialties: ["general", "brakes", "oil-change"], price_tier: "budget", rating: 4.2, review_count: 142, latOff: 0.02, lngOff: 0.01 },
-    { name: "Precision Motors", specialties: ["european", "diagnostics", "transmission"], price_tier: "premium", rating: 4.8, review_count: 389, latOff: -0.01, lngOff: 0.03 },
-    { name: "QuickFix Auto Service", specialties: ["general", "tires", "alignment"], price_tier: "mid", rating: 4.5, review_count: 256, latOff: 0.03, lngOff: -0.02 },
-    { name: "Metro Automotive", specialties: ["domestic", "engine", "electrical"], price_tier: "mid", rating: 4.3, review_count: 178, latOff: -0.02, lngOff: -0.01 },
-    { name: "Elite Auto Repair", specialties: ["luxury", "bmw", "mercedes"], price_tier: "premium", rating: 4.7, review_count: 298, latOff: 0.01, lngOff: 0.04 },
-    { name: "Budget Auto Works", specialties: ["general", "brakes", "suspension"], price_tier: "budget", rating: 4.0, review_count: 97, latOff: -0.03, lngOff: 0.02 },
-  ];
-
-  return baseShops.map((s, i) => ({
-    id: `shop-${zipCode}-${i}`,
-    name: s.name,
-    rating: s.rating,
-    review_count: s.review_count,
-    address: `${1000 + i * 100} Main St, Detroit, MI ${zipCode}`,
-    phone: `(313) ${200 + i}-${1000 + i * 111}`,
-    distance_miles: 1.5 + i * 0.8,
-    specialties: s.specialties,
-    price_tier: s.price_tier as Shop["price_tier"],
-    response_time: i % 2 === 0 ? "within 1 hour" : "within 2 hours",
-    availability: (i % 3 === 0 ? "same_day" : i % 3 === 1 ? "next_day" : "within_week") as Shop["availability"],
-    wrenchli_verified: i % 2 === 0,
-    quote_url: `/get-quote?shop=shop-${zipCode}-${i}`,
-    booking_url: i % 3 === 0 ? `/schedule?shop=shop-${zipCode}-${i}` : undefined,
-    lat: baseCoords.lat + s.latOff,
-    lng: baseCoords.lng + s.lngOff,
-  }));
-};
 
 export default function FindShops() {
   const [zipCode, setZipCode] = useState("");
@@ -69,12 +28,21 @@ export default function FindShops() {
     setSearched(true);
     setSelectedShop(null);
     try {
-      const coords = await geocodeZipCode(zip);
-      setMapCenter(coords);
+      const { data, error } = await supabase.functions.invoke("find-shops", {
+        body: { location: zip, service_type: "general" },
+      });
 
-      const mockShops = generateMockShops(zip);
-      setShops(mockShops);
-      toast.success(`Found ${mockShops.length} shops near ${zip}`);
+      if (error) throw error;
+
+      const providers: Shop[] = (data.providers || []).map((p: any) => ({
+        ...p,
+        price_tier: p.price_tier as Shop["price_tier"],
+        availability: p.availability as Shop["availability"],
+      }));
+
+      setShops(providers);
+      if (data.center) setMapCenter(data.center);
+      toast.success(`Found ${providers.length} shops near ${zip} (${data.city || "Metro Area"})`);
     } catch (error) {
       console.error("Search error:", error);
       toast.error("Failed to search shops. Please try again.");
