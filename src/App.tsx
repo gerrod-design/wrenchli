@@ -31,6 +31,7 @@ import NotificationSettings from "./pages/NotificationSettings";
 import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
 import Pilot from "./pages/Pilot";
+import FindShops from "./pages/FindShops";
 
 const queryClient = new QueryClient();
 
