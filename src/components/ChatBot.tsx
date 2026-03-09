@@ -84,8 +84,8 @@ export default function ChatBot() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const send = useCallback(async () => {
-    const text = input.trim();
+  const send = useCallback(async (override?: string) => {
+    const text = (override ?? input).trim();
     if (!text || loading) return;
     setInput("");
     const userMsg: Msg = { role: "user", content: text };
@@ -177,7 +177,7 @@ export default function ChatBot() {
                       <button
                         key={chip}
                         type="button"
-                        onClick={() => { setInput(chip); }}
+                        onClick={() => send(chip)}
                         className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                       >
                         {chip}
