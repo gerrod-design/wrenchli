@@ -72,6 +72,7 @@ function AnimatedRoutes() {
           <Route path="/developers" element={<Developers />} />
           <Route path="/developers/gpt-actions" element={<CustomGPTGuide />} />
           <Route path="/pilot" element={<Pilot />} />
+          <Route path="/find-shops" element={<FindShops />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
