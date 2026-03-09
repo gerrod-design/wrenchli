@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { type Shop } from "./ShopCard";
@@ -15,36 +15,52 @@ export default function ShopMap({ shops, center, selectedShop, onShopClick }: Sh
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const markersRef = useRef<L.LayerGroup | null>(null);
+  const [ready, setReady] = useState(false);
 
-  // Initialize map
+  // Initialize map once container is visible
   useEffect(() => {
-    if (!mapRef.current || mapInstance.current) return;
+    if (!mapRef.current) return;
 
-    const map = L.map(mapRef.current, {
-      center: center ? [center.lat, center.lng] : [42.3314, -83.0458],
-      zoom: 12,
-      zoomControl: true,
-    });
+    // Wait a tick for the container to have dimensions
+    const timer = setTimeout(() => {
+      if (mapInstance.current || !mapRef.current) return;
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(map);
+      const map = L.map(mapRef.current, {
+        center: center ? [center.lat, center.lng] : [42.3314, -83.0458],
+        zoom: 12,
+        zoomControl: true,
+      });
 
-    markersRef.current = L.layerGroup().addTo(map);
-    mapInstance.current = map;
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }).addTo(map);
+
+      markersRef.current = L.layerGroup().addTo(map);
+      mapInstance.current = map;
+
+      // Force a resize after mount to fix tile rendering
+      setTimeout(() => map.invalidateSize(), 200);
+
+      setReady(true);
+    }, 100);
 
     return () => {
-      map.remove();
-      mapInstance.current = null;
-      markersRef.current = null;
+      clearTimeout(timer);
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+        markersRef.current = null;
+      }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update center
   useEffect(() => {
     if (!mapInstance.current || !center) return;
     mapInstance.current.setView([center.lat, center.lng], 12);
+    setTimeout(() => mapInstance.current?.invalidateSize(), 100);
   }, [center]);
 
   // Update markers
@@ -59,18 +75,16 @@ export default function ShopMap({ shops, center, selectedShop, onShopClick }: Sh
       const color = isSelected ? "#14b8a6" : "#f97316";
 
       const icon = L.divIcon({
-        className: "custom-marker",
+        className: "",
         html: `<div style="
-          width: 28px; height: 28px; border-radius: 50%;
+          width: 24px; height: 24px; border-radius: 50%;
           background: ${color}; border: 3px solid white;
           box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-          display: flex; align-items: center; justify-content: center;
-          transition: transform 0.15s;
           transform: scale(${isSelected ? 1.3 : 1});
         "></div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-        popupAnchor: [0, -16],
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -14],
       });
 
       const marker = L.marker([shop.lat, shop.lng], { icon }).addTo(markersRef.current!);
@@ -90,11 +104,9 @@ export default function ShopMap({ shops, center, selectedShop, onShopClick }: Sh
 
       marker.on("click", () => onShopClick?.(shop));
 
-      if (isSelected) {
-        marker.openPopup();
-      }
+      if (isSelected) marker.openPopup();
     });
-  }, [shops, selectedShop, onShopClick]);
+  }, [shops, selectedShop, onShopClick, ready]);
 
   if (!center && shops.length === 0) {
     return (
@@ -111,7 +123,7 @@ export default function ShopMap({ shops, center, selectedShop, onShopClick }: Sh
     <div
       ref={mapRef}
       className="w-full h-full rounded-lg overflow-hidden border border-border"
-      style={{ minHeight: "400px" }}
+      style={{ minHeight: "400px", height: "100%" }}
     />
   );
 }
