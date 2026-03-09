@@ -102,30 +102,56 @@ export default function FindShops() {
               <p className="text-lg text-primary-foreground/80 mb-8">
                 Search by ZIP code to discover verified repair shops near you. Compare ratings, prices, and availability.
               </p>
-              <div className="flex gap-3 max-w-md mx-auto">
-                <div className="relative flex-1">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    placeholder="Enter ZIP code"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    className="pl-10 h-12 text-base bg-background text-foreground"
-                    maxLength={5}
-                  />
+              {/* Search Bar */}
+              <div className="flex flex-col gap-3 max-w-lg mx-auto">
+                <div className="flex gap-3">
+                  <div className="relative flex-1">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Enter ZIP code"
+                      value={zipCode}
+                      onChange={(e) => setZipCode(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      className="pl-10 h-12 text-base bg-background text-foreground"
+                      maxLength={5}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSearch}
+                    disabled={loading}
+                    className="h-12 px-6 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+                  >
+                    {loading ? (
+                      <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Searching...</>
+                    ) : (
+                      <><Search className="mr-2 h-5 w-5" />Search</>
+                    )}
+                  </Button>
                 </div>
-                <Button
-                  onClick={handleSearch}
-                  disabled={loading}
-                  className="h-12 px-6 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
-                >
-                  {loading ? (
-                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Searching...</>
-                  ) : (
-                    <><Search className="mr-2 h-5 w-5" />Search</>
-                  )}
-                </Button>
+                {/* Filters */}
+                <div className="flex gap-3">
+                  <Select value={serviceType} onValueChange={setServiceType}>
+                    <SelectTrigger className="flex-1 h-10 bg-background text-foreground border-border">
+                      <SelectValue placeholder="Service Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SERVICE_TYPES.map((s) => (
+                        <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={priceTier} onValueChange={setPriceTier}>
+                    <SelectTrigger className="flex-1 h-10 bg-background text-foreground border-border">
+                      <SelectValue placeholder="Price Range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRICE_TIERS.map((p) => (
+                        <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </SectionReveal>
