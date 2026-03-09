@@ -31,10 +31,24 @@ const PRICE_TIERS = [
   { value: "premium", label: "$$$ — Premium" },
 ];
 
+const VEHICLE_MAKES = [
+  { value: "any", label: "Any Vehicle" },
+  { value: "BMW", label: "BMW" },
+  { value: "Mercedes-Benz", label: "Mercedes-Benz" },
+  { value: "Audi", label: "Audi" },
+  { value: "Lexus", label: "Lexus" },
+  { value: "Ford", label: "Ford" },
+  { value: "Chevrolet", label: "Chevrolet" },
+  { value: "Toyota", label: "Toyota" },
+  { value: "Honda", label: "Honda" },
+  { value: "Volkswagen", label: "Volkswagen" },
+];
+
 export default function FindShops() {
   const [zipCode, setZipCode] = useState("");
   const [serviceType, setServiceType] = useState("general");
   const [priceTier, setPriceTier] = useState("all");
+  const [vehicleMake, setVehicleMake] = useState("any");
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -56,6 +70,7 @@ export default function FindShops() {
           location: zip,
           service_type: serviceType,
           price_range: priceTier === "all" ? null : priceTier,
+          vehicle_make: vehicleMake === "any" ? null : vehicleMake,
         },
       });
 
@@ -130,9 +145,9 @@ export default function FindShops() {
                   </Button>
                 </div>
                 {/* Filters */}
-                <div className="flex gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <Select value={serviceType} onValueChange={setServiceType}>
-                    <SelectTrigger className="flex-1 h-10 bg-background text-foreground border-border">
+                    <SelectTrigger className="h-10 bg-background text-foreground border-border">
                       <SelectValue placeholder="Service Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -142,12 +157,22 @@ export default function FindShops() {
                     </SelectContent>
                   </Select>
                   <Select value={priceTier} onValueChange={setPriceTier}>
-                    <SelectTrigger className="flex-1 h-10 bg-background text-foreground border-border">
+                    <SelectTrigger className="h-10 bg-background text-foreground border-border">
                       <SelectValue placeholder="Price Range" />
                     </SelectTrigger>
                     <SelectContent>
                       {PRICE_TIERS.map((p) => (
                         <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={vehicleMake} onValueChange={setVehicleMake}>
+                    <SelectTrigger className="h-10 bg-background text-foreground border-border">
+                      <SelectValue placeholder="Vehicle Make" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VEHICLE_MAKES.map((v) => (
+                        <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
