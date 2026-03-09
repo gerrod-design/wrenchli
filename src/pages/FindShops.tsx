@@ -70,6 +70,7 @@ export default function FindShops() {
           location: zip,
           service_type: serviceType,
           price_range: priceTier === "all" ? null : priceTier,
+          vehicle_make: vehicleMake === "any" ? null : vehicleMake,
         },
       });
 
