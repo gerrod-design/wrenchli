@@ -1,10 +1,11 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Stethoscope, CarFront, CreditCard, Bookmark } from "lucide-react";
+import { Stethoscope, CarFront, CreditCard, Bookmark, Wrench } from "lucide-react";
 
 export default function MobileBottomBar() {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const isInsightsPage = pathname === "/vehicle-insights";
+  const isFindShopsPage = pathname === "/find-shops";
 
   // Build quote link with current diagnosis context from URL params
   const buildQuoteLink = () => {
@@ -47,7 +48,7 @@ export default function MobileBottomBar() {
             Save to Garage
           </Link>
         </>
-      ) : (
+      ) : isFindShopsPage ? (
         <>
           <Link
             to="/#quote"
@@ -57,11 +58,35 @@ export default function MobileBottomBar() {
             Get a Diagnosis
           </Link>
           <Link
-            to="/vehicle-insights"
+            to="/garage"
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg border border-border bg-card font-semibold text-sm text-foreground"
           >
+            <Bookmark className="h-4 w-4" />
+            My Garage
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link
+            to="/#quote"
+            className="flex h-12 flex-1 items-center justify-center gap-2 mx-1 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
+          >
+            <Stethoscope className="h-4 w-4" />
+            Diagnosis
+          </Link>
+          <Link
+            to="/find-shops"
+            className="flex h-12 flex-1 items-center justify-center gap-2 mx-1 rounded-lg border border-border bg-card font-semibold text-sm text-foreground"
+          >
+            <Wrench className="h-4 w-4" />
+            Find Shops
+          </Link>
+          <Link
+            to="/vehicle-insights"
+            className="flex h-12 flex-1 items-center justify-center gap-2 mx-1 rounded-lg border border-border bg-card font-semibold text-sm text-foreground"
+          >
             <CarFront className="h-4 w-4" />
-            DIY Diagnosis
+            DIY
           </Link>
         </>
       )}
