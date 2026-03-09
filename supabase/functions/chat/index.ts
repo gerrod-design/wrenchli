@@ -5,7 +5,7 @@ const corsHeaders = {
 };
 
 const MAX_MESSAGES = 20;
-const MAX_CONTENT_LENGTH = 2000;
+const MAX_CONTENT_LENGTH = 8000;
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
 
