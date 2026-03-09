@@ -53,7 +53,9 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
               {shop.name}
             </h3>
             {shop.wrenchli_verified && (
-              <Shield className="h-4 w-4 text-wrenchli-teal flex-shrink-0" title="Wrenchli Verified" />
+              <span title="Wrenchli Verified">
+                <Shield className="h-4 w-4 text-wrenchli-teal flex-shrink-0" />
+              </span>
             )}
           </div>
           <div className="flex items-center gap-2 text-sm">

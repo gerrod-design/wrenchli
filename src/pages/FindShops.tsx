@@ -23,12 +23,12 @@ const geocodeZipCode = async (zipCode: string): Promise<{ lat: number; lng: numb
 const generateMockShops = (zipCode: string): Shop[] => {
   const baseCoords = { lat: 42.3314, lng: -83.0458 };
   const baseShops = [
-    { name: "AutoCare Express", specialties: ["general", "brakes", "oil-change"], price_tier: "budget" as const, rating: 4.2, review_count: 142, latOff: 0.02, lngOff: 0.01 },
-    { name: "Precision Motors", specialties: ["european", "diagnostics", "transmission"], price_tier: "premium" as const, rating: 4.8, review_count: 389, latOff: -0.01, lngOff: 0.03 },
-    { name: "QuickFix Auto Service", specialties: ["general", "tires", "alignment"], price_tier: "mid" as const, rating: 4.5, review_count: 256, latOff: 0.03, lngOff: -0.02 },
-    { name: "Metro Automotive", specialties: ["domestic", "engine", "electrical"], price_tier: "mid" as const, rating: 4.3, review_count: 178, latOff: -0.02, lngOff: -0.01 },
-    { name: "Elite Auto Repair", specialties: ["luxury", "bmw", "mercedes"], price_tier: "premium" as const, rating: 4.7, review_count: 298, latOff: 0.01, lngOff: 0.04 },
-    { name: "Budget Auto Works", specialties: ["general", "brakes", "suspension"], price_tier: "budget" as const, rating: 4.0, review_count: 97, latOff: -0.03, lngOff: 0.02 },
+    { name: "AutoCare Express", specialties: ["general", "brakes", "oil-change"], price_tier: "budget", rating: 4.2, review_count: 142, latOff: 0.02, lngOff: 0.01 },
+    { name: "Precision Motors", specialties: ["european", "diagnostics", "transmission"], price_tier: "premium", rating: 4.8, review_count: 389, latOff: -0.01, lngOff: 0.03 },
+    { name: "QuickFix Auto Service", specialties: ["general", "tires", "alignment"], price_tier: "mid", rating: 4.5, review_count: 256, latOff: 0.03, lngOff: -0.02 },
+    { name: "Metro Automotive", specialties: ["domestic", "engine", "electrical"], price_tier: "mid", rating: 4.3, review_count: 178, latOff: -0.02, lngOff: -0.01 },
+    { name: "Elite Auto Repair", specialties: ["luxury", "bmw", "mercedes"], price_tier: "premium", rating: 4.7, review_count: 298, latOff: 0.01, lngOff: 0.04 },
+    { name: "Budget Auto Works", specialties: ["general", "brakes", "suspension"], price_tier: "budget", rating: 4.0, review_count: 97, latOff: -0.03, lngOff: 0.02 },
   ];
 
   return baseShops.map((s, i) => ({
