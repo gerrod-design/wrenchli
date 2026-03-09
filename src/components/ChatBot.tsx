@@ -84,8 +84,8 @@ export default function ChatBot() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const send = useCallback(async () => {
-    const text = input.trim();
+  const send = useCallback(async (override?: string) => {
+    const text = (override ?? input).trim();
     if (!text || loading) return;
     setInput("");
     const userMsg: Msg = { role: "user", content: text };
