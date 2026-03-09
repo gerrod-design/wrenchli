@@ -168,9 +168,23 @@ export default function ChatBot() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {messages.length === 0 && (
-                <p className="text-muted-foreground text-sm text-center mt-8">
-                  🔧 Describe your car issue, a warning light, or a DTC code — I'll help diagnose it and find repair options near you.
-                </p>
+                <div className="mt-8 space-y-3">
+                  <p className="text-muted-foreground text-sm text-center">
+                    🔧 Describe your car issue, a warning light, or a DTC code — I'll help diagnose it and find repair options near you.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {["Check engine light", "Strange noise", "What's my car worth?", "Find a shop near me"].map((chip) => (
+                      <button
+                        key={chip}
+                        type="button"
+                        onClick={() => { setInput(chip); }}
+                        className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
               {messages.map((m, i) => (
                 <div
