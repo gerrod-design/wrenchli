@@ -5,6 +5,7 @@ export default function MobileBottomBar() {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const isInsightsPage = pathname === "/vehicle-insights";
+  const isFindShopsPage = pathname === "/find-shops";
 
   // Build quote link with current diagnosis context from URL params
   const buildQuoteLink = () => {
