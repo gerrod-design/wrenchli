@@ -169,7 +169,7 @@ export default function ChatBot() {
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {messages.length === 0 && (
                 <p className="text-muted-foreground text-sm text-center mt-8">
-                  👋 Hi! Ask me anything about Wrenchli.
+                  🔧 Describe your car issue, a warning light, or a DTC code — I'll help diagnose it and find repair options near you.
                 </p>
               )}
               {messages.map((m, i) => (
