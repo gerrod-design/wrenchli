@@ -30,6 +30,7 @@ const navItems: NavItem[] = [
       { label: "Financing", to: "/for-car-owners#financing" },
     ],
   },
+  { label: "Find Shops", to: "/find-shops" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
