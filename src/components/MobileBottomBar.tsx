@@ -1,5 +1,5 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Stethoscope, CarFront, CreditCard, Bookmark } from "lucide-react";
+import { Stethoscope, CarFront, CreditCard, Bookmark, Wrench } from "lucide-react";
 
 export default function MobileBottomBar() {
   const { pathname } = useLocation();
