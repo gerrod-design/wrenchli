@@ -145,9 +145,9 @@ export default function FindShops() {
                   </Button>
                 </div>
                 {/* Filters */}
-                <div className="flex gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <Select value={serviceType} onValueChange={setServiceType}>
-                    <SelectTrigger className="flex-1 h-10 bg-background text-foreground border-border">
+                    <SelectTrigger className="h-10 bg-background text-foreground border-border">
                       <SelectValue placeholder="Service Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -157,12 +157,22 @@ export default function FindShops() {
                     </SelectContent>
                   </Select>
                   <Select value={priceTier} onValueChange={setPriceTier}>
-                    <SelectTrigger className="flex-1 h-10 bg-background text-foreground border-border">
+                    <SelectTrigger className="h-10 bg-background text-foreground border-border">
                       <SelectValue placeholder="Price Range" />
                     </SelectTrigger>
                     <SelectContent>
                       {PRICE_TIERS.map((p) => (
                         <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={vehicleMake} onValueChange={setVehicleMake}>
+                    <SelectTrigger className="h-10 bg-background text-foreground border-border">
+                      <SelectValue placeholder="Vehicle Make" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VEHICLE_MAKES.map((v) => (
+                        <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
