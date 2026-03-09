@@ -48,6 +48,7 @@ export default function FindShops() {
   const [zipCode, setZipCode] = useState("");
   const [serviceType, setServiceType] = useState("general");
   const [priceTier, setPriceTier] = useState("all");
+  const [vehicleMake, setVehicleMake] = useState("any");
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
