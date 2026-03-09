@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { type Shop } from "./ShopCard";
 import { MapPin } from "lucide-react";
 
@@ -9,96 +11,97 @@ interface ShopMapProps {
   onShopClick?: (shop: Shop) => void;
 }
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyAfAPh_b-IW0lPTez-stGQlsgMp9u9mpf8";
-
 export default function ShopMap({ shops, center, selectedShop, onShopClick }: ShopMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const mapInstance = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.LayerGroup | null>(null);
 
+  // Initialize map
   useEffect(() => {
-    if ((window as any).google?.maps) {
-      setMapLoaded(true);
-      return;
-    }
+    if (!mapRef.current || mapInstance.current) return;
 
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setMapLoaded(true);
-    script.onerror = () => setError("Failed to load Google Maps");
-    document.head.appendChild(script);
+    const map = L.map(mapRef.current, {
+      center: center ? [center.lat, center.lng] : [42.3314, -83.0458],
+      zoom: 12,
+      zoomControl: true,
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19,
+    }).addTo(map);
+
+    markersRef.current = L.layerGroup().addTo(map);
+    mapInstance.current = map;
+
+    return () => {
+      map.remove();
+      mapInstance.current = null;
+      markersRef.current = null;
+    };
   }, []);
 
+  // Update center
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current || !center) return;
+    if (!mapInstance.current || !center) return;
+    mapInstance.current.setView([center.lat, center.lng], 12);
+  }, [center]);
 
-    const google = (window as any).google;
-    if (!google?.maps) return;
-
-    const map = new google.maps.Map(mapRef.current, {
-      center,
-      zoom: 12,
-      styles: [
-        { featureType: "all", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
-        { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#e2e8f0" }] },
-        { featureType: "all", elementType: "labels.text.stroke", stylers: [{ color: "#0f172a" }] },
-        { featureType: "road", elementType: "geometry", stylers: [{ color: "#334155" }] },
-        { featureType: "water", elementType: "geometry", stylers: [{ color: "#0f172a" }] },
-      ],
-    });
+  // Update markers
+  useEffect(() => {
+    if (!mapInstance.current || !markersRef.current) return;
+    markersRef.current.clearLayers();
 
     shops.forEach((shop) => {
       if (!shop.lat || !shop.lng) return;
 
-      const marker = new google.maps.Marker({
-        position: { lat: shop.lat, lng: shop.lng },
-        map,
-        title: shop.name,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: shop.id === selectedShop?.id ? "#14b8a6" : "#f97316",
-          fillOpacity: 1,
-          strokeColor: "#ffffff",
-          strokeWeight: 2,
-        },
+      const isSelected = shop.id === selectedShop?.id;
+      const color = isSelected ? "#14b8a6" : "#f97316";
+
+      const icon = L.divIcon({
+        className: "custom-marker",
+        html: `<div style="
+          width: 28px; height: 28px; border-radius: 50%;
+          background: ${color}; border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          display: flex; align-items: center; justify-content: center;
+          transition: transform 0.15s;
+          transform: scale(${isSelected ? 1.3 : 1});
+        "></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -16],
       });
 
-      const infoWindow = new google.maps.InfoWindow({
-        content: `
-          <div style="color: #0f172a; padding: 8px; max-width: 200px;">
-            <h3 style="font-weight: 600; margin: 0 0 4px 0; font-size: 14px;">${shop.name}</h3>
-            <p style="margin: 0 0 4px 0; font-size: 12px; color: #475569;">${shop.address}</p>
-            <div style="display: flex; align-items: center; gap: 4px; font-size: 12px;">
-              <span style="color: #f59e0b;">★</span>
-              <span>${shop.rating.toFixed(1)}</span>
-              <span style="color: #94a3b8;">•</span>
-              <span style="color: #475569;">${shop.distance_miles.toFixed(1)} mi</span>
-            </div>
+      const marker = L.marker([shop.lat, shop.lng], { icon }).addTo(markersRef.current!);
+
+      marker.bindPopup(`
+        <div style="min-width: 180px;">
+          <h3 style="font-weight: 600; margin: 0 0 4px; font-size: 14px;">${shop.name}</h3>
+          <p style="margin: 0 0 4px; font-size: 12px; color: #64748b;">${shop.address}</p>
+          <div style="display: flex; align-items: center; gap: 4px; font-size: 12px;">
+            <span style="color: #f59e0b;">★</span>
+            <span>${shop.rating.toFixed(1)}</span>
+            <span style="color: #94a3b8;">•</span>
+            <span style="color: #64748b;">${shop.distance_miles.toFixed(1)} mi</span>
           </div>
-        `,
-      });
+        </div>
+      `);
 
-      marker.addListener("click", () => {
-        infoWindow.open(map, marker);
-        onShopClick?.(shop);
-      });
+      marker.on("click", () => onShopClick?.(shop));
 
-      if (shop.id === selectedShop?.id) {
-        infoWindow.open(map, marker);
+      if (isSelected) {
+        marker.openPopup();
       }
     });
-  }, [mapLoaded, shops, center, selectedShop, onShopClick]);
+  }, [shops, selectedShop, onShopClick]);
 
-  if (error) {
+  if (!center && shops.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-muted rounded-lg border border-border">
         <div className="text-center p-8">
           <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">{error}</p>
-          <p className="text-xs text-muted-foreground mt-2">Shops are listed below</p>
+          <p className="text-sm text-muted-foreground">Search to see shops on the map</p>
         </div>
       </div>
     );
