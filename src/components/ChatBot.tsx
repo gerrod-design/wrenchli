@@ -16,7 +16,7 @@ export default function ChatBot() {
   const [showHistory, setShowHistory] = useState(false);
   const {
     messages, setMessages, conversations, activeId,
-    startNewChat, switchConversation, removeConversation, clearAllHistory,
+    startNewChat, switchConversation, removeConversation, renameConversation, clearAllHistory,
   } = useChatHistory();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
