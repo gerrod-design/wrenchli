@@ -7,6 +7,7 @@ import {
   deleteConversation,
   deleteAllConversations,
   renameConversation as renameConv,
+  togglePinConversation as togglePinConv,
   type Conversation,
 } from "./conversationStore";
 
@@ -80,6 +81,13 @@ export function useChatHistory() {
     );
   }, []);
 
+  const togglePin = useCallback((id: string) => {
+    const newPinned = togglePinConv(id);
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, pinned: newPinned } : c))
+    );
+  }, []);
+
   // Auto-create first conversation if none exist
   useEffect(() => {
     if (conversations.length === 0 && activeId === null) {
@@ -96,6 +104,7 @@ export function useChatHistory() {
     switchConversation,
     removeConversation,
     renameConversation,
+    togglePin,
     clearAllHistory,
   };
 }

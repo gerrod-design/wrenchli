@@ -5,6 +5,7 @@ export interface Conversation {
   title: string;
   messages: Msg[];
   updatedAt: number;
+  pinned?: boolean;
 }
 
 const STORAGE_KEY = "wrenchli-conversations";
@@ -108,6 +109,16 @@ export function renameConversation(id: string, title: string) {
   convos[idx].title = title.trim() || "Untitled";
   convos[idx].updatedAt = Date.now();
   saveConversations(convos);
+}
+
+export function togglePinConversation(id: string): boolean {
+  const convos = loadConversations();
+  const idx = convos.findIndex((c) => c.id === id);
+  if (idx === -1) return false;
+  const newPinned = !convos[idx].pinned;
+  convos[idx].pinned = newPinned;
+  saveConversations(convos);
+  return newPinned;
 }
 
 export function deleteAllConversations() {

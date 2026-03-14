@@ -16,7 +16,7 @@ export default function ChatBot() {
   const [showHistory, setShowHistory] = useState(false);
   const {
     messages, setMessages, conversations, activeId,
-    startNewChat, switchConversation, removeConversation, renameConversation, clearAllHistory,
+    startNewChat, switchConversation, removeConversation, renameConversation, togglePin, clearAllHistory,
   } = useChatHistory();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -178,18 +178,10 @@ export default function ChatBot() {
                   onNew={startNewChat}
                   onDelete={removeConversation}
                   onRename={renameConversation}
+                  onPin={togglePin}
+                  onClearAll={() => { clearAllHistory(); setShowHistory(false); toast.success("All chats cleared"); }}
                   onClose={() => setShowHistory(false)}
                 />
-                {conversations.length > 1 && (
-                  <div className="border-t border-border px-3 py-2">
-                    <button
-                      onClick={() => { clearAllHistory(); setShowHistory(false); toast.success("All chats cleared"); }}
-                      className="text-[10px] text-destructive hover:underline"
-                    >
-                      Delete all conversations
-                    </button>
-                  </div>
-                )}
               </div>
             ) : (
               <>
