@@ -155,7 +155,7 @@ export default function FindShops() {
               </p>
               {/* Search Bar */}
               <div className="flex flex-col gap-3 max-w-lg mx-auto">
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                   <div className="relative flex-1">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input
@@ -168,6 +168,20 @@ export default function FindShops() {
                       maxLength={5}
                     />
                   </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleLocateMe}
+                    disabled={locating}
+                    className="h-12 px-3 bg-background text-foreground border-border hover:bg-muted"
+                    title="Use my location"
+                  >
+                    {locating ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <LocateFixed className="h-5 w-5" />
+                    )}
+                  </Button>
                   <Button
                     onClick={handleSearch}
                     disabled={loading}
