@@ -65,6 +65,13 @@ const cityCoords: Record<string, { lat: number; lng: number }> = {
   "Farmington Hills": { lat: 42.4853, lng: -83.3771 },
   Novi: { lat: 42.4801, lng: -83.4755 },
   Canton: { lat: 42.3087, lng: -83.4816 },
+  // Ohio
+  Columbus: { lat: 39.9612, lng: -82.9988 },
+  Toledo: { lat: 41.6528, lng: -83.5379 },
+  Dublin: { lat: 40.0992, lng: -83.1141 },
+  Westerville: { lat: 40.1262, lng: -82.9291 },
+  "Bowling Green": { lat: 41.3748, lng: -83.6513 },
+  Perrysburg: { lat: 41.5570, lng: -83.6271 },
 };
 
 const b = BASE_URL;
