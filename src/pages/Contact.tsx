@@ -129,7 +129,7 @@ export default function Contact() {
                 <Store className="h-4 w-4" /> For Repair Shops
               </div>
               <h2 className="font-heading text-xl font-bold md:text-2xl">Interested in Partnering?</h2>
-              <p className="mt-2 text-sm text-muted-foreground">We're onboarding shops in Detroit. Tell us about yours.</p>
+              <p className="mt-2 text-sm text-muted-foreground">We're onboarding shops in Michigan and Ohio. Tell us about yours.</p>
               <form onSubmit={submitShop} className="mt-6 space-y-4">
                 <Input placeholder="Shop name *" required value={shopForm.shopName} onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })} className="h-12 text-base" maxLength={200} />
                 <Input placeholder="Your name" value={shopForm.name} onChange={(e) => setShopForm({ ...shopForm, name: e.target.value })} className="h-12 text-base" maxLength={100} />
