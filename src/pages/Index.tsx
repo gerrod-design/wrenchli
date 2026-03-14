@@ -27,7 +27,7 @@ export default function Index() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Wrenchli — Vehicle Repair, Finally Fixed"
-        description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Detroit."
+        description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Michigan and Ohio."
         path="/"
       />
       {/* Cinematic Hero */}
