@@ -116,7 +116,7 @@ export default function CinematicHero() {
         >
           Fixing the broken vehicle repair experience.
           <br />
-          Coming soon to Michigan &amp; Ohio.
+          Coming soon to {userLocation.region}.
         </motion.p>
 
         {/* CTA Buttons */}
