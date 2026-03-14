@@ -23,6 +23,7 @@ const valueProps = [
 
 export default function Index() {
   const [recommendOpen, setRecommendOpen] = useState(false);
+  const userLocation = useLocation();
 
   return (
     <main className="pb-[60px] md:pb-0">
