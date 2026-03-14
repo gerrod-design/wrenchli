@@ -4,7 +4,7 @@ import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Loader2 } from "lucide-react";
+import { Search, MapPin, Loader2, LocateFixed } from "lucide-react";
 import ShopMap from "@/components/shops/ShopMap";
 import ShopList from "@/components/shops/ShopList";
 import { type Shop } from "@/components/shops/ShopCard";
