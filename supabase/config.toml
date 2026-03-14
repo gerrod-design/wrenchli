@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.estimate-vehicle-value]
 verify_jwt = false
+
+[functions.diagnose-damage-photo]
+verify_jwt = false
