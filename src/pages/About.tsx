@@ -12,7 +12,7 @@ export default function About() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="About Wrenchli"
-        description="Meet the team fixing the broken auto repair experience. Based in Detroit, Wrenchli brings transparency, trust, and accessibility to a $288B industry."
+        description="Meet the team fixing the broken auto repair experience. Based in Michigan, Wrenchli brings transparency, trust, and accessibility to a $288B industry."
         path="/about"
       />
       {/* Hero */}
