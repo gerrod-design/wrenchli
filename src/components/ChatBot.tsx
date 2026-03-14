@@ -128,7 +128,7 @@ export default function ChatBot() {
           <motion.button
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-24 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8"
+            className="fixed bottom-[76px] right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8 md:right-6"
             aria-label="Open chat"
           >
             <MessageCircle className="h-6 w-6" />
@@ -143,8 +143,8 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-24 right-4 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl md:bottom-8 md:right-6"
-            style={{ height: "min(520px, calc(100vh - 10rem))" }}
+            className="fixed inset-x-0 bottom-[60px] z-50 flex flex-col overflow-hidden rounded-t-2xl border border-border bg-card shadow-2xl md:inset-x-auto md:bottom-8 md:right-6 md:w-[360px] md:max-w-[calc(100vw-2rem)] md:rounded-2xl"
+            style={{ height: isMobile ? "calc(100vh - 60px)" : "min(520px, calc(100vh - 10rem))" }}
           >
             {/* Header */}
             <div className="flex items-center justify-between bg-primary px-4 py-3">
