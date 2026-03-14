@@ -6,6 +6,7 @@ import {
   updateConversation,
   deleteConversation,
   deleteAllConversations,
+  renameConversation as renameConv,
   type Conversation,
 } from "./conversationStore";
 

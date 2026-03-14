@@ -101,6 +101,15 @@ export function deleteConversation(id: string) {
   saveConversations(convos);
 }
 
+export function renameConversation(id: string, title: string) {
+  const convos = loadConversations();
+  const idx = convos.findIndex((c) => c.id === id);
+  if (idx === -1) return;
+  convos[idx].title = title.trim() || "Untitled";
+  convos[idx].updatedAt = Date.now();
+  saveConversations(convos);
+}
+
 export function deleteAllConversations() {
   saveConversations([]);
 }
