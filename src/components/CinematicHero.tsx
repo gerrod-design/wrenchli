@@ -35,6 +35,8 @@ export default function CinematicHero() {
   const prefersReducedMotion = useReducedMotion();
   const isSaveData = useIsSaveData();
   const [isMobile, setIsMobile] = useState(false);
+  const userLocation = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
