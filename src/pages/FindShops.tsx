@@ -51,9 +51,45 @@ export default function FindShops() {
   const [vehicleMake, setVehicleMake] = useState("any");
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
   const [searched, setSearched] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`
+          );
+          const data = await res.json();
+          const zip = data?.address?.postcode?.slice(0, 5);
+          if (zip) {
+            setZipCode(zip);
+            toast.success(`Located ZIP: ${zip}`);
+          } else {
+            toast.error("Could not determine your ZIP code.");
+          }
+        } catch {
+          toast.error("Failed to look up your location.");
+        } finally {
+          setLocating(false);
+        }
+      },
+      () => {
+        toast.error("Location access denied. Please enter your ZIP manually.");
+        setLocating(false);
+      },
+      { timeout: 10000 }
+    );
+  };
 
   const handleSearch = async () => {
     const zip = zipCode.replace(/\D/g, "").slice(0, 5);
