@@ -110,12 +110,17 @@ export default function CinematicHero() {
         {/* Subtitle */}
         <motion.p
           {...fadeUp(1.2, 15)}
-          className="mt-5 md:mt-6 text-base md:text-xl leading-relaxed text-white/90 max-w-[600px]"
+          className="mt-5 md:mt-6 text-lg md:text-2xl font-semibold tracking-wide text-white/95 max-w-[600px]"
           style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)" }}
         >
-          Fixing the broken vehicle repair experience.
-          <br />
-          Coming soon to {userLocation.region}.
+          Mobility for All.
+        </motion.p>
+        <motion.p
+          {...fadeUp(1.5, 10)}
+          className="mt-2 text-sm md:text-base text-white/70 max-w-[500px]"
+          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)" }}
+        >
+          Affordable vehicle repair — coming soon to {userLocation.region}.
         </motion.p>
 
         {/* CTA Buttons */}
