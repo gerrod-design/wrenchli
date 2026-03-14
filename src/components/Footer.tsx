@@ -52,11 +52,11 @@ export default function Footer() {
               <img src={wrenchliLogo} alt="Wrenchli logo" className="h-7 w-7 rounded object-contain" />
               Wrenchli
             </Link>
-            <p className="mb-5 text-sm leading-relaxed text-primary-foreground/60">
-              Fixing the broken vehicle repair experience.
-              <br className="md:hidden" />
-              <span className="hidden md:inline"> </span>
-               Coming soon to {userLocation.region}.
+            <p className="mb-1 text-sm font-medium tracking-wide text-primary-foreground/80">
+              Mobility for All.
+            </p>
+            <p className="mb-5 text-xs leading-relaxed text-primary-foreground/50">
+              Fixing the broken vehicle repair experience — coming soon to {userLocation.region}.
             </p>
             <a
               href="https://linkedin.com/company/wrenchli"
