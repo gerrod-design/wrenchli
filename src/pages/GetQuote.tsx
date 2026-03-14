@@ -174,6 +174,7 @@ export default function GetQuote() {
         customer_phone: phone || null,
         customer_notes: notes || null,
         financing_interested: financingInterested,
+        photo_urls: damagePhotos.length > 0 ? damagePhotos : null,
         status: "referral_requested",
         referral_requested_at: new Date().toISOString(),
         referral_token: getReferralToken() || null,
