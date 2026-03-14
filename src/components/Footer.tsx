@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Linkedin } from "lucide-react";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
+import { useLocation } from "@/contexts/LocationContext";
 
 const footerLinks = {
   Company: [
