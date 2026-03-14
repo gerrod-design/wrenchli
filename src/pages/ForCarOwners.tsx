@@ -157,7 +157,8 @@ export default function ForCarOwners() {
             <h1 className="mt-6 font-heading text-3xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
               Stop Overpaying. Start Trusting.
             </h1>
-            <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
+            <p className="mt-3 text-base font-semibold tracking-wide text-primary-foreground/90 md:text-lg">Mobility for All.</p>
+            <p className="mt-3 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
               Finding an honest mechanic shouldn't feel like a gamble. Wrenchli gives you transparent pricing, vetted shops, and the confidence to say yes to the right repair at the right price.
             </p>
             <Button asChild size="lg" className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
