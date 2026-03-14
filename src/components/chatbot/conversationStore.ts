@@ -5,6 +5,7 @@ export interface Conversation {
   title: string;
   messages: Msg[];
   updatedAt: number;
+  pinned?: boolean;
 }
 
 const STORAGE_KEY = "wrenchli-conversations";
