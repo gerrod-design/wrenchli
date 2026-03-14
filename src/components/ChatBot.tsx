@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,6 +13,7 @@ import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
 
 export default function ChatBot() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const {
@@ -236,7 +238,25 @@ export default function ChatBot() {
                         {m.role === "user" ? (
                           <span className="whitespace-pre-wrap">{m.content}</span>
                         ) : (
-                          <ReactMarkdown components={{ a: ({ href, children }) => <a href={href} className="text-primary underline font-medium hover:opacity-80">{children}</a> }}>
+                          <ReactMarkdown components={{
+                            a: ({ href, children }) => {
+                              if (href && href.startsWith('/')) {
+                                return (
+                                  <button
+                                    onClick={(e) => { e.preventDefault(); navigate(href); setOpen(false); }}
+                                    className="text-primary underline font-medium hover:opacity-80 cursor-pointer"
+                                  >
+                                    {children}
+                                  </button>
+                                );
+                              }
+                              return (
+                                <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium hover:opacity-80">
+                                  {children}
+                                </a>
+                              );
+                            }
+                          }}>
                             {m.content}
                           </ReactMarkdown>
                         )}
