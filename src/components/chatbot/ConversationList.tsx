@@ -169,13 +169,31 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
                       >
                         {conv.pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
                       </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); exportConversationAsText(conv); }}
-                        className="p-1 rounded hover:bg-accent transition-all"
-                        title="Export as text"
-                      >
-                        <Download className="h-3 w-3" />
-                      </button>
+                      <div className="relative">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setExportMenuId(exportMenuId === conv.id ? null : conv.id); }}
+                          className="p-1 rounded hover:bg-accent transition-all"
+                          title="Export conversation"
+                        >
+                          <Download className="h-3 w-3" />
+                        </button>
+                        {exportMenuId === conv.id && (
+                          <div className="absolute right-0 top-6 z-50 bg-popover border border-border rounded-md shadow-md py-1 min-w-[120px]">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); exportConversationAsText(conv); setExportMenuId(null); }}
+                              className="w-full text-left px-3 py-1.5 text-[10px] hover:bg-accent transition-colors"
+                            >
+                              Export as .txt
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); exportConversationAsJson(conv); setExportMenuId(null); }}
+                              className="w-full text-left px-3 py-1.5 text-[10px] hover:bg-accent transition-colors"
+                            >
+                              Export as .json
+                            </button>
+                          </div>
+                        )}
+                      </div>
                       <button
                         onClick={(e) => startEditing(conv, e)}
                         className="p-1 rounded hover:bg-accent transition-all"
