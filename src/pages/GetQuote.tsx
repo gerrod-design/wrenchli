@@ -66,6 +66,7 @@ export default function GetQuote() {
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
   const [financingInterested, setFinancingInterested] = useState(false);
+  const [damagePhotos, setDamagePhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [quoteId, setQuoteId] = useState<string | null>(null);
