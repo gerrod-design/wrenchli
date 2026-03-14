@@ -177,6 +177,7 @@ export default function ChatBot() {
                   onSelect={switchConversation}
                   onNew={startNewChat}
                   onDelete={removeConversation}
+                  onRename={renameConversation}
                   onClose={() => setShowHistory(false)}
                 />
                 {conversations.length > 1 && (
