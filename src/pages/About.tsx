@@ -22,7 +22,8 @@ export default function About() {
         <div className="container-wrenchli text-center relative">
           <SectionReveal>
             <h1 className="font-heading text-3xl font-extrabold md:text-5xl lg:text-6xl">About Wrenchli</h1>
-            <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
+            <p className="mt-3 text-base font-semibold tracking-wide text-primary-foreground/90 md:text-lg">Mobility for All.</p>
+            <p className="mt-3 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
               We're fixing the broken auto repair experience — starting in Michigan and Ohio.
             </p>
           </SectionReveal>
