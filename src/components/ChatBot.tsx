@@ -86,7 +86,9 @@ export default function ChatBot() {
   const [isDragOver, setIsDragOver] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
