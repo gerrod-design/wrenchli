@@ -267,7 +267,7 @@ export default function ForShops() {
             {[
               { stat: "500+", label: "Survey Respondents" },
               { stat: "78%", label: "Strong Interest from Consumers" },
-              { stat: "30+", label: "Warm Shop Relationships in Detroit" },
+              { stat: "30+", label: "Warm Shop Relationships in MI & OH" },
             ].map((item, i) => (
               <SectionReveal key={item.label} delay={i * 120}>
                 <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
