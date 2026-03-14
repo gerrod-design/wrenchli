@@ -1,6 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { MessageSquarePlus, Trash2, MessageCircle, Search, X, Pencil, Check, Pin, PinOff, AlertTriangle } from "lucide-react";
+import { MessageSquarePlus, Trash2, MessageCircle, Search, X, Pencil, Check, Pin, PinOff, AlertTriangle, Download } from "lucide-react";
 import type { Conversation } from "./conversationStore";
+import { formatRelativeTime } from "./RelativeTime";
+import { exportConversationAsText, exportConversationAsJson } from "./exportConversation";
 
 interface Props {
   conversations: Conversation[];
