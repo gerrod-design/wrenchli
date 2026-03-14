@@ -4,7 +4,7 @@ import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Loader2 } from "lucide-react";
+import { Search, MapPin, Loader2, LocateFixed } from "lucide-react";
 import ShopMap from "@/components/shops/ShopMap";
 import ShopList from "@/components/shops/ShopList";
 import { type Shop } from "@/components/shops/ShopCard";
@@ -51,9 +51,45 @@ export default function FindShops() {
   const [vehicleMake, setVehicleMake] = useState("any");
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
   const [searched, setSearched] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`
+          );
+          const data = await res.json();
+          const zip = data?.address?.postcode?.slice(0, 5);
+          if (zip) {
+            setZipCode(zip);
+            toast.success(`Located ZIP: ${zip}`);
+          } else {
+            toast.error("Could not determine your ZIP code.");
+          }
+        } catch {
+          toast.error("Failed to look up your location.");
+        } finally {
+          setLocating(false);
+        }
+      },
+      () => {
+        toast.error("Location access denied. Please enter your ZIP manually.");
+        setLocating(false);
+      },
+      { timeout: 10000 }
+    );
+  };
 
   const handleSearch = async () => {
     const zip = zipCode.replace(/\D/g, "").slice(0, 5);
@@ -119,7 +155,7 @@ export default function FindShops() {
               </p>
               {/* Search Bar */}
               <div className="flex flex-col gap-3 max-w-lg mx-auto">
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                   <div className="relative flex-1">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input
@@ -132,6 +168,20 @@ export default function FindShops() {
                       maxLength={5}
                     />
                   </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleLocateMe}
+                    disabled={locating}
+                    className="h-12 px-3 bg-background text-foreground border-border hover:bg-muted"
+                    title="Use my location"
+                  >
+                    {locating ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <LocateFixed className="h-5 w-5" />
+                    )}
+                  </Button>
                   <Button
                     onClick={handleSearch}
                     disabled={loading}
