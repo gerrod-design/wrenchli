@@ -416,6 +416,18 @@ export default function ChatBot() {
                 >
                   <ImagePlus className="h-4 w-4" />
                 </button>
+                {isMobile && (
+                  <button
+                    type="button"
+                    onClick={() => cameraInputRef.current?.click()}
+                    disabled={loading || uploading || pendingPhotos.length >= 5}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40"
+                    aria-label="Take photo"
+                    title="Take a photo with camera"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </button>
+                )}
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
