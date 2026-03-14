@@ -76,7 +76,7 @@ export default function Contact() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Contact Us"
-        description="Get in touch with Wrenchli. Questions about auto repair quotes, shop partnerships, or anything else — we're here to help. Detroit, MI."
+        description="Get in touch with Wrenchli. Questions about auto repair quotes, shop partnerships, or anything else — we're here to help. Michigan & Ohio."
         path="/contact"
       />
       {/* Hero */}
