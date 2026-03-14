@@ -169,6 +169,13 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
                         {conv.pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
                       </button>
                       <button
+                        onClick={(e) => { e.stopPropagation(); exportConversationAsText(conv); }}
+                        className="p-1 rounded hover:bg-accent transition-all"
+                        title="Export as text"
+                      >
+                        <Download className="h-3 w-3" />
+                      </button>
+                      <button
                         onClick={(e) => startEditing(conv, e)}
                         className="p-1 rounded hover:bg-accent transition-all"
                         title="Rename conversation"
