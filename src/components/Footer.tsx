@@ -41,6 +41,7 @@ const footerLinks = {
 
 export default function Footer() {
   const [recommendOpen, setRecommendOpen] = useState(false);
+  const userLocation = useLocation();
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-wrenchli py-12 pb-24 md:py-16 md:pb-16">
