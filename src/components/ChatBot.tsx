@@ -30,8 +30,11 @@ async function streamChat({
     body: JSON.stringify({ messages }),
   });
 
+  console.log("[ChatBot] Chat response status:", resp.status);
+
   if (!resp.ok) {
     const data = await resp.json().catch(() => ({}));
+    console.error("[ChatBot] Chat error response:", data);
     onError(data.error || "Something went wrong. Please try again.");
     return;
   }
