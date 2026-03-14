@@ -6,6 +6,7 @@ import {
   updateConversation,
   deleteConversation,
   deleteAllConversations,
+  renameConversation as renameConv,
   type Conversation,
 } from "./conversationStore";
 
@@ -72,6 +73,13 @@ export function useChatHistory() {
     setActiveId(null);
   }, []);
 
+  const renameConversation = useCallback((id: string, title: string) => {
+    renameConv(id, title);
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, title: title.trim() || "Untitled", updatedAt: Date.now() } : c))
+    );
+  }, []);
+
   // Auto-create first conversation if none exist
   useEffect(() => {
     if (conversations.length === 0 && activeId === null) {
@@ -87,6 +95,7 @@ export function useChatHistory() {
     startNewChat,
     switchConversation,
     removeConversation,
+    renameConversation,
     clearAllHistory,
   };
 }

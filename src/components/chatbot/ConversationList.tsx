@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { MessageSquarePlus, Trash2, MessageCircle, Search, X } from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { MessageSquarePlus, Trash2, MessageCircle, Search, X, Pencil, Check } from "lucide-react";
 import type { Conversation } from "./conversationStore";
 
 interface Props {
@@ -8,11 +8,15 @@ interface Props {
   onSelect: (id: string) => void;
   onNew: () => void;
   onDelete: (id: string) => void;
+  onRename: (id: string, title: string) => void;
   onClose: () => void;
 }
 
-export function ConversationList({ conversations, activeId, onSelect, onNew, onDelete, onClose }: Props) {
+export function ConversationList({ conversations, activeId, onSelect, onNew, onDelete, onRename, onClose }: Props) {
   const [search, setSearch] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const editRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return conversations;
@@ -23,6 +27,26 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
         c.messages.some((m) => m.content.toLowerCase().includes(q))
     );
   }, [conversations, search]);
+
+  useEffect(() => {
+    if (editingId && editRef.current) {
+      editRef.current.focus();
+      editRef.current.select();
+    }
+  }, [editingId]);
+
+  const startEditing = (conv: Conversation, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingId(conv.id);
+    setEditValue(conv.title);
+  };
+
+  const commitRename = () => {
+    if (editingId && editValue.trim()) {
+      onRename(editingId, editValue.trim());
+    }
+    setEditingId(null);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -80,18 +104,55 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
               >
                 <MessageCircle className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{conv.title}</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {conv.messages.length} message{conv.messages.length !== 1 ? "s" : ""}
-                  </p>
+                  {editingId === conv.id ? (
+                    <form
+                      onSubmit={(e) => { e.preventDefault(); commitRename(); }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        ref={editRef}
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onBlur={commitRename}
+                        onKeyDown={(e) => { if (e.key === "Escape") setEditingId(null); }}
+                        className="w-full text-xs font-medium bg-background border border-input rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-ring"
+                      />
+                    </form>
+                  ) : (
+                    <>
+                      <p className="text-xs font-medium truncate">{conv.title}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {conv.messages.length} message{conv.messages.length !== 1 ? "s" : ""}
+                      </p>
+                    </>
+                  )}
                 </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); onDelete(conv.id); }}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-destructive/10 hover:text-destructive transition-all"
-                  title="Delete conversation"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </button>
+                {editingId === conv.id ? (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); commitRename(); }}
+                    className="p-1 rounded hover:bg-primary/10 text-primary transition-all"
+                    title="Save"
+                  >
+                    <Check className="h-3 w-3" />
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all">
+                    <button
+                      onClick={(e) => startEditing(conv, e)}
+                      className="p-1 rounded hover:bg-accent transition-all"
+                      title="Rename conversation"
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onDelete(conv.id); }}
+                      className="p-1 rounded hover:bg-destructive/10 hover:text-destructive transition-all"
+                      title="Delete conversation"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
