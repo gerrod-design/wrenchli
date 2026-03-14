@@ -1,4 +1,5 @@
-import { MessageSquarePlus, Trash2, MessageCircle } from "lucide-react";
+import { useState, useMemo } from "react";
+import { MessageSquarePlus, Trash2, MessageCircle, Search, X } from "lucide-react";
 import type { Conversation } from "./conversationStore";
 
 interface Props {
@@ -11,6 +12,18 @@ interface Props {
 }
 
 export function ConversationList({ conversations, activeId, onSelect, onNew, onDelete, onClose }: Props) {
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return conversations;
+    const q = search.toLowerCase();
+    return conversations.filter(
+      (c) =>
+        c.title.toLowerCase().includes(q) ||
+        c.messages.some((m) => m.content.toLowerCase().includes(q))
+    );
+  }, [conversations, search]);
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -26,13 +39,36 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
         </button>
       </div>
 
+      {/* Search */}
+      <div className="px-3 py-2 border-b border-border">
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search conversations…"
+            className="w-full rounded-md border border-input bg-background pl-7 pr-7 py-1.5 text-xs outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* List */}
       <div className="flex-1 overflow-y-auto">
-        {conversations.length === 0 ? (
-          <p className="text-xs text-muted-foreground text-center py-6">No conversations yet</p>
+        {filtered.length === 0 ? (
+          <p className="text-xs text-muted-foreground text-center py-6">
+            {search ? "No matching conversations" : "No conversations yet"}
+          </p>
         ) : (
           <div className="py-1">
-            {conversations.map((conv) => (
+            {filtered.map((conv) => (
               <div
                 key={conv.id}
                 className={`group flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors ${
