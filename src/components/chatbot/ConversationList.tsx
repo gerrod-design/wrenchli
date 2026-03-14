@@ -21,6 +21,7 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [exportMenuId, setExportMenuId] = useState<string | null>(null);
   const editRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
