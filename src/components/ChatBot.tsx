@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Loader2, ImagePlus, Camera } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, ImagePlus, Camera, Copy, Share2, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,6 +87,7 @@ export default function ChatBot() {
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -331,7 +332,7 @@ export default function ChatBot() {
               {messages.map((m, i) => (
                 <div
                   key={i}
-                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                  className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
                 >
                   <div
                     className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
@@ -367,6 +368,39 @@ export default function ChatBot() {
                       </ReactMarkdown>
                     )}
                   </div>
+                  {/* Share/Copy actions for assistant messages */}
+                  {m.role === "assistant" && !loading && m.content.length > 20 && (
+                    <div className="flex items-center gap-1 mt-1 ml-1">
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(m.content);
+                          setCopiedIndex(i);
+                          toast.success("Copied to clipboard");
+                          setTimeout(() => setCopiedIndex(null), 2000);
+                        }}
+                        className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        title="Copy response"
+                      >
+                        {copiedIndex === i ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        {copiedIndex === i ? "Copied" : "Copy"}
+                      </button>
+                      {typeof navigator.share === "function" && (
+                        <button
+                          onClick={() => {
+                            navigator.share({
+                              title: "Wrenchli Diagnosis",
+                              text: m.content,
+                            }).catch(() => {});
+                          }}
+                          className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                          title="Share diagnosis"
+                        >
+                          <Share2 className="h-3 w-3" />
+                          Share
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
               {loading && messages[messages.length - 1]?.role !== "assistant" && (
