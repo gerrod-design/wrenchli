@@ -169,20 +169,28 @@ export default function FindShops() {
                       maxLength={5}
                     />
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleLocateMe}
-                    disabled={locating}
-                    className="h-12 px-3 bg-background text-foreground border-border hover:bg-muted"
-                    title="Use my location"
-                  >
-                    {locating ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <LocateFixed className="h-5 w-5" />
-                    )}
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleLocateMe}
+                          disabled={locating}
+                          className="h-12 px-3 bg-background text-foreground border-border hover:bg-muted"
+                        >
+                          {locating ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <LocateFixed className="h-5 w-5" />
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Detect my ZIP code</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <Button
                     onClick={handleSearch}
                     disabled={loading}
