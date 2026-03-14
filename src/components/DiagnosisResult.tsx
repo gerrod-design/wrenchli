@@ -108,7 +108,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
   const showInstantMatches = symptom && !hasRun;
 
   return (
-    <section className="section-padding bg-secondary">
+    <section id="diagnosis-results" className="section-padding bg-secondary">
       <div className="container-wrenchli max-w-3xl">
         {/* Instant symptom matches (shown before AI diagnosis) */}
         {showInstantMatches && (

@@ -3,11 +3,16 @@ import { ExternalLink, Wrench, Lightbulb, AlertTriangle, ChevronDown } from "luc
 import { getPartsForDiagnosis, buildRetailerUrl } from "@/data/partsLibrary";
 import { cn } from "@/lib/utils";
 
-const retailers = [
-  { id: "autozone" as const, label: "AutoZone", bg: "hsl(0 72% 51%)", text: "white" },
-  { id: "oreilly" as const, label: "O'Reilly", bg: "hsl(142 71% 29%)", text: "white" },
-  { id: "amazon" as const, label: "Amazon", bg: "hsl(30 100% 50%)", text: "hsl(0 0% 10%)" },
-] as const;
+import type { RetailerId } from "@/data/partsLibrary";
+
+const retailers: { id: RetailerId; label: string; bg: string; text: string }[] = [
+  { id: "autozone", label: "AutoZone", bg: "hsl(0 72% 51%)", text: "white" },
+  { id: "oreilly", label: "O'Reilly", bg: "hsl(142 71% 29%)", text: "white" },
+  { id: "advanceauto", label: "Advance Auto", bg: "hsl(0 0% 15%)", text: "white" },
+  { id: "rockauto", label: "RockAuto", bg: "hsl(210 80% 35%)", text: "white" },
+  { id: "napa", label: "NAPA", bg: "hsl(45 100% 40%)", text: "hsl(0 0% 10%)" },
+  { id: "amazon", label: "Amazon", bg: "hsl(30 100% 50%)", text: "hsl(0 0% 10%)" },
+];
 
 interface OrderPartsProps {
   diagnosisTitle: string;

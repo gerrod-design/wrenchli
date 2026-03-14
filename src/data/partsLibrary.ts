@@ -141,8 +141,10 @@ export function getPartsForDiagnosis(diagnosisTitle: string): PartsInfo | undefi
 /**
  * Build a retailer search URL with vehicle context appended.
  */
+export type RetailerId = "autozone" | "oreilly" | "amazon" | "rockauto" | "advanceauto" | "napa";
+
 export function buildRetailerUrl(
-  retailer: "autozone" | "oreilly" | "amazon",
+  retailer: RetailerId,
   searchQuery: string,
   vehicle: string
 ): string {
@@ -155,6 +157,12 @@ export function buildRetailerUrl(
     case "oreilly":
       return `https://www.oreillyauto.com/shop/b/${fullQuery}`;
     case "amazon":
-      return `https://www.amazon.com/s?k=${fullQuery}`;
+      return `https://www.amazon.com/s?k=${fullQuery}&tag=wrenchli-20`;
+    case "rockauto":
+      return `https://www.rockauto.com/en/catalog/?a=${encodeURIComponent(fullQuery.replace(/\+/g, " "))}`;
+    case "advanceauto":
+      return `https://shop.advanceautoparts.com/web/PartSearchCmd?storeId=10151&searchTerm=${encodeURIComponent(fullQuery.replace(/\+/g, " "))}`;
+    case "napa":
+      return `https://www.napaonline.com/search?text=${encodeURIComponent(fullQuery.replace(/\+/g, " "))}`;
   }
 }

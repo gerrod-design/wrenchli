@@ -150,10 +150,13 @@ When presenting a diagnosis result, ALWAYS include a "Your Options" section with
    - Provide YouTube tutorial search links. Build them as: https://www.youtube.com/results?search_query= followed by the URL-encoded search terms. Provide 2-3 variations:
      * "[repair title] [vehicle year make model] DIY tutorial"
      * "How to [repair action] [vehicle year make model]"
-   - Provide parts ordering links for common retailers. Build search URLs:
-     * AutoZone: https://www.autozone.com/searchresult?searchText=[part+vehicle]
-     * O'Reilly: https://www.oreillyauto.com/shop/b/[part+vehicle]
-     * Amazon: https://www.amazon.com/s?k=[part+vehicle]
+    - Provide parts ordering links for common retailers. Build search URLs:
+      * AutoZone: https://www.autozone.com/searchresult?searchText=[part+vehicle]
+      * O'Reilly: https://www.oreillyauto.com/shop/b/[part+vehicle]
+      * Advance Auto Parts: https://shop.advanceautoparts.com/web/PartSearchCmd?storeId=10151&searchTerm=[part+vehicle]
+      * RockAuto: https://www.rockauto.com/en/catalog/?a=[part+vehicle]
+      * NAPA: https://www.napaonline.com/search?text=[part+vehicle]
+      * Amazon: https://www.amazon.com/s?k=[part+vehicle]&tag=wrenchli-20
    - Link to the full DIY diagnosis page: [🔧 Full DIY Guide & Tools](/vehicle-insights?symptom=[url-encoded-symptom]&year=[year]&make=[make]&model=[model])
 
 2. **👨‍🔧 Get It Fixed Professionally** — Always include:
