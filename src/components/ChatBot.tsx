@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Msg = { role: "user" | "assistant"; content: string; image_urls?: string[] };
 
@@ -29,8 +30,11 @@ async function streamChat({
     body: JSON.stringify({ messages }),
   });
 
+  console.log("[ChatBot] Chat response status:", resp.status);
+
   if (!resp.ok) {
     const data = await resp.json().catch(() => ({}));
+    console.error("[ChatBot] Chat error response:", data);
     onError(data.error || "Something went wrong. Please try again.");
     return;
   }
@@ -85,7 +89,9 @@ export default function ChatBot() {
   const [isDragOver, setIsDragOver] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -174,6 +180,7 @@ export default function ChatBot() {
       content: text || "Please analyze this vehicle damage.",
       ...(pendingPhotos.length > 0 ? { image_urls: [...pendingPhotos] } : {}),
     };
+    console.log("[ChatBot] Sending message:", { content: userMsg.content, image_urls: userMsg.image_urls });
     setPendingPhotos([]);
     setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
@@ -217,12 +224,20 @@ export default function ChatBot() {
 
   return (
     <>
-      {/* Hidden file input */}
+      {/* Hidden file inputs */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
         multiple
+        className="hidden"
+        onChange={(e) => handleFileUpload(e.target.files)}
+      />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
         className="hidden"
         onChange={(e) => handleFileUpload(e.target.files)}
       />
@@ -405,6 +420,18 @@ export default function ChatBot() {
                 >
                   <ImagePlus className="h-4 w-4" />
                 </button>
+                {isMobile && (
+                  <button
+                    type="button"
+                    onClick={() => cameraInputRef.current?.click()}
+                    disabled={loading || uploading || pendingPhotos.length >= 5}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40"
+                    aria-label="Take photo"
+                    title="Take a photo with camera"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </button>
+                )}
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
