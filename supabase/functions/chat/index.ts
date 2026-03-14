@@ -156,7 +156,7 @@ When presenting a diagnosis result, ALWAYS include a "Your Options" section with
       * Advance Auto Parts: https://shop.advanceautoparts.com/web/PartSearchCmd?storeId=10151&searchTerm=[part+vehicle]
       * RockAuto: https://www.rockauto.com/en/catalog/?a=[part+vehicle]
       * NAPA: https://www.napaonline.com/search?text=[part+vehicle]
-      * Amazon: https://www.amazon.com/s?k=[part+vehicle]&tag=wrenchli-20
+      * Amazon: https://www.amazon.com/s?k=[part+vehicle]&tag=wrenchli20-20
    - Link to the full DIY diagnosis page: [🔧 Full DIY Guide & Tools](/vehicle-insights?symptom=[url-encoded-symptom]&year=[year]&make=[make]&model=[model])
 
 2. **👨‍🔧 Get It Fixed Professionally** — Always include:
