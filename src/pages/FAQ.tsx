@@ -9,7 +9,7 @@ const consumerFaqs = [
   { q: "Is Wrenchli free for vehicle owners?", a: "Yes, completely free. We charge shops a small transaction fee — not you. The price you see is the price you pay." },
   { q: "How do you vet the shops?", a: "Every shop on Wrenchli must be licensed, insured, and meet our quality standards. We verify credentials and monitor reviews continuously." },
   { q: "Can I finance my repair?", a: "Yes — we're building in point-of-sale financing through multiple lending partners. You'll be able to apply at checkout and get approved in minutes. This feature is coming soon." },
-  { q: "When is Wrenchli launching?", a: "We're launching in Detroit, Michigan first. Join the waitlist to be notified as soon as we go live in your area." },
+  { q: "When is Wrenchli launching?", a: "We're launching in Michigan and Ohio first. Join the waitlist to be notified as soon as we go live in your area." },
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program. Details will be announced before launch." },
 ];
 
