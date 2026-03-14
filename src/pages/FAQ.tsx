@@ -9,7 +9,7 @@ const consumerFaqs = [
   { q: "Is Wrenchli free for vehicle owners?", a: "Yes, completely free. We charge shops a small transaction fee — not you. The price you see is the price you pay." },
   { q: "How do you vet the shops?", a: "Every shop on Wrenchli must be licensed, insured, and meet our quality standards. We verify credentials and monitor reviews continuously." },
   { q: "Can I finance my repair?", a: "Yes — we're building in point-of-sale financing through multiple lending partners. You'll be able to apply at checkout and get approved in minutes. This feature is coming soon." },
-  { q: "When is Wrenchli launching?", a: "We're launching in Detroit, Michigan first. Join the waitlist to be notified as soon as we go live in your area." },
+  { q: "When is Wrenchli launching?", a: "We're launching in Michigan and Ohio first. Join the waitlist to be notified as soon as we go live in your area." },
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program. Details will be announced before launch." },
 ];
 
@@ -18,7 +18,7 @@ const shopFaqs = [
   { q: "How do I get customers through Wrenchli?", a: "Customers search for repairs on Wrenchli and receive quotes from shops in their area. You set your own prices and respond to requests that match your services." },
   { q: "What SaaS tools are included?", a: "Smart scheduling, digital inspections (photo/video reports), integrated payments, customer CRM, automated reminders, and your own professional shop profile page." },
   { q: "Do I have to change my workflow?", a: "Wrenchli is designed to fit into how you already work. Our onboarding team will help you get set up and trained." },
-  { q: "How do I apply?", a: "Visit our For Shop Owners page and fill out the early access application. We're onboarding Detroit shops now." },
+  { q: "How do I apply?", a: "Visit our For Shop Owners page and fill out the early access application. We're onboarding shops in Michigan and Ohio now." },
 ];
 
 export default function FAQ() {

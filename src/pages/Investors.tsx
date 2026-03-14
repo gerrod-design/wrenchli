@@ -98,7 +98,7 @@ export default function Investors() {
             {[
               { stat: "500+", label: "Survey Respondents" },
               { stat: "78%", label: "Strong Consumer Interest" },
-              { stat: "30+", label: "Warm Shop Relationships in Detroit" },
+              { stat: "30+", label: "Warm Shop Relationships in MI & OH" },
             ].map((item, i) => (
               <SectionReveal key={item.label} delay={i * 120}>
                 <div className="rounded-xl border border-border bg-card p-6 shadow-sm text-center">
@@ -109,7 +109,7 @@ export default function Investors() {
             ))}
           </div>
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            Real data from our pre-launch research. Launching in Detroit.
+            Real data from our pre-launch research. Launching in Michigan &amp; Ohio.
           </p>
         </div>
       </section>

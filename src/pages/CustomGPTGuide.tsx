@@ -201,7 +201,7 @@ export default function CustomGPTGuide() {
               <div className="space-y-2">
                 {[
                   "My 2019 Toyota Camry makes a grinding noise when I brake. What's wrong?",
-                  "How much would it cost to fix worn brake pads in Detroit?",
+                  "How much would it cost to fix worn brake pads near me?",
                   "What's my 2020 Honda Civic worth with 55,000 miles?",
                   "What maintenance is due on my 2018 Ford F-150 at 60,000 miles?",
                   "Find me a good mechanic near 48009 for BMW service",

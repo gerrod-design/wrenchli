@@ -267,7 +267,7 @@ export default function ForShops() {
             {[
               { stat: "500+", label: "Survey Respondents" },
               { stat: "78%", label: "Strong Interest from Consumers" },
-              { stat: "30+", label: "Warm Shop Relationships in Detroit" },
+              { stat: "30+", label: "Warm Shop Relationships in MI & OH" },
             ].map((item, i) => (
               <SectionReveal key={item.label} delay={i * 120}>
                 <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
@@ -313,7 +313,7 @@ export default function ForShops() {
         <div className="container-wrenchli max-w-lg">
           <SectionReveal>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Apply to Partner</h2>
-            <p className="mt-3 text-center text-primary-foreground/70">We're onboarding shops in Detroit now. Fill out the form and we'll be in touch.</p>
+            <p className="mt-3 text-center text-primary-foreground/70">We're onboarding shops in Michigan and Ohio now. Fill out the form and we'll be in touch.</p>
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
               <Input placeholder="Shop name *" required value={form.shopName} onChange={(e) => setForm({ ...form, shopName: e.target.value })} className="h-12 text-base bg-card text-foreground" maxLength={200} />
               <Input placeholder="Your name" value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} className="h-12 text-base bg-card text-foreground" maxLength={100} />

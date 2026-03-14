@@ -76,7 +76,7 @@ export default function Contact() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Contact Us"
-        description="Get in touch with Wrenchli. Questions about auto repair quotes, shop partnerships, or anything else — we're here to help. Detroit, MI."
+        description="Get in touch with Wrenchli. Questions about auto repair quotes, shop partnerships, or anything else — we're here to help. Michigan & Ohio."
         path="/contact"
       />
       {/* Hero */}
@@ -129,7 +129,7 @@ export default function Contact() {
                 <Store className="h-4 w-4" /> For Repair Shops
               </div>
               <h2 className="font-heading text-xl font-bold md:text-2xl">Interested in Partnering?</h2>
-              <p className="mt-2 text-sm text-muted-foreground">We're onboarding shops in Detroit. Tell us about yours.</p>
+              <p className="mt-2 text-sm text-muted-foreground">We're onboarding shops in Michigan and Ohio. Tell us about yours.</p>
               <form onSubmit={submitShop} className="mt-6 space-y-4">
                 <Input placeholder="Shop name *" required value={shopForm.shopName} onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })} className="h-12 text-base" maxLength={200} />
                 <Input placeholder="Your name" value={shopForm.name} onChange={(e) => setShopForm({ ...shopForm, name: e.target.value })} className="h-12 text-base" maxLength={100} />
@@ -186,7 +186,7 @@ export default function Contact() {
               <div className="flex flex-col items-center text-center rounded-xl border border-border bg-card p-6">
                 <MapPin className="h-6 w-6 text-accent mb-3" />
                 <div className="font-heading text-sm font-semibold">Headquarters</div>
-                <p className="mt-1 text-sm text-muted-foreground">Detroit, Michigan</p>
+                <p className="mt-1 text-sm text-muted-foreground">Michigan</p>
               </div>
             </SectionReveal>
           </div>

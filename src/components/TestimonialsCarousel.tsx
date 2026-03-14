@@ -40,10 +40,17 @@ const testimonials = [
   },
   {
     name: "Tamika W.",
-    location: "Livonia, MI",
+    location: "Columbus, OH",
     quote:
       "I've been going back and forth on whether to fix my vehicle or just get a new one. If Wrenchli could break down the real cost of both options side by side, that would save me so much stress and guesswork.",
     vehicle: "2014 Nissan Altima",
+  },
+  {
+    name: "Jason K.",
+    location: "Toledo, OH",
+    quote:
+      "Finding a trustworthy mechanic in a new city is stressful. Having a platform that vets shops and lets me compare prices upfront? That's exactly what I need.",
+    vehicle: "2021 Hyundai Tucson",
   },
 ];
 
@@ -75,7 +82,7 @@ export default function TestimonialsCarousel() {
             What Drivers Are Telling Us
           </h2>
           <p className="mt-2 text-center text-primary-foreground/60 text-sm">
-            Feedback from interviews with drivers across Metro Detroit
+            Feedback from interviews with drivers across Michigan &amp; Ohio
           </p>
         </SectionReveal>
 

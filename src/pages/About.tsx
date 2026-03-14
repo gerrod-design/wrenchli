@@ -12,7 +12,7 @@ export default function About() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="About Wrenchli"
-        description="Meet the team fixing the broken auto repair experience. Based in Detroit, Wrenchli brings transparency, trust, and accessibility to a $288B industry."
+        description="Meet the team fixing the broken auto repair experience. Based in Michigan, Wrenchli brings transparency, trust, and accessibility to a $288B industry."
         path="/about"
       />
       {/* Hero */}
@@ -23,7 +23,7 @@ export default function About() {
           <SectionReveal>
             <h1 className="font-heading text-3xl font-extrabold md:text-5xl lg:text-6xl">About Wrenchli</h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              We're fixing the broken auto repair experience — starting right here in Detroit.
+              We're fixing the broken auto repair experience — starting in Michigan and Ohio.
             </p>
           </SectionReveal>
         </div>
@@ -48,7 +48,7 @@ export default function About() {
                 We're building the platform that fixes both sides. Transparent pricing and vetted shops for consumers. Pre-qualified customers and modern tools for shops. And embedded financing so cost never stands between a vehicle owner and the repair they need.
               </p>
               <p className="text-foreground font-medium">
-                Based in Detroit — the heart of America's automotive industry — Wrenchli is where technology meets the trades.
+                Based in Michigan — the heart of America's automotive industry — Wrenchli is where technology meets the trades.
               </p>
               <button
                 onClick={() => setShowBrandVideo(true)}

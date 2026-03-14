@@ -27,7 +27,7 @@ export default function Index() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Wrenchli — Vehicle Repair, Finally Fixed"
-        description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Detroit."
+        description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Michigan and Ohio."
         path="/"
       />
       {/* Cinematic Hero */}
@@ -69,7 +69,7 @@ export default function Index() {
               Be the First to Know
             </h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Wrenchli is launching in Detroit soon. Join the early access list and get notified when we go live.
+              Wrenchli is launching in Michigan and Ohio soon. Join the early access list and get notified when we go live.
             </p>
             <div className="mt-8">
               <WaitlistForm source="home-waitlist" />
