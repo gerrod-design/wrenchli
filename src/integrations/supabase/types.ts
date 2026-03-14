@@ -689,6 +689,7 @@ export type Database = {
           financing_interested: boolean
           id: string
           metro_area: string | null
+          photo_urls: string[] | null
           referral_requested_at: string | null
           referral_token: string | null
           status: string
@@ -715,6 +716,7 @@ export type Database = {
           financing_interested?: boolean
           id?: string
           metro_area?: string | null
+          photo_urls?: string[] | null
           referral_requested_at?: string | null
           referral_token?: string | null
           status?: string
@@ -741,6 +743,7 @@ export type Database = {
           financing_interested?: boolean
           id?: string
           metro_area?: string | null
+          photo_urls?: string[] | null
           referral_requested_at?: string | null
           referral_token?: string | null
           status?: string
