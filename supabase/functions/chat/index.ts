@@ -6,6 +6,7 @@ const corsHeaders = {
 
 const MAX_MESSAGES = 20;
 const MAX_CONTENT_LENGTH = 8000;
+const MAX_IMAGE_URLS = 5;
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-3-flash-preview";
 
@@ -90,6 +91,26 @@ const tools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "diagnose_damage_photo",
+      description:
+        "Analyze vehicle damage from photos. Returns damage type, severity, affected area, repair options with cost estimates, and safety concerns. Use when the user sends photos of vehicle damage.",
+      parameters: {
+        type: "object",
+        properties: {
+          image_urls: {
+            type: "array",
+            items: { type: "string" },
+            description: "Array of image URLs showing vehicle damage",
+          },
+          vehicle_info: { type: "string", description: "Vehicle description, e.g. '2022 Jeep Grand Cherokee'" },
+        },
+        required: ["image_urls"],
+      },
+    },
+  },
 ];
 
 const SYSTEM_PROMPT = `You are Wrenchli's friendly AI assistant with access to powerful automotive tools. Wrenchli connects vehicle owners with trusted local auto repair shops.
@@ -99,6 +120,7 @@ You have tools to:
 2. **estimate_repair_cost** — Get cost estimates for repairs (needs diagnosis_title + zip_code)
 3. **estimate_vehicle_value** — Check what a vehicle is worth
 4. **find_local_shops** — Find trusted mechanics nearby
+5. **diagnose_damage_photo** — Analyze photos of vehicle damage to identify issues, severity, and repair options
 
 IMPORTANT: When calling estimate_repair_cost, you MUST use the exact parameter names: "diagnosis_title" (not "diagnosis"), "vehicle_year" (not "year"), "vehicle_make" (not "make"), "vehicle_model" (not "model"), and "zip_code".
 
@@ -107,7 +129,13 @@ IMPORTANT: When calling estimate_repair_cost, you MUST use the exact parameter n
 - User asks "how much will it cost to fix…" → use estimate_repair_cost (ask for ZIP if not provided)
 - User asks "what's my car worth" or "should I repair or replace" → use estimate_vehicle_value
 - User asks for shops, mechanics, or where to get service → use find_local_shops
+- User sends photos of vehicle damage → use diagnose_damage_photo with the image URLs from the message
 - You can call multiple tools at once if the question needs both diagnosis AND cost estimate.
+
+**When user sends images:**
+- Look at the user message content for image_url entries — these are photos the user attached
+- Extract the URLs and pass them to diagnose_damage_photo
+- If the user mentions their vehicle, also pass vehicle_info
 
 **After getting tool results, always:**
 - Summarize the key findings in plain language
@@ -115,6 +143,7 @@ IMPORTANT: When calling estimate_repair_cost, you MUST use the exact parameter n
 
 **Available pages (use markdown links):**
 - [Vehicle Insights / DIY Diagnosis](/vehicle-insights) — enter symptoms or codes
+- [Photo Damage Diagnosis](/damage-diagnosis) — upload photos for AI analysis
 - [Get a Quote](/get-quote) — request repair quotes from local shops
 - [My Garage](/garage) — save and manage vehicles
 - [For Car Owners](/for-car-owners) — how Wrenchli helps owners
@@ -147,7 +176,6 @@ async function executeTool(
         break;
 
       case "estimate_repair_cost": {
-        // Normalize argument names (model sometimes uses wrong names)
         const args: Record<string, unknown> = { ...rawArgs };
         if (args.diagnosis && !args.diagnosis_title) {
           args.diagnosis_title = args.diagnosis;
@@ -193,6 +221,14 @@ async function executeTool(
         break;
       }
 
+      case "diagnose_damage_photo":
+        resp = await fetch(`${FUNCTIONS_BASE}/diagnose-damage-photo`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(rawArgs),
+        });
+        break;
+
       default:
         return JSON.stringify({ error: `Unknown tool: ${name}` });
     }
@@ -205,8 +241,39 @@ async function executeTool(
   }
 }
 
+// ── Build multimodal content for AI messages ──
+type ContentPart = { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } };
+
+function buildAiMessages(
+  messages: Array<{ role: string; content: string; image_urls?: string[] }>
+): Array<Record<string, unknown>> {
+  const aiMessages: Array<Record<string, unknown>> = [
+    { role: "system", content: SYSTEM_PROMPT },
+  ];
+
+  for (const msg of messages) {
+    if (msg.role === "user" && msg.image_urls && msg.image_urls.length > 0) {
+      // Multimodal message with text + images
+      const parts: ContentPart[] = [];
+      if (msg.content) {
+        parts.push({ type: "text", text: msg.content });
+      }
+      for (const url of msg.image_urls) {
+        parts.push({ type: "image_url", image_url: { url } });
+      }
+      aiMessages.push({ role: "user", content: parts });
+    } else {
+      aiMessages.push({ role: msg.role, content: msg.content });
+    }
+  }
+
+  return aiMessages;
+}
+
 // ── Validate incoming messages ──
-function validateMessages(rawMessages: unknown[]): { role: string; content: string }[] | Response {
+function validateMessages(
+  rawMessages: unknown[]
+): Array<{ role: string; content: string; image_urls?: string[] }> | Response {
   if (rawMessages.length === 0 || rawMessages.length > MAX_MESSAGES) {
     return new Response(
       JSON.stringify({ error: `Messages array must have 1-${MAX_MESSAGES} items` }),
@@ -215,33 +282,63 @@ function validateMessages(rawMessages: unknown[]): { role: string; content: stri
   }
 
   const validRoles = new Set(["user", "assistant"]);
-  const messages: { role: string; content: string }[] = [];
+  const messages: Array<{ role: string; content: string; image_urls?: string[] }> = [];
 
   for (const msg of rawMessages) {
-    if (
-      !msg || typeof msg !== "object" ||
-      typeof (msg as Record<string, unknown>).role !== "string" ||
-      typeof (msg as Record<string, unknown>).content !== "string"
-    ) {
+    if (!msg || typeof msg !== "object") {
+      return new Response(
+        JSON.stringify({ error: "Each message must be an object" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const m = msg as Record<string, unknown>;
+    const role = m.role;
+    const content = m.content;
+    const image_urls = m.image_urls;
+
+    if (typeof role !== "string" || typeof content !== "string") {
       return new Response(
         JSON.stringify({ error: "Each message must have role and content strings" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    const { role, content } = msg as { role: string; content: string };
+
     if (!validRoles.has(role)) {
       return new Response(
         JSON.stringify({ error: "Message role must be 'user' or 'assistant'" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    if (content.length === 0 || content.length > MAX_CONTENT_LENGTH) {
+
+    if (content.length > MAX_CONTENT_LENGTH) {
       return new Response(
-        JSON.stringify({ error: `Message content must be 1-${MAX_CONTENT_LENGTH} characters` }),
+        JSON.stringify({ error: `Message content must be under ${MAX_CONTENT_LENGTH} characters` }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    messages.push({ role, content });
+
+    // Validate image_urls if present
+    let validatedImageUrls: string[] | undefined;
+    if (Array.isArray(image_urls)) {
+      validatedImageUrls = image_urls
+        .filter((u): u is string => typeof u === "string" && u.startsWith("http"))
+        .slice(0, MAX_IMAGE_URLS);
+    }
+
+    // Allow empty content if images are present
+    if (content.length === 0 && (!validatedImageUrls || validatedImageUrls.length === 0)) {
+      return new Response(
+        JSON.stringify({ error: "Message must have content or images" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    messages.push({
+      role,
+      content,
+      ...(validatedImageUrls && validatedImageUrls.length > 0 ? { image_urls: validatedImageUrls } : {}),
+    });
   }
   return messages;
 }
@@ -279,10 +376,7 @@ Deno.serve(async (req) => {
 
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
-    const aiMessages: Array<Record<string, unknown>> = [
-      { role: "system", content: SYSTEM_PROMPT },
-      ...messages,
-    ];
+    const aiMessages = buildAiMessages(messages);
 
     // ── Turn 1: Non-streaming request (may produce tool calls) ──
     const turn1Resp = await fetch(AI_GATEWAY, {
@@ -327,7 +421,6 @@ Deno.serve(async (req) => {
       turn1Data = await turn1Resp.json();
     } catch (e) {
       console.error("Failed to parse Turn 1 JSON:", e);
-      // Fallback: return a plain text response
       return new Response(
         JSON.stringify({ error: "Failed to process AI response" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -339,7 +432,6 @@ Deno.serve(async (req) => {
     // ── No tool calls: return content directly as SSE stream ──
     if (!assistantMsg?.tool_calls || assistantMsg.tool_calls.length === 0) {
       const content = assistantMsg?.content || "I'm sorry, I couldn't generate a response. Please try again.";
-      // Synthesize an SSE stream from the non-streamed content
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         start(controller) {
@@ -378,7 +470,6 @@ Deno.serve(async (req) => {
     );
 
     // ── Turn 2: Send tool results, stream final text answer ──
-    // Clean assistant message: keep tool_calls but ensure content is set
     const cleanAssistantMsg = {
       role: "assistant",
       content: assistantMsg.content || "",
@@ -401,7 +492,6 @@ Deno.serve(async (req) => {
         model: MODEL,
         messages: turn2Messages,
         stream: true,
-        // Do NOT pass tools — force the model to respond with text only
       }),
     });
 
