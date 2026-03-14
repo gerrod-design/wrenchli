@@ -7,6 +7,7 @@ import {
   deleteConversation,
   deleteAllConversations,
   renameConversation as renameConv,
+  togglePinConversation as togglePinConv,
   type Conversation,
 } from "./conversationStore";
 

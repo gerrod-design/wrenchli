@@ -111,6 +111,16 @@ export function renameConversation(id: string, title: string) {
   saveConversations(convos);
 }
 
+export function togglePinConversation(id: string): boolean {
+  const convos = loadConversations();
+  const idx = convos.findIndex((c) => c.id === id);
+  if (idx === -1) return false;
+  const newPinned = !convos[idx].pinned;
+  convos[idx].pinned = newPinned;
+  saveConversations(convos);
+  return newPinned;
+}
+
 export function deleteAllConversations() {
   saveConversations([]);
 }
