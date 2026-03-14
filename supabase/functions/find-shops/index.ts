@@ -191,7 +191,7 @@ serve(async (req) => {
         center: coords,
         results_count: providersWithCoords.length,
         location,
-        city: city || "Detroit Metro",
+        city: city || "Service Area",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
