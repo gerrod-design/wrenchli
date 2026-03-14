@@ -497,6 +497,18 @@ export default function GetQuote() {
                     className="text-base min-h-[80px]"
                   />
 
+                  {/* Damage photos */}
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      📸 Attach damage photos (optional — helps shops assess the issue)
+                    </label>
+                    <PhotoUploader
+                      photos={damagePhotos}
+                      onPhotosChange={setDamagePhotos}
+                      maxPhotos={5}
+                    />
+                  </div>
+
                   {/* Financing interest — referral stage */}
                   <div className="rounded-lg border border-border bg-muted/30 p-3 flex items-start gap-3">
                     <Checkbox
