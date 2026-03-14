@@ -1,6 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { MessageSquarePlus, Trash2, MessageCircle, Search, X, Pencil, Check, Pin, PinOff, AlertTriangle } from "lucide-react";
+import { MessageSquarePlus, Trash2, MessageCircle, Search, X, Pencil, Check, Pin, PinOff, AlertTriangle, Download } from "lucide-react";
 import type { Conversation } from "./conversationStore";
+import { formatRelativeTime } from "./RelativeTime";
+import { exportConversationAsText, exportConversationAsJson } from "./exportConversation";
 
 interface Props {
   conversations: Conversation[];
@@ -144,7 +146,7 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
                       <>
                         <p className="text-xs font-medium truncate">{conv.title}</p>
                         <p className="text-[10px] text-muted-foreground">
-                          {conv.messages.length} message{conv.messages.length !== 1 ? "s" : ""}
+                          {conv.messages.length} msg{conv.messages.length !== 1 ? "s" : ""} · {formatRelativeTime(conv.updatedAt)}
                         </p>
                       </>
                     )}
@@ -165,6 +167,13 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
                         title={conv.pinned ? "Unpin" : "Pin to top"}
                       >
                         {conv.pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); exportConversationAsText(conv); }}
+                        className="p-1 rounded hover:bg-accent transition-all"
+                        title="Export as text"
+                      >
+                        <Download className="h-3 w-3" />
                       </button>
                       <button
                         onClick={(e) => startEditing(conv, e)}
