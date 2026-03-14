@@ -32,6 +32,7 @@ import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
 import Pilot from "./pages/Pilot";
 import FindShops from "./pages/FindShops";
+import DamageDiagnosis from "./pages/DamageDiagnosis";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ function AnimatedRoutes() {
           <Route path="/developers/gpt-actions" element={<CustomGPTGuide />} />
           <Route path="/pilot" element={<Pilot />} />
           <Route path="/find-shops" element={<FindShops />} />
+          <Route path="/damage-diagnosis" element={<DamageDiagnosis />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>

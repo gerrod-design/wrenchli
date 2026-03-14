@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import PhotoUploader from "@/components/damage/PhotoUploader";
 import { useSearchParams, Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import SectionReveal from "@/components/SectionReveal";
@@ -65,6 +66,7 @@ export default function GetQuote() {
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
   const [financingInterested, setFinancingInterested] = useState(false);
+  const [damagePhotos, setDamagePhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [quoteId, setQuoteId] = useState<string | null>(null);
@@ -172,6 +174,7 @@ export default function GetQuote() {
         customer_phone: phone || null,
         customer_notes: notes || null,
         financing_interested: financingInterested,
+        photo_urls: damagePhotos.length > 0 ? damagePhotos : null,
         status: "referral_requested",
         referral_requested_at: new Date().toISOString(),
         referral_token: getReferralToken() || null,
@@ -493,6 +496,18 @@ export default function GetQuote() {
                     onChange={(e) => setNotes(e.target.value)}
                     className="text-base min-h-[80px]"
                   />
+
+                  {/* Damage photos */}
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      📸 Attach damage photos (optional — helps shops assess the issue)
+                    </label>
+                    <PhotoUploader
+                      photos={damagePhotos}
+                      onPhotosChange={setDamagePhotos}
+                      maxPhotos={5}
+                    />
+                  </div>
 
                   {/* Financing interest — referral stage */}
                   <div className="rounded-lg border border-border bg-muted/30 p-3 flex items-start gap-3">
