@@ -324,7 +324,7 @@ export const desktopShopScreens = [
         <div className="flex-1 px-8 py-4 overflow-hidden">
           <div className="max-w-lg mx-auto space-y-3">
             <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-              <MapPin className="h-3 w-3" /> Detroit Metro Area
+              <MapPin className="h-3 w-3" /> Your Metro Area
             </div>
             <div className="text-center py-2">
               <p className="text-[10px] text-muted-foreground mb-0.5">Estimated Repair Cost</p>
