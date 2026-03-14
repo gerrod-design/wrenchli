@@ -23,7 +23,7 @@ export default function WaitlistForm({ userType = "consumer", source = "home", c
     try {
       const { error } = await supabase.from("waitlist_signups").insert({ email, name: name || null });
       if (error) throw error;
-      toast({ title: "You're on the list! 🎉", description: "We'll notify you when Wrenchli launches in Detroit." });
+      toast({ title: "You're on the list! 🎉", description: "We'll notify you when Wrenchli launches in your area." });
       setEmail("");
       setName("");
     } catch {

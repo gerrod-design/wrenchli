@@ -418,7 +418,7 @@ const estimateSampleResponse = `{
   "parts_estimate": "$80–$150",
   "labor_estimate": "$120–$300",
   "labor_hours": "1.5–2.5 hours",
-  "regional_notes": "Detroit area labor rates average $95–$130/hr",
+  "regional_notes": "Regional labor rates average $95–$130/hr",
   "what_to_expect": "Technician will replace worn brake pads and inspect rotors for damage.",
   "warranty_note": "Most shops offer 12-month/12,000-mile warranty on brake work"
 }`;

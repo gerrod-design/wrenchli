@@ -48,7 +48,7 @@ export default function About() {
                 We're building the platform that fixes both sides. Transparent pricing and vetted shops for consumers. Pre-qualified customers and modern tools for shops. And embedded financing so cost never stands between a vehicle owner and the repair they need.
               </p>
               <p className="text-foreground font-medium">
-                Based in Detroit — the heart of America's automotive industry — Wrenchli is where technology meets the trades.
+                Based in Michigan — the heart of America's automotive industry — Wrenchli is where technology meets the trades.
               </p>
               <button
                 onClick={() => setShowBrandVideo(true)}

@@ -109,7 +109,7 @@ export default function Investors() {
             ))}
           </div>
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            Real data from our pre-launch research. Launching in Detroit.
+            Real data from our pre-launch research. Launching in Michigan &amp; Ohio.
           </p>
         </div>
       </section>

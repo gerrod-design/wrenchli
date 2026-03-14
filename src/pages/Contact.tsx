@@ -186,7 +186,7 @@ export default function Contact() {
               <div className="flex flex-col items-center text-center rounded-xl border border-border bg-card p-6">
                 <MapPin className="h-6 w-6 text-accent mb-3" />
                 <div className="font-heading text-sm font-semibold">Headquarters</div>
-                <p className="mt-1 text-sm text-muted-foreground">Detroit, Michigan</p>
+                <p className="mt-1 text-sm text-muted-foreground">Michigan</p>
               </div>
             </SectionReveal>
           </div>

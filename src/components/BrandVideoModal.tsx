@@ -67,7 +67,7 @@ export default function BrandVideoModal({ isOpen, onClose }: Props) {
                 </p>
                 <p className="mt-3 text-white/60 text-sm leading-relaxed max-w-md">
                   Wrenchli is building the future of auto repair — transparent pricing,
-                  DIY empowerment, and trusted local shops. Launching in Detroit.
+                  DIY empowerment, and trusted local shops. Launching in Michigan &amp; Ohio.
                 </p>
               </div>
             </div>

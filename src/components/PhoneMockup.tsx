@@ -287,7 +287,7 @@ const shopScreens = [
         <div className="flex-1 px-3 py-3 space-y-2">
           {[
             { name: "Mike's Auto", price: "$175", dist: "1.2 mi", rating: "4.7" },
-            { name: "Detroit Auto Care", price: "$210", dist: "2.8 mi", rating: "4.5" },
+            { name: "Midwest Auto Care", price: "$210", dist: "2.8 mi", rating: "4.5" },
             { name: "Metro Brake & Tire", price: "$195", dist: "0.5 mi", rating: "4.8" },
           ].map((shop) => (
             <div key={shop.name} className="rounded-lg border border-border bg-card p-2 shadow-sm">

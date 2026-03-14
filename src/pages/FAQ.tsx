@@ -18,7 +18,7 @@ const shopFaqs = [
   { q: "How do I get customers through Wrenchli?", a: "Customers search for repairs on Wrenchli and receive quotes from shops in their area. You set your own prices and respond to requests that match your services." },
   { q: "What SaaS tools are included?", a: "Smart scheduling, digital inspections (photo/video reports), integrated payments, customer CRM, automated reminders, and your own professional shop profile page." },
   { q: "Do I have to change my workflow?", a: "Wrenchli is designed to fit into how you already work. Our onboarding team will help you get set up and trained." },
-  { q: "How do I apply?", a: "Visit our For Shop Owners page and fill out the early access application. We're onboarding Detroit shops now." },
+  { q: "How do I apply?", a: "Visit our For Shop Owners page and fill out the early access application. We're onboarding shops in Michigan and Ohio now." },
 ];
 
 export default function FAQ() {

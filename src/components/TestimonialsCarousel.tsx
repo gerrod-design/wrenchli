@@ -75,7 +75,7 @@ export default function TestimonialsCarousel() {
             What Drivers Are Telling Us
           </h2>
           <p className="mt-2 text-center text-primary-foreground/60 text-sm">
-            Feedback from interviews with drivers across Metro Detroit
+            Feedback from interviews with drivers across Michigan &amp; Ohio
           </p>
         </SectionReveal>
 
