@@ -128,7 +128,7 @@ export default function ChatBot() {
           <motion.button
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-24 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8"
+            className="fixed bottom-[76px] right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8 md:right-6"
             aria-label="Open chat"
           >
             <MessageCircle className="h-6 w-6" />
