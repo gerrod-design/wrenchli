@@ -32,6 +32,7 @@ import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
 import Pilot from "./pages/Pilot";
 import FindShops from "./pages/FindShops";
+import DamageDiagnosis from "./pages/DamageDiagnosis";
 
 const queryClient = new QueryClient();
 
