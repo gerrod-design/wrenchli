@@ -56,7 +56,7 @@ export default function Footer() {
               Fixing the broken vehicle repair experience.
               <br className="md:hidden" />
               <span className="hidden md:inline"> </span>
-               Coming soon to Michigan &amp; Ohio.
+               Coming soon to {userLocation.region}.
             </p>
             <a
               href="https://linkedin.com/company/wrenchli"
