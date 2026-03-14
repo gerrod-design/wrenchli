@@ -177,6 +177,7 @@ export default function ChatBot() {
       content: text || "Please analyze this vehicle damage.",
       ...(pendingPhotos.length > 0 ? { image_urls: [...pendingPhotos] } : {}),
     };
+    console.log("[ChatBot] Sending message:", { content: userMsg.content, image_urls: userMsg.image_urls });
     setPendingPhotos([]);
     setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
