@@ -178,16 +178,16 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
                           <Download className="h-3 w-3" />
                         </button>
                         {exportMenuId === conv.id && (
-                          <div className="absolute right-0 top-6 z-50 bg-popover border border-border rounded-md shadow-md py-1 min-w-[120px]">
+                          <div className="absolute right-0 top-6 z-50 bg-popover text-popover-foreground border border-border rounded-md shadow-md py-1 min-w-[120px]">
                             <button
                               onClick={(e) => { e.stopPropagation(); exportConversationAsText(conv); setExportMenuId(null); }}
-                              className="w-full text-left px-3 py-1.5 text-[10px] hover:bg-accent transition-colors"
+                              className="w-full text-left px-3 py-1.5 text-[10px] text-popover-foreground hover:bg-accent transition-colors"
                             >
                               Export as .txt
                             </button>
                             <button
                               onClick={(e) => { e.stopPropagation(); exportConversationAsJson(conv); setExportMenuId(null); }}
-                              className="w-full text-left px-3 py-1.5 text-[10px] hover:bg-accent transition-colors"
+                              className="w-full text-left px-3 py-1.5 text-[10px] text-popover-foreground hover:bg-accent transition-colors"
                             >
                               Export as .json
                             </button>
