@@ -412,7 +412,7 @@ const estimateCurlExample = `curl -X POST "${ESTIMATE_URL}" \\
   }'`;
 
 const estimateSampleResponse = `{
-  "metro_area": "Detroit Metro Area",
+  "metro_area": "Metro Area",
   "cost_low": 200,
   "cost_high": 450,
   "parts_estimate": "$80–$150",
