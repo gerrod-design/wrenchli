@@ -87,6 +87,7 @@ export default function ChatBot() {
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
