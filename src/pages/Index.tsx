@@ -12,6 +12,7 @@ import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import WaitlistForm from "@/components/WaitlistForm";
+import { useLocation } from "@/contexts/LocationContext";
 
 const valueProps = [
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
