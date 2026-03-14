@@ -238,7 +238,25 @@ export default function ChatBot() {
                         {m.role === "user" ? (
                           <span className="whitespace-pre-wrap">{m.content}</span>
                         ) : (
-                          <ReactMarkdown components={{ a: ({ href, children }) => <a href={href} className="text-primary underline font-medium hover:opacity-80">{children}</a> }}>
+                          <ReactMarkdown components={{
+                            a: ({ href, children }) => {
+                              if (href && href.startsWith('/')) {
+                                return (
+                                  <button
+                                    onClick={(e) => { e.preventDefault(); navigate(href); setOpen(false); }}
+                                    className="text-primary underline font-medium hover:opacity-80 cursor-pointer"
+                                  >
+                                    {children}
+                                  </button>
+                                );
+                              }
+                              return (
+                                <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium hover:opacity-80">
+                                  {children}
+                                </a>
+                              );
+                            }
+                          }}>
                             {m.content}
                           </ReactMarkdown>
                         )}
