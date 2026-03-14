@@ -100,6 +100,10 @@ export default function VehicleInsights() {
       setDiagCodes(undefined);
     }
     setDiagnosisKey((k) => k + 1);
+    // Auto-scroll to results after a brief render delay
+    setTimeout(() => {
+      document.getElementById("diagnosis-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
   };
 
   return (
