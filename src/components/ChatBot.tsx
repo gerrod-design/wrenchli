@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Loader2, ImagePlus, Camera, Trash2 } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +9,15 @@ import type { Msg } from "./chatbot/types";
 import { streamChat } from "./chatbot/streamChat";
 import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
+import { ConversationList } from "./chatbot/ConversationList";
 
 export default function ChatBot() {
   const [open, setOpen] = useState(false);
-  const { messages, setMessages, clearHistory } = useChatHistory();
+  const [showHistory, setShowHistory] = useState(false);
+  const {
+    messages, setMessages, conversations, activeId,
+    startNewChat, switchConversation, removeConversation, clearAllHistory,
+  } = useChatHistory();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
@@ -59,9 +64,16 @@ export default function ChatBot() {
   const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(false); };
   const removePendingPhoto = (index: number) => setPendingPhotos((prev) => prev.filter((_, i) => i !== index));
 
+  const ensureActiveConversation = useCallback(() => {
+    if (!activeId) {
+      startNewChat();
+    }
+  }, [activeId, startNewChat]);
+
   const send = useCallback(async (override?: string) => {
     const text = (override ?? input).trim();
     if ((!text && pendingPhotos.length === 0) || loading) return;
+    ensureActiveConversation();
     setInput("");
     const userMsg: Msg = {
       role: "user",
@@ -95,7 +107,7 @@ export default function ChatBot() {
       upsert("Sorry, something went wrong. Please try again.");
       setLoading(false);
     }
-  }, [input, loading, messages, pendingPhotos, setMessages]);
+  }, [input, loading, messages, pendingPhotos, setMessages, ensureActiveConversation]);
 
   const SUGGESTION_CHIPS = [
     "Check engine light",
@@ -135,141 +147,171 @@ export default function ChatBot() {
             {/* Header */}
             <div className="flex items-center justify-between bg-primary px-4 py-3">
               <span className="font-semibold text-primary-foreground text-sm">Wrenchli Assistant</span>
-              <div className="flex items-center gap-2">
-                {messages.length > 0 && (
-                  <button
-                    onClick={() => { clearHistory(); toast.success("Chat cleared"); }}
-                    className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"
-                    aria-label="Clear chat history"
-                    title="Clear chat"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
-                <button onClick={() => setOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground" aria-label="Close chat">
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => { startNewChat(); setShowHistory(false); }}
+                  className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"
+                  aria-label="New chat" title="New chat"
+                >
+                  <MessageSquarePlus className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setShowHistory(!showHistory)}
+                  className={`transition-colors ${showHistory ? "text-primary-foreground" : "text-primary-foreground/60 hover:text-primary-foreground"}`}
+                  aria-label="Chat history" title="Chat history"
+                >
+                  <History className="h-4 w-4" />
+                </button>
+                <button onClick={() => { setOpen(false); setShowHistory(false); }} className="text-primary-foreground/80 hover:text-primary-foreground" aria-label="Close chat">
                   <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
 
-            {/* Messages */}
-            <div
-              ref={dropZoneRef}
-              onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}
-              className={`flex-1 overflow-y-auto px-4 py-3 space-y-3 relative transition-colors ${isDragOver ? "bg-accent/10" : ""}`}
-            >
-              {isDragOver && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-accent/10 border-2 border-dashed border-accent rounded-lg">
-                  <div className="text-center">
-                    <Camera className="h-8 w-8 mx-auto text-accent mb-2" />
-                    <p className="text-sm font-medium text-accent">Drop photos here</p>
-                  </div>
-                </div>
-              )}
-
-              {messages.length === 0 && (
-                <div className="mt-8 space-y-3">
-                  <p className="text-muted-foreground text-sm text-center">
-                    🔧 Describe your car issue, a warning light, or a DTC code — or drop a photo of damage for instant AI analysis.
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {SUGGESTION_CHIPS.map((chip) => (
-                      <button
-                        key={chip} type="button"
-                        onClick={() => chip.includes("photo") ? fileInputRef.current?.click() : send(chip)}
-                        className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-                      >
-                        {chip}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {messages.map((m, i) => (
-                <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
-                  <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
-                    m.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground prose prose-sm prose-neutral dark:prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1 [&_h2]:text-sm [&_h2]:font-bold [&_h2]:mt-2 [&_h2]:mb-1 [&_a]:text-primary [&_a]:underline [&_a]:font-medium"
-                  }`}>
-                    {m.role === "user" && m.image_urls && m.image_urls.length > 0 && (
-                      <div className="grid grid-cols-2 gap-1 mb-2">
-                        {m.image_urls.map((url, j) => (
-                          <img key={j} src={url} alt={`Attached ${j + 1}`} className="rounded-md w-full h-20 object-cover" />
-                        ))}
-                      </div>
-                    )}
-                    {m.role === "user" ? (
-                      <span className="whitespace-pre-wrap">{m.content}</span>
-                    ) : (
-                      <ReactMarkdown components={{ a: ({ href, children }) => <a href={href} className="text-primary underline font-medium hover:opacity-80">{children}</a> }}>
-                        {m.content}
-                      </ReactMarkdown>
-                    )}
-                  </div>
-                  {m.role === "assistant" && !loading && m.content.length > 20 && (
-                    <MessageActions content={m.content} />
-                  )}
-                </div>
-              ))}
-
-              {loading && messages[messages.length - 1]?.role !== "assistant" && (
-                <div className="flex justify-start">
-                  <div className="bg-secondary rounded-xl px-3 py-2 flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground animate-pulse">
-                      {messages[messages.length - 1]?.image_urls?.length ? "Analyzing damage photos…" : "Thinking…"}
-                    </span>
-                  </div>
-                </div>
-              )}
-              <div ref={bottomRef} />
-            </div>
-
-            {/* Pending photos */}
-            {pendingPhotos.length > 0 && (
-              <div className="border-t border-border px-3 py-2 flex gap-2 overflow-x-auto">
-                {pendingPhotos.map((url, i) => (
-                  <div key={i} className="relative flex-shrink-0 group">
-                    <img src={url} alt={`Pending ${i + 1}`} className="h-12 w-12 rounded-md object-cover border border-border" />
-                    <button onClick={() => removePendingPhoto(i)} className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full h-4 w-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">×</button>
-                  </div>
-                ))}
-                {uploading && (
-                  <div className="h-12 w-12 rounded-md border border-dashed border-border flex items-center justify-center flex-shrink-0">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            {/* History panel or Messages */}
+            {showHistory ? (
+              <div className="flex-1 overflow-hidden">
+                <ConversationList
+                  conversations={conversations}
+                  activeId={activeId}
+                  onSelect={switchConversation}
+                  onNew={startNewChat}
+                  onDelete={removeConversation}
+                  onClose={() => setShowHistory(false)}
+                />
+                {conversations.length > 1 && (
+                  <div className="border-t border-border px-3 py-2">
+                    <button
+                      onClick={() => { clearAllHistory(); setShowHistory(false); toast.success("All chats cleared"); }}
+                      className="text-[10px] text-destructive hover:underline"
+                    >
+                      Delete all conversations
+                    </button>
                   </div>
                 )}
               </div>
-            )}
+            ) : (
+              <>
+                {/* Messages */}
+                <div
+                  ref={dropZoneRef}
+                  onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}
+                  className={`flex-1 overflow-y-auto px-4 py-3 space-y-3 relative transition-colors ${isDragOver ? "bg-accent/10" : ""}`}
+                >
+                  {isDragOver && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-accent/10 border-2 border-dashed border-accent rounded-lg">
+                      <div className="text-center">
+                        <Camera className="h-8 w-8 mx-auto text-accent mb-2" />
+                        <p className="text-sm font-medium text-accent">Drop photos here</p>
+                      </div>
+                    </div>
+                  )}
 
-            {/* Input */}
-            <div className="border-t border-border">
-              <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2">
-                <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Attach photo" title="Attach damage photo">
-                  <ImagePlus className="h-4 w-4" />
-                </button>
-                {isMobile && (
-                  <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Take photo" title="Take a photo with camera">
-                    <Camera className="h-4 w-4" />
-                  </button>
+                  {messages.length === 0 && (
+                    <div className="mt-8 space-y-3">
+                      <p className="text-muted-foreground text-sm text-center">
+                        🔧 Describe your car issue, a warning light, or a DTC code — or drop a photo of damage for instant AI analysis.
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-2">
+                        {SUGGESTION_CHIPS.map((chip) => (
+                          <button
+                            key={chip} type="button"
+                            onClick={() => chip.includes("photo") ? fileInputRef.current?.click() : send(chip)}
+                            className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                          >
+                            {chip}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {messages.map((m, i) => (
+                    <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
+                      <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
+                        m.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground prose prose-sm prose-neutral dark:prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1 [&_h2]:text-sm [&_h2]:font-bold [&_h2]:mt-2 [&_h2]:mb-1 [&_a]:text-primary [&_a]:underline [&_a]:font-medium"
+                      }`}>
+                        {m.role === "user" && m.image_urls && m.image_urls.length > 0 && (
+                          <div className="grid grid-cols-2 gap-1 mb-2">
+                            {m.image_urls.map((url, j) => (
+                              <img key={j} src={url} alt={`Attached ${j + 1}`} className="rounded-md w-full h-20 object-cover" />
+                            ))}
+                          </div>
+                        )}
+                        {m.role === "user" ? (
+                          <span className="whitespace-pre-wrap">{m.content}</span>
+                        ) : (
+                          <ReactMarkdown components={{ a: ({ href, children }) => <a href={href} className="text-primary underline font-medium hover:opacity-80">{children}</a> }}>
+                            {m.content}
+                          </ReactMarkdown>
+                        )}
+                      </div>
+                      {m.role === "assistant" && !loading && m.content.length > 20 && (
+                        <MessageActions content={m.content} />
+                      )}
+                    </div>
+                  ))}
+
+                  {loading && messages[messages.length - 1]?.role !== "assistant" && (
+                    <div className="flex justify-start">
+                      <div className="bg-secondary rounded-xl px-3 py-2 flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground animate-pulse">
+                          {messages[messages.length - 1]?.image_urls?.length ? "Analyzing damage photos…" : "Thinking…"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={bottomRef} />
+                </div>
+
+                {/* Pending photos */}
+                {pendingPhotos.length > 0 && (
+                  <div className="border-t border-border px-3 py-2 flex gap-2 overflow-x-auto">
+                    {pendingPhotos.map((url, i) => (
+                      <div key={i} className="relative flex-shrink-0 group">
+                        <img src={url} alt={`Pending ${i + 1}`} className="h-12 w-12 rounded-md object-cover border border-border" />
+                        <button onClick={() => removePendingPhoto(i)} className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full h-4 w-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                      </div>
+                    ))}
+                    {uploading && (
+                      <div className="h-12 w-12 rounded-md border border-dashed border-border flex items-center justify-center flex-shrink-0">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
                 )}
-                <input value={input} onChange={(e) => setInput(e.target.value)}
-                  placeholder={pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Type a message…"}
-                  maxLength={8000}
-                  className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring" disabled={loading} />
-                <button type="submit" disabled={loading || (!input.trim() && pendingPhotos.length === 0)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground disabled:opacity-40" aria-label="Send">
-                  <Send className="h-4 w-4" />
-                </button>
-              </form>
-              {input.length > 7600 && (
-                <div className="px-3 pb-2 text-xs text-muted-foreground">{8000 - input.length} characters remaining</div>
-              )}
-            </div>
+
+                {/* Input */}
+                <div className="border-t border-border">
+                  <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2">
+                    <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
+                      className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Attach photo" title="Attach damage photo">
+                      <ImagePlus className="h-4 w-4" />
+                    </button>
+                    {isMobile && (
+                      <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Take photo" title="Take a photo with camera">
+                        <Camera className="h-4 w-4" />
+                      </button>
+                    )}
+                    <input value={input} onChange={(e) => setInput(e.target.value)}
+                      placeholder={pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Type a message…"}
+                      maxLength={8000}
+                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring" disabled={loading} />
+                    <button type="submit" disabled={loading || (!input.trim() && pendingPhotos.length === 0)}
+                      className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground disabled:opacity-40" aria-label="Send">
+                      <Send className="h-4 w-4" />
+                    </button>
+                  </form>
+                  {input.length > 7600 && (
+                    <div className="px-3 pb-2 text-xs text-muted-foreground">{8000 - input.length} characters remaining</div>
+                  )}
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
