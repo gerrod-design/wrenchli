@@ -146,7 +146,7 @@ export function ConversationList({ conversations, activeId, onSelect, onNew, onD
                       <>
                         <p className="text-xs font-medium truncate">{conv.title}</p>
                         <p className="text-[10px] text-muted-foreground">
-                          {conv.messages.length} message{conv.messages.length !== 1 ? "s" : ""}
+                          {conv.messages.length} msg{conv.messages.length !== 1 ? "s" : ""} · {formatRelativeTime(conv.updatedAt)}
                         </p>
                       </>
                     )}
