@@ -39,6 +39,13 @@ const locationMap: Record<string, string> = {
   farmington: "Farmington Hills", "48334": "Farmington Hills",
   novi: "Novi", "48375": "Novi",
   canton: "Canton", "48187": "Canton",
+  // Ohio
+  columbus: "Columbus", "43215": "Columbus", "43201": "Columbus", "43202": "Columbus", "43204": "Columbus",
+  toledo: "Toledo", "43604": "Toledo", "43606": "Toledo", "43612": "Toledo",
+  dublin: "Dublin", "43017": "Dublin",
+  westerville: "Westerville", "43081": "Westerville",
+  "bowling green": "Bowling Green", "43402": "Bowling Green",
+  perrysburg: "Perrysburg", "43551": "Perrysburg",
 };
 
 const LUXURY_BRANDS = ["BMW", "Mercedes-Benz", "Audi", "Lexus"];
@@ -58,6 +65,13 @@ const cityCoords: Record<string, { lat: number; lng: number }> = {
   "Farmington Hills": { lat: 42.4853, lng: -83.3771 },
   Novi: { lat: 42.4801, lng: -83.4755 },
   Canton: { lat: 42.3087, lng: -83.4816 },
+  // Ohio
+  Columbus: { lat: 39.9612, lng: -82.9988 },
+  Toledo: { lat: 41.6528, lng: -83.5379 },
+  Dublin: { lat: 40.0992, lng: -83.1141 },
+  Westerville: { lat: 40.1262, lng: -82.9291 },
+  "Bowling Green": { lat: 41.3748, lng: -83.6513 },
+  Perrysburg: { lat: 41.5570, lng: -83.6271 },
 };
 
 const b = BASE_URL;
@@ -97,6 +111,17 @@ function getProvidersDatabase(): ServiceProvider[] {
     { id: "canton_michigan_ave_auto", name: "Michigan Ave Auto Works", rating: 4.6, review_count: 198, address: "41500 Michigan Ave, Canton, MI 48187", phone: "(734) 555-4150", distance_miles: 0, specialties: ["general", "domestic", "transmission", "brakes"], price_tier: "mid", response_time: "2 hours", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=canton_michigan_ave_auto` },
     { id: "canton_euro_precision", name: "Euro Precision Canton", rating: 4.8, review_count: 123, address: "45000 Ford Rd, Canton, MI 48187", phone: "(734) 555-4500", distance_miles: 2, specialties: ["european", "luxury", "import", "bmw", "volkswagen"], price_tier: "premium", response_time: "1 hour", availability: "next_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=canton_euro_precision` },
     { id: "canton_budget_auto", name: "Canton Budget Auto Center", rating: 4.3, review_count: 267, address: "42700 Cherry Hill Rd, Canton, MI 48187", phone: "(734) 555-4270", distance_miles: 3, specialties: ["general", "oil_change", "brakes", "tires", "budget_friendly"], price_tier: "budget", response_time: "1 hour", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=canton_budget_auto` },
+    // Columbus, OH
+    { id: "columbus_high_st_auto", name: "High Street Auto Care", rating: 4.8, review_count: 267, address: "1450 N High St, Columbus, OH 43201", phone: "(614) 555-1450", distance_miles: 0, specialties: ["general", "domestic", "engine", "brakes"], price_tier: "mid", response_time: "2 hours", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=columbus_high_st_auto` },
+    { id: "columbus_german_auto", name: "Columbus German Auto Specialists", rating: 4.9, review_count: 189, address: "3200 Olentangy River Rd, Columbus, OH 43202", phone: "(614) 555-3200", distance_miles: 2, specialties: ["european", "luxury", "bmw", "mercedes", "audi", "volkswagen"], price_tier: "premium", response_time: "1 hour", availability: "next_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=columbus_german_auto` },
+    { id: "columbus_budget_muffler", name: "Budget Muffler & Brake", rating: 4.4, review_count: 345, address: "2800 W Broad St, Columbus, OH 43204", phone: "(614) 555-2800", distance_miles: 3, specialties: ["general", "brakes", "exhaust", "oil_change", "budget_friendly"], price_tier: "budget", response_time: "1 hour", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=columbus_budget_muffler` },
+    { id: "dublin_precision", name: "Dublin Precision Auto", rating: 4.7, review_count: 178, address: "6500 Perimeter Dr, Dublin, OH 43017", phone: "(614) 555-6500", distance_miles: 0, specialties: ["general", "import", "hybrid", "electrical"], price_tier: "mid", response_time: "2 hours", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=dublin_precision` },
+    { id: "westerville_family_auto", name: "Westerville Family Auto", rating: 4.6, review_count: 156, address: "100 S State St, Westerville, OH 43081", phone: "(614) 555-0100", distance_miles: 0, specialties: ["general", "family_service", "brakes", "maintenance"], price_tier: "mid", response_time: "3 hours", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=westerville_family_auto` },
+    // Toledo, OH
+    { id: "toledo_secor_auto", name: "Secor Road Auto Service", rating: 4.7, review_count: 234, address: "3400 Secor Rd, Toledo, OH 43606", phone: "(419) 555-3400", distance_miles: 0, specialties: ["general", "domestic", "engine", "transmission"], price_tier: "mid", response_time: "2 hours", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=toledo_secor_auto` },
+    { id: "toledo_euro_masters", name: "Toledo Euro Masters", rating: 4.8, review_count: 145, address: "5100 Monroe St, Toledo, OH 43623", phone: "(419) 555-5100", distance_miles: 2, specialties: ["european", "luxury", "bmw", "mercedes", "import"], price_tier: "premium", response_time: "1 hour", availability: "next_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=toledo_euro_masters` },
+    { id: "toledo_express_auto", name: "Express Auto Toledo", rating: 4.3, review_count: 312, address: "1900 W Alexis Rd, Toledo, OH 43612", phone: "(419) 555-1900", distance_miles: 3, specialties: ["general", "oil_change", "tires", "brakes", "budget_friendly"], price_tier: "budget", response_time: "1 hour", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=toledo_express_auto` },
+    { id: "perrysburg_auto_pro", name: "Perrysburg Auto Pro", rating: 4.6, review_count: 167, address: "26500 N Dixie Hwy, Perrysburg, OH 43551", phone: "(419) 555-2650", distance_miles: 0, specialties: ["general", "brakes", "electrical", "ac_service"], price_tier: "mid", response_time: "2 hours", availability: "same_day", wrenchli_verified: true, quote_url: `${b}/vehicle-insights?shop=perrysburg_auto_pro` },
   ];
 }
 
@@ -166,7 +191,7 @@ serve(async (req) => {
         center: coords,
         results_count: providersWithCoords.length,
         location,
-        city: city || "Detroit Metro",
+        city: city || "Service Area",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );

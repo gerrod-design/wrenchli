@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Linkedin } from "lucide-react";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
+import { useLocation } from "@/contexts/LocationContext";
 
 const footerLinks = {
   Company: [
@@ -40,6 +41,7 @@ const footerLinks = {
 
 export default function Footer() {
   const [recommendOpen, setRecommendOpen] = useState(false);
+  const userLocation = useLocation();
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-wrenchli py-12 pb-24 md:py-16 md:pb-16">
@@ -54,7 +56,7 @@ export default function Footer() {
               Fixing the broken vehicle repair experience.
               <br className="md:hidden" />
               <span className="hidden md:inline"> </span>
-              Coming soon to Michigan &amp; Ohio.
+               Coming soon to {userLocation.region}.
             </p>
             <a
               href="https://linkedin.com/company/wrenchli"

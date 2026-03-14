@@ -12,6 +12,7 @@ import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import WaitlistForm from "@/components/WaitlistForm";
+import { useLocation } from "@/contexts/LocationContext";
 
 const valueProps = [
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
@@ -22,6 +23,7 @@ const valueProps = [
 
 export default function Index() {
   const [recommendOpen, setRecommendOpen] = useState(false);
+  const userLocation = useLocation();
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -69,7 +71,7 @@ export default function Index() {
               Be the First to Know
             </h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Wrenchli is launching in Michigan and Ohio soon. Join the early access list and get notified when we go live.
+              Wrenchli is launching in {userLocation.region} soon. Join the early access list and get notified when we go live.
             </p>
             <div className="mt-8">
               <WaitlistForm source="home-waitlist" />

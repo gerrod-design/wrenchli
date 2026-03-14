@@ -29,6 +29,24 @@ const locationMap: Record<string, string> = {
   "48375": "Novi",
   canton: "Canton",
   "48187": "Canton",
+  // Ohio
+  columbus: "Columbus",
+  "43215": "Columbus",
+  "43201": "Columbus",
+  "43202": "Columbus",
+  "43204": "Columbus",
+  toledo: "Toledo",
+  "43604": "Toledo",
+  "43606": "Toledo",
+  "43612": "Toledo",
+  dublin: "Dublin",
+  "43017": "Dublin",
+  westerville: "Westerville",
+  "43081": "Westerville",
+  "bowling green": "Bowling Green",
+  "43402": "Bowling Green",
+  perrysburg: "Perrysburg",
+  "43551": "Perrysburg",
 };
 
 const LUXURY_BRANDS = ["BMW", "Mercedes-Benz", "Audi", "Lexus"];
