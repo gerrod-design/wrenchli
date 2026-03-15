@@ -134,13 +134,33 @@ function getProvidersDatabase(): ServiceProvider[] {
 }
 
 function filterByLocation(providers: ServiceProvider[], location: string): { providers: ServiceProvider[]; city: string | null } {
-  const loc = location.toLowerCase();
+  const loc = location.toLowerCase().trim();
+
+  // 1. Exact match in locationMap (city name or ZIP)
   for (const [key, city] of Object.entries(locationMap)) {
     if (loc.includes(key)) {
       return { providers: providers.filter((p) => p.address.includes(city)), city };
     }
   }
-  return { providers, city: null };
+
+  // 2. ZIP prefix → filter to same state only
+  const zip = loc.replace(/\D/g, "");
+  if (zip.length >= 3) {
+    const prefix = zip.substring(0, 3);
+    const state = zipPrefixToState[prefix];
+    if (state) {
+      const tag = stateAddressTag[state];
+      const stateProviders = providers.filter((p) => p.address.includes(tag));
+      if (stateProviders.length > 0) {
+        // Default to nearest major city in that state
+        const defaultCity = state === "MI" ? "Detroit" : "Columbus";
+        return { providers: stateProviders, city: defaultCity };
+      }
+    }
+  }
+
+  // 3. No match at all — return empty rather than everything
+  return { providers: [], city: null };
 }
 
 function findServiceProviders(params: { location: string; service_type: string; price_range?: string | null; vehicle_make?: string | null }) {
