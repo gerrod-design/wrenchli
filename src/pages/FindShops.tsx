@@ -8,6 +8,7 @@ import { Search, MapPin, Loader2, LocateFixed } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ShopMap from "@/components/shops/ShopMap";
 import ShopList from "@/components/shops/ShopList";
+import { type ShopFilter } from "@/components/shops/ShopList";
 import { type Shop } from "@/components/shops/ShopCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
