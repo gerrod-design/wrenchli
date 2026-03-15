@@ -57,6 +57,7 @@ export default function FindShops() {
   const [searched, setSearched] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [shopFilter, setShopFilter] = useState<ShopFilter>("all");
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
