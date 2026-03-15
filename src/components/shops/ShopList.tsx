@@ -34,7 +34,7 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip }: 
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
-          <Link to="/for-shops">
+          <Link to="/contact?subject=recommend-shop">
             <Button variant="default" className="gap-2">
               <MessageSquarePlus className="h-4 w-4" />
               Recommend a Shop
