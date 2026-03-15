@@ -98,7 +98,7 @@ const locationMap: Record<string, string> = {
   "bowling green": "Bowling Green", "43402": "Bowling Green", "43403": "Bowling Green",
   perrysburg: "Perrysburg", "43551": "Perrysburg", "43552": "Perrysburg",
   // OH — nearby cities → nearest shop city
-  "hilliard": "Columbus", "43026": "Columbus",
+  "hilliard": "Hilliard", "43026": "Hilliard",
   "grove city": "Columbus", "43123": "Columbus",
   "reynoldsburg": "Columbus", "43068": "Columbus",
   "gahanna": "Columbus", "43230": "Columbus",
@@ -110,6 +110,22 @@ const locationMap: Record<string, string> = {
   "sylvania": "Toledo", "43560": "Toledo",
   "oregon": "Toledo", "43616": "Toledo",
   "findlay": "Perrysburg", "45839": "Perrysburg", "45840": "Perrysburg",
+  // OH — Cleveland area
+  cleveland: "Cleveland", "44101": "Cleveland", "44102": "Cleveland", "44103": "Cleveland", "44104": "Cleveland", "44105": "Cleveland", "44106": "Cleveland", "44107": "Cleveland", "44108": "Cleveland", "44109": "Cleveland", "44110": "Cleveland", "44111": "Cleveland", "44112": "Cleveland", "44113": "Cleveland", "44114": "Cleveland", "44115": "Cleveland", "44118": "Cleveland", "44119": "Cleveland", "44120": "Cleveland", "44121": "Cleveland", "44125": "Cleveland", "44127": "Cleveland", "44128": "Cleveland", "44129": "Cleveland", "44130": "Cleveland", "44134": "Cleveland", "44135": "Cleveland",
+  "parma": "Cleveland", "44129": "Cleveland", "44130": "Cleveland", "44134": "Cleveland",
+  "lakewood": "Cleveland", "44107": "Cleveland",
+  "euclid": "Cleveland", "44117": "Cleveland", "44123": "Cleveland", "44132": "Cleveland",
+  // OH — Cincinnati area
+  cincinnati: "Cincinnati", "45201": "Cincinnati", "45202": "Cincinnati", "45203": "Cincinnati", "45204": "Cincinnati", "45205": "Cincinnati", "45206": "Cincinnati", "45207": "Cincinnati", "45208": "Cincinnati", "45209": "Cincinnati", "45210": "Cincinnati", "45211": "Cincinnati", "45212": "Cincinnati", "45213": "Cincinnati", "45214": "Cincinnati", "45215": "Cincinnati", "45216": "Cincinnati", "45217": "Cincinnati", "45218": "Cincinnati", "45219": "Cincinnati", "45220": "Cincinnati", "45223": "Cincinnati", "45224": "Cincinnati", "45225": "Cincinnati", "45226": "Cincinnati", "45227": "Cincinnati", "45229": "Cincinnati", "45230": "Cincinnati", "45231": "Cincinnati", "45232": "Cincinnati", "45233": "Cincinnati", "45236": "Cincinnati", "45237": "Cincinnati", "45238": "Cincinnati", "45239": "Cincinnati", "45240": "Cincinnati", "45241": "Cincinnati", "45242": "Cincinnati", "45243": "Cincinnati", "45244": "Cincinnati", "45245": "Cincinnati", "45246": "Cincinnati", "45247": "Cincinnati", "45248": "Cincinnati", "45249": "Cincinnati", "45251": "Cincinnati", "45252": "Cincinnati",
+  "mason": "Cincinnati", "45040": "Cincinnati",
+  "west chester": "Cincinnati", "45069": "Cincinnati",
+  // OH — Dayton area
+  dayton: "Dayton", "45401": "Dayton", "45402": "Dayton", "45403": "Dayton", "45404": "Dayton", "45405": "Dayton", "45406": "Dayton", "45409": "Dayton", "45410": "Dayton", "45414": "Dayton", "45415": "Dayton", "45416": "Dayton", "45417": "Dayton", "45419": "Dayton", "45420": "Dayton", "45424": "Dayton", "45426": "Dayton", "45428": "Dayton", "45429": "Dayton", "45430": "Dayton", "45431": "Dayton", "45432": "Dayton", "45433": "Dayton", "45439": "Dayton", "45440": "Dayton",
+  "kettering": "Dayton", "45429": "Dayton", "45420": "Dayton",
+  "beavercreek": "Dayton", "45431": "Dayton", "45432": "Dayton",
+  // OH — Akron area
+  akron: "Akron", "44301": "Akron", "44302": "Akron", "44303": "Akron", "44304": "Akron", "44305": "Akron", "44306": "Akron", "44307": "Akron", "44308": "Akron", "44310": "Akron", "44311": "Akron", "44312": "Akron", "44313": "Akron", "44314": "Akron", "44319": "Akron", "44320": "Akron",
+  "canton oh": "Akron", "44701": "Akron", "44702": "Akron", "44703": "Akron", "44704": "Akron", "44705": "Akron", "44706": "Akron", "44707": "Akron", "44708": "Akron", "44709": "Akron", "44710": "Akron", "44711": "Akron", "44714": "Akron", "44718": "Akron", "44720": "Akron", "44721": "Akron",
 };
 
 /* ── ZIP prefix → state mapping for fallback ── */
