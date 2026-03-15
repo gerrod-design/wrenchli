@@ -280,7 +280,8 @@ function filterByLocation(providers: ServiceProvider[], location: string): { pro
   // 1. Exact match in locationMap (city name or ZIP)
   for (const [key, city] of Object.entries(locationMap)) {
     if (loc.includes(key)) {
-      return { providers: providers.filter((p) => p.address.includes(city)), city };
+      const cityPattern = new RegExp(`,\\s*${city.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[,\\s]`, 'i');
+      return { providers: providers.filter((p) => cityPattern.test(p.address)), city };
     }
   }
 
