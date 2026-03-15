@@ -2,15 +2,21 @@ import ShopCard, { type Shop } from "./ShopCard";
 import { Loader2, MapPinOff, MessageSquarePlus, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Building2, Wrench, LayoutGrid } from "lucide-react";
+
+export type ShopFilter = "all" | "shops" | "dealers";
 
 interface ShopListProps {
   shops: Shop[];
   loading?: boolean;
   onShopSelect?: (shop: Shop) => void;
   searchedZip?: string;
+  filter?: ShopFilter;
+  onFilterChange?: (filter: ShopFilter) => void;
 }
 
-export default function ShopList({ shops, loading, onShopSelect, searchedZip }: ShopListProps) {
+export default function ShopList({ shops, loading, onShopSelect, searchedZip, filter = "all", onFilterChange }: ShopListProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
