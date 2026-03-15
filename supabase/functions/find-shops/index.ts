@@ -26,27 +26,35 @@ interface ServiceProvider {
 
 /* ── Location Mapping ── */
 const locationMap: Record<string, string> = {
-  warren: "Warren", "48091": "Warren",
-  birmingham: "Birmingham", "48009": "Birmingham",
-  troy: "Troy", "48084": "Troy",
-  sterling: "Sterling Heights", "48315": "Sterling Heights",
-  "ann arbor": "Ann Arbor", "48104": "Ann Arbor",
-  dearborn: "Dearborn", "48124": "Dearborn",
-  livonia: "Livonia", "48150": "Livonia",
-  detroit: "Detroit", "48201": "Detroit",
-  southfield: "Southfield", "48075": "Southfield",
-  "royal oak": "Royal Oak", "48067": "Royal Oak",
-  farmington: "Farmington Hills", "48334": "Farmington Hills",
-  novi: "Novi", "48375": "Novi",
-  canton: "Canton", "48187": "Canton",
+  warren: "Warren", "48091": "Warren", "48089": "Warren", "48092": "Warren", "48093": "Warren",
+  birmingham: "Birmingham", "48009": "Birmingham", "48012": "Birmingham", "48025": "Birmingham", "48301": "Birmingham", "48302": "Birmingham", "48304": "Birmingham",
+  troy: "Troy", "48084": "Troy", "48083": "Troy", "48085": "Troy", "48098": "Troy",
+  sterling: "Sterling Heights", "48310": "Sterling Heights", "48311": "Sterling Heights", "48312": "Sterling Heights", "48313": "Sterling Heights", "48314": "Sterling Heights", "48315": "Sterling Heights",
+  "ann arbor": "Ann Arbor", "48104": "Ann Arbor", "48103": "Ann Arbor", "48105": "Ann Arbor", "48108": "Ann Arbor",
+  dearborn: "Dearborn", "48124": "Dearborn", "48120": "Dearborn", "48121": "Dearborn", "48126": "Dearborn", "48128": "Dearborn",
+  livonia: "Livonia", "48150": "Livonia", "48151": "Livonia", "48152": "Livonia", "48153": "Livonia", "48154": "Livonia",
+  detroit: "Detroit", "48201": "Detroit", "48202": "Detroit", "48203": "Detroit", "48204": "Detroit", "48205": "Detroit", "48206": "Detroit", "48207": "Detroit", "48208": "Detroit", "48209": "Detroit", "48210": "Detroit", "48211": "Detroit", "48212": "Detroit", "48213": "Detroit", "48214": "Detroit", "48215": "Detroit", "48216": "Detroit", "48217": "Detroit", "48219": "Detroit", "48221": "Detroit", "48223": "Detroit", "48224": "Detroit", "48225": "Detroit", "48226": "Detroit", "48227": "Detroit", "48228": "Detroit", "48234": "Detroit", "48235": "Detroit", "48236": "Detroit", "48238": "Detroit",
+  southfield: "Southfield", "48075": "Southfield", "48076": "Southfield", "48033": "Southfield", "48034": "Southfield", "48037": "Southfield",
+  "royal oak": "Royal Oak", "48067": "Royal Oak", "48068": "Royal Oak", "48073": "Royal Oak",
+  farmington: "Farmington Hills", "48334": "Farmington Hills", "48331": "Farmington Hills", "48332": "Farmington Hills", "48333": "Farmington Hills", "48335": "Farmington Hills", "48336": "Farmington Hills",
+  novi: "Novi", "48375": "Novi", "48374": "Novi", "48376": "Novi", "48377": "Novi",
+  canton: "Canton", "48187": "Canton", "48188": "Canton",
   // Ohio
-  columbus: "Columbus", "43215": "Columbus", "43201": "Columbus", "43202": "Columbus", "43204": "Columbus",
-  toledo: "Toledo", "43604": "Toledo", "43606": "Toledo", "43612": "Toledo",
-  dublin: "Dublin", "43017": "Dublin",
-  westerville: "Westerville", "43081": "Westerville",
+  columbus: "Columbus", "43215": "Columbus", "43201": "Columbus", "43202": "Columbus", "43204": "Columbus", "43203": "Columbus", "43205": "Columbus", "43206": "Columbus", "43210": "Columbus", "43211": "Columbus", "43212": "Columbus", "43213": "Columbus", "43214": "Columbus", "43220": "Columbus", "43221": "Columbus", "43222": "Columbus", "43223": "Columbus", "43224": "Columbus", "43227": "Columbus", "43228": "Columbus", "43229": "Columbus", "43230": "Columbus", "43231": "Columbus", "43232": "Columbus",
+  toledo: "Toledo", "43604": "Toledo", "43606": "Toledo", "43612": "Toledo", "43605": "Toledo", "43607": "Toledo", "43608": "Toledo", "43609": "Toledo", "43610": "Toledo", "43611": "Toledo", "43613": "Toledo", "43614": "Toledo", "43615": "Toledo", "43620": "Toledo", "43623": "Toledo",
+  dublin: "Dublin", "43017": "Dublin", "43016": "Dublin",
+  westerville: "Westerville", "43081": "Westerville", "43082": "Westerville",
   "bowling green": "Bowling Green", "43402": "Bowling Green",
   perrysburg: "Perrysburg", "43551": "Perrysburg",
 };
+
+/* ── ZIP prefix → state mapping for fallback ── */
+const zipPrefixToState: Record<string, string> = {
+  "480": "MI", "481": "MI", "482": "MI", "483": "MI", "484": "MI", "485": "MI", "486": "MI", "487": "MI", "488": "MI", "489": "MI", "490": "MI", "491": "MI", "492": "MI", "493": "MI", "494": "MI", "495": "MI", "496": "MI", "497": "MI", "498": "MI", "499": "MI",
+  "430": "OH", "431": "OH", "432": "OH", "433": "OH", "434": "OH", "435": "OH", "436": "OH", "437": "OH", "438": "OH", "439": "OH", "440": "OH", "441": "OH", "442": "OH", "443": "OH", "444": "OH", "445": "OH", "446": "OH", "447": "OH", "448": "OH", "449": "OH", "450": "OH", "451": "OH", "452": "OH", "453": "OH", "454": "OH", "455": "OH", "456": "OH", "457": "OH", "458": "OH",
+};
+
+const stateAddressTag: Record<string, string> = { MI: ", MI ", OH: ", OH " };
 
 const LUXURY_BRANDS = ["BMW", "Mercedes-Benz", "Audi", "Lexus"];
 
@@ -126,13 +134,33 @@ function getProvidersDatabase(): ServiceProvider[] {
 }
 
 function filterByLocation(providers: ServiceProvider[], location: string): { providers: ServiceProvider[]; city: string | null } {
-  const loc = location.toLowerCase();
+  const loc = location.toLowerCase().trim();
+
+  // 1. Exact match in locationMap (city name or ZIP)
   for (const [key, city] of Object.entries(locationMap)) {
     if (loc.includes(key)) {
       return { providers: providers.filter((p) => p.address.includes(city)), city };
     }
   }
-  return { providers, city: null };
+
+  // 2. ZIP prefix → filter to same state only
+  const zip = loc.replace(/\D/g, "");
+  if (zip.length >= 3) {
+    const prefix = zip.substring(0, 3);
+    const state = zipPrefixToState[prefix];
+    if (state) {
+      const tag = stateAddressTag[state];
+      const stateProviders = providers.filter((p) => p.address.includes(tag));
+      if (stateProviders.length > 0) {
+        // Default to nearest major city in that state
+        const defaultCity = state === "MI" ? "Detroit" : "Columbus";
+        return { providers: stateProviders, city: defaultCity };
+      }
+    }
+  }
+
+  // 3. No match at all — return empty rather than everything
+  return { providers: [], city: null };
 }
 
 function findServiceProviders(params: { location: string; service_type: string; price_range?: string | null; vehicle_make?: string | null }) {
