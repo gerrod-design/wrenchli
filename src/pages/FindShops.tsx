@@ -8,6 +8,7 @@ import { Search, MapPin, Loader2, LocateFixed } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ShopMap from "@/components/shops/ShopMap";
 import ShopList from "@/components/shops/ShopList";
+import { type ShopFilter } from "@/components/shops/ShopList";
 import { type Shop } from "@/components/shops/ShopCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -56,6 +57,7 @@ export default function FindShops() {
   const [searched, setSearched] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [shopFilter, setShopFilter] = useState<ShopFilter>("all");
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
@@ -276,7 +278,7 @@ export default function FindShops() {
                 </div>
               </SectionReveal>
               <SectionReveal delay={100}>
-                <ShopList shops={shops} loading={loading} onShopSelect={setSelectedShop} searchedZip={searched ? zipCode : undefined} />
+                <ShopList shops={shops} loading={loading} onShopSelect={setSelectedShop} searchedZip={searched ? zipCode : undefined} filter={shopFilter} onFilterChange={setShopFilter} />
               </SectionReveal>
             </div>
           )}
