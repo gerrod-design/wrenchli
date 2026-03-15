@@ -70,20 +70,45 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
   const repairShops = shops.filter((s) => !s.is_dealer);
   const dealers = shops.filter((s) => s.is_dealer);
 
+  const filteredShops = filter === "shops" ? repairShops
+    : filter === "dealers" ? dealers
+    : shops;
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 className="font-heading text-xl font-semibold">
-          {shops.length} {shops.length === 1 ? "Result" : "Results"} Found
-          {dealers.length > 0 && (
+          {filteredShops.length} {filteredShops.length === 1 ? "Result" : "Results"} Found
+          {dealers.length > 0 && filter === "all" && (
             <span className="text-sm font-normal text-muted-foreground ml-2">
               ({repairShops.length} shops · {dealers.length} dealers)
             </span>
           )}
         </h2>
+        {onFilterChange && dealers.length > 0 && (
+          <ToggleGroup
+            type="single"
+            value={filter}
+            onValueChange={(v) => v && onFilterChange(v as ShopFilter)}
+            className="bg-muted rounded-lg p-0.5"
+          >
+            <ToggleGroupItem value="all" aria-label="Show all" className="gap-1.5 text-xs px-3 h-8 data-[state=on]:bg-background data-[state=on]:shadow-sm rounded-md">
+              <LayoutGrid className="h-3.5 w-3.5" />
+              All
+            </ToggleGroupItem>
+            <ToggleGroupItem value="shops" aria-label="Shops only" className="gap-1.5 text-xs px-3 h-8 data-[state=on]:bg-background data-[state=on]:shadow-sm rounded-md">
+              <Wrench className="h-3.5 w-3.5" />
+              Shops
+            </ToggleGroupItem>
+            <ToggleGroupItem value="dealers" aria-label="Dealers only" className="gap-1.5 text-xs px-3 h-8 data-[state=on]:bg-background data-[state=on]:shadow-sm rounded-md">
+              <Building2 className="h-3.5 w-3.5" />
+              Dealers
+            </ToggleGroupItem>
+          </ToggleGroup>
+        )}
       </div>
       <div className="grid gap-4 md:gap-5">
-        {shops.map((shop) => (
+        {filteredShops.map((shop) => (
           <div
             key={shop.id}
             onClick={() => onShopSelect?.(shop)}
