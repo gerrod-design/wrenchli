@@ -61,11 +61,19 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip }: 
     );
   }
 
+  const repairShops = shops.filter((s) => !s.is_dealer);
+  const dealers = shops.filter((s) => s.is_dealer);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading text-xl font-semibold">
-          {shops.length} {shops.length === 1 ? "Shop" : "Shops"} Found
+          {shops.length} {shops.length === 1 ? "Result" : "Results"} Found
+          {dealers.length > 0 && (
+            <span className="text-sm font-normal text-muted-foreground ml-2">
+              ({repairShops.length} shops · {dealers.length} dealers)
+            </span>
+          )}
         </h2>
       </div>
       <div className="grid gap-4 md:gap-5">

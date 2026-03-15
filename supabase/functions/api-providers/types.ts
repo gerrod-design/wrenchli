@@ -21,4 +21,6 @@ export interface ServiceProvider {
   wrenchli_verified: boolean;
   quote_url: string;
   booking_url?: string;
+  is_dealer?: boolean;
+  dealer_brands?: string[];
 }
