@@ -153,13 +153,27 @@ const cityCoords: Record<string, { lat: number; lng: number }> = {
   "Farmington Hills": { lat: 42.4853, lng: -83.3771 },
   Novi: { lat: 42.4801, lng: -83.4755 },
   Canton: { lat: 42.3087, lng: -83.4816 },
+  Pontiac: { lat: 42.6389, lng: -83.2910 },
+  "Rochester Hills": { lat: 42.6584, lng: -83.1499 },
+  Westland: { lat: 42.3242, lng: -83.4002 },
+  Plymouth: { lat: 42.3714, lng: -83.4702 },
+  Ypsilanti: { lat: 42.2411, lng: -83.6130 },
+  Flint: { lat: 43.0125, lng: -83.6875 },
+  Lansing: { lat: 42.7325, lng: -84.5555 },
+  Kalamazoo: { lat: 42.2917, lng: -85.5872 },
+  "Grand Rapids": { lat: 42.9634, lng: -85.6681 },
   // Ohio
   Columbus: { lat: 39.9612, lng: -82.9988 },
   Toledo: { lat: 41.6528, lng: -83.5379 },
   Dublin: { lat: 40.0992, lng: -83.1141 },
   Westerville: { lat: 40.1262, lng: -82.9291 },
+  Hilliard: { lat: 40.0334, lng: -83.1585 },
   "Bowling Green": { lat: 41.3748, lng: -83.6513 },
   Perrysburg: { lat: 41.5570, lng: -83.6271 },
+  Cleveland: { lat: 41.4993, lng: -81.6944 },
+  Cincinnati: { lat: 39.1031, lng: -84.5120 },
+  Dayton: { lat: 39.7589, lng: -84.1916 },
+  Akron: { lat: 41.0814, lng: -81.5190 },
 };
 
 const b = BASE_URL;
