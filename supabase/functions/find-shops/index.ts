@@ -22,6 +22,8 @@ interface ServiceProvider {
   availability: "same_day" | "next_day" | "within_week";
   wrenchli_verified: boolean;
   quote_url: string;
+  is_dealer?: boolean;
+  dealer_brands?: string[];
 }
 
 /* ── Location Mapping ── */
