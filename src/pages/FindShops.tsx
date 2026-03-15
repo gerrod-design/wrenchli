@@ -278,7 +278,7 @@ export default function FindShops() {
                 </div>
               </SectionReveal>
               <SectionReveal delay={100}>
-                <ShopList shops={shops} loading={loading} onShopSelect={setSelectedShop} searchedZip={searched ? zipCode : undefined} />
+                <ShopList shops={shops} loading={loading} onShopSelect={setSelectedShop} searchedZip={searched ? zipCode : undefined} filter={shopFilter} onFilterChange={setShopFilter} />
               </SectionReveal>
             </div>
           )}
