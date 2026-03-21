@@ -89,13 +89,13 @@ export default function UserJourneySelector() {
           </div>
         </SectionReveal>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3 items-stretch">
           {journeys.map((j, i) => (
-            <SectionReveal key={j.title} delay={i * 150}>
+            <SectionReveal key={j.title} delay={i * 150} className="h-full">
               <motion.div
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className={`group relative flex flex-col rounded-xl border border-border bg-card shadow-sm overflow-hidden transition-colors duration-200 ${j.borderHover}`}
+                className={`group relative flex flex-col h-full rounded-xl border border-border bg-card shadow-sm overflow-hidden transition-colors duration-200 ${j.borderHover}`}
               >
                 {/* Subtle gradient overlay */}
                 <div
