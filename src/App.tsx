@@ -90,6 +90,8 @@ function AnimatedRoutes() {
           <Route path="/financing-options" element={<FinancingOptions />} />
           <Route path="/mi-loan-eligibility" element={<MILoanEligibility />} />
           <Route path="/mi-loan-application" element={<MILoanApplication />} />
+          <Route path="/mi-loan/approved" element={<MILoanApproved />} />
+          <Route path="/mi-loan/denied" element={<MILoanDenied />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
