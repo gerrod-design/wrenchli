@@ -385,8 +385,20 @@ function findServiceProviders(params: { location: string; service_type: string; 
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.GENEROUS);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded" }),
+      { status: 429, headers: { ...securityHeaders, ...getRateLimitHeaders(RATE_LIMITS.GENEROUS.maxRequests, rateResult.remaining, rateResult.resetTime), "Content-Type": "application/json" } }
+    );
   }
 
   try {
@@ -395,13 +407,12 @@ serve(async (req) => {
     if (!location || typeof location !== "string") {
       return new Response(JSON.stringify({ error: "Location (ZIP code or city) is required" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...securityHeaders, "Content-Type": "application/json" },
       });
     }
 
     const { providers, city } = findServiceProviders({ location, service_type, price_range, vehicle_make });
 
-    // Add coordinates based on matched city
     const coords = city ? cityCoords[city] : cityCoords["Detroit"];
     const providersWithCoords = providers.map((p, i) => ({
       ...p,
@@ -417,13 +428,13 @@ serve(async (req) => {
         location,
         city: city || "Service Area",
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...securityHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
     console.error("find-shops error:", e);
     return new Response(JSON.stringify({ error: "Invalid request body" }), {
       status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   }
 });
