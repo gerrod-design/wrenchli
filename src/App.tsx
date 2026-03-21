@@ -85,6 +85,9 @@ function AnimatedRoutes() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/financing-options" element={<FinancingOptions />} />
+          <Route path="/mi-loan-eligibility" element={<MILoanEligibility />} />
+          <Route path="/mi-loan-application" element={<MILoanApplication />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
