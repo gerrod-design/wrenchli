@@ -1,15 +1,32 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  // Rate limiting
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STANDARD);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
+      {
+        status: 429,
+        headers: {
+          ...securityHeaders,
+          ...getRateLimitHeaders(RATE_LIMITS.STANDARD.maxRequests, rateResult.remaining, rateResult.resetTime),
+          "Content-Type": "application/json",
+        },
+      },
+    );
   }
 
   try {
@@ -24,7 +41,7 @@ serve(async (req) => {
     } catch {
       return new Response(
         JSON.stringify({ error: "Invalid JSON" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -34,16 +51,15 @@ serve(async (req) => {
     if (!diagnosis_title || !zip_code) {
       return new Response(
         JSON.stringify({ error: "diagnosis_title and zip_code are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Validate ZIP
     const zipClean = (zip_code || "").replace(/\D/g, "").slice(0, 5);
     if (zipClean.length !== 5) {
       return new Response(
         JSON.stringify({ error: "Invalid ZIP code" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -97,42 +113,15 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
                 parameters: {
                   type: "object",
                   properties: {
-                    metro_area: {
-                      type: "string",
-                      description: "The metro area name based on the ZIP code, e.g. 'Detroit Metro Area'",
-                    },
-                    cost_low: {
-                      type: "number",
-                      description: "Low end of the estimated cost range in dollars",
-                    },
-                    cost_high: {
-                      type: "number",
-                      description: "High end of the estimated cost range in dollars",
-                    },
-                    parts_estimate: {
-                      type: "string",
-                      description: "Estimated parts cost range, e.g. '$80–$150'",
-                    },
-                    labor_estimate: {
-                      type: "string",
-                      description: "Estimated labor cost range, e.g. '$120–$250'",
-                    },
-                    labor_hours: {
-                      type: "string",
-                      description: "Estimated labor hours, e.g. '1.5–2.5 hours'",
-                    },
-                    regional_notes: {
-                      type: "string",
-                      description: "Any regional pricing notes, e.g. 'Detroit area labor rates average $95–$130/hr'",
-                    },
-                    what_to_expect: {
-                      type: "string",
-                      description: "Brief 1-2 sentence description of what the repair involves for the customer",
-                    },
-                    warranty_note: {
-                      type: "string",
-                      description: "Typical warranty information for this type of repair",
-                    },
+                    metro_area: { type: "string", description: "The metro area name based on the ZIP code" },
+                    cost_low: { type: "number", description: "Low end of the estimated cost range in dollars" },
+                    cost_high: { type: "number", description: "High end of the estimated cost range in dollars" },
+                    parts_estimate: { type: "string", description: "Estimated parts cost range" },
+                    labor_estimate: { type: "string", description: "Estimated labor cost range" },
+                    labor_hours: { type: "string", description: "Estimated labor hours" },
+                    regional_notes: { type: "string", description: "Regional pricing notes" },
+                    what_to_expect: { type: "string", description: "Brief description of the repair for the customer" },
+                    warranty_note: { type: "string", description: "Typical warranty information" },
                   },
                   required: ["metro_area", "cost_low", "cost_high", "parts_estimate", "labor_estimate", "labor_hours", "regional_notes", "what_to_expect", "warranty_note"],
                   additionalProperties: false,
@@ -149,20 +138,20 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 429, headers: { ...securityHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
         return new Response(
           JSON.stringify({ error: "AI service temporarily unavailable." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 402, headers: { ...securityHeaders, "Content-Type": "application/json" } }
         );
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -171,7 +160,7 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
     if (!toolCall || toolCall.function.name !== "provide_cost_estimate") {
       return new Response(
         JSON.stringify({ error: "Unexpected AI response format" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -196,13 +185,13 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
     }).then(() => {});
 
     return new Response(JSON.stringify(estimate), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("estimate-repair error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   }
 });

@@ -1,8 +1,6 @@
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 const MAX_MESSAGES = 20;
 const MAX_CONTENT_LENGTH = 8000;
@@ -11,7 +9,6 @@ const GEMINI_MODEL = "gemini-2.0-flash-exp";
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 const FUNCTIONS_BASE = Deno.env.get("SUPABASE_URL") + "/functions/v1";
 
-// Function declarations for Gemini (different format than OpenAI)
 const tools = [
   {
     name: "diagnose_vehicle",
@@ -108,7 +105,6 @@ You have tools to:
 
 Keep answers concise, helpful, and friendly.`;
 
-// Execute a tool call
 async function executeTool(
   name: string,
   rawArgs: Record<string, unknown>,
@@ -189,12 +185,11 @@ async function executeTool(
   }
 }
 
-// Validate incoming messages
-function validateMessages(rawMessages: unknown[]): { role: string; content: string }[] | Response {
+function validateMessages(rawMessages: unknown[], secHeaders: Record<string, string>): { role: string; content: string }[] | Response {
   if (rawMessages.length === 0 || rawMessages.length > MAX_MESSAGES) {
     return new Response(
       JSON.stringify({ error: `Messages array must have 1-${MAX_MESSAGES} items` }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 400, headers: { ...secHeaders, "Content-Type": "application/json" } },
     );
   }
 
@@ -209,20 +204,20 @@ function validateMessages(rawMessages: unknown[]): { role: string; content: stri
     ) {
       return new Response(
         JSON.stringify({ error: "Each message must have role and content strings" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...secHeaders, "Content-Type": "application/json" } },
       );
     }
     const { role, content } = msg as { role: string; content: string };
     if (!validRoles.has(role)) {
       return new Response(
         JSON.stringify({ error: "Message role must be 'user' or 'assistant'" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...secHeaders, "Content-Type": "application/json" } },
       );
     }
     if (content.length === 0 || content.length > MAX_CONTENT_LENGTH) {
       return new Response(
         JSON.stringify({ error: `Message content must be 1-${MAX_CONTENT_LENGTH} characters` }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...secHeaders, "Content-Type": "application/json" } },
       );
     }
     messages.push({ role, content });
@@ -230,7 +225,6 @@ function validateMessages(rawMessages: unknown[]): { role: string; content: stri
   return messages;
 }
 
-// Convert chat history to Gemini format
 function toGeminiMessages(messages: { role: string; content: string }[]) {
   return messages.map(m => ({
     role: m.role === "assistant" ? "model" : "user",
@@ -238,10 +232,29 @@ function toGeminiMessages(messages: { role: string; content: string }[]) {
   }));
 }
 
-// Main handler
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  // Rate limiting
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STRICT);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
+      {
+        status: 429,
+        headers: {
+          ...securityHeaders,
+          ...getRateLimitHeaders(RATE_LIMITS.STRICT.maxRequests, rateResult.remaining, rateResult.resetTime),
+          "Content-Type": "application/json",
+        },
+      },
+    );
   }
 
   try {
@@ -255,27 +268,24 @@ Deno.serve(async (req) => {
     } catch {
       return new Response(
         JSON.stringify({ error: "Invalid JSON" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
     if (!body || typeof body !== "object" || !Array.isArray((body as Record<string, unknown>).messages)) {
       return new Response(
         JSON.stringify({ error: "Invalid request format" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const validated = validateMessages((body as Record<string, unknown>).messages as unknown[]);
+    const validated = validateMessages((body as Record<string, unknown>).messages as unknown[], securityHeaders);
     if (validated instanceof Response) return validated;
     const messages = validated;
 
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
-
-    // Convert to Gemini format
     const geminiMessages = toGeminiMessages(messages);
 
-    // Turn 1: Request with tools (non-streaming to detect tool calls)
     const turn1Body = {
       systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
       contents: geminiMessages,
@@ -297,7 +307,7 @@ Deno.serve(async (req) => {
       console.error("Gemini API error (turn 1):", turn1Resp.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -305,10 +315,8 @@ Deno.serve(async (req) => {
     const candidate = turn1Data.candidates?.[0];
     const content = candidate?.content;
 
-    // Check for function calls
     const functionCalls = content?.parts?.filter((p: { functionCall?: unknown }) => p.functionCall) || [];
 
-    // No function calls: return text directly as SSE stream
     if (functionCalls.length === 0) {
       const textParts = content?.parts?.filter((p: { text?: string }) => p.text) || [];
       const text = textParts.map((p: { text: string }) => p.text).join("") || 
@@ -326,11 +334,10 @@ Deno.serve(async (req) => {
         },
       });
       return new Response(stream, {
-        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
       });
     }
 
-    // Execute function calls in parallel
     console.log("Function calls:", JSON.stringify(functionCalls.map((fc: { functionCall: { name: string } }) => fc.functionCall.name)));
 
     const functionResponses = await Promise.all(
@@ -346,7 +353,6 @@ Deno.serve(async (req) => {
       }),
     );
 
-    // Turn 2: Send function results back, request final text answer
     const turn2Contents = [
       ...geminiMessages,
       { role: "model", parts: functionCalls },
@@ -373,7 +379,7 @@ Deno.serve(async (req) => {
       console.error("Gemini API error (turn 2):", turn2Resp.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -383,7 +389,6 @@ Deno.serve(async (req) => {
     const finalText = finalParts.map((p: { text: string }) => p.text).join("") || 
                       "I couldn't process the results. Please try again.";
 
-    // Stream the final response as SSE
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
@@ -397,13 +402,13 @@ Deno.serve(async (req) => {
     });
 
     return new Response(stream, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
     console.error("chat-gemini error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
     );
   }
 });

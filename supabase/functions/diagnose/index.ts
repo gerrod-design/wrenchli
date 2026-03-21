@@ -1,14 +1,31 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  // Rate limiting
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STANDARD);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
+      {
+        status: 429,
+        headers: {
+          ...securityHeaders,
+          ...getRateLimitHeaders(RATE_LIMITS.STANDARD.maxRequests, rateResult.remaining, rateResult.resetTime),
+          "Content-Type": "application/json",
+        },
+      },
+    );
   }
 
   try {
@@ -18,7 +35,7 @@ serve(async (req) => {
     } catch {
       return new Response(
         JSON.stringify({ error: "Invalid JSON" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -27,7 +44,7 @@ serve(async (req) => {
     if (!codes && !symptom) {
       return new Response(
         JSON.stringify({ error: "Provide either 'codes' or 'symptom'" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -113,20 +130,20 @@ serve(async (req) => {
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 429, headers: { ...securityHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
         return new Response(
           JSON.stringify({ error: "AI service temporarily unavailable. Please try again later." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 402, headers: { ...securityHeaders, "Content-Type": "application/json" } }
         );
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -135,19 +152,19 @@ serve(async (req) => {
     if (!toolCall || toolCall.function.name !== "provide_diagnoses") {
       return new Response(
         JSON.stringify({ error: "Unexpected AI response format" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const diagnoses = JSON.parse(toolCall.function.arguments);
     return new Response(JSON.stringify(diagnoses), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("diagnose error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   }
 });
