@@ -43,6 +43,7 @@ import MILoanEligibility from "./pages/MILoanEligibility";
 import MILoanApplication from "./pages/MILoanApplication";
 import MILoanApproved from "./pages/MILoanApproved";
 import MILoanDenied from "./pages/MILoanDenied";
+import MIAffordableLoan from "./pages/MIAffordableLoan";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
