@@ -40,6 +40,8 @@ export default function Index() {
 
       <QuickActionBar />
 
+      <UserJourneySelector />
+
       {/* Value Proposition Cards */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli">
@@ -58,8 +60,6 @@ export default function Index() {
           </div>
         </div>
       </section>
-
-      <UserJourneySelector />
 
       {/* Recommend a Shop */}
       <RecommendShopSection onOpenModal={() => setRecommendOpen(true)} />
