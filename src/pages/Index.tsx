@@ -10,6 +10,7 @@ import HowItWorksVideo from "@/components/HowItWorksVideo";
 import { Button } from "@/components/ui/button";
 import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
+import UserJourneySelector from "@/components/UserJourneySelector";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import WaitlistForm from "@/components/WaitlistForm";
 import { useLocation } from "@/contexts/LocationContext";
@@ -57,6 +58,8 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      <UserJourneySelector />
 
       {/* Recommend a Shop */}
       <RecommendShopSection onOpenModal={() => setRecommendOpen(true)} />
