@@ -41,6 +41,8 @@ import Accessibility from "./pages/Accessibility";
 import FinancingOptions from "./pages/FinancingOptions";
 import MILoanEligibility from "./pages/MILoanEligibility";
 import MILoanApplication from "./pages/MILoanApplication";
+import MILoanApproved from "./pages/MILoanApproved";
+import MILoanDenied from "./pages/MILoanDenied";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
