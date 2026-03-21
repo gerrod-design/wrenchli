@@ -36,6 +36,7 @@ const footerLinks = {
     { label: "Privacy Policy", to: "/privacy" },
     { label: "Terms of Service", to: "/terms" },
     { label: "Accessibility", to: "/accessibility" },
+    { label: "🍪 Manage Cookies", to: "__cookies__" },
   ],
 };
 
