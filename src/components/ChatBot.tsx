@@ -170,15 +170,13 @@ export default function ChatBot() {
         {!open && (
           <motion.div
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
-            className="fixed bottom-[76px] right-4 z-50 flex flex-col items-center gap-1 md:bottom-8 md:right-6 cursor-pointer"
+            className="fixed bottom-[76px] right-4 z-50 flex h-auto w-auto items-center justify-center rounded-2xl bg-primary p-3 text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8 md:right-6 cursor-pointer"
             onClick={handleOpenChat}
           >
-            <div className={!hasInteracted ? "animate-[chat-pulse_2s_ease-in-out_infinite]" : ""}>
+            <div className="flex flex-col items-center gap-1">
               <WrenchliRobot size={0.5} waving={!hasInteracted} />
+              <span className="text-[11px] font-semibold tracking-tight">Ask Wrenchli</span>
             </div>
-            <span className="rounded-full bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow-lg whitespace-nowrap">
-              Ask Wrenchli
-            </span>
           </motion.div>
         )}
       </AnimatePresence>
