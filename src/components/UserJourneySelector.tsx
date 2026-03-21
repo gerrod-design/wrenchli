@@ -19,10 +19,13 @@ const journeys = [
     ],
     primaryCta: { label: "Get Your Free Diagnosis", to: "/#quote" },
     secondaryCta: { label: "How It Works", to: "/for-car-owners" },
-    accentClass: "bg-accent",
+    gradient: "from-accent/8 via-transparent to-accent/4",
+    iconBg: "bg-accent",
     checkClass: "bg-accent/15 text-accent",
     borderHover: "group-hover:border-accent/40",
     barClass: "bg-accent",
+    btnClass: "bg-accent text-accent-foreground hover:bg-accent/90",
+    glowClass: "bg-accent/10",
   },
   {
     icon: Store,
@@ -38,10 +41,13 @@ const journeys = [
     ],
     primaryCta: { label: "Apply to Partner", to: "/for-shops#apply" },
     secondaryCta: { label: "Learn More", to: "/for-shops" },
-    accentClass: "bg-primary",
+    gradient: "from-primary/8 via-transparent to-primary/4",
+    iconBg: "bg-primary",
     checkClass: "bg-primary/15 text-primary",
     borderHover: "group-hover:border-primary/40",
     barClass: "bg-primary",
+    btnClass: "bg-primary text-primary-foreground hover:bg-primary/90",
+    glowClass: "bg-primary/10",
   },
   {
     icon: TrendingUp,
@@ -57,10 +63,13 @@ const journeys = [
     ],
     primaryCta: { label: "View Investment Info", to: "/investors" },
     secondaryCta: { label: "Contact Us", to: "/contact" },
-    accentClass: "bg-emerald-600",
+    gradient: "from-emerald-600/8 via-transparent to-emerald-600/4",
+    iconBg: "bg-emerald-600",
     checkClass: "bg-emerald-600/15 text-emerald-600",
     borderHover: "group-hover:border-emerald-600/40",
     barClass: "bg-emerald-600",
+    btnClass: "bg-emerald-600 text-white hover:bg-emerald-600/90",
+    glowClass: "bg-emerald-600/10",
   },
 ];
 
@@ -88,14 +97,29 @@ export default function UserJourneySelector() {
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className={`group relative flex flex-col rounded-xl border border-border bg-card shadow-sm overflow-hidden transition-colors duration-200 ${j.borderHover}`}
               >
+                {/* Subtle gradient overlay */}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${j.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
+                />
+
+                {/* Large faded background icon */}
+                <div className="absolute -right-6 -top-6 pointer-events-none opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-500">
+                  <j.icon className="h-36 w-36" strokeWidth={1} />
+                </div>
+
                 {/* Content */}
-                <div className="flex flex-col flex-1 p-7">
+                <div className="relative flex flex-col flex-1 p-7">
                   {/* Icon + Title */}
                   <div className="flex items-center gap-3 mb-1">
-                    <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-lg ${j.accentClass} text-white`}
-                    >
-                      <j.icon className="h-5 w-5" />
+                    <div className="relative">
+                      <div
+                        className={`absolute inset-0 rounded-lg ${j.glowClass} scale-150 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                      />
+                      <div
+                        className={`relative flex h-11 w-11 items-center justify-center rounded-lg ${j.iconBg} text-white shadow-sm`}
+                      >
+                        <j.icon className="h-5 w-5" />
+                      </div>
                     </div>
                     <div>
                       <h3 className="font-heading text-lg font-semibold leading-tight">
@@ -129,7 +153,7 @@ export default function UserJourneySelector() {
                   <div className="mt-6 flex flex-col gap-2">
                     <Button
                       asChild
-                      className={`${j.accentClass} text-white hover:opacity-90 transition-opacity`}
+                      className={`${j.btnClass} transition-opacity shadow-sm`}
                     >
                       <Link to={j.primaryCta.to}>
                         {j.primaryCta.label}
