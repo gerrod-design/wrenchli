@@ -1,6 +1,7 @@
 // Check if ZIP is in Michigan
 export function isMichiganZip(zip: string): boolean {
-  const zipNum = parseInt(zip, 10);
+  if (!zip) return false;
+  const zipNum = parseInt(zip.replace(/\D/g, ""), 10);
   return zipNum >= 48000 && zipNum <= 49999;
 }
 
@@ -33,3 +34,14 @@ export const MI_LOAN = {
   maxApr: 36,
   supportPhone: "(800) 242-9790",
 } as const;
+
+// Detect user's state via IP geolocation
+export async function detectUserState(): Promise<string | null> {
+  try {
+    const response = await fetch("https://ipapi.co/json/");
+    const data = await response.json();
+    return data.region_code || null;
+  } catch {
+    return null;
+  }
+}

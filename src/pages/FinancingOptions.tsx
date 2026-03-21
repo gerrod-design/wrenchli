@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  CheckCircle, CreditCard, DollarSign, Building, Shield, Star, Sparkles, ArrowRight,
+  CheckCircle, CreditCard, DollarSign, Building, Star, Sparkles, ArrowRight,
 } from "lucide-react";
+import { isMichiganZip, calculateMonthlyPayment, MI_LOAN } from "@/lib/financing";
 
 export default function FinancingOptions() {
   const [searchParams] = useSearchParams();
@@ -17,13 +18,31 @@ export default function FinancingOptions() {
   const make = searchParams.get("make") || "";
   const model = searchParams.get("model") || "";
 
-  const isMichigan = zip.startsWith("48") || zip.startsWith("49");
-  const miEligibleAmount = repairCost <= 1200;
-  const miMonthly = Math.round((repairCost * 1.36) / 12);
-
+  const isMI = isMichiganZip(zip);
+  const miEligible = repairCost <= MI_LOAN.maxAmount;
+  const miMonthly = calculateMonthlyPayment(repairCost, MI_LOAN.maxApr, MI_LOAN.termMonths);
   const affirmMonthly = Math.round((repairCost * 1.10) / 12);
 
-  const options = [
+  const miLoanCard = {
+    id: "mi-loan",
+    title: "MI Affordable Loan",
+    icon: <Star className="h-6 w-6" />,
+    highlight: true,
+    badge: "🏛️ FEATURED — Michigan Residents Only",
+    amount: `~$${miMonthly}/mo`,
+    subtitle: `${MI_LOAN.termMonths} months • ${MI_LOAN.maxApr}% APR max`,
+    features: [
+      `Up to $${MI_LOAN.maxAmount.toLocaleString()} available`,
+      "✨ No traditional credit check",
+      "✅ State of Michigan program",
+      "🏅 Designed for unexpected car repairs",
+      "Quick eligibility check",
+    ],
+    buttonText: "Check Eligibility",
+    buttonLink: `/mi-loan-eligibility?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${zip}&year=${year}&make=${make}&model=${model}`,
+  };
+
+  const otherOptions = [
     {
       id: "pay-full",
       title: "Pay in Full",
@@ -49,23 +68,6 @@ export default function FinancingOptions() {
       buttonLink: "https://www.affirm.com",
     },
     {
-      id: "mi-loan",
-      title: "MI Affordable Loan",
-      icon: <Star className="h-6 w-6" />,
-      highlight: true,
-      badge: "NEW! Michigan Residents Only",
-      amount: `~$${miMonthly}/mo`,
-      subtitle: "12 months • 36% APR max",
-      features: [
-        "Up to $1,200 available",
-        "✨ No traditional credit check",
-        "✅ State of Michigan program",
-        "Quick eligibility check",
-      ],
-      buttonText: "Check Eligibility",
-      buttonLink: `/mi-loan-eligibility?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${zip}&year=${year}&make=${make}&model=${model}`,
-    },
-    {
       id: "credit-union",
       title: "Credit Union Loan",
       icon: <Building className="h-6 w-6" />,
@@ -78,6 +80,78 @@ export default function FinancingOptions() {
       buttonLink: null,
     },
   ];
+
+  function renderCard(opt: typeof otherOptions[0], featured = false) {
+    return (
+      <Card
+        className={`relative h-full transition-all duration-300 hover:shadow-lg ${
+          featured
+            ? "border-2 border-accent ring-2 ring-accent/20 shadow-xl"
+            : opt.highlight
+            ? "border-2 border-accent ring-2 ring-accent/20"
+            : "border-border"
+        }`}
+      >
+        {opt.badge && (
+          <Badge className="absolute -top-3 left-4 bg-accent text-accent-foreground">
+            <Sparkles className="h-3 w-3 mr-1" />
+            {opt.badge}
+          </Badge>
+        )}
+        {featured && (
+          <div className="absolute -top-3 -right-3 bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+            🎉 NEW!
+          </div>
+        )}
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+              opt.highlight || featured ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"
+            }`}>
+              {opt.icon}
+            </div>
+            <CardTitle className={featured ? "text-xl" : "text-lg"}>{opt.title}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <p className={`font-heading font-extrabold text-foreground ${featured ? "text-4xl" : "text-3xl"}`}>
+              {opt.amount}
+            </p>
+            <p className="text-sm text-muted-foreground">{opt.subtitle}</p>
+          </div>
+          <ul className="space-y-2">
+            {opt.features.map((f, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-sm">
+                <CheckCircle className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
+                <span className="text-muted-foreground">{f}</span>
+              </li>
+            ))}
+          </ul>
+          {opt.buttonLink?.startsWith("/") ? (
+            <Button
+              className={`w-full ${opt.highlight || featured ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
+              variant={opt.highlight || featured ? "default" : "outline"}
+              size={featured ? "lg" : "default"}
+              asChild
+            >
+              <Link to={opt.buttonLink}>
+                {opt.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          ) : opt.buttonLink ? (
+            <Button className="w-full" variant="outline" onClick={() => window.open(opt.buttonLink!, "_blank")}>
+              {opt.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          ) : (
+            <Button className="w-full" variant="outline" disabled>
+              {opt.buttonText}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -101,82 +175,34 @@ export default function FinancingOptions() {
 
       <section className="section-padding bg-background">
         <div className="container-wrenchli max-w-4xl">
-          <div className="grid gap-6 md:grid-cols-2">
-            {options.map((opt, i) => (
+          {/* MI Loan featured card — full width for MI users */}
+          {isMI && miEligible && (
+            <SectionReveal className="mb-6">
+              {renderCard(miLoanCard, true)}
+            </SectionReveal>
+          )}
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {otherOptions.map((opt, i) => (
               <SectionReveal key={opt.id} delay={i * 80}>
-                <Card
-                  className={`relative h-full transition-shadow hover:shadow-lg ${
-                    opt.highlight
-                      ? "border-2 border-accent ring-2 ring-accent/20"
-                      : "border-border"
-                  }`}
-                >
-                  {opt.badge && (
-                    <Badge className="absolute -top-3 left-4 bg-accent text-accent-foreground">
-                      <Sparkles className="h-3 w-3 mr-1" />
-                      {opt.badge}
-                    </Badge>
-                  )}
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                        opt.highlight ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"
-                      }`}>
-                        {opt.icon}
-                      </div>
-                      <CardTitle className="text-lg">{opt.title}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <p className="font-heading text-3xl font-extrabold text-foreground">{opt.amount}</p>
-                      <p className="text-sm text-muted-foreground">{opt.subtitle}</p>
-                    </div>
-                    <ul className="space-y-2">
-                      {opt.features.map((f, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="h-4 w-4 text-green-600 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    {opt.buttonLink?.startsWith("/") ? (
-                      <Button
-                        className={`w-full ${opt.highlight ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
-                        variant={opt.highlight ? "default" : "outline"}
-                        asChild
-                      >
-                        <Link to={opt.buttonLink}>
-                          {opt.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    ) : opt.buttonLink ? (
-                      <Button
-                        className="w-full"
-                        variant="outline"
-                        onClick={() => window.open(opt.buttonLink!, "_blank")}
-                      >
-                        {opt.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button className="w-full" variant="outline" disabled>
-                        {opt.buttonText}
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
+                {renderCard(opt)}
               </SectionReveal>
             ))}
           </div>
 
-          {isMichigan && miEligibleAmount && (
-            <SectionReveal delay={400}>
-              <div className="mt-8 rounded-2xl border border-accent/30 bg-accent/5 p-6 text-center">
-                <Shield className="h-8 w-8 text-accent mx-auto mb-2" />
+          {/* Show MI Loan as smaller card for non-MI or over-limit */}
+          {(!isMI || !miEligible) && (
+            <SectionReveal delay={300}>
+              <div className="mt-6 rounded-xl border border-border bg-muted/50 p-6 text-center">
+                <Star className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  Based on your ZIP code <span className="font-mono font-semibold">{zip}</span>, you may qualify for the
-                  <span className="font-semibold text-foreground"> MI Affordable Loan</span> program.
+                  <span className="font-semibold text-foreground">MI Affordable Loan</span> — Available to Michigan residents for repairs under $1,200.
+                  {!isMI && " Enter a Michigan ZIP code to check eligibility."}
+                  {isMI && !miEligible && " This repair exceeds the $1,200 limit."}
                 </p>
+                <Button variant="outline" size="sm" className="mt-3" asChild>
+                  <Link to="/mi-affordable-loan">Learn More</Link>
+                </Button>
               </div>
             </SectionReveal>
           )}
