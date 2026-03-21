@@ -38,7 +38,9 @@ import DamageDiagnosis from "./pages/DamageDiagnosis";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
-
+import FinancingOptions from "./pages/FinancingOptions";
+import MILoanEligibility from "./pages/MILoanEligibility";
+import MILoanApplication from "./pages/MILoanApplication";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -83,6 +85,9 @@ function AnimatedRoutes() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/financing-options" element={<FinancingOptions />} />
+          <Route path="/mi-loan-eligibility" element={<MILoanEligibility />} />
+          <Route path="/mi-loan-application" element={<MILoanApplication />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>

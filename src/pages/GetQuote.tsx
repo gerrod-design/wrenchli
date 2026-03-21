@@ -441,8 +441,23 @@ export default function GetQuote() {
               />
             </SectionReveal>
 
+            {/* Financing CTA */}
+            <SectionReveal delay={210}>
+              <div className="rounded-2xl border-2 border-primary bg-primary/5 p-6 md:p-8">
+                <h3 className="font-heading text-xl font-bold mb-2">💳 Need Help Paying?</h3>
+                <p className="text-muted-foreground mb-4">
+                  We offer flexible financing options — including Michigan's MI Affordable Loan program — to help you afford your repair.
+                </p>
+                <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold" asChild>
+                  <Link to={`/financing-options?repair=${Math.round((estimate.cost_low + estimate.cost_high) / 2)}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${zipCode.replace(/\D/g, "").slice(0, 5)}&year=${year}&make=${make}&model=${model}`}>
+                    View Financing Options →
+                  </Link>
+                </Button>
+              </div>
+            </SectionReveal>
+
             {/* Contextual Advertising */}
-            <SectionReveal delay={225}>
+            <SectionReveal delay={250}>
               <ContextualAdvertising
                 diagnosis={diagnosis}
                 diagnosisCode={code}
