@@ -64,10 +64,11 @@ export default function MILoanApplication() {
   const make = searchParams.get("make") || "";
   const model = searchParams.get("model") || "";
 
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>({ ...initialForm, zip });
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
 
   const monthlyPayment = Math.round((repairCost * 1.36) / 12);
   const totalCost = Math.round(repairCost * 1.36);
