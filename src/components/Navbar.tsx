@@ -28,11 +28,22 @@ const navItems: NavItem[] = [
       { label: "How It Works", to: "/for-car-owners" },
       { label: "Vehicle Insights", to: "/vehicle-insights" },
       { label: "Photo Damage Diagnosis", to: "/damage-diagnosis" },
+      { label: "Find Shops", to: "/find-shops" },
       { label: "Financing", to: "/for-car-owners#financing" },
     ],
   },
-  { label: "Find Shops", to: "/find-shops" },
+  {
+    label: "For Shops",
+    to: "/for-shops",
+    dropdown: [
+      { label: "Partner Program", to: "/for-shops" },
+      { label: "How It Works", to: "/for-shops#how-it-works" },
+      { label: "Shop Software", to: "/for-shops#features" },
+      { label: "💬 Recommend a Shop", to: "__recommend__" },
+    ],
+  },
   { label: "About", to: "/about" },
+  { label: "Investors", to: "/investors" },
   { label: "Contact", to: "/contact" },
 ];
 
@@ -152,8 +163,11 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 lg:flex">
           <NotificationBell />
           <GarageDropdown />
+          <Button asChild variant="ghost" size="sm" className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10">
+            <Link to="/investors">Investors</Link>
+          </Button>
           <Button asChild variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
-            <Link to="/for-shops#apply">Partner With Us</Link>
+            <Link to="/for-shops#apply">For Shops</Link>
           </Button>
           <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
             <Link to="/#quote">Get a Quote</Link>
@@ -250,11 +264,14 @@ export default function Navbar() {
           </div>
 
           <div className="mt-6 flex flex-col gap-3">
-            <Button asChild variant="outline" className="h-12 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground text-base" onClick={() => setOpen(false)}>
-              <Link to="/for-shops#apply">Partner With Us</Link>
-            </Button>
             <Button asChild className="h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-base" onClick={() => setOpen(false)}>
               <Link to="/#quote">Get a Quote</Link>
+            </Button>
+            <Button asChild variant="outline" className="h-12 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground text-base" onClick={() => setOpen(false)}>
+              <Link to="/for-shops#apply">For Shops</Link>
+            </Button>
+            <Button asChild variant="ghost" className="h-12 text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 text-base" onClick={() => setOpen(false)}>
+              <Link to="/investors">Investors</Link>
             </Button>
           </div>
         </div>
