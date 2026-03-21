@@ -34,6 +34,8 @@ export default function Index() {
         description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Michigan and Ohio."
         path="/"
       />
+      <MILoanBanner />
+
       {/* Cinematic Hero */}
       <CinematicHero />
 
