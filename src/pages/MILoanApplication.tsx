@@ -86,7 +86,6 @@ export default function MILoanApplication() {
     }
     setSubmitting(true);
     try {
-      // Track MI loan application as a finance selection
       await supabase.from("finance_selections" as any).insert({
         provider: "MI Affordable Loan",
         option_type: "state_program",
@@ -101,14 +100,24 @@ export default function MILoanApplication() {
         zip_code: form.zip || null,
       } as any);
 
-      setSubmitted(true);
-      toast.success("Application submitted successfully!");
+      // Demo: show reviewing state then route to approved
+      setSubmitting(false);
+      setReviewing(true);
     } catch (e) {
       console.error("Submit error:", e);
       toast.error("Something went wrong. Please try again.");
-    } finally {
       setSubmitting(false);
     }
+  };
+
+  // Demo: after 3 seconds of reviewing, navigate to approved
+  useEffect(() => {
+    if (!reviewing) return;
+    const timer = setTimeout(() => {
+      navigate(`/mi-loan/approved?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}`);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [reviewing, navigate, repairCost, diagnosis]);
   };
 
   if (submitted) {
