@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus } from "lucide-react";
+import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus } from "lucide-react";
+import WrenchliRobot from "./WrenchliRobot";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -167,17 +168,18 @@ export default function ChatBot() {
 
       <AnimatePresence>
         {!open && (
-          <motion.button
+          <motion.div
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
+            className="fixed bottom-[76px] right-4 z-50 flex flex-col items-center gap-1 md:bottom-8 md:right-6 cursor-pointer"
             onClick={handleOpenChat}
-            className={`fixed bottom-[76px] right-4 z-50 flex h-12 items-center gap-2 rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8 md:right-6 px-4 ${
-              !hasInteracted ? "animate-[chat-pulse_2s_ease-in-out_infinite]" : ""
-            }`}
-            aria-label="Open chat"
           >
-            <MessageCircle className="h-5 w-5 shrink-0" />
-            <span className="text-sm font-medium whitespace-nowrap">Ask Wrenchli</span>
-          </motion.button>
+            <div className={!hasInteracted ? "animate-[chat-pulse_2s_ease-in-out_infinite]" : ""}>
+              <WrenchliRobot size={0.5} waving={!hasInteracted} />
+            </div>
+            <span className="rounded-full bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold shadow-lg whitespace-nowrap">
+              Ask Wrenchli
+            </span>
+          </motion.div>
         )}
       </AnimatePresence>
 
