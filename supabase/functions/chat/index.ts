@@ -294,7 +294,8 @@ function buildAiMessages(
 
 // ── Validate incoming messages ──
 function validateMessages(
-  rawMessages: unknown[]
+  rawMessages: unknown[],
+  securityHeaders: Record<string, string>,
 ): Array<{ role: string; content: string; image_urls?: string[] }> | Response {
   if (rawMessages.length === 0 || rawMessages.length > MAX_MESSAGES) {
     return new Response(
