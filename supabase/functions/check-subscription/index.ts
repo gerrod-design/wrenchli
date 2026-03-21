@@ -1,12 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "npm:stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 const logStep = (step: string, details?: unknown) => {
   const d = details ? ` - ${JSON.stringify(details)}` : "";
@@ -14,8 +11,20 @@ const logStep = (step: string, details?: unknown) => {
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STANDARD);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded" }),
+      { status: 429, headers: { ...securityHeaders, ...getRateLimitHeaders(RATE_LIMITS.STANDARD.maxRequests, rateResult.remaining, rateResult.resetTime), "Content-Type": "application/json" } }
+    );
   }
 
   const supabaseClient = createClient(
@@ -46,20 +55,14 @@ serve(async (req) => {
     if (customers.data.length === 0) {
       logStep("No Stripe customer found");
       return new Response(JSON.stringify({ subscribed: false }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
+        headers: { ...securityHeaders, "Content-Type": "application/json" }, status: 200,
       });
     }
 
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "active",
-      limit: 1,
-    });
-
+    const subscriptions = await stripe.subscriptions.list({ customer: customerId, status: "active", limit: 1 });
     const hasActiveSub = subscriptions.data.length > 0;
     let productId: string | null = null;
     let subscriptionEnd: string | null = null;
@@ -70,43 +73,21 @@ serve(async (req) => {
       productId = subscription.items.data[0].price.product as string;
       logStep("Active subscription found", { productId, subscriptionEnd });
 
-      // Sync developer_accounts table
       const { data: devAccount } = await supabaseClient
-        .from("developer_accounts")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
+        .from("developer_accounts").select("id").eq("user_id", user.id).maybeSingle();
 
-      // Determine tier & limit from product
-      let tier = "free";
-      let limit = 50;
-      // We match on product ID - the caller can also do this client-side
-      // For now, map based on price in subscription
+      let tier = "free"; let limit = 50;
       const priceId = subscription.items.data[0].price.id;
-      // Pro = price_1T1RFeGgIpvcscSeSqFbCitS, Enterprise = price_1T1RHBGgIpvcscSeOjZjBECx
-      if (priceId === "price_1T1RFeGgIpvcscSeSqFbCitS") {
-        tier = "pro";
-        limit = 500;
-      } else if (priceId === "price_1T1RHBGgIpvcscSeOjZjBECx") {
-        tier = "enterprise";
-        limit = 5000;
-      }
+      if (priceId === "price_1T1RFeGgIpvcscSeSqFbCitS") { tier = "pro"; limit = 500; }
+      else if (priceId === "price_1T1RHBGgIpvcscSeOjZjBECx") { tier = "enterprise"; limit = 5000; }
 
       if (devAccount) {
-        await supabaseClient
-          .from("developer_accounts")
-          .update({
-            subscription_tier: tier,
-            monthly_call_limit: limit,
-            stripe_customer_id: customerId,
-          })
+        await supabaseClient.from("developer_accounts")
+          .update({ subscription_tier: tier, monthly_call_limit: limit, stripe_customer_id: customerId })
           .eq("id", devAccount.id);
       } else {
         await supabaseClient.from("developer_accounts").insert({
-          user_id: user.id,
-          subscription_tier: tier,
-          monthly_call_limit: limit,
-          stripe_customer_id: customerId,
+          user_id: user.id, subscription_tier: tier, monthly_call_limit: limit, stripe_customer_id: customerId,
         });
       }
       logStep("Developer account synced", { tier, limit });
@@ -115,22 +96,14 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({
-        subscribed: hasActiveSub,
-        product_id: productId,
-        subscription_end: subscriptionEnd,
-      }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      },
+      JSON.stringify({ subscribed: hasActiveSub, product_id: productId, subscription_end: subscriptionEnd }),
+      { headers: { ...securityHeaders, "Content-Type": "application/json" }, status: 200 },
     );
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: msg });
     return new Response(JSON.stringify({ error: msg }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      headers: { ...securityHeaders, "Content-Type": "application/json" }, status: 500,
     });
   }
 });

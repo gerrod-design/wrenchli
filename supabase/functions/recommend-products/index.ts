@@ -1,47 +1,44 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STANDARD);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
+      { status: 429, headers: { ...securityHeaders, ...getRateLimitHeaders(RATE_LIMITS.STANDARD.maxRequests, rateResult.remaining, rateResult.resetTime), "Content-Type": "application/json" } }
+    );
   }
 
   try {
     const body = await req.json().catch(() => ({}));
-    const {
-      diagnosis_title,
-      diagnosis_code,
-      vehicle_year,
-      vehicle_make,
-      vehicle_model,
-      vehicle_trim,
-    } = body as Record<string, string>;
+    const { diagnosis_title, diagnosis_code, vehicle_year, vehicle_make, vehicle_model, vehicle_trim } = body as Record<string, string>;
 
     if (!diagnosis_title) {
       return new Response(
         JSON.stringify({ error: "diagnosis_title is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const vehicleStr = [vehicle_year, vehicle_make, vehicle_model, vehicle_trim]
-      .filter(Boolean)
-      .join(" ");
+    const vehicleStr = [vehicle_year, vehicle_make, vehicle_model, vehicle_trim].filter(Boolean).join(" ");
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
@@ -51,10 +48,7 @@ serve(async (req) => {
           },
           {
             role: "user",
-            content: `Diagnosis: ${diagnosis_title}${diagnosis_code ? ` (Code: ${diagnosis_code})` : ""}
-Vehicle: ${vehicleStr || "Unknown"}
-
-Recommend 3 specific products to fix this issue.`,
+            content: `Diagnosis: ${diagnosis_title}${diagnosis_code ? ` (Code: ${diagnosis_code})` : ""}\nVehicle: ${vehicleStr || "Unknown"}\n\nRecommend 3 specific products to fix this issue.`,
           },
         ],
         tools: [
@@ -103,7 +97,7 @@ Recommend 3 specific products to fix this issue.`,
       console.error("AI gateway error:", response.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
-        { status: response.status >= 400 && response.status < 500 ? response.status : 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: response.status >= 400 && response.status < 500 ? response.status : 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -112,19 +106,19 @@ Recommend 3 specific products to fix this issue.`,
     if (!toolCall || toolCall.function.name !== "provide_product_recommendations") {
       return new Response(
         JSON.stringify({ error: "Unexpected AI response format" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const recommendations = JSON.parse(toolCall.function.arguments);
     return new Response(JSON.stringify(recommendations), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("recommend-products error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   }
 });

@@ -1,8 +1,6 @@
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 interface ValueRequest {
   year: number;
@@ -15,8 +13,20 @@ interface ValueRequest {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STANDARD);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Rate limit exceeded" }),
+      { status: 429, headers: { ...securityHeaders, ...getRateLimitHeaders(RATE_LIMITS.STANDARD.maxRequests, rateResult.remaining, rateResult.resetTime), "Content-Type": "application/json" } }
+    );
   }
 
   try {
@@ -26,7 +36,7 @@ Deno.serve(async (req) => {
     if (!year || !make || !model || !mileage) {
       return new Response(
         JSON.stringify({ success: false, error: "year, make, model, and mileage are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -60,7 +70,7 @@ Be accurate and realistic. Consider current used car market conditions, supply/d
     if (!LOVABLE_API_KEY) {
       return new Response(
         JSON.stringify({ success: false, error: "AI service not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -83,16 +93,14 @@ Be accurate and realistic. Consider current used car market conditions, supply/d
       console.error("AI gateway error:", aiResp.status, errText);
       return new Response(
         JSON.stringify({ success: false, error: "Valuation service temporarily unavailable" }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 502, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const aiData = await aiResp.json();
     const rawContent = aiData.choices?.[0]?.message?.content ?? "";
-    
-    // Strip markdown fences if present
     const jsonStr = rawContent.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    
+
     let valuation;
     try {
       valuation = JSON.parse(jsonStr);
@@ -100,23 +108,19 @@ Be accurate and realistic. Consider current used car market conditions, supply/d
       console.error("Failed to parse AI response:", rawContent);
       return new Response(
         JSON.stringify({ success: false, error: "Failed to parse valuation response" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        vehicle: { year, make, model, trim, mileage },
-        valuation,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ success: true, vehicle: { year, make, model, trim, mileage }, valuation }),
+      { headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
     console.error("estimate-vehicle-value error:", err);
     return new Response(
       JSON.stringify({ success: false, error: err instanceof Error ? err.message : "Valuation failed" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   }
 });

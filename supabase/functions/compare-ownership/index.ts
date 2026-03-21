@@ -1,33 +1,36 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STANDARD);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
+      { status: 429, headers: { ...securityHeaders, ...getRateLimitHeaders(RATE_LIMITS.STANDARD.maxRequests, rateResult.remaining, rateResult.resetTime), "Content-Type": "application/json" } }
+    );
+  }
 
   try {
     const {
-      current_vehicle,
-      repair_cost_low,
-      repair_cost_high,
-      replacement_year,
-      replacement_make,
-      replacement_model,
-      replacement_price,
-      replacement_url,
-      zip_code,
+      current_vehicle, repair_cost_low, repair_cost_high,
+      replacement_year, replacement_make, replacement_model,
+      replacement_price, replacement_url, zip_code,
     } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const replacementDesc = [replacement_year, replacement_make, replacement_model]
-      .filter(Boolean)
-      .join(" ");
+    const replacementDesc = [replacement_year, replacement_make, replacement_model].filter(Boolean).join(" ");
 
     const prompt = `You are an automotive financial advisor. Compare the total cost of ownership (TCO) over 3 years for two options:
 
@@ -54,10 +57,7 @@ Use the tool "compare_tco" to return structured results. Be realistic with estim
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [{ role: "user", content: prompt }],
@@ -73,12 +73,9 @@ Use the tool "compare_tco" to return structured results. Be realistic with estim
                   repair_option: {
                     type: "object",
                     properties: {
-                      upfront_cost: { type: "number" },
-                      monthly_payment: { type: "number" },
-                      annual_insurance: { type: "number" },
-                      annual_depreciation: { type: "number" },
-                      maintenance_3yr: { type: "number" },
-                      total_3yr: { type: "number" },
+                      upfront_cost: { type: "number" }, monthly_payment: { type: "number" },
+                      annual_insurance: { type: "number" }, annual_depreciation: { type: "number" },
+                      maintenance_3yr: { type: "number" }, total_3yr: { type: "number" },
                     },
                     required: ["upfront_cost", "monthly_payment", "annual_insurance", "annual_depreciation", "maintenance_3yr", "total_3yr"],
                     additionalProperties: false,
@@ -86,22 +83,15 @@ Use the tool "compare_tco" to return structured results. Be realistic with estim
                   replace_option: {
                     type: "object",
                     properties: {
-                      upfront_cost: { type: "number" },
-                      monthly_payment: { type: "number" },
-                      annual_insurance: { type: "number" },
-                      annual_depreciation: { type: "number" },
-                      maintenance_3yr: { type: "number" },
-                      total_3yr: { type: "number" },
+                      upfront_cost: { type: "number" }, monthly_payment: { type: "number" },
+                      annual_insurance: { type: "number" }, annual_depreciation: { type: "number" },
+                      maintenance_3yr: { type: "number" }, total_3yr: { type: "number" },
                     },
                     required: ["upfront_cost", "monthly_payment", "annual_insurance", "annual_depreciation", "maintenance_3yr", "total_3yr"],
                     additionalProperties: false,
                   },
                   recommendation: { type: "string", description: "A 2-3 sentence plain-English recommendation." },
-                  assumptions: {
-                    type: "array",
-                    items: { type: "string" },
-                    description: "Key assumptions made in the estimate.",
-                  },
+                  assumptions: { type: "array", items: { type: "string" }, description: "Key assumptions made in the estimate." },
                   savings_amount: { type: "number", description: "How much cheaper the better option is over 3 years." },
                   better_option: { type: "string", enum: ["repair", "replace"], description: "Which option is cheaper over 3 years." },
                 },
@@ -118,14 +108,12 @@ Use the tool "compare_tco" to return structured results. Be realistic with estim
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...securityHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "AI service credits exhausted." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...securityHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
@@ -138,15 +126,14 @@ Use the tool "compare_tco" to return structured results. Be realistic with estim
     if (!toolCall) throw new Error("No structured response from AI");
 
     const result = JSON.parse(toolCall.function.arguments);
-
     return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("compare-ownership error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   }
 });
