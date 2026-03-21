@@ -19,7 +19,7 @@ serve(async (req) => {
   if (optionsResp) return optionsResp;
 
   const rateLimitId = getRateLimitIdentifier(req);
-  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STRICT);
+  const rateResult = await checkRateLimit(rateLimitId, RATE_LIMITS.STRICT);
   if (!rateResult.allowed) {
     return new Response(
       JSON.stringify({ error: "Rate limit exceeded" }),

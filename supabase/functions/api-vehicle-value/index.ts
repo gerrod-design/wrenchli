@@ -1,11 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-api-key",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 /* ── MSRP Database ── */
 const MSRP_DATABASE: Record<string, number> = {
@@ -38,13 +34,9 @@ const MSRP_DATABASE: Record<string, number> = {
 };
 
 const BRAND_AVERAGES: Record<string, number> = {
-  Honda: 28000, Toyota: 29000, Ford: 32000, Chevrolet: 31000,
-  BMW: 45000, "Mercedes-Benz": 52000, Audi: 48000, Nissan: 26000,
-  Hyundai: 24000, Kia: 23000, Subaru: 29000, Mazda: 27000,
-  Volkswagen: 30000, Jeep: 34000, Ram: 36000, GMC: 38000,
-  Dodge: 30000, Lexus: 42000, Acura: 37000, Infiniti: 40000,
-  Buick: 32000, Cadillac: 46000, Lincoln: 48000, Volvo: 42000,
-  Tesla: 45000, Chrysler: 30000,
+  Honda: 28000, Toyota: 29000, Ford: 32000, Chevrolet: 31000, BMW: 45000, "Mercedes-Benz": 52000, Audi: 48000, Nissan: 26000,
+  Hyundai: 24000, Kia: 23000, Subaru: 29000, Mazda: 27000, Volkswagen: 30000, Jeep: 34000, Ram: 36000, GMC: 38000,
+  Dodge: 30000, Lexus: 42000, Acura: 37000, Infiniti: 40000, Buick: 32000, Cadillac: 46000, Lincoln: 48000, Volvo: 42000, Tesla: 45000, Chrysler: 30000,
 };
 
 const RELIABLE_BRANDS = ["Honda", "Toyota", "Mazda", "Subaru"];
@@ -53,59 +45,29 @@ const LESS_RELIABLE_BRANDS = ["BMW", "Mercedes-Benz", "Audi", "Jaguar", "Land Ro
 function estimateMSRP(make: string, model: string, year: number): number {
   const key = `${make}-${model}-${year}`;
   if (MSRP_DATABASE[key]) return MSRP_DATABASE[key];
-  const base = BRAND_AVERAGES[make] ?? 30000;
-  return Math.max(base + (year - 2020) * 1000, 15000);
+  return Math.max((BRAND_AVERAGES[make] ?? 30000) + (year - 2020) * 1000, 15000);
 }
 
 function estimateValue(make: string, model: string, year: number, mileage: number) {
-  const currentYear = new Date().getFullYear();
-  const age = currentYear - year;
+  const age = new Date().getFullYear() - year;
   const baseMSRP = estimateMSRP(make, model, year);
-
   let depRate = 0;
   if (age >= 1) depRate += 0.20;
   if (age >= 2) depRate += 0.15;
   if (age >= 3) depRate += Math.min(age - 2, 5) * 0.10;
   if (age > 7) depRate += (age - 7) * 0.05;
   const ageDepreciation = baseMSRP * Math.min(depRate, 0.85);
-
-  const expectedMileage = age * 12000;
-  const mileageAdjustment = (mileage - expectedMileage) * 0.15;
+  const mileageAdjustment = (mileage - age * 12000) * 0.15;
   const regionalAdjustment = baseMSRP * 0.02;
-
-  const currentValue = Math.max(
-    Math.round(baseMSRP - ageDepreciation - mileageAdjustment - regionalAdjustment),
-    500,
-  );
-
+  const currentValue = Math.max(Math.round(baseMSRP - ageDepreciation - mileageAdjustment - regionalAdjustment), 500);
   const marketTrend: "up" | "down" | "stable" = age <= 3 ? "stable" : age >= 10 ? "down" : "stable";
-  const optimalSellWindow = age >= 5 && age <= 8 && mileage < 100000;
-
-  return {
-    current_value: currentValue,
-    confidence: 85,
-    breakdown: {
-      base_msrp: Math.round(baseMSRP),
-      age_depreciation: Math.round(ageDepreciation),
-      mileage_adjustment: Math.round(mileageAdjustment),
-      regional_adjustment: Math.round(regionalAdjustment),
-    },
-    market_trend: marketTrend,
-    optimal_sell_window: optimalSellWindow,
-  };
+  return { current_value: currentValue, confidence: 85, breakdown: { base_msrp: Math.round(baseMSRP), age_depreciation: Math.round(ageDepreciation), mileage_adjustment: Math.round(mileageAdjustment), regional_adjustment: Math.round(regionalAdjustment) }, market_trend: marketTrend, optimal_sell_window: age >= 5 && age <= 8 && mileage < 100000 };
 }
 
-function analyzeRepairVsReplace(
-  vehicleValue: number,
-  repairCost: number,
-  year: number,
-  mileage: number,
-  make: string,
-) {
+function analyzeRepairVsReplace(vehicleValue: number, repairCost: number, year: number, mileage: number, make: string) {
   const age = new Date().getFullYear() - year;
   const costRatio = repairCost / vehicleValue;
   const repairPercentage = Math.round(costRatio * 100);
-
   let threshold = 0.20;
   if (age <= 3) threshold = 0.25;
   if (age >= 9) threshold = 0.15;
@@ -114,164 +76,79 @@ function analyzeRepairVsReplace(
   if (RELIABLE_BRANDS.includes(make)) threshold += 0.03;
   if (LESS_RELIABLE_BRANDS.includes(make) && age > 7) threshold -= 0.03;
 
-  let recommendation: "repair_recommended" | "consider_replacement" | "replace_recommended";
-  let reasoning: string;
-
-  if (costRatio < threshold * 0.6) {
-    recommendation = "repair_recommended";
-    reasoning = `At ${repairPercentage}% of vehicle value, this repair is financially sound and will extend your vehicle's life significantly.`;
-  } else if (costRatio < threshold) {
-    recommendation = "repair_recommended";
-    reasoning = `At ${repairPercentage}% of vehicle value, repair is still the better financial choice, though you should consider your long-term vehicle plans.`;
-  } else if (costRatio < threshold * 1.5) {
-    recommendation = "consider_replacement";
-    reasoning = `At ${repairPercentage}% of vehicle value, you should compare repair costs against upgrading to a newer, more reliable vehicle.`;
-  } else {
-    recommendation = "replace_recommended";
-    reasoning = `At ${repairPercentage}% of vehicle value, replacement would likely provide better long-term value and reliability.`;
-  }
+  let recommendation: string, reasoning: string;
+  if (costRatio < threshold * 0.6) { recommendation = "repair_recommended"; reasoning = `At ${repairPercentage}% of vehicle value, this repair is financially sound.`; }
+  else if (costRatio < threshold) { recommendation = "repair_recommended"; reasoning = `At ${repairPercentage}% of vehicle value, repair is still the better financial choice.`; }
+  else if (costRatio < threshold * 1.5) { recommendation = "consider_replacement"; reasoning = `At ${repairPercentage}% of vehicle value, compare repair costs against upgrading.`; }
+  else { recommendation = "replace_recommended"; reasoning = `At ${repairPercentage}% of vehicle value, replacement would likely provide better long-term value.`; }
 
   return { repair_percentage: repairPercentage, recommendation, reasoning };
 }
 
-/* ── Hash API key ── */
 async function hashApiKey(key: string): Promise<string> {
   const encoded = new TextEncoder().encode(key);
   const buf = await crypto.subtle.digest("SHA-256", encoded);
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/* ── Handler ── */
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: { ...securityHeaders, "Content-Type": "application/json" } });
   }
 
-  // --- Auth ---
   const apiKey = req.headers.get("x-api-key");
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Missing API key. Include x-api-key header." }), {
-      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+  if (!apiKey) return new Response(JSON.stringify({ error: "Missing API key. Include x-api-key header." }), { status: 401, headers: { ...securityHeaders, "Content-Type": "application/json" } });
 
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
-
+  const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const keyHash = await hashApiKey(apiKey);
 
-  const { data: keyRecord, error: keyError } = await supabase
-    .from("api_keys")
-    .select("id, is_active, rate_limit_per_minute")
-    .eq("key_hash", keyHash)
-    .maybeSingle();
+  const { data: keyRecord, error: keyError } = await supabase.from("api_keys").select("id, is_active, rate_limit_per_minute").eq("key_hash", keyHash).maybeSingle();
+  if (keyError || !keyRecord) return new Response(JSON.stringify({ error: "Invalid API key." }), { status: 403, headers: { ...securityHeaders, "Content-Type": "application/json" } });
+  if (!keyRecord.is_active) return new Response(JSON.stringify({ error: "API key is deactivated." }), { status: 403, headers: { ...securityHeaders, "Content-Type": "application/json" } });
 
-  if (keyError || !keyRecord) {
-    return new Response(JSON.stringify({ error: "Invalid API key." }), {
-      status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-  if (!keyRecord.is_active) {
-    return new Response(JSON.stringify({ error: "API key is deactivated." }), {
-      status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
-  // --- Rate Limiting ---
   const windowStart = new Date(Date.now() - 60_000).toISOString();
-  const { count } = await supabase
-    .from("api_rate_limits")
-    .select("*", { count: "exact", head: true })
-    .eq("key_hash", keyHash)
-    .gte("requested_at", windowStart);
-
+  const { count } = await supabase.from("api_rate_limits").select("*", { count: "exact", head: true }).eq("key_hash", keyHash).gte("requested_at", windowStart);
   if ((count ?? 0) >= keyRecord.rate_limit_per_minute) {
-    return new Response(JSON.stringify({
-      error: "Rate limit exceeded.", limit_per_minute: keyRecord.rate_limit_per_minute, retry_after_seconds: 60,
-    }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" } });
+    return new Response(JSON.stringify({ error: "Rate limit exceeded.", limit_per_minute: keyRecord.rate_limit_per_minute, retry_after_seconds: 60 }), { status: 429, headers: { ...securityHeaders, "Content-Type": "application/json", "Retry-After": "60" } });
   }
 
   supabase.from("api_rate_limits").insert({ key_hash: keyHash }).then(() => {});
   supabase.from("api_keys").update({ last_used_at: new Date().toISOString() }).eq("id", keyRecord.id).then(() => {});
   if (Math.random() < 0.05) supabase.rpc("cleanup_old_rate_limits").then(() => {});
 
-  // --- Process ---
   const requestStart = Date.now();
   try {
     const body = await req.json();
     const { vehicle, repair_cost } = body;
 
     if (!vehicle || !vehicle.year || !vehicle.make || !vehicle.model || !vehicle.mileage) {
-      return new Response(JSON.stringify({ error: "Vehicle year, make, model, and mileage are required" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(JSON.stringify({ error: "Vehicle year, make, model, and mileage are required" }), { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } });
     }
-    if (vehicle.year < 1990 || vehicle.year > new Date().getFullYear() + 1) {
-      return new Response(JSON.stringify({ error: "Invalid vehicle year" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    if (vehicle.mileage < 0 || vehicle.mileage > 500000) {
-      return new Response(JSON.stringify({ error: "Invalid mileage" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    if (vehicle.year < 1990 || vehicle.year > new Date().getFullYear() + 1) return new Response(JSON.stringify({ error: "Invalid vehicle year" }), { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } });
+    if (vehicle.mileage < 0 || vehicle.mileage > 500000) return new Response(JSON.stringify({ error: "Invalid mileage" }), { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } });
 
     const valuation = estimateValue(vehicle.make, vehicle.model, vehicle.year, vehicle.mileage);
-
-    let tradeVsRepair = undefined;
-    if (repair_cost && repair_cost > 0) {
-      tradeVsRepair = analyzeRepairVsReplace(
-        valuation.current_value, repair_cost, vehicle.year, vehicle.mileage, vehicle.make,
-      );
-    }
+    const tradeVsRepair = repair_cost && repair_cost > 0 ? analyzeRepairVsReplace(valuation.current_value, repair_cost, vehicle.year, vehicle.mileage, vehicle.make) : undefined;
 
     const baseUrl = "https://wrenchli.lovable.app";
     const response = {
-      current_value: valuation.current_value,
-      confidence: valuation.confidence,
-      value_breakdown: valuation.breakdown,
-      market_analysis: {
-        trend: valuation.market_trend,
-        optimal_sell_window: valuation.optimal_sell_window,
-        trade_vs_repair: tradeVsRepair,
-      },
-      wrenchli_services: {
-        detailed_analysis_url: `${baseUrl}/garage`,
-        get_quotes_url: `${baseUrl}/vehicle-insights?year=${vehicle.year}&make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}`,
-        garage_management_url: `${baseUrl}/garage`,
-      },
+      current_value: valuation.current_value, confidence: valuation.confidence, value_breakdown: valuation.breakdown,
+      market_analysis: { trend: valuation.market_trend, optimal_sell_window: valuation.optimal_sell_window, trade_vs_repair: tradeVsRepair },
+      wrenchli_services: { detailed_analysis_url: `${baseUrl}/garage`, get_quotes_url: `${baseUrl}/vehicle-insights?year=${vehicle.year}&make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}`, garage_management_url: `${baseUrl}/garage` },
     };
 
-    // Log request
-    supabase.from("api_request_logs").insert({
-      endpoint: "api-vehicle-value",
-      key_hash: keyHash,
-      diagnosis_title: tradeVsRepair?.recommendation ?? null,
-      vehicle_year: String(vehicle.year),
-      vehicle_make: vehicle.make,
-      vehicle_model: vehicle.model,
-      zip_code: vehicle.zipCode || null,
-      response_status: 200,
-      response_time_ms: Date.now() - requestStart,
-      cost_low: valuation.current_value,
-      cost_high: repair_cost || null,
-    }).then(() => {});
+    supabase.from("api_request_logs").insert({ endpoint: "api-vehicle-value", key_hash: keyHash, diagnosis_title: tradeVsRepair?.recommendation ?? null, vehicle_year: String(vehicle.year), vehicle_make: vehicle.make, vehicle_model: vehicle.model, zip_code: vehicle.zipCode || null, response_status: 200, response_time_ms: Date.now() - requestStart, cost_low: valuation.current_value, cost_high: repair_cost || null }).then(() => {});
 
-    return new Response(JSON.stringify(response), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify(response), { headers: { ...securityHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("api-vehicle-value error:", e);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } });
   }
 });

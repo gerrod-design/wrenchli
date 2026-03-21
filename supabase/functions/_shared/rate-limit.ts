@@ -1,3 +1,5 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
 interface RateLimitConfig {
   maxRequests: number;
   windowSeconds: number;
@@ -9,11 +11,6 @@ interface RateLimitResult {
   resetTime: number;
 }
 
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
-
 export const RATE_LIMITS = {
   STRICT: { maxRequests: 10, windowSeconds: 60 },
   STANDARD: { maxRequests: 60, windowSeconds: 60 },
@@ -21,41 +18,67 @@ export const RATE_LIMITS = {
   ADMIN: { maxRequests: 30, windowSeconds: 60 },
 } as const;
 
-const store = new Map<string, RateLimitEntry>();
-
-// Auto-cleanup every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of store) {
-    if (entry.resetAt <= now) {
-      store.delete(key);
-    }
-  }
-}, 5 * 60 * 1000);
-
-export function checkRateLimit(
+/**
+ * Database-backed rate limiter using edge_rate_limits table.
+ * Falls back to allowing the request if the DB check fails.
+ */
+export async function checkRateLimit(
   identifier: string,
   config: RateLimitConfig = RATE_LIMITS.STANDARD,
-): RateLimitResult {
+  endpoint = "default",
+): Promise<RateLimitResult> {
   const now = Date.now();
-  const entry = store.get(identifier);
+  const resetTime = now + config.windowSeconds * 1000;
 
-  if (!entry || entry.resetAt <= now) {
-    const resetAt = now + config.windowSeconds * 1000;
-    store.set(identifier, { count: 1, resetAt });
-    return { allowed: true, remaining: config.maxRequests - 1, resetTime: resetAt };
+  try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } },
+    );
+
+    const windowStart = new Date(now - config.windowSeconds * 1000).toISOString();
+
+    // Count recent requests
+    const { count, error: countError } = await supabase
+      .from("edge_rate_limits")
+      .select("*", { count: "exact", head: true })
+      .eq("identifier", identifier)
+      .eq("endpoint", endpoint)
+      .gte("requested_at", windowStart);
+
+    if (countError) {
+      console.error("Rate limit count error:", countError);
+      return { allowed: true, remaining: config.maxRequests - 1, resetTime };
+    }
+
+    const currentCount = count ?? 0;
+
+    if (currentCount >= config.maxRequests) {
+      return { allowed: false, remaining: 0, resetTime };
+    }
+
+    // Record this request (fire and forget)
+    supabase
+      .from("edge_rate_limits")
+      .insert({ identifier, endpoint, requested_at: new Date().toISOString() })
+      .then(() => {});
+
+    // Probabilistic cleanup (1 in 50 requests)
+    if (Math.random() < 0.02) {
+      supabase.rpc("cleanup_edge_rate_limits").then(() => {});
+    }
+
+    return {
+      allowed: true,
+      remaining: config.maxRequests - currentCount - 1,
+      resetTime,
+    };
+  } catch (err) {
+    console.error("Rate limit error:", err);
+    // Fail open to avoid blocking legitimate traffic
+    return { allowed: true, remaining: config.maxRequests - 1, resetTime };
   }
-
-  entry.count++;
-  if (entry.count > config.maxRequests) {
-    return { allowed: false, remaining: 0, resetTime: entry.resetAt };
-  }
-
-  return {
-    allowed: true,
-    remaining: config.maxRequests - entry.count,
-    resetTime: entry.resetAt,
-  };
 }
 
 export function getRateLimitIdentifier(

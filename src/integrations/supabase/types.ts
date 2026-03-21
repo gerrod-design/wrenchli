@@ -344,6 +344,27 @@ export type Database = {
         }
         Relationships: []
       }
+      edge_rate_limits: {
+        Row: {
+          endpoint: string
+          id: string
+          identifier: string
+          requested_at: string
+        }
+        Insert: {
+          endpoint: string
+          id?: string
+          identifier: string
+          requested_at?: string
+        }
+        Update: {
+          endpoint?: string
+          id?: string
+          identifier?: string
+          requested_at?: string
+        }
+        Relationships: []
+      }
       finance_selections: {
         Row: {
           apr: number
@@ -1112,6 +1133,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_edge_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       has_role: {
         Args: {

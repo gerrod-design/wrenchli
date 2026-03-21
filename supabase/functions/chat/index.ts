@@ -377,7 +377,7 @@ Deno.serve(async (req) => {
 
   // Rate limiting
   const rateLimitId = getRateLimitIdentifier(req);
-  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STRICT);
+  const rateResult = await checkRateLimit(rateLimitId, RATE_LIMITS.STRICT);
   const rlHeaders = getRateLimitHeaders(RATE_LIMITS.STRICT.maxRequests, rateResult.remaining, rateResult.resetTime);
 
   if (!rateResult.allowed) {
