@@ -38,7 +38,9 @@ import DamageDiagnosis from "./pages/DamageDiagnosis";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
-
+import FinancingOptions from "./pages/FinancingOptions";
+import MILoanEligibility from "./pages/MILoanEligibility";
+import MILoanApplication from "./pages/MILoanApplication";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
