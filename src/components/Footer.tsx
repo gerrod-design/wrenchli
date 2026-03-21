@@ -33,9 +33,9 @@ const footerLinks = {
     { label: "Contact Us", to: "/contact" },
   ],
   Legal: [
-    { label: "Privacy Policy", to: "/privacy", badge: "Coming Soon" },
-    { label: "Terms of Service", to: "/terms", badge: "Coming Soon" },
-    { label: "Accessibility", to: "/accessibility", badge: "Coming Soon" },
+    { label: "Privacy Policy", to: "/privacy" },
+    { label: "Terms of Service", to: "/terms" },
+    { label: "Accessibility", to: "/accessibility" },
   ],
 };
 
