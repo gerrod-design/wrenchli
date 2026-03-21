@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import SEO from "@/components/SEO";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
