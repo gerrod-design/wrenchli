@@ -22,23 +22,23 @@ function isAllowedOrigin(origin: string): boolean {
 
 export function getCorsHeaders(origin?: string | null): Record<string, string> {
   const resolvedOrigin =
-    origin && isAllowedOrigin(origin) ? origin : "*";
+    origin && isAllowedOrigin(origin) ? origin : ALLOWED_ORIGINS[0];
 
   return {
     "Access-Control-Allow-Origin": resolvedOrigin,
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type, x-api-key, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
     "Access-Control-Max-Age": "86400",
   };
 }
 
+export const corsHeaders = getCorsHeaders(ALLOWED_ORIGINS[0]);
+
 export function handleCorsOptions(req: Request): Response | null {
   if (req.method === "OPTIONS") {
-    const origin = req.headers.get("origin");
+    const origin = req.headers.get("Origin");
     return new Response(null, { status: 204, headers: getCorsHeaders(origin) });
   }
   return null;
 }
-
-export const corsHeaders = getCorsHeaders();
