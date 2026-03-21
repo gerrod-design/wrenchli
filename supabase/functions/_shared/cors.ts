@@ -1,6 +1,7 @@
 const ALLOWED_ORIGINS = [
   "https://wrenchli.net",
   "https://www.wrenchli.net",
+  "https://wrenchli.lovable.app",
 ];
 
 const DEV_ORIGINS = [
@@ -8,17 +9,20 @@ const DEV_ORIGINS = [
   "http://localhost:3000",
 ];
 
-function getAllowedOrigins(): string[] {
+function isAllowedOrigin(origin: string): boolean {
+  const allowed = [...ALLOWED_ORIGINS];
   const env = Deno.env.get("ENVIRONMENT");
-  return env === "development"
-    ? [...ALLOWED_ORIGINS, ...DEV_ORIGINS]
-    : ALLOWED_ORIGINS;
+  if (env === "development") allowed.push(...DEV_ORIGINS);
+
+  if (allowed.includes(origin)) return true;
+  // Allow Lovable preview/published domains
+  if (origin.endsWith(".lovableproject.com") || origin.endsWith(".lovable.app")) return true;
+  return false;
 }
 
 export function getCorsHeaders(origin?: string | null): Record<string, string> {
-  const allowed = getAllowedOrigins();
   const resolvedOrigin =
-    origin && allowed.includes(origin) ? origin : allowed[0];
+    origin && isAllowedOrigin(origin) ? origin : "*";
 
   return {
     "Access-Control-Allow-Origin": resolvedOrigin,
