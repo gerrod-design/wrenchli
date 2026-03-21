@@ -45,10 +45,10 @@ export default function Index() {
       {/* Value Proposition Cards */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli">
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3 items-stretch">
             {valueProps.map((v, i) => (
-              <SectionReveal key={v.title} delay={i * 120}>
-                <div className="group flex flex-col items-center rounded-xl border border-border bg-card p-8 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+              <SectionReveal key={v.title} delay={i * 120} className="h-full">
+                <div className="group flex h-full flex-col items-center rounded-xl border border-border bg-card p-8 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
                   <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10">
                     <v.icon className="h-7 w-7 text-accent" />
                   </div>
