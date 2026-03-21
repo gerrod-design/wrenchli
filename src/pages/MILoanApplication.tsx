@@ -118,32 +118,21 @@ export default function MILoanApplication() {
     }, 3000);
     return () => clearTimeout(timer);
   }, [reviewing, navigate, repairCost, diagnosis]);
-  };
 
-  if (submitted) {
+  if (reviewing) {
     return (
       <main className="pb-[60px] md:pb-0">
-        <SEO title="Application Submitted — Wrenchli" description="Your MI Affordable Loan application has been submitted." path="/mi-loan-application" />
+        <SEO title="Reviewing Application — Wrenchli" description="Your MI Affordable Loan application is being reviewed." path="/mi-loan-application" />
         <section className="section-padding bg-background min-h-[60vh] flex items-center">
           <div className="container-wrenchli max-w-lg text-center">
             <SectionReveal>
               <div className="rounded-2xl border border-border bg-card p-8 space-y-4">
-                <CheckCircle className="h-14 w-14 text-accent mx-auto" />
-                <h2 className="font-heading text-2xl font-bold">Application Submitted!</h2>
+                <Loader2 className="h-14 w-14 text-accent mx-auto animate-spin" />
+                <h2 className="font-heading text-2xl font-bold">Reviewing Your Application...</h2>
                 <p className="text-muted-foreground">
-                  Your MI Affordable Loan application for <span className="font-semibold">${repairCost.toLocaleString()}</span> has been submitted. A loan coordinator will contact you within 1–2 business days.
+                  We're checking your eligibility. This will only take a moment.
                 </p>
-                <div className="rounded-lg bg-accent/5 border border-accent/20 p-4 text-sm text-left space-y-2">
-                  <p className="font-semibold">What happens next:</p>
-                  <ul className="space-y-1 text-muted-foreground">
-                    <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" /> Your info is reviewed (no hard credit pull)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" /> A coordinator calls to verify details</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" /> Funds sent directly to the repair shop</li>
-                  </ul>
-                </div>
-                <Button asChild variant="outline" className="mt-4">
-                  <Link to="/">Back to Home</Link>
-                </Button>
+                <Progress value={66} className="h-2" />
               </div>
             </SectionReveal>
           </div>
