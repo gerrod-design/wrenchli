@@ -59,6 +59,8 @@ export default function Index() {
         </div>
       </section>
 
+      <UserJourneySelector />
+
       {/* Recommend a Shop */}
       <RecommendShopSection onOpenModal={() => setRecommendOpen(true)} />
 
