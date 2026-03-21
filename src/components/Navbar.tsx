@@ -29,7 +29,8 @@ const navItems: NavItem[] = [
       { label: "Vehicle Insights", to: "/vehicle-insights" },
       { label: "Photo Damage Diagnosis", to: "/damage-diagnosis" },
       { label: "Find Shops", to: "/find-shops" },
-      { label: "Financing", to: "/for-car-owners#financing" },
+      { label: "Financing", to: "/financing-options" },
+      { label: "🏛️ MI Affordable Loan ✨", to: "/mi-affordable-loan" },
     ],
   },
   {
