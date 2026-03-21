@@ -264,11 +264,14 @@ export default function Navbar() {
           </div>
 
           <div className="mt-6 flex flex-col gap-3">
-            <Button asChild variant="outline" className="h-12 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground text-base" onClick={() => setOpen(false)}>
-              <Link to="/for-shops#apply">Partner With Us</Link>
-            </Button>
             <Button asChild className="h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-base" onClick={() => setOpen(false)}>
               <Link to="/#quote">Get a Quote</Link>
+            </Button>
+            <Button asChild variant="outline" className="h-12 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground text-base" onClick={() => setOpen(false)}>
+              <Link to="/for-shops#apply">For Shops</Link>
+            </Button>
+            <Button asChild variant="ghost" className="h-12 text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 text-base" onClick={() => setOpen(false)}>
+              <Link to="/investors">Investors</Link>
             </Button>
           </div>
         </div>
