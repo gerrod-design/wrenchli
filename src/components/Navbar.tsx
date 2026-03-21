@@ -43,7 +43,6 @@ const navItems: NavItem[] = [
     ],
   },
   { label: "About", to: "/about" },
-  { label: "Investors", to: "/investors" },
   { label: "Contact", to: "/contact" },
 ];
 
