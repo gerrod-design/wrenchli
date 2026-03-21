@@ -1,8 +1,6 @@
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 const MAX_MESSAGES = 20;
 const MAX_CONTENT_LENGTH = 8000;
@@ -301,7 +299,7 @@ function validateMessages(
   if (rawMessages.length === 0 || rawMessages.length > MAX_MESSAGES) {
     return new Response(
       JSON.stringify({ error: `Messages array must have 1-${MAX_MESSAGES} items` }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
     );
   }
 
@@ -312,7 +310,7 @@ function validateMessages(
     if (!msg || typeof msg !== "object") {
       return new Response(
         JSON.stringify({ error: "Each message must be an object" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -324,21 +322,21 @@ function validateMessages(
     if (typeof role !== "string" || typeof content !== "string") {
       return new Response(
         JSON.stringify({ error: "Each message must have role and content strings" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
     if (!validRoles.has(role)) {
       return new Response(
         JSON.stringify({ error: "Message role must be 'user' or 'assistant'" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
     if (content.length > MAX_CONTENT_LENGTH) {
       return new Response(
         JSON.stringify({ error: `Message content must be under ${MAX_CONTENT_LENGTH} characters` }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -354,7 +352,7 @@ function validateMessages(
     if (content.length === 0 && (!validatedImageUrls || validatedImageUrls.length === 0)) {
       return new Response(
         JSON.stringify({ error: "Message must have content or images" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -369,8 +367,23 @@ function validateMessages(
 
 // ── Main handler ──
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  // Rate limiting
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.STRICT);
+  const rlHeaders = getRateLimitHeaders(RATE_LIMITS.STRICT.maxRequests, rateResult.remaining, rateResult.resetTime);
+
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
+      { status: 429, headers: { ...securityHeaders, ...rlHeaders, "Content-Type": "application/json" } },
+    );
   }
 
   try {
@@ -380,14 +393,14 @@ Deno.serve(async (req) => {
     } catch {
       return new Response(
         JSON.stringify({ error: "Invalid JSON" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
     if (!body || typeof body !== "object" || !Array.isArray((body as Record<string, unknown>).messages)) {
       return new Response(
         JSON.stringify({ error: "Invalid request format" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -423,20 +436,20 @@ Deno.serve(async (req) => {
       if (status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 429, headers: { ...securityHeaders, "Content-Type": "application/json" } },
         );
       }
       if (status === 402) {
         return new Response(
           JSON.stringify({ error: "AI service temporarily unavailable." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 402, headers: { ...securityHeaders, "Content-Type": "application/json" } },
         );
       }
       const t = await turn1Resp.text();
       console.error("AI gateway error (turn 1):", status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -447,7 +460,7 @@ Deno.serve(async (req) => {
       console.error("Failed to parse Turn 1 JSON:", e);
       return new Response(
         JSON.stringify({ error: "Failed to process AI response" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -468,7 +481,7 @@ Deno.serve(async (req) => {
         },
       });
       return new Response(stream, {
-        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
       });
     }
 
@@ -524,18 +537,18 @@ Deno.serve(async (req) => {
       console.error("AI gateway error (turn 2):", turn2Resp.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
     return new Response(turn2Resp.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
     console.error("chat error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
     );
   }
 });
