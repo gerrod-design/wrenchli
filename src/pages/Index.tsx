@@ -14,6 +14,7 @@ import UserJourneySelector from "@/components/UserJourneySelector";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import WaitlistForm from "@/components/WaitlistForm";
 import { useLocation } from "@/contexts/LocationContext";
+import MILoanBanner from "@/components/MILoanBanner";
 
 const valueProps = [
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
