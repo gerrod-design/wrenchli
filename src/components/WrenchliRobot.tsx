@@ -19,6 +19,10 @@ export default function WrenchliRobot({ size = 1, waving = false }: WrenchliRobo
       xmlns="http://www.w3.org/2000/svg"
       animate={{ y: [0, -4, 0] }}
       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      whileHover={{
+        scale: 1.05,
+        filter: "drop-shadow(0 0 8px #14b8a6)",
+      }}
     >
       <defs>
         <filter id="tealGlow">
