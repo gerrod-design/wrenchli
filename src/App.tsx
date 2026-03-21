@@ -15,6 +15,7 @@ import MobileBottomBar from "@/components/MobileBottomBar";
 import BackToTop from "@/components/BackToTop";
 import ChatBot from "@/components/ChatBot";
 import SitePasswordGate from "@/components/SitePasswordGate";
+import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
 import ForCarOwners from "./pages/ForCarOwners";
 import ForShops from "./pages/ForShops";
