@@ -28,11 +28,22 @@ const navItems: NavItem[] = [
       { label: "How It Works", to: "/for-car-owners" },
       { label: "Vehicle Insights", to: "/vehicle-insights" },
       { label: "Photo Damage Diagnosis", to: "/damage-diagnosis" },
+      { label: "Find Shops", to: "/find-shops" },
       { label: "Financing", to: "/for-car-owners#financing" },
     ],
   },
-  { label: "Find Shops", to: "/find-shops" },
+  {
+    label: "For Shops",
+    to: "/for-shops",
+    dropdown: [
+      { label: "Partner Program", to: "/for-shops" },
+      { label: "How It Works", to: "/for-shops#how-it-works" },
+      { label: "Shop Software", to: "/for-shops#features" },
+      { label: "💬 Recommend a Shop", to: "__recommend__" },
+    ],
+  },
   { label: "About", to: "/about" },
+  { label: "Investors", to: "/investors" },
   { label: "Contact", to: "/contact" },
 ];
 
