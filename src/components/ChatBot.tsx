@@ -176,7 +176,7 @@ export default function ChatBot() {
             aria-label="Open chat"
           >
             <MessageCircle className="h-5 w-5 shrink-0" />
-            <span className="text-sm font-medium whitespace-nowrap">Need Help?</span>
+            <span className="text-sm font-medium whitespace-nowrap">Ask Wrenchli</span>
           </motion.button>
         )}
       </AnimatePresence>
