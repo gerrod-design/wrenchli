@@ -86,6 +86,16 @@ export default function Footer() {
                       >
                         {link.label}
                       </button>
+                    ) : link.to === "__cookies__" ? (
+                      <button
+                        onClick={() => {
+                          localStorage.removeItem("wrenchli_cookie_consent");
+                          window.location.reload();
+                        }}
+                        className="text-sm text-primary-foreground/60 transition-colors hover:text-accent text-left"
+                      >
+                        {link.label}
+                      </button>
                     ) : link.to.includes("#") ? (
                       <a
                         href={link.to}
