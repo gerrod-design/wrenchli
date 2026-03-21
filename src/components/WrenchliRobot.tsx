@@ -61,9 +61,9 @@ export default function WrenchliRobot({ size = 1, waving = false }: WrenchliRobo
         height="30"
         rx="2"
         fill="#E5E7EB"
-        style={{ originX: "4px", originY: "58px" }}
-        animate={waving ? { rotate: [-10, -40, -10] } : { rotate: 0 }}
-        transition={waving ? { duration: 0.8, repeat: Infinity, ease: "easeInOut" } : undefined}
+        animate={{ rotate: [0, -20, 0] }}
+        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 8 }}
+        style={{ transformOrigin: "top center" }}
       />
 
       {/* Right arm */}
