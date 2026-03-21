@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  CheckCircle, ArrowRight, ArrowLeft, Sparkles, Shield, User, Briefcase, FileText,
+  CheckCircle, ArrowRight, ArrowLeft, Sparkles, Shield, User, Briefcase, FileText, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
