@@ -1,11 +1,5 @@
 export const BASE_URL = "https://wrenchli.lovable.app";
 
-export const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-api-key",
-};
-
 export interface ServiceProvider {
   id: string;
   name: string;
