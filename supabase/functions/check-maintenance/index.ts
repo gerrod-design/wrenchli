@@ -1,11 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
-// Standard maintenance schedule (mirrors src/data/maintenanceSchedule.ts)
 const MAINTENANCE_SCHEDULE = [
   { type: "oil_change", label: "Oil Change", intervalMiles: 5000, costLow: 30, costHigh: 75 },
   { type: "tire_rotation", label: "Tire Rotation", intervalMiles: 7500, costLow: 25, costHigh: 50 },
@@ -20,8 +17,20 @@ const MAINTENANCE_SCHEDULE = [
 ];
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.ADMIN);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded" }),
+      { status: 429, headers: { ...securityHeaders, ...getRateLimitHeaders(RATE_LIMITS.ADMIN.maxRequests, rateResult.remaining, rateResult.resetTime), "Content-Type": "application/json" } }
+    );
   }
 
   try {
@@ -29,7 +38,6 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Get vehicles with mileage data
     const { data: vehicles, error: vErr } = await supabase
       .from("user_vehicles")
       .select("id, make, model, year, current_mileage, user_id")
@@ -38,7 +46,7 @@ Deno.serve(async (req) => {
     if (vErr) throw vErr;
     if (!vehicles || vehicles.length === 0) {
       return new Response(JSON.stringify({ message: "No vehicles with mileage data", alerts: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...securityHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -47,7 +55,6 @@ Deno.serve(async (req) => {
 
     for (const vehicle of vehicles) {
       try {
-        // Check user preferences
         const { data: prefData } = await supabase
           .from("notification_preferences")
           .select("inapp_maintenance")
@@ -59,7 +66,6 @@ Deno.serve(async (req) => {
         const currentMileage = vehicle.current_mileage;
         const vehicleName = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
 
-        // Get last maintenance records for this vehicle
         const { data: records } = await supabase
           .from("maintenance_records")
           .select("service_type, mileage_at_service")
@@ -80,7 +86,6 @@ Deno.serve(async (req) => {
           const dueMileage = lastMileage + item.intervalMiles;
           const milesUntilDue = dueMileage - currentMileage;
 
-          // Only alert for overdue, urgent (<=1000mi), or soon (<=3000mi)
           if (milesUntilDue > 3000) continue;
 
           let priority: string;
@@ -88,7 +93,6 @@ Deno.serve(async (req) => {
           else if (milesUntilDue <= 1000) priority = "urgent";
           else priority = "soon";
 
-          // Check for duplicate (same vehicle + service_type within 7 days)
           const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
           const { data: existing } = await supabase
             .from("maintenance_alerts")
@@ -109,32 +113,17 @@ Deno.serve(async (req) => {
           const { error: insertErr } = await supabase
             .from("maintenance_alerts")
             .insert({
-              vehicle_id: vehicle.id,
-              service_type: item.type,
-              service_label: item.label,
-              priority,
-              due_mileage: dueMileage,
-              current_mileage: currentMileage,
-              miles_until_due: milesUntilDue,
-              estimated_cost_low: item.costLow,
-              estimated_cost_high: item.costHigh,
-              summary,
+              vehicle_id: vehicle.id, service_type: item.type, service_label: item.label,
+              priority, due_mileage: dueMileage, current_mileage: currentMileage,
+              miles_until_due: milesUntilDue, estimated_cost_low: item.costLow,
+              estimated_cost_high: item.costHigh, summary,
             });
 
           if (!insertErr) {
             totalAlerts++;
-            // Queue email for this alert
             newMaintenanceAlerts.push({
-              userId: vehicle.user_id,
-              vehicleName,
-              serviceLabel: item.label,
-              priority,
-              milesText: milesUntilDue < 0
-                ? `${Math.abs(milesUntilDue).toLocaleString()} miles overdue`
-                : `due in ${milesUntilDue.toLocaleString()} miles`,
-              costLow: item.costLow,
-              costHigh: item.costHigh,
-              summary,
+              userId: vehicle.user_id, vehicleName, serviceLabel: item.label,
+              priority, milesText, costLow: item.costLow, costHigh: item.costHigh, summary,
             });
           }
         }
@@ -143,7 +132,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Send email notifications
     let emailsSent = 0;
     const byUser = new Map<string, typeof newMaintenanceAlerts>();
     for (const alert of newMaintenanceAlerts) {
@@ -165,26 +153,20 @@ Deno.serve(async (req) => {
         const email = userData?.user?.email;
         if (!email) continue;
 
-        // Send one email per maintenance alert
+        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
         for (const alert of alerts) {
           try {
             await fetch(`${supabaseUrl}/functions/v1/send-alert-email`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${serviceRoleKey}`,
-              },
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}` },
               body: JSON.stringify({
                 to: email,
                 alertData: {
-                  type: "maintenance",
-                  vehicleName: alert.vehicleName,
-                  serviceLabel: alert.serviceLabel,
-                  priority: alert.priority,
-                  milesText: alert.milesText,
-                  costLow: alert.costLow,
-                  costHigh: alert.costHigh,
-                  summary: alert.summary,
+                  type: "maintenance", vehicleName: alert.vehicleName, serviceLabel: alert.serviceLabel,
+                  priority: alert.priority, milesText: alert.milesText, costLow: alert.costLow,
+                  costHigh: alert.costHigh, summary: alert.summary,
                 },
               }),
             });
@@ -199,19 +181,14 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({
-        message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} maintenance alerts, sent ${emailsSent} emails`,
-        checked: vehicles.length,
-        newAlerts: totalAlerts,
-        emailsSent,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} maintenance alerts, sent ${emailsSent} emails`, checked: vehicles.length, newAlerts: totalAlerts, emailsSent }),
+      { headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in check-maintenance:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   }
 });

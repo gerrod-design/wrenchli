@@ -1,16 +1,25 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
-// Significant change threshold (percentage)
 const SIGNIFICANT_CHANGE_PERCENT = 5;
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.ADMIN);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded" }),
+      { status: 429, headers: { ...securityHeaders, ...getRateLimitHeaders(RATE_LIMITS.ADMIN.maxRequests, rateResult.remaining, rateResult.resetTime), "Content-Type": "application/json" } }
+    );
   }
 
   try {
@@ -18,7 +27,6 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Get all vehicles with value history
     const { data: vehicles, error: vErr } = await supabase
       .from("user_vehicles")
       .select("id, make, model, year, user_id");
@@ -26,7 +34,7 @@ Deno.serve(async (req) => {
     if (vErr) throw vErr;
     if (!vehicles || vehicles.length === 0) {
       return new Response(JSON.stringify({ message: "No vehicles to check", alerts: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...securityHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -35,7 +43,6 @@ Deno.serve(async (req) => {
 
     for (const vehicle of vehicles) {
       try {
-        // Check user notification preferences
         const { data: prefData } = await supabase
           .from("notification_preferences")
           .select("inapp_market_value")
@@ -45,7 +52,6 @@ Deno.serve(async (req) => {
         const enabled = prefData?.inapp_market_value ?? true;
         if (!enabled) continue;
 
-        // Get last two value records for this vehicle
         const { data: history, error: hErr } = await supabase
           .from("vehicle_value_history")
           .select("estimated_value, recorded_at")
@@ -61,7 +67,6 @@ Deno.serve(async (req) => {
 
         const changePercent = ((current - previous) / previous) * 100;
         const absChange = Math.abs(changePercent);
-
         if (absChange < SIGNIFICANT_CHANGE_PERCENT) continue;
 
         const direction = changePercent > 0 ? "increase" : "decrease";
@@ -69,7 +74,6 @@ Deno.serve(async (req) => {
         const arrow = direction === "increase" ? "↑" : "↓";
         const summary = `Your ${vehicleName} market value shifted ${arrow} ${absChange.toFixed(1)}% — from $${previous.toLocaleString()} to $${current.toLocaleString()}.`;
 
-        // Check for duplicate alert (same vehicle, same values, within 24h)
         const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         const { data: existing } = await supabase
           .from("market_value_alerts")
@@ -84,33 +88,19 @@ Deno.serve(async (req) => {
         const { error: insertErr } = await supabase
           .from("market_value_alerts")
           .insert({
-            vehicle_id: vehicle.id,
-            previous_value: previous,
-            current_value: current,
-            change_percent: Number(absChange.toFixed(2)),
-            change_direction: direction,
-            summary,
+            vehicle_id: vehicle.id, previous_value: previous, current_value: current,
+            change_percent: Number(absChange.toFixed(2)), change_direction: direction, summary,
           });
 
         if (!insertErr) {
           totalAlerts++;
-          // Queue email
-          newValueAlerts.push({
-            userId: vehicle.user_id,
-            vehicleName,
-            previousValue: previous,
-            currentValue: current,
-            changePercent: absChange,
-            changeDirection: direction,
-            summary,
-          });
+          newValueAlerts.push({ userId: vehicle.user_id, vehicleName, previousValue: previous, currentValue: current, changePercent: absChange, changeDirection: direction, summary });
         }
       } catch (err) {
         console.warn(`Failed to check market value for vehicle ${vehicle.id}:`, err);
       }
     }
 
-    // Send email notifications
     let emailsSent = 0;
     const byUser = new Map<string, typeof newValueAlerts>();
     for (const alert of newValueAlerts) {
@@ -136,20 +126,13 @@ Deno.serve(async (req) => {
           try {
             await fetch(`${supabaseUrl}/functions/v1/send-alert-email`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${serviceRoleKey}`,
-              },
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}` },
               body: JSON.stringify({
                 to: email,
                 alertData: {
-                  type: "market_value",
-                  vehicleName: alert.vehicleName,
-                  previousValue: alert.previousValue,
-                  currentValue: alert.currentValue,
-                  changePercent: alert.changePercent,
-                  changeDirection: alert.changeDirection,
-                  summary: alert.summary,
+                  type: "market_value", vehicleName: alert.vehicleName, previousValue: alert.previousValue,
+                  currentValue: alert.currentValue, changePercent: alert.changePercent,
+                  changeDirection: alert.changeDirection, summary: alert.summary,
                 },
               }),
             });
@@ -164,19 +147,14 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({
-        message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} market value alerts, sent ${emailsSent} emails`,
-        checked: vehicles.length,
-        newAlerts: totalAlerts,
-        emailsSent,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} market value alerts, sent ${emailsSent} emails`, checked: vehicles.length, newAlerts: totalAlerts, emailsSent }),
+      { headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in check-market-values:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   }
 });

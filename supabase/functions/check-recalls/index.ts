@@ -1,13 +1,23 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const securityHeaders = mergeSecurityHeaders(corsHeaders);
+
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
+
+  const rateLimitId = getRateLimitIdentifier(req);
+  const rateResult = checkRateLimit(rateLimitId, RATE_LIMITS.ADMIN);
+  if (!rateResult.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded" }),
+      { status: 429, headers: { ...securityHeaders, ...getRateLimitHeaders(RATE_LIMITS.ADMIN.maxRequests, rateResult.remaining, rateResult.resetTime), "Content-Type": "application/json" } }
+    );
   }
 
   try {
@@ -15,7 +25,6 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Get all user vehicles
     const { data: vehicles, error: vehiclesError } = await supabase
       .from("user_vehicles")
       .select("id, make, model, year, user_id");
@@ -23,14 +32,13 @@ Deno.serve(async (req) => {
     if (vehiclesError) throw vehiclesError;
     if (!vehicles || vehicles.length === 0) {
       return new Response(JSON.stringify({ message: "No vehicles to check", checked: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...securityHeaders, "Content-Type": "application/json" },
       });
     }
 
     let totalNew = 0;
     const emailAlerts: { userId: string; vehicleName: string; recalls: any[] }[] = [];
 
-    // Deduplicate by make/model/year to minimize API calls
     const uniqueVehicles = new Map<string, { make: string; model: string; year: number; vehicleIds: { id: string; userId: string }[] }>();
     for (const v of vehicles) {
       const key = `${v.year}_${v.make}_${v.model}`;
@@ -66,21 +74,12 @@ Deno.serve(async (req) => {
               consequence.toLowerCase().includes("fire") ||
               consequence.toLowerCase().includes("crash") ||
               consequence.toLowerCase().includes("injury")
-                ? "urgent"
-                : "high";
+                ? "urgent" : "high";
 
             const { error: insertError } = await supabase
               .from("recall_alerts")
               .upsert(
-                {
-                  vehicle_id: vehicle.id,
-                  campaign_number: campaignNumber,
-                  component,
-                  summary,
-                  consequence,
-                  remedy,
-                  priority,
-                },
+                { vehicle_id: vehicle.id, campaign_number: campaignNumber, component, summary, consequence, remedy, priority },
                 { onConflict: "vehicle_id,campaign_number", ignoreDuplicates: true }
               );
 
@@ -91,24 +90,17 @@ Deno.serve(async (req) => {
 
           if (newRecalls.length > 0) {
             totalNew += newRecalls.length;
-            emailAlerts.push({
-              userId: vehicle.userId,
-              vehicleName: `${group.year} ${group.make} ${group.model}`,
-              recalls: newRecalls,
-            });
+            emailAlerts.push({ userId: vehicle.userId, vehicleName: `${group.year} ${group.make} ${group.model}`, recalls: newRecalls });
           }
         }
 
-        // Rate limit NHTSA calls
         await new Promise((r) => setTimeout(r, 200));
       } catch (err) {
         console.warn(`Failed to check recalls for ${group.make} ${group.model}:`, err);
       }
     }
 
-    // Send email notifications for users with new recalls
     if (emailAlerts.length > 0) {
-      // Group by userId
       const byUser = new Map<string, { vehicleName: string; recalls: any[] }[]>();
       for (const alert of emailAlerts) {
         if (!byUser.has(alert.userId)) byUser.set(alert.userId, []);
@@ -117,18 +109,15 @@ Deno.serve(async (req) => {
 
       for (const [userId, vehicleAlerts] of byUser) {
         try {
-          // Check user notification preferences
           const { data: prefData } = await supabase
             .from("notification_preferences")
             .select("email_recalls")
             .eq("user_id", userId)
             .maybeSingle();
 
-          // Default to true if no preferences set
           const emailEnabled = prefData?.email_recalls ?? true;
           if (!emailEnabled) continue;
 
-          // Get user email
           const { data: userData } = await supabase.auth.admin.getUserById(userId);
           const email = userData?.user?.email;
           if (!email) continue;
@@ -138,12 +127,8 @@ Deno.serve(async (req) => {
             .map((v) => `• ${v.vehicleName}: ${v.recalls.length} recall(s)`)
             .join("\n");
 
-          // Send email via Supabase Auth (using the built-in mailer via admin API)
-          // For now, we'll use a simple approach: generate invite link which sends an email
-          // In production, integrate with a proper email service
           console.log(`Would send email to ${email}: ${totalRecalls} new recall(s) found\n${vehicleSummary}`);
 
-          // Mark alerts as email_sent
           for (const va of vehicleAlerts) {
             for (const recall of va.recalls) {
               await supabase
@@ -159,18 +144,14 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({
-        message: `Checked ${uniqueVehicles.size} unique vehicle configs, found ${totalNew} new recall alerts`,
-        checked: uniqueVehicles.size,
-        newAlerts: totalNew,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ message: `Checked ${uniqueVehicles.size} unique vehicle configs, found ${totalNew} new recall alerts`, checked: uniqueVehicles.size, newAlerts: totalNew }),
+      { headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in check-recalls:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   }
 });
