@@ -108,6 +108,7 @@ function AppLayout() {
       {!isAdmin && <MobileBottomBar />}
       {!isAdmin && <BackToTop />}
       {!isAdmin && <ChatBot />}
+      {!isAdmin && <CookieConsent />}
     </>
   );
 }
