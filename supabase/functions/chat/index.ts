@@ -405,7 +405,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const validated = validateMessages((body as Record<string, unknown>).messages as unknown[]);
+    const validated = validateMessages((body as Record<string, unknown>).messages as unknown[], securityHeaders);
     if (validated instanceof Response) return validated;
     const messages = validated;
 
