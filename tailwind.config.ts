@@ -149,6 +149,10 @@ export default {
           "90%": { opacity: "1" },
           "100%": { transform: "translateX(375px)", opacity: "0" },
         },
+        "chat-pulse": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",

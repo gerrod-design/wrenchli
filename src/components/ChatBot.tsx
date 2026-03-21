@@ -12,6 +12,16 @@ import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
 
+const WELCOME_MESSAGE = `👋 Hi! What's wrong with your car?
+
+I can help you with:
+• Check engine light diagnosis
+• Strange noises or smells
+• Get repair quotes
+• Photo damage analysis
+
+Just describe your issue or click a suggestion below!`;
+
 export default function ChatBot() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -25,11 +35,38 @@ export default function ChatBot() {
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(() =>
+    localStorage.getItem("wrenchli_chat_interacted") === "true"
+  );
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  // Mark as interacted
+  const markInteracted = useCallback(() => {
+    if (!hasInteracted) {
+      setHasInteracted(true);
+      localStorage.setItem("wrenchli_chat_interacted", "true");
+    }
+  }, [hasInteracted]);
+
+  // Auto-open on first visit after 5 seconds
+  useEffect(() => {
+    const alreadyOpened = localStorage.getItem("wrenchli_chat_opened") === "true";
+    if (alreadyOpened) return;
+
+    const timer = setTimeout(() => {
+      setOpen(true);
+      setMessages([{ role: "assistant", content: WELCOME_MESSAGE }]);
+      localStorage.setItem("wrenchli_chat_opened", "true");
+      markInteracted();
+    }, 5000);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -118,6 +155,11 @@ export default function ChatBot() {
     "📸 Diagnose damage from a photo",
   ];
 
+  const handleOpenChat = () => {
+    setOpen(true);
+    markInteracted();
+  };
+
   return (
     <>
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
@@ -127,11 +169,14 @@ export default function ChatBot() {
         {!open && (
           <motion.button
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
-            onClick={() => setOpen(true)}
-            className="fixed bottom-[76px] right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8 md:right-6"
+            onClick={handleOpenChat}
+            className={`fixed bottom-[76px] right-4 z-50 flex h-12 items-center gap-2 rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8 md:right-6 px-4 ${
+              !hasInteracted ? "animate-[chat-pulse_2s_ease-in-out_infinite]" : ""
+            }`}
             aria-label="Open chat"
           >
-            <MessageCircle className="h-6 w-6" />
+            <MessageCircle className="h-5 w-5 shrink-0" />
+            <span className="text-sm font-medium whitespace-nowrap">Need Help?</span>
           </motion.button>
         )}
       </AnimatePresence>
