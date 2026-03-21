@@ -89,7 +89,7 @@ export default function UserJourneySelector() {
           </div>
         </SectionReveal>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3 items-stretch">
           {journeys.map((j, i) => (
             <SectionReveal key={j.title} delay={i * 150}>
               <motion.div
