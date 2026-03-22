@@ -9,8 +9,8 @@ export default function Investors() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Investors — Wrenchli"
-        description="Wrenchli is fixing the $288B auto repair industry. Learn about our market opportunity, traction, and vision."
+        title="Invest in Wrenchli — Auto Repair Revolution"
+        description="$500B industry. 40% unbanked consumers. Fragmented market. Proven traction. Learn about investing in Wrenchli."
         path="/investors"
       />
 
