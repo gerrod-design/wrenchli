@@ -36,8 +36,6 @@ interface FormData {
   agreeTerms: boolean;
   agreeDisclosure: boolean;
   agreePartialPayment: boolean;
-}
-
 const initialForm: FormData = {
   firstName: "",
   lastName: "",
