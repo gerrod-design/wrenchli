@@ -103,11 +103,23 @@ export default function CinematicHero() {
         {/* Regional info */}
         <motion.p
           {...fadeUp(1.5, 10)}
-          className="mt-2 text-sm md:text-base text-white/70 max-w-[500px]"
-          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)" }}
+          className="mt-4 text-base md:text-xl font-medium text-white/90 max-w-[600px]"
+          style={{ textShadow: "0 3px 16px rgba(0,0,0,0.7), 0 1px 6px rgba(0,0,0,0.5)" }}
         >
           Affordable vehicle repair — coming soon to {userLocation.region}.
         </motion.p>
+
+        {/* Trust badges */}
+        <motion.div
+          {...fadeUp(1.7, 10)}
+          className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs md:text-sm text-white/70"
+          style={{ textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
+        >
+          <span>✓ Free diagnosis</span>
+          <span>✓ DIY tutorials</span>
+          <span>✓ Shop quotes</span>
+          <span>✓ No account required</span>
+        </motion.div>
 
         {/* CTA Buttons */}
         <motion.div

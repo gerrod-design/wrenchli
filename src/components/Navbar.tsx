@@ -121,18 +121,6 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg">
-      {/* Trust bar */}
-      <div className="hidden border-b border-primary-foreground/10 bg-primary/90 lg:block">
-        <div className="container-wrenchli flex h-8 items-center justify-center gap-6 text-xs text-primary-foreground/60">
-          <span>Free diagnosis</span>
-          <span className="text-primary-foreground/20">•</span>
-          <span>DIY tutorials</span>
-          <span className="text-primary-foreground/20">•</span>
-          <span>Shop quotes</span>
-          <span className="text-primary-foreground/20">•</span>
-          <span>No account required</span>
-        </div>
-      </div>
       <div className="container-wrenchli flex h-16 items-center justify-between md:h-[68px]">
         {/* Logo */}
         <Link to="/" className="flex flex-col">
