@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { isMichiganZip } from "@/lib/financing";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 import {
   Dialog,
   DialogContent,
