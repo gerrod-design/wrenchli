@@ -128,7 +128,7 @@ export default function Navbar() {
             <img src={wrenchliLogo} alt="Wrenchli logo" className="h-8 w-8 object-contain" />
             Wrenchli
           </span>
-          <span className="text-[10px] font-medium tracking-wide text-primary-foreground/60 ml-10">
+          <span className="text-xs font-medium tracking-wide text-primary-foreground/60 ml-10">
             Mobility for All.
           </span>
         </Link>
