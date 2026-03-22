@@ -168,7 +168,8 @@ export default function MILoanApplication() {
             </Badge>
             <h1 className="font-heading text-2xl font-bold md:text-4xl">Loan Application</h1>
             <p className="mt-2 text-primary-foreground/70">
-              ${repairCost.toLocaleString()} repair • ~${monthlyPayment}/mo for 12 months
+              {formatCurrency(scenario.loanAmount)} loan • ~{formatCurrency(monthlyPayment)}/mo for 12 months
+              {scenario.isPartial && ` • ${formatCurrency(scenario.outOfPocket)} at shop`}
             </p>
           </SectionReveal>
         </div>
