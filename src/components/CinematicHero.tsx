@@ -103,7 +103,7 @@ export default function CinematicHero() {
         {/* Regional info */}
         <motion.p
           {...fadeUp(1.5, 10)}
-          className="mt-4 text-base md:text-xl font-medium text-white/90 max-w-[600px]"
+          className="mt-4 text-base md:text-xl font-semibold text-white max-w-[600px]"
           style={{ textShadow: "0 3px 16px rgba(0,0,0,0.7), 0 1px 6px rgba(0,0,0,0.5)" }}
         >
           Affordable vehicle repair — coming soon to {userLocation.region}.
