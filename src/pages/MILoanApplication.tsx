@@ -88,6 +88,11 @@ export default function MILoanApplication() {
       toast.error("Please agree to both checkboxes to continue.");
       return;
     }
+    if (scenario.isPartial && !form.agreePartialPayment) {
+      toast.error("Please acknowledge the additional shop payment.");
+      return;
+    }
+    }
     setSubmitting(true);
     try {
       await supabase.from("finance_selections" as any).insert({
