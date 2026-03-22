@@ -174,9 +174,6 @@ export default function Navbar() {
           <Button asChild size="sm" className="bg-wrenchli-trust-blue text-white hover:bg-wrenchli-trust-blue/90 font-semibold">
             <Link to="/for-shops#apply">For Shops</Link>
           </Button>
-          <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
-            <Link to="/#quote">Get a Quote</Link>
-          </Button>
         </div>
 
         {/* Mobile hamburger */}
