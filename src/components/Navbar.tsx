@@ -135,9 +135,14 @@ export default function Navbar() {
       </div>
       <div className="container-wrenchli flex h-16 items-center justify-between md:h-[68px]">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold">
-          <img src={wrenchliLogo} alt="Wrenchli logo" className="h-8 w-8 object-contain" />
-          Wrenchli
+        <Link to="/" className="flex flex-col">
+          <span className="flex items-center gap-2 font-heading text-xl font-bold">
+            <img src={wrenchliLogo} alt="Wrenchli logo" className="h-8 w-8 object-contain" />
+            Wrenchli
+          </span>
+          <span className="text-[10px] font-medium tracking-wide text-primary-foreground/60 ml-10">
+            Mobility for All.
+          </span>
         </Link>
 
         {/* Desktop nav - center */}
