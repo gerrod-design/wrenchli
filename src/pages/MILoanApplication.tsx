@@ -366,7 +366,7 @@ export default function MILoanApplication() {
                       <span className="font-bold text-amber-800 dark:text-amber-300">{formatCurrency(scenario.outOfPocket)}</span>
                     </div>
                   </div>
-                )
+                )}
 
                 {/* Applicant info */}
                 <div className="rounded-lg bg-muted/50 p-4 space-y-2 text-sm">
