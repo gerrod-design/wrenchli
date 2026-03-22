@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
 
 interface FormData {
   firstName: string;
@@ -34,6 +35,7 @@ interface FormData {
   employmentDuration: string;
   agreeTerms: boolean;
   agreeDisclosure: boolean;
+  agreePartialPayment: boolean;
 }
 
 const initialForm: FormData = {
@@ -53,6 +55,7 @@ const initialForm: FormData = {
   employmentDuration: "",
   agreeTerms: false,
   agreeDisclosure: false,
+  agreePartialPayment: false,
 };
 
 export default function MILoanApplication() {
@@ -70,8 +73,9 @@ export default function MILoanApplication() {
   const [submitting, setSubmitting] = useState(false);
   const [reviewing, setReviewing] = useState(false);
 
-  const monthlyPayment = Math.round((repairCost * 1.36) / 12);
-  const totalCost = Math.round(repairCost * 1.36);
+  const scenario = calculateFinancingScenario(repairCost);
+  const monthlyPayment = scenario.monthlyPayment;
+  const totalCost = scenario.totalLoanCost;
 
   const update = (field: keyof FormData, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -84,14 +88,18 @@ export default function MILoanApplication() {
       toast.error("Please agree to both checkboxes to continue.");
       return;
     }
+    if (scenario.isPartial && !form.agreePartialPayment) {
+      toast.error("Please acknowledge the additional shop payment.");
+      return;
+    }
     setSubmitting(true);
     try {
       await supabase.from("finance_selections" as any).insert({
         provider: "MI Affordable Loan",
-        option_type: "state_program",
-        apr: 36,
+        option_type: scenario.isPartial ? "state_program_partial" : "state_program",
+        apr: MI_LOAN.maxApr,
         monthly_payment: monthlyPayment,
-        term_months: 12,
+        term_months: MI_LOAN.termMonths,
         total_cost: totalCost,
         repair_cost: repairCost,
         vehicle_year: year || null,
@@ -100,7 +108,6 @@ export default function MILoanApplication() {
         zip_code: form.zip || null,
       } as any);
 
-      // Demo: show reviewing state then route to approved
       setSubmitting(false);
       setReviewing(true);
     } catch (e) {
@@ -110,7 +117,6 @@ export default function MILoanApplication() {
     }
   };
 
-  // Demo: after 3 seconds of reviewing, navigate to approved
   useEffect(() => {
     if (!reviewing) return;
     const timer = setTimeout(() => {
@@ -129,9 +135,7 @@ export default function MILoanApplication() {
               <div className="rounded-2xl border border-border bg-card p-8 space-y-4">
                 <Loader2 className="h-14 w-14 text-accent mx-auto animate-spin" />
                 <h2 className="font-heading text-2xl font-bold">Reviewing Your Application...</h2>
-                <p className="text-muted-foreground">
-                  We're checking your eligibility. This will only take a moment.
-                </p>
+                <p className="text-muted-foreground">We're checking your eligibility. This will only take a moment.</p>
                 <Progress value={66} className="h-2" />
               </div>
             </SectionReveal>
@@ -159,7 +163,8 @@ export default function MILoanApplication() {
             </Badge>
             <h1 className="font-heading text-2xl font-bold md:text-4xl">Loan Application</h1>
             <p className="mt-2 text-primary-foreground/70">
-              ${repairCost.toLocaleString()} repair • ~${monthlyPayment}/mo for 12 months
+              {formatCurrency(scenario.loanAmount)} loan • ~{formatCurrency(monthlyPayment)}/mo for 12 months
+              {scenario.isPartial && ` • ${formatCurrency(scenario.outOfPocket)} at shop`}
             </p>
           </SectionReveal>
         </div>
@@ -324,18 +329,39 @@ export default function MILoanApplication() {
                   {(year || make || model) && (
                     <div className="flex justify-between"><span className="text-muted-foreground">Vehicle</span><span className="font-medium">{[year, make, model].filter(Boolean).join(" ")}</span></div>
                   )}
-                  <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-semibold text-accent">${repairCost.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Total Repair Cost</span><span className="font-semibold text-accent">{formatCurrency(repairCost)}</span></div>
                 </div>
 
                 {/* Loan summary */}
                 <div className="rounded-lg border-2 border-accent bg-accent/5 p-4 space-y-2 text-sm">
                   <h4 className="font-semibold text-xs uppercase tracking-wider text-accent">Loan Summary</h4>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Loan Amount</span><span className="font-medium">${repairCost.toLocaleString()}</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Term</span><span className="font-medium">12 months</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Est. APR</span><span className="font-medium">36%</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Monthly Payment</span><span className="font-bold text-accent text-lg">~${monthlyPayment}/mo</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Total Repayment</span><span className="font-medium">${totalCost.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Loan Amount</span><span className="font-medium">{formatCurrency(scenario.loanAmount)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Term</span><span className="font-medium">{MI_LOAN.termMonths} months</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Est. APR</span><span className="font-medium">{MI_LOAN.maxApr}%</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Monthly Payment</span><span className="font-bold text-accent text-lg">~{formatCurrency(monthlyPayment)}/mo</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Total Repayment</span><span className="font-medium">{formatCurrency(totalCost)}</span></div>
                 </div>
+
+                {/* Partial financing notice */}
+                {scenario.isPartial && (
+                  <div className="rounded-lg border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/20 p-4 space-y-2 text-sm">
+                    <h4 className="font-semibold text-amber-800 dark:text-amber-300 flex items-center gap-1">
+                      ⚠️ Additional Payment at Shop
+                    </h4>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Total Repair Cost</span>
+                      <span className="font-medium">{formatCurrency(repairCost)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">MI Loan Covers</span>
+                      <span className="font-medium text-green-700">{formatCurrency(MI_LOAN.maxAmount)}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-amber-300 pt-2">
+                      <span className="font-semibold text-amber-800 dark:text-amber-300">You Pay at Shop</span>
+                      <span className="font-bold text-amber-800 dark:text-amber-300">{formatCurrency(scenario.outOfPocket)}</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Applicant info */}
                 <div className="rounded-lg bg-muted/50 p-4 space-y-2 text-sm">
@@ -361,6 +387,14 @@ export default function MILoanApplication() {
                       I understand this is a <span className="font-semibold">pre-qualification</span> only. Final approval, terms, and APR are determined by the lending partner.
                     </label>
                   </div>
+                  {scenario.isPartial && (
+                    <div className="flex items-start gap-3">
+                      <Checkbox id="partialPayment" checked={form.agreePartialPayment} onCheckedChange={(v) => update("agreePartialPayment", v === true)} className="mt-0.5" />
+                      <label htmlFor="partialPayment" className="text-xs text-muted-foreground cursor-pointer">
+                        I understand I'll pay <span className="font-semibold">{formatCurrency(scenario.outOfPocket)}</span> at the shop when I pick up my vehicle.
+                      </label>
+                    </div>
+                  )}
                 </div>
 
                 <div className="rounded-lg bg-accent/5 border border-accent/20 p-3 flex items-center gap-2 text-xs text-muted-foreground">
@@ -374,7 +408,7 @@ export default function MILoanApplication() {
                   </Button>
                   <Button
                     onClick={handleSubmit}
-                    disabled={submitting || !form.agreeTerms || !form.agreeDisclosure}
+                    disabled={submitting || !form.agreeTerms || !form.agreeDisclosure || (scenario.isPartial && !form.agreePartialPayment)}
                     className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
                   >
                     {submitting ? "Submitting..." : "Submit Application"} {!submitting && <ArrowRight className="ml-2 h-4 w-4" />}

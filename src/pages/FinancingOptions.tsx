@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   CheckCircle, CreditCard, DollarSign, Building, Star, Sparkles, ArrowRight,
 } from "lucide-react";
-import { isMichiganZip, calculateMonthlyPayment, MI_LOAN } from "@/lib/financing";
+import { isMichiganZip, calculateMonthlyPayment, calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
 
 export default function FinancingOptions() {
   const [searchParams] = useSearchParams();
@@ -19,8 +19,8 @@ export default function FinancingOptions() {
   const model = searchParams.get("model") || "";
 
   const isMI = isMichiganZip(zip);
-  const miEligible = repairCost <= MI_LOAN.maxAmount;
-  const miMonthly = calculateMonthlyPayment(repairCost, MI_LOAN.maxApr, MI_LOAN.termMonths);
+  const scenario = calculateFinancingScenario(repairCost);
+  const miEligible = !scenario.isTooHigh; // eligible for full or partial
   const affirmMonthly = Math.round((repairCost * 1.10) / 12);
 
   const miLoanCard = {
@@ -28,15 +28,17 @@ export default function FinancingOptions() {
     title: "MI Affordable Loan",
     icon: <Star className="h-6 w-6" />,
     highlight: true,
-    badge: "🏛️ FEATURED — Michigan Residents Only",
-    amount: `~$${miMonthly}/mo`,
+    badge: scenario.isPartial ? "🏛️ PARTIAL FINANCING — Michigan Residents" : "🏛️ FEATURED — Michigan Residents Only",
+    amount: `~${formatCurrency(scenario.monthlyPayment)}/mo`,
     subtitle: `${MI_LOAN.termMonths} months • ${MI_LOAN.maxApr}% APR max`,
     features: [
-      `Up to $${MI_LOAN.maxAmount.toLocaleString()} available`,
+      `Loan amount: ${formatCurrency(scenario.loanAmount)}`,
       "✨ No traditional credit check",
       "✅ State of Michigan program",
       "🏅 Designed for unexpected car repairs",
-      "Quick eligibility check",
+      ...(scenario.isPartial
+        ? [`⚠️ You pay ${formatCurrency(scenario.outOfPocket)} at shop`]
+        : ["Quick eligibility check"]),
     ],
     buttonText: "Check Eligibility",
     buttonLink: `/mi-loan-eligibility?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${zip}&year=${year}&make=${make}&model=${model}`,
@@ -196,9 +198,8 @@ export default function FinancingOptions() {
               <div className="mt-6 rounded-xl border border-border bg-muted/50 p-6 text-center">
                 <Star className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">MI Affordable Loan</span> — Available to Michigan residents for repairs under $1,200.
+                  <span className="font-semibold text-foreground">MI Affordable Loan</span> — Available to Michigan residents for car repairs (up to $1,200 loan, partial financing for higher amounts).
                   {!isMI && " Enter a Michigan ZIP code to check eligibility."}
-                  {isMI && !miEligible && " This repair exceeds the $1,200 limit."}
                 </p>
                 <Button variant="outline" size="sm" className="mt-3" asChild>
                   <Link to="/mi-affordable-loan">Learn More</Link>

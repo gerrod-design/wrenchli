@@ -45,3 +45,25 @@ export async function detectUserState(): Promise<string | null> {
     return null;
   }
 }
+
+// Calculate financing scenario (full vs partial)
+export function calculateFinancingScenario(repairCost: number, maxLoan: number = MI_LOAN.maxAmount) {
+  const isFullFinancing = repairCost <= maxLoan;
+  const loanAmount = isFullFinancing ? repairCost : maxLoan;
+  const outOfPocket = isFullFinancing ? 0 : repairCost - maxLoan;
+  const monthlyPayment = calculateMonthlyPayment(loanAmount, MI_LOAN.maxApr, MI_LOAN.termMonths);
+  const totalLoanCost = Math.round(monthlyPayment * MI_LOAN.termMonths * 100) / 100;
+  const isPartial = !isFullFinancing && repairCost <= 5000;
+  const isTooHigh = repairCost > 5000;
+
+  return {
+    isFullFinancing,
+    isPartial,
+    isTooHigh,
+    loanAmount,
+    outOfPocket,
+    monthlyPayment,
+    totalLoanCost,
+    repairCost,
+  };
+}
