@@ -73,8 +73,9 @@ export default function MILoanApplication() {
   const [submitting, setSubmitting] = useState(false);
   const [reviewing, setReviewing] = useState(false);
 
-  const monthlyPayment = Math.round((repairCost * 1.36) / 12);
-  const totalCost = Math.round(repairCost * 1.36);
+  const scenario = calculateFinancingScenario(repairCost);
+  const monthlyPayment = scenario.monthlyPayment;
+  const totalCost = scenario.totalLoanCost;
 
   const update = (field: keyof FormData, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
