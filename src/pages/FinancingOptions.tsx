@@ -8,6 +8,8 @@ import {
   CheckCircle, CreditCard, DollarSign, Building, Star, Sparkles, ArrowRight,
 } from "lucide-react";
 import { isMichiganZip, calculateMonthlyPayment, calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
+import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function FinancingOptions() {
   const [searchParams] = useSearchParams();
