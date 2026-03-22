@@ -55,6 +55,7 @@ const initialForm: FormData = {
   employmentDuration: "",
   agreeTerms: false,
   agreeDisclosure: false,
+  agreePartialPayment: false,
 };
 
 export default function MILoanApplication() {
