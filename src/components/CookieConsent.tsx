@@ -45,10 +45,10 @@ export default function CookieConsent() {
             <X className="h-4 w-4" />
           </button>
 
-          <div className="flex items-start gap-3 pr-6">
-            <Cookie className="h-5 w-5 shrink-0 text-accent mt-0.5" />
-            <div className="space-y-2">
-              <p className="text-sm text-foreground leading-relaxed">
+          <div className="flex items-start gap-2 pr-5 sm:gap-3 sm:pr-6">
+            <Cookie className="h-4 w-4 shrink-0 text-accent mt-0.5 sm:h-5 sm:w-5" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <p className="text-xs sm:text-sm text-foreground leading-relaxed">
                 We use cookies and local storage for essential site functionality and anonymous analytics.{" "}
                 <Link to="/privacy" className="text-accent hover:underline font-medium">
                   Privacy Policy
