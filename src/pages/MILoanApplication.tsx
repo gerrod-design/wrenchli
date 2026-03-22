@@ -17,6 +17,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
+import { trackEvent } from "@/lib/analytics";
 
 interface FormData {
   firstName: string;
