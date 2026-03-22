@@ -28,15 +28,17 @@ export default function FinancingOptions() {
     title: "MI Affordable Loan",
     icon: <Star className="h-6 w-6" />,
     highlight: true,
-    badge: "🏛️ FEATURED — Michigan Residents Only",
-    amount: `~$${miMonthly}/mo`,
+    badge: scenario.isPartial ? "🏛️ PARTIAL FINANCING — Michigan Residents" : "🏛️ FEATURED — Michigan Residents Only",
+    amount: `~${formatCurrency(scenario.monthlyPayment)}/mo`,
     subtitle: `${MI_LOAN.termMonths} months • ${MI_LOAN.maxApr}% APR max`,
     features: [
-      `Up to $${MI_LOAN.maxAmount.toLocaleString()} available`,
+      `Loan amount: ${formatCurrency(scenario.loanAmount)}`,
       "✨ No traditional credit check",
       "✅ State of Michigan program",
       "🏅 Designed for unexpected car repairs",
-      "Quick eligibility check",
+      ...(scenario.isPartial
+        ? [`⚠️ You pay ${formatCurrency(scenario.outOfPocket)} at shop`]
+        : ["Quick eligibility check"]),
     ],
     buttonText: "Check Eligibility",
     buttonLink: `/mi-loan-eligibility?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${zip}&year=${year}&make=${make}&model=${model}`,
