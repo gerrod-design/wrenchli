@@ -263,8 +263,8 @@ export default function HowItWorksVideo() {
           <div className="mt-10 text-center space-y-3">
             <p className="font-heading text-lg font-bold text-foreground md:text-2xl">
               {isMobile
-                ? "Ready to try it? Tap below — takes about 60 seconds."
-                : "Ready to try it? Your first diagnosis takes about 60 seconds."}
+                ? "Ready to try it? Tap below — takes about a minute."
+                : "Ready to try it? Your first diagnosis takes about a minute."}
             </p>
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
