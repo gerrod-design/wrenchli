@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
 import { format, addDays } from "date-fns";
+import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function MILoanApproved() {
   const [searchParams] = useSearchParams();
