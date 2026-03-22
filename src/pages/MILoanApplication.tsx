@@ -97,10 +97,10 @@ export default function MILoanApplication() {
     try {
       await supabase.from("finance_selections" as any).insert({
         provider: "MI Affordable Loan",
-        option_type: "state_program",
-        apr: 36,
+        option_type: scenario.isPartial ? "state_program_partial" : "state_program",
+        apr: MI_LOAN.maxApr,
         monthly_payment: monthlyPayment,
-        term_months: 12,
+        term_months: MI_LOAN.termMonths,
         total_cost: totalCost,
         repair_cost: repairCost,
         vehicle_year: year || null,
