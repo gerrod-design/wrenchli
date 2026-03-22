@@ -41,9 +41,9 @@ export default function Investors() {
             <StatCounter end={1.2} prefix="$" suffix="M" label="Saved by Customers" />
             <StatCounter end={300} suffix="+" label="Shops in MI & OH" />
           </div>
-          <p className="mt-8 text-center text-primary-foreground/60 md:text-lg">
-            We're here to change that. Wrenchli brings trust back to auto repair.
-          </p>
+          <div className="mt-8 text-center">
+            <StatCounter end={4.8} suffix="★" label="Average Rating" />
+          </div>
         </div>
       </section>
 
