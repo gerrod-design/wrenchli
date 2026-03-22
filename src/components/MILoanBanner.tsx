@@ -32,6 +32,7 @@ export default function MILoanBanner() {
     if (stored === "MI") {
       setShow(true);
       setVisible(true);
+      trackEvent({ event_type: "user_action", category: "finance_option", action: "mi_loan_banner_viewed", metadata: { user_state: "MI" } });
       return;
     }
 
