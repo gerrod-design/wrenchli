@@ -46,7 +46,7 @@ export default function VehicleIdentifier({
   const hasGarageVehicles = garageVehicles.length > 0;
 
   const baseTabs: { id: TabId; label: string; shortLabel: string; icon: typeof Car }[] = [
-    { id: "dropdown", label: "Drop-Down", shortLabel: "Drop-Down", icon: Car },
+    { id: "dropdown", label: "Select", shortLabel: "Select", icon: Car },
     { id: "vin", label: "Enter VIN", shortLabel: "Type VIN", icon: Keyboard },
     { id: "scan", label: "📷 Scan VIN", shortLabel: "Scan VIN", icon: Camera },
   ];
