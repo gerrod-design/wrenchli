@@ -88,13 +88,6 @@ export default function CinematicHero() {
       {/* Content */}
       <div className="relative z-[2] flex flex-col items-center justify-center h-full px-6 text-center max-w-[900px] mx-auto">
         {/* WRENCHLI wordmark */}
-        <motion.p
-          {...fadeUp(0.3)}
-          className="font-heading text-base md:text-xl font-bold tracking-[0.35em] md:tracking-[0.5em] text-white/90 uppercase"
-          style={{ textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
-        >
-          WRENCHLI
-        </motion.p>
 
         {/* Headline */}
         <motion.h1
