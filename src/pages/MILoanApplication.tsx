@@ -35,6 +35,7 @@ interface FormData {
   employmentDuration: string;
   agreeTerms: boolean;
   agreeDisclosure: boolean;
+  agreePartialPayment: boolean;
 }
 
 const initialForm: FormData = {
