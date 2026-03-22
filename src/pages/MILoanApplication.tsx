@@ -391,7 +391,15 @@ export default function MILoanApplication() {
                     <label htmlFor="disclosure" className="text-xs text-muted-foreground cursor-pointer">
                       I understand this is a <span className="font-semibold">pre-qualification</span> only. Final approval, terms, and APR are determined by the lending partner.
                     </label>
+                </div>
+                {scenario.isPartial && (
+                  <div className="flex items-start gap-3">
+                    <Checkbox id="partialPayment" checked={form.agreePartialPayment} onCheckedChange={(v) => update("agreePartialPayment", v === true)} className="mt-0.5" />
+                    <label htmlFor="partialPayment" className="text-xs text-muted-foreground cursor-pointer">
+                      I understand I'll pay <span className="font-semibold">{formatCurrency(scenario.outOfPocket)}</span> at the shop when I pick up my vehicle.
+                    </label>
                   </div>
+                )}
                 </div>
 
                 <div className="rounded-lg bg-accent/5 border border-accent/20 p-3 flex items-center gap-2 text-xs text-muted-foreground">
