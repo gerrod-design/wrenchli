@@ -19,8 +19,8 @@ export default function FinancingOptions() {
   const model = searchParams.get("model") || "";
 
   const isMI = isMichiganZip(zip);
-  const miEligible = repairCost <= MI_LOAN.maxAmount;
-  const miMonthly = calculateMonthlyPayment(repairCost, MI_LOAN.maxApr, MI_LOAN.termMonths);
+  const scenario = calculateFinancingScenario(repairCost);
+  const miEligible = !scenario.isTooHigh; // eligible for full or partial
   const affirmMonthly = Math.round((repairCost * 1.10) / 12);
 
   const miLoanCard = {
