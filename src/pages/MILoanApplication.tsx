@@ -76,6 +76,16 @@ export default function MILoanApplication() {
 
   const scenario = calculateFinancingScenario(repairCost);
   const monthlyPayment = scenario.monthlyPayment;
+
+  useEffect(() => {
+    trackEvent({
+      event_type: "user_action",
+      category: "finance_option",
+      action: "mi_loan_application_started",
+      value: repairCost,
+      metadata: { financing_type: scenario.isPartial ? "partial" : "full" },
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const totalCost = scenario.totalLoanCost;
 
   const update = (field: keyof FormData, value: string | boolean) =>
