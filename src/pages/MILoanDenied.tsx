@@ -7,6 +7,8 @@ import {
   Info, CreditCard, Building, Phone, ArrowRight,
 } from "lucide-react";
 import { MI_LOAN } from "@/lib/financing";
+import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function MILoanDenied() {
   const [searchParams] = useSearchParams();
