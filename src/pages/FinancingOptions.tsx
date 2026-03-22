@@ -198,9 +198,8 @@ export default function FinancingOptions() {
               <div className="mt-6 rounded-xl border border-border bg-muted/50 p-6 text-center">
                 <Star className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">MI Affordable Loan</span> — Available to Michigan residents for repairs under $1,200.
+                  <span className="font-semibold text-foreground">MI Affordable Loan</span> — Available to Michigan residents for car repairs (up to $1,200 loan, partial financing for higher amounts).
                   {!isMI && " Enter a Michigan ZIP code to check eligibility."}
-                  {isMI && !miEligible && " This repair exceeds the $1,200 limit."}
                 </p>
                 <Button variant="outline" size="sm" className="mt-3" asChild>
                   <Link to="/mi-affordable-loan">Learn More</Link>
