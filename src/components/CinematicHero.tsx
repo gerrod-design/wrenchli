@@ -100,14 +100,7 @@ export default function CinematicHero() {
           Finally <span className="text-accent">Fixed</span>
         </motion.h1>
 
-        {/* Subtitle */}
-        <motion.p
-          {...fadeUp(1.2, 15)}
-          className="mt-5 md:mt-6 text-lg md:text-2xl font-semibold tracking-wide text-white/95 max-w-[600px]"
-          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)" }}
-        >
-          Mobility for All.
-        </motion.p>
+        {/* Regional info */}
         <motion.p
           {...fadeUp(1.5, 10)}
           className="mt-2 text-sm md:text-base text-white/70 max-w-[500px]"
