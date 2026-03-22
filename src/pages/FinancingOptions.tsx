@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   CheckCircle, CreditCard, DollarSign, Building, Star, Sparkles, ArrowRight,
 } from "lucide-react";
-import { isMichiganZip, calculateMonthlyPayment, MI_LOAN } from "@/lib/financing";
+import { isMichiganZip, calculateMonthlyPayment, calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
 
 export default function FinancingOptions() {
   const [searchParams] = useSearchParams();
