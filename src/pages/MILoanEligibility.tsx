@@ -9,6 +9,7 @@ import {
   CheckCircle, XCircle, MapPin, DollarSign, ArrowRight, Sparkles, CreditCard, AlertTriangle,
 } from "lucide-react";
 import { isMichiganZip, calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
+import { trackEvent } from "@/lib/analytics";
 
 export default function MILoanEligibility() {
   const [searchParams] = useSearchParams();
