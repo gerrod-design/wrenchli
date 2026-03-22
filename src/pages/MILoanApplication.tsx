@@ -36,6 +36,8 @@ interface FormData {
   agreeTerms: boolean;
   agreeDisclosure: boolean;
   agreePartialPayment: boolean;
+}
+
 const initialForm: FormData = {
   firstName: "",
   lastName: "",
@@ -90,7 +92,6 @@ export default function MILoanApplication() {
       toast.error("Please acknowledge the additional shop payment.");
       return;
     }
-    }
     setSubmitting(true);
     try {
       await supabase.from("finance_selections" as any).insert({
@@ -107,7 +108,6 @@ export default function MILoanApplication() {
         zip_code: form.zip || null,
       } as any);
 
-      // Demo: show reviewing state then route to approved
       setSubmitting(false);
       setReviewing(true);
     } catch (e) {
@@ -117,7 +117,6 @@ export default function MILoanApplication() {
     }
   };
 
-  // Demo: after 3 seconds of reviewing, navigate to approved
   useEffect(() => {
     if (!reviewing) return;
     const timer = setTimeout(() => {
@@ -136,9 +135,7 @@ export default function MILoanApplication() {
               <div className="rounded-2xl border border-border bg-card p-8 space-y-4">
                 <Loader2 className="h-14 w-14 text-accent mx-auto animate-spin" />
                 <h2 className="font-heading text-2xl font-bold">Reviewing Your Application...</h2>
-                <p className="text-muted-foreground">
-                  We're checking your eligibility. This will only take a moment.
-                </p>
+                <p className="text-muted-foreground">We're checking your eligibility. This will only take a moment.</p>
                 <Progress value={66} className="h-2" />
               </div>
             </SectionReveal>
@@ -332,14 +329,14 @@ export default function MILoanApplication() {
                   {(year || make || model) && (
                     <div className="flex justify-between"><span className="text-muted-foreground">Vehicle</span><span className="font-medium">{[year, make, model].filter(Boolean).join(" ")}</span></div>
                   )}
-                  <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-semibold text-accent">{formatCurrency(repairCost)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Total Repair Cost</span><span className="font-semibold text-accent">{formatCurrency(repairCost)}</span></div>
                 </div>
 
                 {/* Loan summary */}
                 <div className="rounded-lg border-2 border-accent bg-accent/5 p-4 space-y-2 text-sm">
                   <h4 className="font-semibold text-xs uppercase tracking-wider text-accent">Loan Summary</h4>
                   <div className="flex justify-between"><span className="text-muted-foreground">Loan Amount</span><span className="font-medium">{formatCurrency(scenario.loanAmount)}</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Term</span><span className="font-medium">12 months</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Term</span><span className="font-medium">{MI_LOAN.termMonths} months</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Est. APR</span><span className="font-medium">{MI_LOAN.maxApr}%</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Monthly Payment</span><span className="font-bold text-accent text-lg">~{formatCurrency(monthlyPayment)}/mo</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Total Repayment</span><span className="font-medium">{formatCurrency(totalCost)}</span></div>
@@ -390,14 +387,14 @@ export default function MILoanApplication() {
                       I understand this is a <span className="font-semibold">pre-qualification</span> only. Final approval, terms, and APR are determined by the lending partner.
                     </label>
                   </div>
-                {scenario.isPartial && (
-                  <div className="flex items-start gap-3">
-                    <Checkbox id="partialPayment" checked={form.agreePartialPayment} onCheckedChange={(v) => update("agreePartialPayment", v === true)} className="mt-0.5" />
-                    <label htmlFor="partialPayment" className="text-xs text-muted-foreground cursor-pointer">
-                      I understand I'll pay <span className="font-semibold">{formatCurrency(scenario.outOfPocket)}</span> at the shop when I pick up my vehicle.
-                    </label>
-                  </div>
-                )}
+                  {scenario.isPartial && (
+                    <div className="flex items-start gap-3">
+                      <Checkbox id="partialPayment" checked={form.agreePartialPayment} onCheckedChange={(v) => update("agreePartialPayment", v === true)} className="mt-0.5" />
+                      <label htmlFor="partialPayment" className="text-xs text-muted-foreground cursor-pointer">
+                        I understand I'll pay <span className="font-semibold">{formatCurrency(scenario.outOfPocket)}</span> at the shop when I pick up my vehicle.
+                      </label>
+                    </div>
+                  )}
                 </div>
 
                 <div className="rounded-lg bg-accent/5 border border-accent/20 p-3 flex items-center gap-2 text-xs text-muted-foreground">
