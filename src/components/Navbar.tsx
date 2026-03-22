@@ -168,10 +168,10 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 lg:flex">
           <NotificationBell />
           <GarageDropdown />
-          <Button asChild variant="ghost" size="sm" className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10">
-            <Link to="/investors">Investors</Link>
+          <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
+            <Link to="/#quote">Get a Quote</Link>
           </Button>
-          <Button asChild variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+          <Button asChild size="sm" className="bg-wrenchli-trust-blue text-white hover:bg-wrenchli-trust-blue/90 font-semibold">
             <Link to="/for-shops#apply">For Shops</Link>
           </Button>
           <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
