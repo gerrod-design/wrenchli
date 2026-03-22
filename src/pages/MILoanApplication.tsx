@@ -413,7 +413,7 @@ export default function MILoanApplication() {
                   </Button>
                   <Button
                     onClick={handleSubmit}
-                    disabled={submitting || !form.agreeTerms || !form.agreeDisclosure}
+                    disabled={submitting || !form.agreeTerms || !form.agreeDisclosure || (scenario.isPartial && !form.agreePartialPayment)}
                     className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
                   >
                     {submitting ? "Submitting..." : "Submit Application"} {!submitting && <ArrowRight className="ml-2 h-4 w-4" />}
