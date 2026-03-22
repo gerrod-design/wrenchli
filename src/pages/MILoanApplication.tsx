@@ -334,18 +334,39 @@ export default function MILoanApplication() {
                   {(year || make || model) && (
                     <div className="flex justify-between"><span className="text-muted-foreground">Vehicle</span><span className="font-medium">{[year, make, model].filter(Boolean).join(" ")}</span></div>
                   )}
-                  <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-semibold text-accent">${repairCost.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-semibold text-accent">{formatCurrency(repairCost)}</span></div>
                 </div>
 
                 {/* Loan summary */}
                 <div className="rounded-lg border-2 border-accent bg-accent/5 p-4 space-y-2 text-sm">
                   <h4 className="font-semibold text-xs uppercase tracking-wider text-accent">Loan Summary</h4>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Loan Amount</span><span className="font-medium">${repairCost.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Loan Amount</span><span className="font-medium">{formatCurrency(scenario.loanAmount)}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Term</span><span className="font-medium">12 months</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Est. APR</span><span className="font-medium">36%</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Monthly Payment</span><span className="font-bold text-accent text-lg">~${monthlyPayment}/mo</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Total Repayment</span><span className="font-medium">${totalCost.toLocaleString()}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Est. APR</span><span className="font-medium">{MI_LOAN.maxApr}%</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Monthly Payment</span><span className="font-bold text-accent text-lg">~{formatCurrency(monthlyPayment)}/mo</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Total Repayment</span><span className="font-medium">{formatCurrency(totalCost)}</span></div>
                 </div>
+
+                {/* Partial financing notice */}
+                {scenario.isPartial && (
+                  <div className="rounded-lg border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/20 p-4 space-y-2 text-sm">
+                    <h4 className="font-semibold text-amber-800 dark:text-amber-300 flex items-center gap-1">
+                      ⚠️ Additional Payment at Shop
+                    </h4>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Total Repair Cost</span>
+                      <span className="font-medium">{formatCurrency(repairCost)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">MI Loan Covers</span>
+                      <span className="font-medium text-green-700">{formatCurrency(MI_LOAN.maxAmount)}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-amber-300 pt-2">
+                      <span className="font-semibold text-amber-800 dark:text-amber-300">You Pay at Shop</span>
+                      <span className="font-bold text-amber-800 dark:text-amber-300">{formatCurrency(scenario.outOfPocket)}</span>
+                    </div>
+                  </div>
+                )
 
                 {/* Applicant info */}
                 <div className="rounded-lg bg-muted/50 p-4 space-y-2 text-sm">
