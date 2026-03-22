@@ -7,12 +7,25 @@ import {
   Info, CreditCard, Building, Phone, ArrowRight,
 } from "lucide-react";
 import { MI_LOAN } from "@/lib/financing";
+import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function MILoanDenied() {
   const [searchParams] = useSearchParams();
   const repairCost = Number(searchParams.get("repair")) || 500;
   const diagnosis = searchParams.get("diagnosis") || "Car Repair";
   const zip = searchParams.get("zip") || "";
+
+  useEffect(() => {
+    trackEvent({
+      event_type: "ad_conversion",
+      category: "finance_option",
+      action: "mi_loan_denied",
+      value: repairCost,
+      label: diagnosis,
+      zip_code: zip,
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <main className="pb-[60px] md:pb-0">

@@ -17,6 +17,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
+import { trackEvent } from "@/lib/analytics";
 
 interface FormData {
   firstName: string;
@@ -75,6 +76,16 @@ export default function MILoanApplication() {
 
   const scenario = calculateFinancingScenario(repairCost);
   const monthlyPayment = scenario.monthlyPayment;
+
+  useEffect(() => {
+    trackEvent({
+      event_type: "user_action",
+      category: "finance_option",
+      action: "mi_loan_application_started",
+      value: repairCost,
+      metadata: { financing_type: scenario.isPartial ? "partial" : "full" },
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const totalCost = scenario.totalLoanCost;
 
   const update = (field: keyof FormData, value: string | boolean) =>
@@ -93,6 +104,13 @@ export default function MILoanApplication() {
       return;
     }
     setSubmitting(true);
+    trackEvent({
+      event_type: "ad_conversion",
+      category: "finance_option",
+      action: "mi_loan_application_completed",
+      value: repairCost,
+      metadata: { financing_type: scenario.isPartial ? "partial" : "full", loan_amount: scenario.loanAmount },
+    });
     try {
       await supabase.from("finance_selections" as any).insert({
         provider: "MI Affordable Loan",

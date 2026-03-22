@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { isMichiganZip } from "@/lib/financing";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ export default function MILoanEligibilityPopup({ zip }: Props) {
 
     sessionStorage.setItem(SESSION_KEY, "true");
     setOpen(true);
+    trackEvent({ event_type: "user_action", category: "finance_option", action: "mi_loan_popup_viewed", metadata: { zip } });
 
     // Auto-dismiss after 15 seconds
     const timer = setTimeout(() => setOpen(false), 15000);

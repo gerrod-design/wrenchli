@@ -1,11 +1,17 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, ArrowRight } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function MIAffordableLoan() {
+  useEffect(() => {
+    trackEvent({ event_type: "page_view", category: "finance_option", action: "mi_loan_landing_page_viewed" });
+  }, []);
+
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO

@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
 import { format, addDays } from "date-fns";
+import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function MILoanApproved() {
   const [searchParams] = useSearchParams();
@@ -16,6 +18,16 @@ export default function MILoanApproved() {
 
   const scenario = calculateFinancingScenario(repairCost);
   const firstPaymentDate = addDays(new Date(), 30);
+
+  useEffect(() => {
+    trackEvent({
+      event_type: "ad_conversion",
+      category: "finance_option",
+      action: scenario.isPartial ? "mi_loan_approved_partial" : "mi_loan_approved_full",
+      value: repairCost,
+      metadata: { loan_amount: scenario.loanAmount, out_of_pocket: scenario.outOfPocket },
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loanDetails = [
     { label: "Loan Amount", value: formatCurrency(scenario.loanAmount) },

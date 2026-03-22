@@ -9,6 +9,7 @@ import {
   CheckCircle, XCircle, MapPin, DollarSign, ArrowRight, Sparkles, CreditCard, AlertTriangle,
 } from "lucide-react";
 import { isMichiganZip, calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
+import { trackEvent } from "@/lib/analytics";
 
 export default function MILoanEligibility() {
   const [searchParams] = useSearchParams();
@@ -27,7 +28,20 @@ export default function MILoanEligibility() {
   const isEligible = isMichigan && !scenario.isTooHigh;
 
   const handleCheck = () => {
-    if (enteredZip.length === 5) setStep("result");
+    if (enteredZip.length === 5) {
+      setStep("result");
+      const eligible = isMichiganZip(enteredZip) && !scenario.isTooHigh;
+      const financingType = scenario.isPartial ? "partial" : scenario.isTooHigh ? "over_limit" : "full";
+      trackEvent({
+        event_type: "user_action",
+        category: "finance_option",
+        action: eligible ? "mi_loan_eligibility_passed" : "mi_loan_eligibility_failed",
+        label: !isMichiganZip(enteredZip) ? "non_michigan" : financingType,
+        value: repairCost,
+        zip_code: enteredZip,
+        metadata: { financing_type: financingType, repair_cost: repairCost },
+      });
+    }
   };
 
   const applicationLink = `/mi-loan-application?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${enteredZip}&year=${year}&make=${make}&model=${model}`;

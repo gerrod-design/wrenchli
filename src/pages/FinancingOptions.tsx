@@ -8,6 +8,8 @@ import {
   CheckCircle, CreditCard, DollarSign, Building, Star, Sparkles, ArrowRight,
 } from "lucide-react";
 import { isMichiganZip, calculateMonthlyPayment, calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
+import { useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function FinancingOptions() {
   const [searchParams] = useSearchParams();
@@ -20,6 +22,17 @@ export default function FinancingOptions() {
 
   const isMI = isMichiganZip(zip);
   const scenario = calculateFinancingScenario(repairCost);
+
+  useEffect(() => {
+    trackEvent({
+      event_type: "page_view",
+      category: "finance_option",
+      action: "financing_options_viewed",
+      value: repairCost,
+      zip_code: zip,
+      metadata: { is_michigan: isMI },
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const miEligible = !scenario.isTooHigh; // eligible for full or partial
   const affirmMonthly = Math.round((repairCost * 1.10) / 12);
 

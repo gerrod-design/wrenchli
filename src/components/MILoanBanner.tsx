@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 
 const DISMISS_KEY = "mi_loan_banner_dismissed";
 const DISMISS_EXPIRY_DAYS = 7;
@@ -31,6 +32,7 @@ export default function MILoanBanner() {
     if (stored === "MI") {
       setShow(true);
       setVisible(true);
+      trackEvent({ event_type: "user_action", category: "finance_option", action: "mi_loan_banner_viewed", metadata: { user_state: "MI" } });
       return;
     }
 
@@ -43,6 +45,7 @@ export default function MILoanBanner() {
         if (state === "MI") {
           setShow(true);
           setVisible(true);
+          trackEvent({ event_type: "user_action", category: "finance_option", action: "mi_loan_banner_viewed", metadata: { user_state: "MI" } });
         }
       })
       .catch(() => {});
@@ -51,6 +54,7 @@ export default function MILoanBanner() {
   function handleDismiss() {
     localStorage.setItem(DISMISS_KEY, JSON.stringify({ timestamp: Date.now() }));
     setVisible(false);
+    trackEvent({ event_type: "user_action", category: "finance_option", action: "mi_loan_banner_dismissed" });
   }
 
   if (!show) return null;
