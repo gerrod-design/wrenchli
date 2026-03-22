@@ -391,7 +391,7 @@ export default function MILoanApplication() {
                     <label htmlFor="disclosure" className="text-xs text-muted-foreground cursor-pointer">
                       I understand this is a <span className="font-semibold">pre-qualification</span> only. Final approval, terms, and APR are determined by the lending partner.
                     </label>
-                </div>
+                  </div>
                 {scenario.isPartial && (
                   <div className="flex items-start gap-3">
                     <Checkbox id="partialPayment" checked={form.agreePartialPayment} onCheckedChange={(v) => update("agreePartialPayment", v === true)} className="mt-0.5" />
