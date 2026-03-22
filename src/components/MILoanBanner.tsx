@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 
 const DISMISS_KEY = "mi_loan_banner_dismissed";
 const DISMISS_EXPIRY_DAYS = 7;
