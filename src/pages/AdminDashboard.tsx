@@ -20,6 +20,7 @@ import OptimizationEngine from "@/components/OptimizationEngine";
 import ApiKeyManager from "@/components/ApiKeyManager";
 import ApiUsageAnalytics from "@/components/ApiUsageAnalytics";
 import ReferralAnalytics from "@/components/ReferralAnalytics";
+import MILoanFunnel from "@/components/MILoanFunnel";
 
 interface FinanceSelection {
   id: string;
