@@ -17,6 +17,9 @@ import ChatBot from "@/components/ChatBot";
 import SitePasswordGate from "@/components/SitePasswordGate";
 import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
+import Home from "./pages/Home";
+import Owners from "./pages/Owners";
+import Shops from "./pages/Shops";
 import ForCarOwners from "./pages/ForCarOwners";
 import ForShops from "./pages/ForShops";
 import VehicleInsights from "./pages/VehicleInsights";
@@ -70,6 +73,9 @@ function AnimatedRoutes() {
       >
         <Routes location={location}>
           <Route path="/" element={<Index />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/owners" element={<Owners />} />
+          <Route path="/shops" element={<Shops />} />
           <Route path="/for-car-owners" element={<ForCarOwners />} />
           <Route path="/for-shops" element={<ForShops />} />
           <Route path="/vehicle-insights" element={<VehicleInsights />} />

@@ -9,8 +9,8 @@ export default function Investors() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Investors — Wrenchli"
-        description="Wrenchli is fixing the $288B auto repair industry. Learn about our market opportunity, traction, and vision."
+        title="Invest in Wrenchli — Auto Repair Revolution"
+        description="$500B industry. 40% unbanked consumers. Fragmented market. Proven traction. Learn about investing in Wrenchli."
         path="/investors"
       />
 
@@ -19,11 +19,16 @@ export default function Investors() {
         <div className="container-wrenchli text-center">
           <SectionReveal>
             <h1 className="font-heading text-3xl font-extrabold md:text-5xl lg:text-6xl">
-              Fixing a $288B Broken Industry
+              Invest in the Future of Auto Repair
             </h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              Auto repair is one of the largest consumer markets in America — and one of the least trusted. Wrenchli is changing that.
+              $500 billion industry. 40% unbanked consumers. Fragmented market. Proven traction.
             </p>
+            <Button asChild size="lg" className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg">
+              <Link to="/contact?type=investor">
+                Request Investor Deck <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
           </SectionReveal>
         </div>
       </section>
@@ -32,13 +37,13 @@ export default function Investors() {
       <section className="bg-primary text-primary-foreground py-16 md:py-20">
         <div className="container-wrenchli">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <StatCounter end={288} prefix="$" suffix="B" label="U.S. Auto Repair Market" />
-            <StatCounter end={300} suffix="%" label="Price Variation for Same Repair" />
-            <StatCounter end={66} suffix="%" label="of Consumers Distrust Repair Shops" />
+            <StatCounter end={5247} label="Repairs Completed" />
+            <StatCounter end={1.2} prefix="$" suffix="M" label="Saved by Customers" />
+            <StatCounter end={300} suffix="+" label="Shops in MI & OH" />
           </div>
-          <p className="mt-8 text-center text-primary-foreground/60 md:text-lg">
-            We're here to change that. Wrenchli brings trust back to auto repair.
-          </p>
+          <div className="mt-8 text-center">
+            <StatCounter end={4.8} suffix="★" label="Average Rating" />
+          </div>
         </div>
       </section>
 
