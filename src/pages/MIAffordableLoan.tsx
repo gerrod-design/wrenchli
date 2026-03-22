@@ -85,7 +85,7 @@ export default function MIAffordableLoan() {
             <ul className="mt-6 space-y-3">
               {[
                 "Michigan resident (ZIP codes starting with 48xxx or 49xxx)",
-                "Need car repair under $1,200",
+                "Need car repair (partial financing available for repairs over $1,200)",
                 "Stable source of income (employment, benefits, etc.)",
                 "18 years or older",
               ].map((item) => (
