@@ -14,12 +14,13 @@ import {
   LogOut, CreditCard, FileText, Users, Store, TrendingUp,
   Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2,
 } from "lucide-react";
-import { Key } from "lucide-react";
+import { Key, Landmark } from "lucide-react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import OptimizationEngine from "@/components/OptimizationEngine";
 import ApiKeyManager from "@/components/ApiKeyManager";
 import ApiUsageAnalytics from "@/components/ApiUsageAnalytics";
 import ReferralAnalytics from "@/components/ReferralAnalytics";
+import MILoanFunnel from "@/components/MILoanFunnel";
 
 interface FinanceSelection {
   id: string;
@@ -293,8 +294,9 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="finance" className="w-full">
-          <TabsList className="grid w-full grid-cols-10">
+          <TabsList className="flex w-full overflow-x-auto">
             <TabsTrigger value="finance"><CreditCard className="h-4 w-4 mr-1.5 hidden sm:inline" />Finance</TabsTrigger>
+            <TabsTrigger value="mi-loan"><Landmark className="h-4 w-4 mr-1.5 hidden sm:inline" />MI Loan</TabsTrigger>
             <TabsTrigger value="quotes"><FileText className="h-4 w-4 mr-1.5 hidden sm:inline" />Quotes</TabsTrigger>
             <TabsTrigger value="referrals"><Link2 className="h-4 w-4 mr-1.5 hidden sm:inline" />Referrals</TabsTrigger>
             <TabsTrigger value="waitlist"><Users className="h-4 w-4 mr-1.5 hidden sm:inline" />Waitlist</TabsTrigger>
@@ -305,6 +307,11 @@ export default function AdminDashboard() {
             <TabsTrigger value="analytics"><BarChart3 className="h-4 w-4 mr-1.5 hidden sm:inline" />Analytics</TabsTrigger>
             <TabsTrigger value="optimization"><TrendingUp className="h-4 w-4 mr-1.5 hidden sm:inline" />Optimize</TabsTrigger>
           </TabsList>
+
+          {/* MI Loan Funnel Tab */}
+          <TabsContent value="mi-loan" className="mt-6">
+            <MILoanFunnel />
+          </TabsContent>
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="mt-6">
