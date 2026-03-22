@@ -35,7 +35,7 @@ export default function CookieConsent() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="fixed bottom-[140px] left-4 right-4 z-[60] mx-auto max-w-lg rounded-xl border border-border bg-card p-4 shadow-xl sm:bottom-6 sm:left-6 sm:right-auto"
+          className="fixed bottom-[140px] left-3 right-3 z-[60] mx-auto max-w-sm rounded-lg border border-border bg-card p-3 shadow-xl sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-lg sm:rounded-xl sm:p-4"
         >
           <button
             onClick={decline}
@@ -45,10 +45,10 @@ export default function CookieConsent() {
             <X className="h-4 w-4" />
           </button>
 
-          <div className="flex items-start gap-3 pr-6">
-            <Cookie className="h-5 w-5 shrink-0 text-accent mt-0.5" />
-            <div className="space-y-2">
-              <p className="text-sm text-foreground leading-relaxed">
+          <div className="flex items-start gap-2 pr-5 sm:gap-3 sm:pr-6">
+            <Cookie className="h-4 w-4 shrink-0 text-accent mt-0.5 sm:h-5 sm:w-5" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <p className="text-xs sm:text-sm text-foreground leading-relaxed">
                 We use cookies and local storage for essential site functionality and anonymous analytics.{" "}
                 <Link to="/privacy" className="text-accent hover:underline font-medium">
                   Privacy Policy
