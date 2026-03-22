@@ -174,6 +174,7 @@ export default function MIAffordableLoan() {
                 { q: "Can I pay off early?", a: "Yes, there are no prepayment penalties." },
                 { q: "What if I'm denied?", a: "We'll show you alternative financing options like Affirm or credit union loans." },
                 { q: "Is this a government loan?", a: "The program is funded by the State of Michigan but administered by approved credit unions and lenders." },
+                { q: "Can I use this if my repair costs more than $1,200?", a: "Yes! The loan covers up to $1,200 and you pay the remaining balance at the shop. For example, a $1,500 repair = $1,200 loan + $300 at the shop." },
               ].map(({ q, a }) => (
                 <div key={q}>
                   <h3 className="font-semibold text-foreground">{q}</h3>
