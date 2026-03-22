@@ -294,8 +294,9 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="finance" className="w-full">
-          <TabsList className="grid w-full grid-cols-10">
+          <TabsList className="flex w-full overflow-x-auto">
             <TabsTrigger value="finance"><CreditCard className="h-4 w-4 mr-1.5 hidden sm:inline" />Finance</TabsTrigger>
+            <TabsTrigger value="mi-loan"><Landmark className="h-4 w-4 mr-1.5 hidden sm:inline" />MI Loan</TabsTrigger>
             <TabsTrigger value="quotes"><FileText className="h-4 w-4 mr-1.5 hidden sm:inline" />Quotes</TabsTrigger>
             <TabsTrigger value="referrals"><Link2 className="h-4 w-4 mr-1.5 hidden sm:inline" />Referrals</TabsTrigger>
             <TabsTrigger value="waitlist"><Users className="h-4 w-4 mr-1.5 hidden sm:inline" />Waitlist</TabsTrigger>
