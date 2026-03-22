@@ -308,6 +308,11 @@ export default function AdminDashboard() {
             <TabsTrigger value="optimization"><TrendingUp className="h-4 w-4 mr-1.5 hidden sm:inline" />Optimize</TabsTrigger>
           </TabsList>
 
+          {/* MI Loan Funnel Tab */}
+          <TabsContent value="mi-loan" className="mt-6">
+            <MILoanFunnel />
+          </TabsContent>
+
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="mt-6">
             <AnalyticsDashboard />
