@@ -36,6 +36,7 @@ export default function MILoanEligibilityPopup({ zip }: Props) {
 
     sessionStorage.setItem(SESSION_KEY, "true");
     setOpen(true);
+    trackEvent({ event_type: "user_action", category: "finance_option", action: "mi_loan_popup_viewed", metadata: { zip } });
 
     // Auto-dismiss after 15 seconds
     const timer = setTimeout(() => setOpen(false), 15000);

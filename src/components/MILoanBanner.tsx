@@ -54,6 +54,7 @@ export default function MILoanBanner() {
   function handleDismiss() {
     localStorage.setItem(DISMISS_KEY, JSON.stringify({ timestamp: Date.now() }));
     setVisible(false);
+    trackEvent({ event_type: "user_action", category: "finance_option", action: "mi_loan_banner_dismissed" });
   }
 
   if (!show) return null;

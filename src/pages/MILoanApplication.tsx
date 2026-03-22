@@ -94,6 +94,13 @@ export default function MILoanApplication() {
       return;
     }
     setSubmitting(true);
+    trackEvent({
+      event_type: "ad_conversion",
+      category: "finance_option",
+      action: "mi_loan_application_completed",
+      value: repairCost,
+      metadata: { financing_type: scenario.isPartial ? "partial" : "full", loan_amount: scenario.loanAmount },
+    });
     try {
       await supabase.from("finance_selections" as any).insert({
         provider: "MI Affordable Loan",
