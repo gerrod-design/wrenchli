@@ -20,9 +20,7 @@ const sharedSteps = [
 ];
 
 const defaultSteps = [
-  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Choose your path: DIY tutorial or shop quotes." },
-  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide, or book a shop appointment with financing." },
-  { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it or used a shop, you're back in control." },
+  { step: 3, icon: GitFork, title: "Choose Your Path & Fix It", desc: "Go DIY with video guides and parts links, or get matched with a local shop — either way, you're back on the road." },
 ];
 
 const diySteps = [
@@ -139,7 +137,7 @@ export default function HowItWorksVideo() {
             How It Works
           </p>
           <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
-            Your vehicle, your choice — in under 70 seconds.
+            Your vehicle, your choice — in about a minute.
           </h2>
         </SectionReveal>
 
@@ -265,8 +263,8 @@ export default function HowItWorksVideo() {
           <div className="mt-10 text-center space-y-3">
             <p className="font-heading text-lg font-bold text-foreground md:text-2xl">
               {isMobile
-                ? "Ready to try it? Tap below — takes about 60 seconds."
-                : "Ready to try it? Your first diagnosis takes about 60 seconds."}
+                ? "Ready to try it? Tap below — takes about a minute."
+                : "Ready to try it? Your first diagnosis takes about a minute."}
             </p>
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
