@@ -4,9 +4,9 @@ import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  CheckCircle, CalendarDays, DollarSign, Wrench, ArrowRight, Sparkles, Download,
+  CheckCircle, CalendarDays, DollarSign, Wrench, ArrowRight, Sparkles, Download, AlertTriangle, CreditCard,
 } from "lucide-react";
-import { calculateMonthlyPayment, formatCurrency, MI_LOAN } from "@/lib/financing";
+import { calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
 import { format, addDays } from "date-fns";
 
 export default function MILoanApproved() {
@@ -14,24 +14,26 @@ export default function MILoanApproved() {
   const repairCost = Number(searchParams.get("repair")) || 500;
   const diagnosis = searchParams.get("diagnosis") || "Car Repair";
 
-  const monthly = calculateMonthlyPayment(repairCost, MI_LOAN.maxApr, MI_LOAN.termMonths);
-  const totalCost = monthly * MI_LOAN.termMonths;
+  const scenario = calculateFinancingScenario(repairCost);
   const firstPaymentDate = addDays(new Date(), 30);
 
   const loanDetails = [
-    { label: "Loan Amount", value: formatCurrency(repairCost) },
+    { label: "Loan Amount", value: formatCurrency(scenario.loanAmount) },
     { label: "Interest Rate", value: `${MI_LOAN.maxApr}% APR` },
     { label: "Term", value: `${MI_LOAN.termMonths} months` },
-    { label: "Monthly Payment", value: formatCurrency(monthly), highlight: true },
+    { label: "Monthly Payment", value: formatCurrency(scenario.monthlyPayment), highlight: true },
     { label: "First Payment Due", value: format(firstPaymentDate, "MMMM d, yyyy") },
-    { label: "Total Cost", value: formatCurrency(totalCost) },
+    { label: "Total Loan Cost", value: formatCurrency(scenario.totalLoanCost) },
   ];
 
   const nextSteps = [
-    { icon: <CalendarDays className="h-5 w-5" />, text: "Book appointment with your repair shop" },
-    { icon: <DollarSign className="h-5 w-5" />, text: "We transfer funds directly to the shop" },
+    { icon: <CheckCircle className="h-5 w-5" />, text: "Loan approved ✅" },
+    { icon: <CalendarDays className="h-5 w-5" />, text: "Book your appointment (we'll send funds to shop)" },
     { icon: <Wrench className="h-5 w-5" />, text: "Get your car repaired" },
-    { icon: <CheckCircle className="h-5 w-5" />, text: "Make easy monthly payments" },
+    ...(scenario.isPartial
+      ? [{ icon: <CreditCard className="h-5 w-5" />, text: `Pay ${formatCurrency(scenario.outOfPocket)} at shop when picking up` }]
+      : []),
+    { icon: <DollarSign className="h-5 w-5" />, text: "Make easy monthly payments (auto-pay recommended)" },
   ];
 
   return (
@@ -74,17 +76,39 @@ export default function MILoanApproved() {
                 ))}
               </div>
 
+              {/* Partial financing warning */}
+              {scenario.isPartial && (
+                <div className="rounded-xl border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/20 p-5 text-left space-y-3">
+                  <h3 className="text-base font-bold flex items-center gap-2 text-amber-800 dark:text-amber-300">
+                    <AlertTriangle className="h-5 w-5" /> Additional Payment Required
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Your total repair cost is <span className="font-semibold">{formatCurrency(repairCost)}</span>. The MI Loan covers{" "}
+                    <span className="font-semibold">{formatCurrency(MI_LOAN.maxAmount)}</span>. You'll need to pay the remaining{" "}
+                    <span className="font-bold text-amber-700 dark:text-amber-300">{formatCurrency(scenario.outOfPocket)}</span> at the shop.
+                  </p>
+                  <div className="rounded-lg bg-card border border-border p-3 text-sm">
+                    <p className="font-semibold text-foreground mb-1">Payment options at shop:</p>
+                    <ul className="list-disc ml-5 text-muted-foreground space-y-1">
+                      <li>Credit or Debit Card</li>
+                      <li>Cash</li>
+                      <li>Shop Payment Plan (ask shop directly)</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
               {/* Next steps */}
               <div className="text-left space-y-3">
                 <h3 className="font-heading font-semibold text-sm uppercase tracking-wider text-muted-foreground">
                   Next Steps
                 </h3>
-                {nextSteps.map((step, i) => (
+                {nextSteps.map((s, i) => (
                   <div key={i} className="flex items-center gap-3 rounded-lg bg-accent/5 border border-accent/10 p-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent text-sm font-bold">
                       {i + 1}
                     </div>
-                    <span className="text-sm text-foreground">{step.text}</span>
+                    <span className="text-sm text-foreground">{s.text}</span>
                   </div>
                 ))}
               </div>

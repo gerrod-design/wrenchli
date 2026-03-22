@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  CheckCircle, XCircle, MapPin, DollarSign, ArrowRight, Sparkles, CreditCard,
+  CheckCircle, XCircle, MapPin, DollarSign, ArrowRight, Sparkles, CreditCard, AlertTriangle,
 } from "lucide-react";
+import { isMichiganZip, calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
 
 export default function MILoanEligibility() {
   const [searchParams] = useSearchParams();
@@ -21,14 +22,15 @@ export default function MILoanEligibility() {
   const [enteredZip, setEnteredZip] = useState(zip);
   const [step, setStep] = useState<"zip" | "result">("zip");
 
-  const isMichigan = enteredZip.startsWith("48") || enteredZip.startsWith("49");
-  const isUnderLimit = repairCost <= 1200;
-  const isEligible = isMichigan && isUnderLimit;
-  const monthlyPayment = Math.round((repairCost * 1.36) / 12);
+  const isMichigan = isMichiganZip(enteredZip);
+  const scenario = calculateFinancingScenario(repairCost);
+  const isEligible = isMichigan && !scenario.isTooHigh;
 
   const handleCheck = () => {
     if (enteredZip.length === 5) setStep("result");
   };
+
+  const applicationLink = `/mi-loan-application?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${enteredZip}&year=${year}&make=${make}&model=${model}`;
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -81,16 +83,22 @@ export default function MILoanEligibility() {
                   <div className="flex items-center gap-2 text-sm">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">Repair cost:</span>
-                    <span className="font-semibold">${repairCost.toLocaleString()}</span>
-                    {isUnderLimit ? (
+                    <span className="font-semibold">{formatCurrency(repairCost)}</span>
+                    {!scenario.isTooHigh ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : (
                       <XCircle className="h-4 w-4 text-destructive" />
                     )}
                   </div>
-                  {!isUnderLimit && (
+                  {scenario.isPartial && (
+                    <p className="text-xs text-accent flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      Exceeds $1,200 limit — partial financing available
+                    </p>
+                  )}
+                  {scenario.isTooHigh && (
                     <p className="text-xs text-destructive">
-                      Exceeds the $1,200 program limit. You can still check other options.
+                      Exceeds the program's practical range. We'll show alternative options.
                     </p>
                   )}
                 </div>
@@ -106,13 +114,14 @@ export default function MILoanEligibility() {
             </SectionReveal>
           )}
 
-          {step === "result" && isEligible && (
+          {/* ── ELIGIBLE: full financing ── */}
+          {step === "result" && isEligible && scenario.isFullFinancing && (
             <SectionReveal>
               <div className="rounded-2xl border-2 border-accent bg-accent/5 p-6 md:p-8 space-y-5 text-center">
                 <Sparkles className="h-12 w-12 text-accent mx-auto" />
                 <h2 className="font-heading text-2xl font-bold">✨ You May Qualify!</h2>
                 <p className="text-muted-foreground">
-                  Based on your location and repair cost, you appear eligible for the MI Affordable Loan program.
+                  Based on your location and repair cost, you appear eligible for full financing.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -125,7 +134,7 @@ export default function MILoanEligibility() {
                   <div className="rounded-lg bg-card border border-border p-4">
                     <p className="text-xs text-muted-foreground">Amount</p>
                     <p className="font-semibold text-foreground flex items-center justify-center gap-1">
-                      <CheckCircle className="h-4 w-4 text-green-600" /> ${repairCost.toLocaleString()}
+                      <CheckCircle className="h-4 w-4 text-green-600" /> {formatCurrency(repairCost)}
                     </p>
                   </div>
                 </div>
@@ -133,17 +142,13 @@ export default function MILoanEligibility() {
                 <div className="rounded-xl bg-card border border-border p-5">
                   <p className="text-sm text-muted-foreground mb-1">Estimated Monthly Payment</p>
                   <p className="font-heading text-4xl font-extrabold text-accent">
-                    ${monthlyPayment}<span className="text-lg font-normal text-muted-foreground">/mo</span>
+                    {formatCurrency(scenario.monthlyPayment)}<span className="text-lg font-normal text-muted-foreground">/mo</span>
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">for 12 months</p>
+                  <p className="text-xs text-muted-foreground mt-1">for 12 months • Out-of-pocket: $0</p>
                 </div>
 
-                <Button
-                  size="lg"
-                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
-                  asChild
-                >
-                  <Link to={`/mi-loan-application?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${enteredZip}&year=${year}&make=${make}&model=${model}`}>
+                <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold" asChild>
+                  <Link to={applicationLink}>
                     Continue to Application <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -151,6 +156,54 @@ export default function MILoanEligibility() {
             </SectionReveal>
           )}
 
+          {/* ── ELIGIBLE: partial financing ── */}
+          {step === "result" && isEligible && scenario.isPartial && (
+            <SectionReveal>
+              <div className="rounded-2xl border-2 border-accent bg-accent/5 p-6 md:p-8 space-y-5 text-center">
+                <AlertTriangle className="h-12 w-12 text-accent mx-auto" />
+                <h2 className="font-heading text-2xl font-bold">💡 Partial Financing Available</h2>
+                <p className="text-muted-foreground">
+                  Your repair exceeds the $1,200 limit, but we can still help cover most of it!
+                </p>
+
+                <div className="rounded-xl bg-card border border-border p-5 space-y-3 text-left">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Total Repair Cost</span>
+                    <span className="font-semibold">{formatCurrency(repairCost)}</span>
+                  </div>
+                  <div className="border-t border-border pt-3 flex justify-between text-sm">
+                    <span className="text-green-700 font-medium">✅ MI Loan covers</span>
+                    <span className="font-bold text-green-700">{formatCurrency(MI_LOAN.maxAmount)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground ml-4">Monthly payment</span>
+                    <span className="font-semibold text-accent">{formatCurrency(scenario.monthlyPayment)}/mo × 12</span>
+                  </div>
+                  <div className="border-t border-border pt-3 flex justify-between text-sm">
+                    <span className="text-amber-700 font-medium">⚠️ You pay at shop</span>
+                    <span className="font-bold text-amber-700">{formatCurrency(scenario.outOfPocket)}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">(Cash, card, or shop payment plan)</p>
+                </div>
+
+                <div className="space-y-3">
+                  <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold" asChild>
+                    <Link to={applicationLink}>
+                      Apply for {formatCurrency(MI_LOAN.maxAmount)} Loan <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <p className="text-xs text-muted-foreground">Or finance the full amount:</p>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link to={`/financing-options?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${enteredZip}`}>
+                      <CreditCard className="mr-2 h-4 w-4" /> View Affirm Options (up to $17,500)
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </SectionReveal>
+          )}
+
+          {/* ── NOT ELIGIBLE ── */}
           {step === "result" && !isEligible && (
             <SectionReveal>
               <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 md:p-8 space-y-5 text-center">
@@ -162,9 +215,9 @@ export default function MILoanEligibility() {
                       ❌ MI Affordable Loan is only available to Michigan residents.
                     </p>
                   )}
-                  {!isUnderLimit && (
+                  {scenario.isTooHigh && (
                     <p className="text-destructive">
-                      ❌ This repair (${repairCost.toLocaleString()}) exceeds the $1,200 program limit.
+                      ❌ This repair ({formatCurrency(repairCost)}) exceeds the program's practical range.
                     </p>
                   )}
                 </div>
@@ -183,12 +236,7 @@ export default function MILoanEligibility() {
                   </Button>
                 </div>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setStep("zip")}
-                  className="text-muted-foreground"
-                >
+                <Button variant="ghost" size="sm" onClick={() => setStep("zip")} className="text-muted-foreground">
                   ← Try a different ZIP code
                 </Button>
               </div>
