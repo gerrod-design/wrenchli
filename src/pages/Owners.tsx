@@ -38,7 +38,7 @@ export default function Owners() {
       <CinematicHero />
       <HowItWorksVideo />
       <QuickActionBar />
-      <UserJourneySelector />
+      
 
       {/* Value Proposition Cards */}
       <section className="section-padding bg-background">

@@ -43,7 +43,7 @@ export default function Index() {
 
       <QuickActionBar />
 
-      <UserJourneySelector />
+      
 
       {/* Value Proposition Cards */}
       <section className="section-padding bg-background">
