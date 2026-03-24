@@ -228,9 +228,9 @@ export default function ForShops() {
 
           <SectionReveal>
             <Tabs defaultValue="acquisition" className="mt-10">
-              <TabsList className="grid w-full grid-cols-3 h-12">
+              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto sm:h-12 gap-1 sm:gap-0">
                 {platformTabs.map((tab) => (
-                  <TabsTrigger key={tab.value} value={tab.value} className="text-xs md:text-sm font-semibold h-10">
+                  <TabsTrigger key={tab.value} value={tab.value} className="text-xs md:text-sm font-semibold h-10 whitespace-nowrap">
                     {tab.label}
                   </TabsTrigger>
                 ))}
