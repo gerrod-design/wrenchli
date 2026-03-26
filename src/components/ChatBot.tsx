@@ -174,7 +174,7 @@ export default function ChatBot() {
             onClick={handleOpenChat}
           >
             <div className="flex flex-col items-center gap-1">
-              <WrenchliRobot size={0.5} waving={!hasInteracted} />
+              <MechanicAvatar size={40} />
               <span className="text-[11px] font-semibold tracking-tight">Ask Wrenchli</span>
             </div>
           </motion.div>
