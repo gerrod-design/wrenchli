@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Lock } from "lucide-react";
@@ -13,9 +14,10 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [adminConfirmed, setAdminConfirmed] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   if (loading) {
     return (
@@ -33,6 +35,16 @@ export default function AdminLogin() {
     e.preventDefault();
     setError("");
     setSubmitting(true);
+
+    if (mode === "forgot") {
+      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (resetErr) setError(resetErr.message);
+      else setResetSent(true);
+      setSubmitting(false);
+      return;
+    }
 
     if (mode === "signup") {
       const { error: err } = await signUp(email, password);
@@ -96,8 +108,12 @@ export default function AdminLogin() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary">
               <Lock className="h-6 w-6 text-primary-foreground" />
             </div>
-            <h1 className="font-heading text-xl font-bold">{mode === "signup" ? "Create Admin Account" : "Admin Login"}</h1>
-            <p className="text-sm text-muted-foreground">{mode === "signup" ? "Create your account, then we'll grant admin access" : "Sign in to access the dashboard"}</p>
+            <h1 className="font-heading text-xl font-bold">
+              {mode === "signup" ? "Create Admin Account" : mode === "forgot" ? "Reset Password" : "Admin Login"}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {mode === "signup" ? "Create your account, then we'll grant admin access" : mode === "forgot" ? "Enter your email to receive a reset link" : "Sign in to access the dashboard"}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -109,18 +125,20 @@ export default function AdminLogin() {
               required
               className="h-11"
             />
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="h-11"
-            />
+            {mode !== "forgot" && (
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="h-11"
+              />
+            )}
             {error && (
               <p className="text-sm text-destructive text-center">{error}</p>
             )}
-            {user && !isAdmin && !submitting && !adminConfirmed && (
+            {user && !isAdmin && !submitting && !adminConfirmed && mode === "login" && (
               <p className="text-sm text-destructive text-center">
                 This account does not have admin access.
               </p>
@@ -131,13 +149,19 @@ export default function AdminLogin() {
               className="w-full h-11 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
             >
               {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {mode === "signup" ? "Create Account" : "Sign In"}
+              {mode === "signup" ? "Create Account" : mode === "forgot" ? "Send Reset Link" : "Sign In"}
             </Button>
           </form>
 
           {signupSuccess && (
             <div className="rounded-lg border border-border bg-muted p-3 text-center">
               <p className="text-sm font-medium">Account created! We'll grant admin access next.</p>
+            </div>
+          )}
+
+          {resetSent && (
+            <div className="rounded-lg border border-border bg-muted p-3 text-center">
+              <p className="text-sm font-medium">Reset link sent! Check your email inbox.</p>
             </div>
           )}
 
@@ -152,11 +176,20 @@ export default function AdminLogin() {
             </Button>
           )}
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={() => { setMode("forgot"); setError(""); setResetSent(false); }}
+                className="text-sm text-muted-foreground hover:underline"
+              >
+                Forgot password?
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSignupSuccess(false); }}
-              className="text-sm text-accent hover:underline"
+              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSignupSuccess(false); setResetSent(false); }}
+              className="block w-full text-sm text-accent hover:underline"
             >
               {mode === "login" ? "Need an account? Sign up" : "Already have an account? Sign in"}
             </button>
