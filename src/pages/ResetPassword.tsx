@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, KeyRound, CheckCircle } from "lucide-react";
+import { Loader2, KeyRound, CheckCircle, ArrowLeft } from "lucide-react";
 import SEO from "@/components/SEO";
 
 export default function ResetPassword() {
@@ -158,6 +158,16 @@ export default function ResetPassword() {
               </Button>
             </form>
           )}
+
+          <div className="text-center pt-2">
+            <a
+              href="/admin/login"
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to Login
+            </a>
+          </div>
         </div>
       </div>
     </main>
