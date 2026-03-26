@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus } from "lucide-react";
-import WrenchliRobot from "./WrenchliRobot";
+import MechanicAvatar from "./MechanicAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -13,15 +13,7 @@ import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
 
-const WELCOME_MESSAGE = `👋 Hi! What's wrong with your car?
-
-I can help you with:
-• Check engine light diagnosis
-• Strange noises or smells
-• Get repair quotes
-• Photo damage analysis
-
-Just describe your issue or click a suggestion below!`;
+const WELCOME_MESSAGE = `👋 Hey! I'm your Wrenchli advisor. What's your name so I can help you personally?`;
 
 export default function ChatBot() {
   const navigate = useNavigate();
@@ -150,10 +142,10 @@ export default function ChatBot() {
   }, [input, loading, messages, pendingPhotos, setMessages, ensureActiveConversation]);
 
   const SUGGESTION_CHIPS = [
-    "Check engine light",
-    "Strange noise",
+    "My check engine light is on",
+    "I hear a strange noise",
     "What's my car worth?",
-    "📸 Diagnose damage from a photo",
+    "📸 Show damage photo",
   ];
 
   const handleOpenChat = () => {
@@ -174,7 +166,7 @@ export default function ChatBot() {
             onClick={handleOpenChat}
           >
             <div className="flex flex-col items-center gap-1">
-              <WrenchliRobot size={0.5} waving={!hasInteracted} />
+              <MechanicAvatar size={40} />
               <span className="text-[11px] font-semibold tracking-tight">Ask Wrenchli</span>
             </div>
           </motion.div>
@@ -267,7 +259,8 @@ export default function ChatBot() {
                   )}
 
                   {messages.map((m, i) => (
-                    <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
+                    <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                      {m.role === "assistant" && <MechanicAvatar size={32} className="mt-0.5" />}
                       <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                         m.role === "user"
                           ? "bg-primary text-primary-foreground"
