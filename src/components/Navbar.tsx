@@ -27,6 +27,7 @@ const navItems: NavItem[] = [
     dropdown: [
       { label: "How It Works", to: "/for-car-owners" },
       { label: "Vehicle Insights", to: "/vehicle-insights" },
+      { label: "DIY Repair Guides", to: "/diy" },
       { label: "Photo Damage Diagnosis", to: "/damage-diagnosis" },
       { label: "Find Shops", to: "/find-shops" },
       { label: "Financing", to: "/financing-options" },
