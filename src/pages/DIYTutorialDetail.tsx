@@ -77,7 +77,7 @@ function getYouTubeEmbedUrl(url: string) {
 function AmazonButton({ url, label, size = "sm" }: { url: string; label: string; size?: "sm" | "default" }) {
   const handleClick = () => {
     import("@/lib/analytics").then(({ trackEvent }) => {
-      trackEvent("amazon_click", { url, label });
+      trackEvent({ action: "amazon_click", category: "diy", label, event_type: "click" });
     });
   };
   return (
