@@ -37,11 +37,21 @@ export default function AdminLogin() {
     setSubmitting(true);
 
     if (mode === "forgot") {
-      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (resetErr) setError(resetErr.message);
-      else setResetSent(true);
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-password-reset`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+            body: JSON.stringify({ email, redirectTo: `${window.location.origin}/reset-password` }),
+          }
+        );
+        const data = await res.json();
+        if (!res.ok) setError(data.error || "Failed to send reset email");
+        else setResetSent(true);
+      } catch {
+        setError("Failed to send reset email. Please try again.");
+      }
       setSubmitting(false);
       return;
     }

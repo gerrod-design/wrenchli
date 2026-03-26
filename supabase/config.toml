@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.diagnose-damage-photo]
 verify_jwt = false
+
+[functions.send-password-reset]
+verify_jwt = false
