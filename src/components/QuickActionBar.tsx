@@ -91,6 +91,9 @@ export default function QuickActionBar() {
   return (
     <section id="quote" className="relative -mt-8 z-10">
       <div className="container-wrenchli">
+        <p className="text-center text-sm text-muted-foreground mb-4 font-medium tracking-wide">
+          Ready? Start here.
+        </p>
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xl md:p-8 space-y-4">
 
           {/* Welcome back bar when pre-filled from garage */}
