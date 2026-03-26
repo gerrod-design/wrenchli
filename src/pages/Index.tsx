@@ -4,7 +4,7 @@ import SEO from "@/components/SEO";
 import { ShieldCheck, Zap, CreditCard } from "lucide-react";
 
 import SectionReveal from "@/components/SectionReveal";
-import QuickActionBar from "@/components/QuickActionBar";
+import InlineChatWidget from "@/components/InlineChatWidget";
 import CinematicHero from "@/components/CinematicHero";
 import HowItWorksVideo from "@/components/HowItWorksVideo";
 
@@ -41,7 +41,7 @@ export default function Index() {
 
       <HowItWorksVideo />
 
-      <QuickActionBar />
+      <InlineChatWidget />
 
       
 
