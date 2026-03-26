@@ -215,7 +215,7 @@ export default function HowItWorksVideo() {
                             ? "opacity-100 translate-x-1"
                             : isCompleted
                               ? "opacity-80"
-                              : "opacity-60 hover:opacity-80 hover:bg-muted/30"
+                              : "opacity-70 hover:opacity-80 hover:bg-muted/30"
                         )}
                       >
                         <div
@@ -230,7 +230,7 @@ export default function HowItWorksVideo() {
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <h3 className={cn(
-                              "font-heading text-sm font-semibold transition-colors",
+                              "font-heading text-base font-semibold transition-colors",
                               isActive ? "text-foreground" : "text-foreground/80"
                             )}>
                               {s.title}
@@ -244,7 +244,7 @@ export default function HowItWorksVideo() {
                                 : "text-muted-foreground"
                             )} />
                           </div>
-                          <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
+                          <p className="mt-0.5 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
                         </div>
                       </button>
                     </SectionReveal>
