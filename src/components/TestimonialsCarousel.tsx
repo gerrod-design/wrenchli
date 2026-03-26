@@ -149,5 +149,6 @@ export default function TestimonialsCarousel() {
         </div>
       </div>
     </section>
+    </>
   );
 }
