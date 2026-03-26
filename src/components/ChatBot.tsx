@@ -13,15 +13,7 @@ import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
 
-const WELCOME_MESSAGE = `👋 Hi! What's wrong with your car?
-
-I can help you with:
-• Check engine light diagnosis
-• Strange noises or smells
-• Get repair quotes
-• Photo damage analysis
-
-Just describe your issue or click a suggestion below!`;
+const WELCOME_MESSAGE = `👋 Hey! I'm your Wrenchli advisor. What's your name so I can help you personally?`;
 
 export default function ChatBot() {
   const navigate = useNavigate();
