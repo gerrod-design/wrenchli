@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+
 import SEO from "@/components/SEO";
 import { ShieldCheck, Zap, CreditCard } from "lucide-react";
 
@@ -7,7 +7,7 @@ import SectionReveal from "@/components/SectionReveal";
 import QuickActionBar from "@/components/QuickActionBar";
 import CinematicHero from "@/components/CinematicHero";
 import HowItWorksVideo from "@/components/HowItWorksVideo";
-import { Button } from "@/components/ui/button";
+
 import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 
