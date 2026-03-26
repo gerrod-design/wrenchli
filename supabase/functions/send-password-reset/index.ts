@@ -26,11 +26,24 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    const defaultResetUrl = "https://wrenchli.lovable.app/reset-password";
+    let safeRedirectTo = typeof redirectTo === "string" && redirectTo.trim().length > 0
+      ? redirectTo
+      : defaultResetUrl;
+
+    // Preview links can 404 outside the active preview session; force published URL instead.
+    if (
+      safeRedirectTo.includes("lovableproject.com") ||
+      safeRedirectTo.includes("id-preview--")
+    ) {
+      safeRedirectTo = defaultResetUrl;
+    }
+
     // Generate the password reset link using the admin API
     const { data, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: "recovery",
       email,
-      options: { redirectTo },
+      options: { redirectTo: safeRedirectTo },
     });
 
     if (linkError || !data?.properties?.action_link) {
@@ -44,7 +57,7 @@ serve(async (req) => {
     // Build a direct link to the app with token_hash, bypassing Supabase's redirect
     // which can 404 if the redirect URL isn't in the allowed list
     const hashedToken = data.properties.hashed_token;
-    const resetLink = `${redirectTo}?token_hash=${hashedToken}&type=recovery`;
+    const resetLink = `${safeRedirectTo}?token_hash=${hashedToken}&type=recovery`;
 
     // Send email via Resend with the link as plain text URL
     const resendKey = Deno.env.get("RESEND_API_KEY");
