@@ -15,6 +15,23 @@ import MobileBottomBar from "@/components/MobileBottomBar";
 import BackToTop from "@/components/BackToTop";
 import ChatBot from "@/components/ChatBot";
 import SitePasswordGate from "@/components/SitePasswordGate";
+
+function SitePasswordGateWrapper() {
+  const location = useLocation();
+  const bypassGate =
+    location.pathname.startsWith("/reset-password") ||
+    location.pathname.startsWith("/admin");
+
+  if (bypassGate) {
+    return <AppLayout />;
+  }
+
+  return (
+    <SitePasswordGate>
+      <AppLayout />
+    </SitePasswordGate>
+  );
+}
 import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
