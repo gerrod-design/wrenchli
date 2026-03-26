@@ -133,11 +133,8 @@ export default function HowItWorksVideo() {
       <div className="container-wrenchli">
         {/* Section header */}
         <SectionReveal>
-          <p className="text-center text-xs font-semibold uppercase tracking-[3px] text-muted-foreground">
+          <h2 className="text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
             How It Works
-          </p>
-          <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
-            Your vehicle, your choice — in about a minute.
           </h2>
         </SectionReveal>
 
