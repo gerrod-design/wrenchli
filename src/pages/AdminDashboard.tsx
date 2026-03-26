@@ -21,6 +21,7 @@ import ApiKeyManager from "@/components/ApiKeyManager";
 import ApiUsageAnalytics from "@/components/ApiUsageAnalytics";
 import ReferralAnalytics from "@/components/ReferralAnalytics";
 import MILoanFunnel from "@/components/MILoanFunnel";
+import ConversionMetrics from "@/components/ConversionMetrics";
 
 interface FinanceSelection {
   id: string;
@@ -304,6 +305,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="contacts"><Mail className="h-4 w-4 mr-1.5 hidden sm:inline" />Contacts</TabsTrigger>
             <TabsTrigger value="api-keys"><Key className="h-4 w-4 mr-1.5 hidden sm:inline" />API Keys</TabsTrigger>
             <TabsTrigger value="api-usage"><Activity className="h-4 w-4 mr-1.5 hidden sm:inline" />API Usage</TabsTrigger>
+            <TabsTrigger value="conversion"><MousePointerClick className="h-4 w-4 mr-1.5 hidden sm:inline" />Conversion</TabsTrigger>
             <TabsTrigger value="analytics"><BarChart3 className="h-4 w-4 mr-1.5 hidden sm:inline" />Analytics</TabsTrigger>
             <TabsTrigger value="optimization"><TrendingUp className="h-4 w-4 mr-1.5 hidden sm:inline" />Optimize</TabsTrigger>
           </TabsList>
@@ -311,6 +313,11 @@ export default function AdminDashboard() {
           {/* MI Loan Funnel Tab */}
           <TabsContent value="mi-loan" className="mt-6">
             <MILoanFunnel />
+          </TabsContent>
+
+          {/* Conversion Metrics Tab */}
+          <TabsContent value="conversion" className="mt-6">
+            <ConversionMetrics />
           </TabsContent>
 
           {/* Analytics Tab */}
