@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat } from "lucide-react";
+import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UrgencyBadge from "./UrgencyBadge";
 import YouTubeTutorials from "./YouTubeTutorials";
 import OrderParts from "./OrderParts";
+import SavingsCallout from "./SavingsCallout";
+import CommonIssueBadge from "./CommonIssueBadge";
+import ConfidenceBuilder from "./ConfidenceBuilder";
 import type { Diagnosis } from "./types";
 import { cn } from "@/lib/utils";
+import { useSmartRepairIntel } from "@/hooks/useSmartRepairIntel";
+import { buildAmazonSearchLink } from "@/data/adRecommendations";
 
 const diyConfig = {
   easy: {
@@ -52,6 +57,27 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
   const [showTools, setShowTools] = useState(false);
   const tools = diagnosis.tools_required || [];
 
+  // Parse vehicle parts for the hook
+  const vehicleParts = vehicle ? (() => {
+    const parts = vehicle.split(" ");
+    return { year: parts[0], make: parts[1], model: parts.slice(2).join(" ") };
+  })() : null;
+
+  // AI-powered repair intelligence
+  const { data: intel, loading: intelLoading } = useSmartRepairIntel(
+    diagnosis.title,
+    diagnosis.code,
+    vehicleParts,
+    diagnosis.diy_cost,
+    diagnosis.shop_cost
+  );
+
+  // Build "Buy All" Amazon link
+  const buyAllLink = buildAmazonSearchLink(
+    `${diagnosis.title} parts kit`,
+    vehicle
+  );
+
   return (
     <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
       {/* Header */}
@@ -66,6 +92,17 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
         </div>
         <UrgencyBadge urgency={diagnosis.urgency} />
       </div>
+
+      {/* Common Issue Badge (#4) */}
+      {intel?.is_common_issue && (
+        <div className="px-5 md:px-6 pt-3">
+          <CommonIssueBadge
+            isCommonIssue={intel.is_common_issue}
+            reason={intel.common_issue_reason}
+            vehicle={vehicle}
+          />
+        </div>
+      )}
 
       {/* Body - 2x2 grid */}
       <div className="grid gap-4 p-5 md:p-6 sm:grid-cols-2">
@@ -111,6 +148,11 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
         </div>
       </div>
 
+      {/* Savings Callout (#3) */}
+      <div className="px-5 md:px-6 pb-2">
+        <SavingsCallout diyCost={diagnosis.diy_cost} shopCost={diagnosis.shop_cost} />
+      </div>
+
       {/* YOUR OPTIONS divider */}
       <div className="flex items-center gap-4 px-5 md:px-6 pt-2 pb-4">
         <div className="h-px flex-1 bg-border" />
@@ -131,6 +173,17 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             </h4>
             <p className="text-xs text-muted-foreground mt-0.5">{diy.subtitle}</p>
           </div>
+
+          {/* Confidence Builder (#5) */}
+          {intel && (
+            <div className="mb-3">
+              <ConfidenceBuilder
+                successRate={intel.diy_success_rate}
+                estimatedSteps={intel.estimated_steps}
+                confidenceMessage={intel.confidence_message}
+              />
+            </div>
+          )}
 
           <div className="space-y-2 text-sm mb-4">
             <div className="flex justify-between">
@@ -215,7 +268,12 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               )}
             >
               <div className="pt-2">
-                <YouTubeTutorials diagnosisTitle={diagnosis.title} vehicle={vehicle} />
+                <YouTubeTutorials
+                  diagnosisTitle={diagnosis.title}
+                  vehicle={vehicle}
+                  smartQueries={intel?.youtube_queries}
+                  loading={intelLoading}
+                />
               </div>
             </div>
             <Button
@@ -238,6 +296,22 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
                 <OrderParts diagnosisTitle={diagnosis.title} vehicle={vehicle} />
               </div>
             </div>
+
+            {/* Buy All Parts Button (#2) */}
+            <Button
+              size="sm"
+              className="w-full text-xs font-semibold bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90"
+              asChild
+            >
+              <a
+                href={buyAllLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ShoppingBag className="mr-1.5 h-3.5 w-3.5" /> Buy All Parts on Amazon
+              </a>
+            </Button>
+
             <Button
               size="sm"
               className={cn(
