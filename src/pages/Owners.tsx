@@ -82,21 +82,6 @@ export default function Owners() {
         </div>
       </section>
 
-      <section className="section-padding bg-primary text-primary-foreground">
-        <div className="container-wrenchli text-center">
-          <SectionReveal>
-            <h2 className="font-heading text-3xl font-bold md:text-5xl">Ready to Get Started?</h2>
-            <p className="mt-4 text-lg text-primary-foreground/70">
-              Get your first diagnosis in under 60 seconds. No account required.
-            </p>
-            <div className="mt-8">
-              <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
-                <Link to="/#quote">Get Your Free Diagnosis</Link>
-              </Button>
-            </div>
-          </SectionReveal>
-        </div>
-      </section>
 
       <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
     </main>
