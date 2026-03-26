@@ -47,6 +47,8 @@ import MILoanApplication from "./pages/MILoanApplication";
 import MILoanApproved from "./pages/MILoanApproved";
 import MILoanDenied from "./pages/MILoanDenied";
 import MIAffordableLoan from "./pages/MIAffordableLoan";
+import DIYTutorials from "./pages/DIYTutorials";
+import DIYTutorialDetail from "./pages/DIYTutorialDetail";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -100,6 +102,8 @@ function AnimatedRoutes() {
           <Route path="/mi-loan-application" element={<MILoanApplication />} />
           <Route path="/mi-loan/approved" element={<MILoanApproved />} />
           <Route path="/mi-loan/denied" element={<MILoanDenied />} />
+          <Route path="/diy" element={<DIYTutorials />} />
+          <Route path="/diy/:slug" element={<DIYTutorialDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
