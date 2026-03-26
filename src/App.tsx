@@ -49,6 +49,7 @@ import MILoanDenied from "./pages/MILoanDenied";
 import MIAffordableLoan from "./pages/MIAffordableLoan";
 import DIYTutorials from "./pages/DIYTutorials";
 import DIYTutorialDetail from "./pages/DIYTutorialDetail";
+import ResetPassword from "./pages/ResetPassword";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -60,6 +61,7 @@ function AnimatedRoutes() {
       <Routes location={location}>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     );
   }
