@@ -149,9 +149,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <SitePasswordGate>
-                <AppLayout />
-              </SitePasswordGate>
+              <SitePasswordGateWrapper />
             </BrowserRouter>
           </LocationProvider>
         </AuthProvider>
