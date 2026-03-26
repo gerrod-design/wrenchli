@@ -46,7 +46,7 @@ export default function Index() {
       
 
       {/* Value Proposition Cards */}
-      <section className="section-padding bg-background">
+      <section className="section-padding bg-secondary">
         <div className="container-wrenchli">
           <div className="grid gap-6 md:grid-cols-3 items-stretch">
             {valueProps.map((v, i) => (
