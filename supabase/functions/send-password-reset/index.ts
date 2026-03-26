@@ -41,7 +41,10 @@ serve(async (req) => {
       });
     }
 
-    const resetLink = data.properties.action_link;
+    // Build a direct link to the app with token_hash, bypassing Supabase's redirect
+    // which can 404 if the redirect URL isn't in the allowed list
+    const hashedToken = data.properties.hashed_token;
+    const resetLink = `${redirectTo}?token_hash=${hashedToken}&type=recovery`;
 
     // Send email via Resend with the link as plain text URL
     const resendKey = Deno.env.get("RESEND_API_KEY");
