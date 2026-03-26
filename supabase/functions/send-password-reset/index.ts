@@ -26,7 +26,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const defaultResetUrl = "https://wrenchli.lovable.app/reset-password";
+    const defaultResetUrl = "https://wrenchli.net/reset-password";
     let safeRedirectTo = typeof redirectTo === "string" && redirectTo.trim().length > 0
       ? redirectTo
       : defaultResetUrl;
