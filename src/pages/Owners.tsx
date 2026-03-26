@@ -59,7 +59,6 @@ export default function Owners() {
         </div>
       </section>
 
-      <RecommendShopSection onOpenModal={() => setRecommendOpen(true)} />
       <TestimonialsCarousel />
 
       {/* Waitlist Signup */}
@@ -82,6 +81,8 @@ export default function Owners() {
         </div>
       </section>
 
+      {/* Recommend a Shop — soft ask after trust is built */}
+      <RecommendShopSection onOpenModal={() => setRecommendOpen(true)} />
 
       <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
     </main>
