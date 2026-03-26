@@ -54,7 +54,9 @@ const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
   const location = useLocation();
-  const isAdmin = location.pathname.startsWith("/admin");
+  const isAdmin =
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/reset-password");
 
   if (isAdmin) {
     return (
@@ -115,7 +117,9 @@ function AnimatedRoutes() {
 
 function AppLayout() {
   const location = useLocation();
-  const isAdmin = location.pathname.startsWith("/admin");
+  const isAdmin =
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/reset-password");
 
   useEffect(() => {
     import("@/lib/analytics").then(({ trackPagePerformance }) => {
