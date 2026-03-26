@@ -142,10 +142,10 @@ export default function ChatBot() {
   }, [input, loading, messages, pendingPhotos, setMessages, ensureActiveConversation]);
 
   const SUGGESTION_CHIPS = [
-    "Check engine light",
-    "Strange noise",
+    "My check engine light is on",
+    "I hear a strange noise",
     "What's my car worth?",
-    "📸 Diagnose damage from a photo",
+    "📸 Show damage photo",
   ];
 
   const handleOpenChat = () => {
@@ -259,7 +259,8 @@ export default function ChatBot() {
                   )}
 
                   {messages.map((m, i) => (
-                    <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
+                    <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                      {m.role === "assistant" && <MechanicAvatar size={32} className="mt-0.5" />}
                       <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                         m.role === "user"
                           ? "bg-primary text-primary-foreground"
