@@ -112,13 +112,18 @@ export default function CinematicHero() {
         {/* Trust badges */}
         <motion.div
           {...fadeUp(1.7, 10)}
-          className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs md:text-sm text-white/70"
-          style={{ textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
+          className="mt-5 flex flex-wrap items-center justify-center gap-x-2 gap-y-2"
         >
-          <span>✓ Free diagnosis</span>
-          <span>✓ DIY tutorials</span>
-          <span>✓ Shop quotes</span>
-          <span>✓ No account required</span>
+          {["Free diagnosis", "DIY tutorials", "Shop quotes", "No account required"].map((label) => (
+            <span
+              key={label}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 px-3.5 py-1.5 text-xs md:text-sm font-medium text-white"
+              style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}
+            >
+              <span className="text-accent font-bold">✓</span>
+              {label}
+            </span>
+          ))}
         </motion.div>
 
         {/* CTA Buttons */}
