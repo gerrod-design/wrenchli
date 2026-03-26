@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat, ShoppingBag } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UrgencyBadge from "./UrgencyBadge";
@@ -78,6 +79,25 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
     vehicle
   );
 
+  // Track savings callout impression via IntersectionObserver
+  const savingsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = savingsRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        trackEvent({ event_type: "ad_impression", category: "diy_product", action: "savings_callout_impression", label: diagnosis.title, metadata: { diy_cost: diagnosis.diy_cost, shop_cost: diagnosis.shop_cost, vehicle } });
+        obs.disconnect();
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [diagnosis.title, diagnosis.diy_cost, diagnosis.shop_cost, vehicle]);
+
+  const handleBuyAllClick = () => {
+    trackEvent({ event_type: "ad_click", category: "diy_product", action: "buy_all_parts_click", label: diagnosis.title, item_url: buyAllLink, metadata: { vehicle, diy_cost: diagnosis.diy_cost } });
+  };
+
   return (
     <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
       {/* Header */}
@@ -149,7 +169,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
       </div>
 
       {/* Savings Callout (#3) */}
-      <div className="px-5 md:px-6 pb-2">
+      <div className="px-5 md:px-6 pb-2" ref={savingsRef}>
         <SavingsCallout diyCost={diagnosis.diy_cost} shopCost={diagnosis.shop_cost} />
       </div>
 
@@ -307,6 +327,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
                 href={buyAllLink}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={handleBuyAllClick}
               >
                 <ShoppingBag className="mr-1.5 h-3.5 w-3.5" /> Buy All Parts on Amazon
               </a>

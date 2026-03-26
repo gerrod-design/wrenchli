@@ -1,4 +1,5 @@
 import { ExternalLink, Play, Search, Loader2, Sparkles } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 import type { YouTubeQuery } from "@/hooks/useSmartRepairIntel";
 
 interface YouTubeTutorialsProps {
@@ -87,6 +88,7 @@ export default function YouTubeTutorials({ diagnosisTitle, vehicle, smartQueries
                   href={buildYouTubeUrl(v.query)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackEvent({ event_type: "ad_click", category: "diy_product", action: "youtube_tutorial_click", label: v.label, metadata: { query: v.query, angle: v.angle, vehicle, diagnosis: diagnosisTitle, source: "smart" } })}
                   className="group rounded-lg bg-muted p-3 md:p-4 flex flex-col items-center text-center transition-shadow hover:shadow-md"
                 >
                   <div className="mb-2 text-lg">{angleEmoji[v.angle] || "▶️"}</div>
@@ -105,6 +107,7 @@ export default function YouTubeTutorials({ diagnosisTitle, vehicle, smartQueries
                   href={buildYouTubeUrl(v.query)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackEvent({ event_type: "ad_click", category: "diy_product", action: "youtube_tutorial_click", label: v.label, metadata: { query: v.query, vehicle, diagnosis: diagnosisTitle, source: "fallback" } })}
                   className="group rounded-lg bg-muted p-3 md:p-4 flex flex-col items-center text-center transition-shadow hover:shadow-md"
                 >
                   <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted-foreground/10 transition-colors group-hover:bg-wrenchli-teal/20">
