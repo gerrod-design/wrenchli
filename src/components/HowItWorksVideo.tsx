@@ -260,32 +260,22 @@ export default function HowItWorksVideo() {
 
         {/* After-walkthrough CTA */}
         <SectionReveal>
-          <div className="mt-10 text-center space-y-3">
-            <p className="font-heading text-lg font-bold text-foreground md:text-2xl">
-              {isMobile
-                ? "Ready to try it? Tap below — takes about a minute."
-                : "Ready to try it? Your first diagnosis takes about a minute."}
-            </p>
-            <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
-                <Link to="/vehicle-insights">
-                  Get Your Free Diagnosis <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+          <div className="mt-10 flex items-center justify-center gap-3">
+            <Button asChild size="lg" className="h-12 px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base transition-transform hover:scale-[1.02]">
+              <Link to="/vehicle-insights">
+                Try It Now — It's Free <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            {hasPlayed && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleReplay}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Replay
               </Button>
-              {hasPlayed && (
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  onClick={handleReplay}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <RotateCcw className="mr-2 h-4 w-4" /> Watch Again
-                </Button>
-              )}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              No account required.
-            </p>
+            )}
           </div>
         </SectionReveal>
       </div>
