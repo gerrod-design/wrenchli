@@ -9,7 +9,7 @@ interface RecommendShopSectionProps {
 
 export default function RecommendShopSection({ onOpenModal }: RecommendShopSectionProps) {
   return (
-    <section className="section-padding" style={{ backgroundColor: "hsl(170 76% 96%)" }}>
+    <section className="section-padding bg-accent/10">
       <div className="container-wrenchli text-center">
         <SectionReveal>
           <h2 className="font-heading text-2xl font-bold md:text-4xl text-foreground">
