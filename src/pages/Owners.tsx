@@ -36,8 +36,8 @@ export default function Owners() {
       <MILoanBanner />
 
       <CinematicHero />
-      <QuickActionBar />
       <HowItWorksVideo />
+      <QuickActionBar />
       
 
       {/* Value Proposition Cards */}

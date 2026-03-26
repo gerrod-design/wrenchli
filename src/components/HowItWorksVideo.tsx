@@ -255,19 +255,26 @@ export default function HowItWorksVideo() {
           </div>
         </div>
 
-        {/* Replay button only */}
-        {hasPlayed && (
-          <div className="mt-6 flex justify-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleReplay}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Replay
+        {/* After-walkthrough CTA */}
+        <SectionReveal>
+          <div className="mt-10 flex items-center justify-center gap-3">
+            <Button asChild size="lg" className="h-12 px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base transition-transform hover:scale-[1.02]">
+              <Link to="/vehicle-insights">
+                Try It Now — It's Free <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
+            {hasPlayed && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleReplay}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Replay
+              </Button>
+            )}
           </div>
-        )}
+        </SectionReveal>
       </div>
     </section>
   );
