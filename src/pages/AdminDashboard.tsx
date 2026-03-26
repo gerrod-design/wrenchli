@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import {
   LogOut, CreditCard, FileText, Users, Store, TrendingUp,
-  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2,
+  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2, MousePointerClick,
 } from "lucide-react";
 import { Key, Landmark } from "lucide-react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
