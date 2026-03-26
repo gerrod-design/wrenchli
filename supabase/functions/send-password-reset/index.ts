@@ -67,23 +67,41 @@ serve(async (req) => {
         to: [email],
         subject: "Reset Your Wrenchli Password",
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 16px;">
-            <h2 style="color: #1a1a1a; margin-bottom: 16px;">Reset Your Password</h2>
-            <p style="color: #555; line-height: 1.6;">
-              We received a request to reset the password for your Wrenchli account. 
-              Copy and paste the link below into your browser to set a new password:
-            </p>
-            <div style="background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 24px 0; word-break: break-all;">
-              <a href="${resetLink}" style="color: #2563eb; font-size: 14px;">${resetLink}</a>
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f4f6f8; padding: 40px 16px;">
+            <div style="max-width: 480px; margin: 0 auto;">
+              <!-- Header -->
+              <div style="background-color: #1E3A5F; border-radius: 12px 12px 0 0; padding: 32px 24px; text-align: center;">
+                <div style="width: 56px; height: 56px; background-color: #ffffff; border-radius: 12px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 28px; font-weight: 800; color: #1E3A5F; line-height: 56px;">W</span>
+                </div>
+                <h1 style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px;">Reset Your Password</h1>
+              </div>
+              <!-- Body -->
+              <div style="background-color: #ffffff; padding: 32px 24px; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0;">
+                <p style="color: #374151; font-size: 15px; line-height: 1.6; margin: 0 0 20px;">
+                  We received a request to reset the password for your Wrenchli account. Use the button below or copy the link to set a new password.
+                </p>
+                <!-- CTA Button -->
+                <div style="text-align: center; margin: 28px 0;">
+                  <a href="${resetLink}" style="display: inline-block; background-color: #E67E22; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 32px; border-radius: 8px;">Reset Password</a>
+                </div>
+                <!-- Fallback link -->
+                <p style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 0 0 8px;">Or copy and paste this link into your browser:</p>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin: 0 0 24px; word-break: break-all;">
+                  <a href="${resetLink}" style="color: #1E3A5F; font-size: 13px; text-decoration: underline;">${resetLink}</a>
+                </div>
+                <p style="color: #9ca3af; font-size: 13px; line-height: 1.5; margin: 0;">
+                  If you didn't request this, you can safely ignore this email. This link will expire shortly.
+                </p>
+              </div>
+              <!-- Footer -->
+              <div style="background-color: #f8fafc; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none; padding: 20px 24px; text-align: center;">
+                <p style="color: #9ca3af; font-size: 12px; margin: 0;">Wrenchli — Your Car Care Companion</p>
+              </div>
             </div>
-            <p style="color: #555; line-height: 1.6; font-size: 14px;">
-              If you didn't request this, you can safely ignore this email.
-            </p>
-            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0;" />
-            <p style="color: #999; font-size: 12px;">Wrenchli — Your Car Care Companion</p>
           </div>
         `,
-        text: `Reset Your Wrenchli Password\n\nCopy and paste this link into your browser to set a new password:\n\n${resetLink}\n\nIf you didn't request this, you can safely ignore this email.\n\n— Wrenchli`,
+        text: `Reset Your Wrenchli Password\n\nWe received a request to reset the password for your Wrenchli account.\n\nCopy and paste this link into your browser to set a new password:\n\n${resetLink}\n\nIf you didn't request this, you can safely ignore this email. This link will expire shortly.\n\n— Wrenchli, Your Car Care Companion`,
       }),
     });
 
