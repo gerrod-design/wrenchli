@@ -121,13 +121,6 @@ export default function ResetPassword() {
               <p className="text-sm text-muted-foreground">
                 This link is invalid or has expired. Please request a new password reset.
               </p>
-              <Button
-                onClick={() => window.location.href = "/admin/login"}
-                variant="outline"
-                className="w-full"
-              >
-                Back to Login
-              </Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
