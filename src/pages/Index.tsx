@@ -51,7 +51,7 @@ export default function Index() {
           <div className="grid gap-6 md:grid-cols-3 items-stretch">
             {valueProps.map((v, i) => (
               <SectionReveal key={v.title} delay={i * 120} className="h-full">
-                <div className="group flex h-full flex-col items-center rounded-xl border border-border bg-card p-8 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                <div className="flex h-full flex-col items-center rounded-xl border border-border/50 bg-muted/30 p-8 text-center">
                   <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10">
                     <v.icon className="h-7 w-7 text-accent" />
                   </div>
