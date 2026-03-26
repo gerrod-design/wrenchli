@@ -15,27 +15,49 @@ export default function ResetPassword() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Listen for the PASSWORD_RECOVERY event from the URL hash
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+    const verifyToken = async () => {
+      // Check for token_hash in URL query params (from our custom edge function)
+      const params = new URLSearchParams(window.location.search);
+      const tokenHash = params.get("token_hash");
+      const type = params.get("type");
+
+      if (tokenHash && type === "recovery") {
+        // Verify the OTP token directly
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: "recovery",
+        });
+        if (!verifyError) {
+          setIsRecovery(true);
+        } else {
+          console.error("Token verification failed:", verifyError.message);
+        }
+        setChecking(false);
+        return;
+      }
+
+      // Fallback: listen for PASSWORD_RECOVERY event from hash-based redirect
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setIsRecovery(true);
+        }
+        setChecking(false);
+      });
+
+      const hash = window.location.hash;
+      if (hash.includes("type=recovery")) {
         setIsRecovery(true);
       }
-      setChecking(false);
-    });
 
-    // Also check hash params directly
-    const hash = window.location.hash;
-    if (hash.includes("type=recovery")) {
-      setIsRecovery(true);
-    }
+      const timer = setTimeout(() => setChecking(false), 3000);
 
-    // Safety timeout
-    const timer = setTimeout(() => setChecking(false), 3000);
-
-    return () => {
-      subscription.unsubscribe();
-      clearTimeout(timer);
+      return () => {
+        subscription.unsubscribe();
+        clearTimeout(timer);
+      };
     };
+
+    verifyToken();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
