@@ -1,12 +1,26 @@
-import { ExternalLink, Play, Search } from "lucide-react";
+import { ExternalLink, Play, Search, Loader2, Sparkles } from "lucide-react";
+import type { YouTubeQuery } from "@/hooks/useSmartRepairIntel";
 
 interface YouTubeTutorialsProps {
   diagnosisTitle: string;
   vehicle: string;
+  smartQueries?: YouTubeQuery[] | null;
+  loading?: boolean;
 }
 
+const angleEmoji: Record<string, string> = {
+  model_specific: "🎯",
+  technique: "🔧",
+  troubleshooting: "🔍",
+};
+
+const angleLabel: Record<string, string> = {
+  model_specific: "Your Vehicle",
+  technique: "Step-by-Step",
+  troubleshooting: "Troubleshooting",
+};
+
 function buildSearchVariations(title: string, vehicle: string) {
-  // Extract a simple action verb from the title
   const actionMap: Record<string, string> = {
     "worn brake pads": "replace brake pads",
     "check engine light": "diagnose check engine light",
@@ -30,20 +44,10 @@ function buildSearchVariations(title: string, vehicle: string) {
     }
   }
 
-  const repair = title;
   return [
-    {
-      label: `${repair} ${vehicle} DIY tutorial`,
-      query: `${repair} ${vehicle} DIY tutorial`,
-    },
-    {
-      label: `How to ${actionVerb} ${vehicle}`,
-      query: `how to ${actionVerb} ${vehicle}`,
-    },
-    {
-      label: `${vehicle} ${repair} step by step`,
-      query: `${vehicle} ${repair} step by step`,
-    },
+    { label: `${title} ${vehicle} DIY tutorial`, query: `${title} ${vehicle} DIY tutorial` },
+    { label: `How to ${actionVerb} ${vehicle}`, query: `how to ${actionVerb} ${vehicle}` },
+    { label: `${vehicle} ${title} step by step`, query: `${vehicle} ${title} step by step` },
   ];
 }
 
@@ -51,8 +55,9 @@ function buildYouTubeUrl(query: string) {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 }
 
-export default function YouTubeTutorials({ diagnosisTitle, vehicle }: YouTubeTutorialsProps) {
-  const variations = buildSearchVariations(diagnosisTitle, vehicle);
+export default function YouTubeTutorials({ diagnosisTitle, vehicle, smartQueries, loading }: YouTubeTutorialsProps) {
+  const useSmartQueries = smartQueries && smartQueries.length > 0;
+  const fallbackVariations = buildSearchVariations(diagnosisTitle, vehicle);
   const generalQuery = `${diagnosisTitle} ${vehicle} DIY`;
 
   return (
@@ -61,30 +66,59 @@ export default function YouTubeTutorials({ diagnosisTitle, vehicle }: YouTubeTut
         <Play className="h-4 w-4" />
         DIY Tutorials for {diagnosisTitle}
         {vehicle && <span className="font-normal text-muted-foreground text-sm">on {vehicle}</span>}
+        {useSmartQueries && (
+          <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-wrenchli-teal/10 px-2 py-0.5 text-[10px] font-medium text-wrenchli-teal">
+            <Sparkles className="h-3 w-3" /> AI-Matched
+          </span>
+        )}
       </h4>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        {variations.map((v, i) => (
-          <a
-            key={i}
-            href={buildYouTubeUrl(v.query)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group rounded-lg bg-muted p-3 md:p-4 flex flex-col items-center text-center transition-shadow hover:shadow-md"
-          >
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted-foreground/10 transition-colors group-hover:bg-wrenchli-teal/20">
-              <Play className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-wrenchli-teal" />
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-              Search YouTube for:
-            </p>
-            <p className="text-xs font-semibold mt-1 leading-snug">"{v.label}"</p>
-            <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-wrenchli-teal">
-              Watch on YouTube <ExternalLink className="h-3 w-3" />
-            </span>
-          </a>
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Finding the best tutorials for your vehicle…
+        </div>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-3">
+          {useSmartQueries
+            ? smartQueries.map((v, i) => (
+                <a
+                  key={i}
+                  href={buildYouTubeUrl(v.query)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group rounded-lg bg-muted p-3 md:p-4 flex flex-col items-center text-center transition-shadow hover:shadow-md"
+                >
+                  <div className="mb-2 text-lg">{angleEmoji[v.angle] || "▶️"}</div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-wrenchli-teal mb-1">
+                    {angleLabel[v.angle] || "Tutorial"}
+                  </p>
+                  <p className="text-xs font-semibold leading-snug line-clamp-3">{v.label}</p>
+                  <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-wrenchli-teal">
+                    Watch on YouTube <ExternalLink className="h-3 w-3" />
+                  </span>
+                </a>
+              ))
+            : fallbackVariations.map((v, i) => (
+                <a
+                  key={i}
+                  href={buildYouTubeUrl(v.query)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group rounded-lg bg-muted p-3 md:p-4 flex flex-col items-center text-center transition-shadow hover:shadow-md"
+                >
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted-foreground/10 transition-colors group-hover:bg-wrenchli-teal/20">
+                    <Play className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-wrenchli-teal" />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Search YouTube for:</p>
+                  <p className="text-xs font-semibold mt-1 leading-snug">"{v.label}"</p>
+                  <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-wrenchli-teal">
+                    Watch on YouTube <ExternalLink className="h-3 w-3" />
+                  </span>
+                </a>
+              ))}
+        </div>
+      )}
 
       <a
         href={buildYouTubeUrl(generalQuery)}
