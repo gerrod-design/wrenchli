@@ -75,7 +75,10 @@ export default function TestimonialsCarousel() {
   const t = testimonials[current];
 
   return (
-    <section className="section-padding bg-primary">
+    <>
+      {/* Gradient bridge from light to dark */}
+      <div className="h-16 bg-gradient-to-b from-secondary to-primary" />
+      <section className="section-padding bg-primary">
       <div className="container-wrenchli max-w-3xl">
         <SectionReveal>
           <h2 className="font-heading text-2xl font-bold text-center text-primary-foreground md:text-4xl">
