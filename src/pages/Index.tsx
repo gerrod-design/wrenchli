@@ -39,9 +39,9 @@ export default function Index() {
       {/* Cinematic Hero */}
       <CinematicHero />
 
-      <HowItWorksVideo />
-
       <QuickActionBar />
+
+      <HowItWorksVideo />
 
       
 
