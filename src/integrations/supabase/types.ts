@@ -344,6 +344,78 @@ export type Database = {
         }
         Relationships: []
       }
+      diy_tutorials: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          difficulty: string
+          estimated_savings_cents: number | null
+          estimated_time_minutes: number
+          id: string
+          instructions: Json | null
+          is_published: boolean
+          parts_needed: Json | null
+          safety_warnings: string[] | null
+          seo_keywords: string[] | null
+          slug: string
+          thumbnail_url: string | null
+          title: string
+          tools_needed: Json | null
+          updated_at: string
+          vehicle_types: string[] | null
+          video_source: string | null
+          video_url: string | null
+          view_count: number | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description: string
+          difficulty?: string
+          estimated_savings_cents?: number | null
+          estimated_time_minutes?: number
+          id?: string
+          instructions?: Json | null
+          is_published?: boolean
+          parts_needed?: Json | null
+          safety_warnings?: string[] | null
+          seo_keywords?: string[] | null
+          slug: string
+          thumbnail_url?: string | null
+          title: string
+          tools_needed?: Json | null
+          updated_at?: string
+          vehicle_types?: string[] | null
+          video_source?: string | null
+          video_url?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          difficulty?: string
+          estimated_savings_cents?: number | null
+          estimated_time_minutes?: number
+          id?: string
+          instructions?: Json | null
+          is_published?: boolean
+          parts_needed?: Json | null
+          safety_warnings?: string[] | null
+          seo_keywords?: string[] | null
+          slug?: string
+          thumbnail_url?: string | null
+          title?: string
+          tools_needed?: Json | null
+          updated_at?: string
+          vehicle_types?: string[] | null
+          video_source?: string | null
+          video_url?: string | null
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       edge_rate_limits: {
         Row: {
           endpoint: string
