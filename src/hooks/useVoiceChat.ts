@@ -57,6 +57,13 @@ export function useVoiceChat() {
   const supportsSTT = typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
   const supportsTTS = typeof window !== "undefined" && "speechSynthesis" in window;
 
+  const clearSilenceTimer = useCallback(() => {
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+  }, []);
+
   const startListening = useCallback(() => {
     if (!supportsSTT || isListening) return;
     // Stop any ongoing speech before listening
@@ -69,22 +76,37 @@ export function useVoiceChat() {
     recognition.interimResults = true;
     recognition.lang = "en-US";
 
-    recognition.onstart = () => setIsListening(true);
+    const resetSilenceTimer = () => {
+      clearSilenceTimer();
+      silenceTimerRef.current = setTimeout(() => {
+        recognition.stop();
+      }, 3000); // 3 seconds of silence → auto-stop
+    };
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      resetSilenceTimer(); // Start initial timeout
+    };
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       const result = Array.from(event.results)
         .map((r) => r[0].transcript)
         .join("");
       setTranscript(result);
+      resetSilenceTimer(); // Reset timeout on each speech result
     };
     recognition.onerror = () => {
+      clearSilenceTimer();
       setIsListening(false);
       setTranscript("");
     };
-    recognition.onend = () => setIsListening(false);
+    recognition.onend = () => {
+      clearSilenceTimer();
+      setIsListening(false);
+    };
 
     recognitionRef.current = recognition;
     recognition.start();
-  }, [supportsSTT, isListening]);
+  }, [supportsSTT, isListening, clearSilenceTimer]);
 
   const stopListening = useCallback(() => {
     recognitionRef.current?.stop();
