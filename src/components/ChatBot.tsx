@@ -78,19 +78,6 @@ export default function ChatBot() {
     prevListeningRef.current = isListening;
   }, [isListening, transcript]);
 
-  // Separate effect to handle the actual send to avoid stale closure
-  useEffect(() => {
-    if (pendingSendRef.current && !isListening && transcript.trim()) {
-      pendingSendRef.current = false;
-      const text = transcript.trim();
-      const t = setTimeout(() => {
-        send(text);
-        setTranscript("");
-        setInput("");
-      }, 300);
-      return () => clearTimeout(t);
-    }
-  }, [isListening, transcript, send, setTranscript]);
 
   // Mark as interacted
   const markInteracted = useCallback(() => {
