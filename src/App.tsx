@@ -17,20 +17,8 @@ import ChatBot from "@/components/ChatBot";
 import SitePasswordGate from "@/components/SitePasswordGate";
 
 function SitePasswordGateWrapper() {
-  const location = useLocation();
-  const bypassGate =
-    location.pathname.startsWith("/reset-password") ||
-    location.pathname.startsWith("/admin");
-
-  if (bypassGate) {
-    return <AppLayout />;
-  }
-
-  return (
-    <SitePasswordGate>
-      <AppLayout />
-    </SitePasswordGate>
-  );
+  // Password gate temporarily disabled during development
+  return <AppLayout />;
 }
 import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
