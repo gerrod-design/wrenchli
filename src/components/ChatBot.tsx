@@ -47,6 +47,41 @@ export default function ChatBot() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const {
+    voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
+    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS,
+  } = useVoiceChat();
+
+  // Auto-speak new assistant messages when voice is enabled
+  const lastSpokenIndexRef = useRef(-1);
+  useEffect(() => {
+    if (!voiceEnabled || messages.length === 0) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.role === "assistant" && !loading && messages.length - 1 > lastSpokenIndexRef.current) {
+      lastSpokenIndexRef.current = messages.length - 1;
+      speak(lastMsg.content, detectAgent(lastMsg.content));
+    }
+  }, [voiceEnabled, messages, loading, speak]);
+
+  // When transcript changes (from voice input), update input field
+  useEffect(() => {
+    if (transcript) setInput(transcript);
+  }, [transcript]);
+
+  // Auto-send when voice recognition ends with transcript
+  const prevListeningRef = useRef(false);
+  useEffect(() => {
+    if (prevListeningRef.current && !isListening && transcript.trim()) {
+      // Small delay to ensure final transcript is captured
+      const t = setTimeout(() => {
+        send(transcript.trim());
+        setTranscript("");
+        setInput("");
+      }, 300);
+      return () => clearTimeout(t);
+    }
+    prevListeningRef.current = isListening;
+  }, [isListening, transcript]);
 
   // Mark as interacted
   const markInteracted = useCallback(() => {
