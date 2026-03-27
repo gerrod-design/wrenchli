@@ -15,6 +15,7 @@ import MobileBottomBar from "@/components/MobileBottomBar";
 import BackToTop from "@/components/BackToTop";
 import ChatBot from "@/components/ChatBot";
 import SitePasswordGate from "@/components/SitePasswordGate";
+import ScrollToTop from "@/components/ScrollToTop";
 
 function SitePasswordGateWrapper() {
   // Password gate temporarily disabled during development
