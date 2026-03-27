@@ -138,6 +138,7 @@ function AppLayout() {
 
   return (
     <>
+      <ScrollToTop />
       {!isAdmin && <Navbar />}
       <AnimatedRoutes />
       {!isAdmin && <Footer />}
