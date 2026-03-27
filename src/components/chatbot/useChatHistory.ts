@@ -22,11 +22,12 @@ export function useChatHistory() {
   const messages = activeConversation?.messages ?? [];
 
   const setMessages = useCallback(
-    (updater: Msg[] | ((prev: Msg[]) => Msg[])) => {
-      if (!activeId) return;
+    (updater: Msg[] | ((prev: Msg[]) => Msg[]), targetId?: string) => {
+      const resolvedId = targetId ?? activeId;
+      if (!resolvedId) return;
       setConversations((prev) => {
         const convos = [...prev];
-        const idx = convos.findIndex((c) => c.id === activeId);
+        const idx = convos.findIndex((c) => c.id === resolvedId);
         if (idx === -1) return prev;
         const currentMsgs = convos[idx].messages;
         const newMsgs = typeof updater === "function" ? updater(currentMsgs) : updater;
@@ -37,7 +38,7 @@ export function useChatHistory() {
           const text = firstUser.content.slice(0, 40);
           convos[idx].title = text.length < firstUser.content.length ? text + "…" : text;
         }
-        updateConversation(activeId, newMsgs);
+        updateConversation(resolvedId, newMsgs);
         return convos;
       });
     },
