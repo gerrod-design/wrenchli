@@ -70,18 +70,27 @@ export default function ChatBot() {
 
   // Auto-send when voice recognition ends with transcript
   const prevListeningRef = useRef(false);
+  const pendingSendRef = useRef(false);
   useEffect(() => {
     if (prevListeningRef.current && !isListening && transcript.trim()) {
-      // Small delay to ensure final transcript is captured
+      pendingSendRef.current = true;
+    }
+    prevListeningRef.current = isListening;
+  }, [isListening, transcript]);
+
+  // Separate effect to handle the actual send to avoid stale closure
+  useEffect(() => {
+    if (pendingSendRef.current && !isListening && transcript.trim()) {
+      pendingSendRef.current = false;
+      const text = transcript.trim();
       const t = setTimeout(() => {
-        send(transcript.trim());
+        send(text);
         setTranscript("");
         setInput("");
       }, 300);
       return () => clearTimeout(t);
     }
-    prevListeningRef.current = isListening;
-  }, [isListening, transcript]);
+  }, [isListening, transcript, send, setTranscript]);
 
   // Mark as interacted
   const markInteracted = useCallback(() => {
@@ -193,6 +202,20 @@ export default function ChatBot() {
     "📸 Show damage photo",
   ];
 
+  // Show voice mode onboarding once
+  const [showVoiceTip, setShowVoiceTip] = useState(false);
+  useEffect(() => {
+    if (!open || !supportsSTT) return;
+    const seen = localStorage.getItem("wrenchli_voice_tip_seen");
+    if (!seen) {
+      const t = setTimeout(() => {
+        setShowVoiceTip(true);
+        localStorage.setItem("wrenchli_voice_tip_seen", "true");
+      }, 2000);
+      return () => clearTimeout(t);
+    }
+  }, [open, supportsSTT]);
+
   const handleOpenChat = () => {
     setOpen(true);
     markInteracted();
@@ -233,14 +256,35 @@ export default function ChatBot() {
               <span className="font-semibold text-primary-foreground text-sm">Wrenchli Assistant</span>
               <div className="flex items-center gap-1.5">
                 {(supportsSTT || supportsTTS) && (
-                  <button
-                    onClick={toggleVoice}
-                    className={`transition-colors ${voiceEnabled ? "text-primary-foreground" : "text-primary-foreground/60 hover:text-primary-foreground"}`}
-                    aria-label={voiceEnabled ? "Disable voice mode" : "Enable voice mode"}
-                    title={voiceEnabled ? "Voice mode on" : "Voice mode off"}
-                  >
-                    {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => {
+                        toggleVoice();
+                        setShowVoiceTip(false);
+                        if (!voiceEnabled) toast.success("🎙️ Voice mode on — I'll speak my responses and listen for yours!", { duration: 3000 });
+                      }}
+                      className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium transition-all ${
+                        voiceEnabled
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "text-primary-foreground/60 hover:text-primary-foreground hover:bg-primary-foreground/10"
+                      }`}
+                      aria-label={voiceEnabled ? "Disable voice mode" : "Enable voice mode"}
+                      title={voiceEnabled ? "Voice mode on" : "Voice mode off"}
+                    >
+                      {voiceEnabled ? <Volume2 className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+                      <span className="hidden sm:inline">{voiceEnabled ? "Voice On" : "Voice"}</span>
+                    </button>
+                    {showVoiceTip && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                        className="absolute right-0 top-full mt-2 z-50 w-48 rounded-lg bg-foreground text-background px-3 py-2 text-xs shadow-lg"
+                      >
+                        <div className="absolute -top-1 right-3 h-2 w-2 rotate-45 bg-foreground" />
+                        🎙️ Tap here for hands-free voice conversations!
+                        <button onClick={() => setShowVoiceTip(false)} className="ml-1 underline opacity-70 hover:opacity-100">Got it</button>
+                      </motion.div>
+                    )}
+                  </div>
                 )}
                 <button
                   onClick={() => { startNewChat(); setShowHistory(false); }}
