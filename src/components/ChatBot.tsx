@@ -305,7 +305,7 @@ export default function ChatBot() {
                               );
                             }
                           }}>
-                            {m.content}
+                            {cleanAgentMarker(m.content)}
                           </ReactMarkdown>
                         )}
                       </div>
