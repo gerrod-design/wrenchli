@@ -109,9 +109,10 @@ export function useVoiceChat() {
   }, [supportsSTT, isListening, clearSilenceTimer]);
 
   const stopListening = useCallback(() => {
+    clearSilenceTimer();
     recognitionRef.current?.stop();
     setIsListening(false);
-  }, []);
+  }, [clearSilenceTimer]);
 
   const speak = useCallback((text: string, agent: AgentType) => {
     if (!supportsTTS || !voiceEnabled || !text) return;
