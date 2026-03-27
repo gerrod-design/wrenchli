@@ -326,10 +326,20 @@ export default function InlineChatWidget() {
                   <Camera className="h-4 w-4" />
                 </button>
               )}
+              {speechSupported && (
+                <button type="button" onClick={toggleListening} disabled={loading}
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
+                    isListening
+                      ? "bg-destructive text-destructive-foreground animate-pulse"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`} aria-label={isListening ? "Stop listening" : "Voice input"}>
+                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+              )}
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Tell me what's going on…"}
+                placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Tell me what's going on…"}
                 maxLength={8000}
                 className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
                 disabled={loading}
