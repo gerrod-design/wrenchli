@@ -196,6 +196,7 @@ export default function ChatBot() {
     }
   }, [isListening, transcript, send, setTranscript]);
 
+  const SUGGESTION_CHIPS = [
     "My check engine light is on",
     "I hear a strange noise",
     "What's my car worth?",
