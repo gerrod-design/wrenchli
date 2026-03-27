@@ -92,7 +92,10 @@ export default function InlineChatWidget() {
   }, [isListening, speechSupported]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Only scroll within the chat container, not the whole page
+    if (messages.length > 1) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }, [messages]);
 
   const uploadPhoto = async (file: File): Promise<string | null> => {
