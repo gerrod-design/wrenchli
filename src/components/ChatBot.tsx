@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus } from "lucide-react";
+import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
