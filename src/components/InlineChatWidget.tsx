@@ -8,9 +8,21 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Msg } from "./chatbot/types";
 import { streamChat } from "./chatbot/streamChat";
-import MechanicAvatar from "./MechanicAvatar";
+import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
 
-const GREETING = "👋 Hey there! I'm your Wrenchli advisor. What's your name so I can help you personally?";
+const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. I've been working on cars for over 15 years, so you're in good hands. What's your name?";
+
+/** Detect agent markers like [Agent: Sam] in message content */
+function detectAgent(content: string): AgentType {
+  if (/\[Agent:\s*Sam\]/i.test(content)) return "sam";
+  if (/\[Agent:\s*Jess\]/i.test(content)) return "jess";
+  return "mike";
+}
+
+/** Strip agent markers from displayed content */
+function cleanAgentMarker(content: string): string {
+  return content.replace(/\[Agent:\s*(?:Mike|Sam|Jess)\]\s*/gi, "");
+}
 
 export default function InlineChatWidget() {
   const navigate = useNavigate();
@@ -120,7 +132,7 @@ export default function InlineChatWidget() {
             {messages.map((m, i) => (
               <div key={i} className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 {m.role === "assistant" && (
-                  <MechanicAvatar size={36} className="mt-0.5" />
+                  <MechanicAvatar size={36} className="mt-0.5" agent={detectAgent(m.content)} />
                 )}
                 <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm ${
                   m.role === "user"
@@ -138,6 +150,7 @@ export default function InlineChatWidget() {
                     <span className="whitespace-pre-wrap">{m.content}</span>
                   ) : (
                     <ReactMarkdown components={{
+
                       a: ({ href, children }) => {
                         if (href && href.startsWith('/')) {
                           return (
@@ -156,7 +169,7 @@ export default function InlineChatWidget() {
                         );
                       }
                     }}>
-                      {m.content}
+                      {cleanAgentMarker(m.content)}
                     </ReactMarkdown>
                   )}
                 </div>
