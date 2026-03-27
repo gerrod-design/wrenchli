@@ -232,6 +232,16 @@ export default function ChatBot() {
             <div className="flex items-center justify-between bg-primary px-4 py-3">
               <span className="font-semibold text-primary-foreground text-sm">Wrenchli Assistant</span>
               <div className="flex items-center gap-1.5">
+                {(supportsSTT || supportsTTS) && (
+                  <button
+                    onClick={toggleVoice}
+                    className={`transition-colors ${voiceEnabled ? "text-primary-foreground" : "text-primary-foreground/60 hover:text-primary-foreground"}`}
+                    aria-label={voiceEnabled ? "Disable voice mode" : "Enable voice mode"}
+                    title={voiceEnabled ? "Voice mode on" : "Voice mode off"}
+                  >
+                    {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                  </button>
+                )}
                 <button
                   onClick={() => { startNewChat(); setShowHistory(false); }}
                   className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"
