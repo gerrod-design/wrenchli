@@ -13,7 +13,7 @@ import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
 
-const WELCOME_MESSAGE = `👋 Hey! I'm Mike, your Wrenchli advisor. I've been working on cars for over 15 years — you're in great hands. What's your name?`;
+const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.`;
 
 function detectAgent(content: string): AgentType {
   if (/\[Agent:\s*Sam\]/i.test(content)) return "sam";
