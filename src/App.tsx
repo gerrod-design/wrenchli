@@ -67,6 +67,7 @@ import MIAffordableLoan from "./pages/MIAffordableLoan";
 import DIYTutorials from "./pages/DIYTutorials";
 import DIYTutorialDetail from "./pages/DIYTutorialDetail";
 import ResetPassword from "./pages/ResetPassword";
+import RepairGuide, { RepairGuidesIndex } from "./pages/RepairGuide";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -125,6 +126,8 @@ function AnimatedRoutes() {
           <Route path="/mi-loan/denied" element={<MILoanDenied />} />
           <Route path="/diy" element={<DIYTutorials />} />
           <Route path="/diy/:slug" element={<DIYTutorialDetail />} />
+          <Route path="/repairs" element={<RepairGuidesIndex />} />
+          <Route path="/repairs/:slug" element={<RepairGuide />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
