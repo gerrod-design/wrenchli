@@ -182,7 +182,20 @@ export default function ChatBot() {
     }
   }, [input, loading, messages, pendingPhotos, setMessages, ensureActiveConversation]);
 
-  const SUGGESTION_CHIPS = [
+  // Auto-send when voice recognition ends with transcript
+  useEffect(() => {
+    if (pendingSendRef.current && !isListening && transcript.trim()) {
+      pendingSendRef.current = false;
+      const text = transcript.trim();
+      const t = setTimeout(() => {
+        send(text);
+        setTranscript("");
+        setInput("");
+      }, 300);
+      return () => clearTimeout(t);
+    }
+  }, [isListening, transcript, send, setTranscript]);
+
     "My check engine light is on",
     "I hear a strange noise",
     "What's my car worth?",
