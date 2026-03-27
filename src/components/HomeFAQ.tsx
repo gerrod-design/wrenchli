@@ -1,17 +1,30 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import SectionReveal from "@/components/SectionReveal";
 import { FaqJsonLd } from "@/components/JsonLd";
 
-const FAQ_ITEMS = [
+interface FaqItem {
+  q: string;
+  a: string;
+  richAnswer?: React.ReactNode;
+}
+
+const FAQ_ITEMS: FaqItem[] = [
   {
     q: "How does Wrenchli work?",
     a: "Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly diagnoses the issue, estimates repair costs, and connects you with vetted local shops or DIY guides.",
+    richAnswer: (
+      <>Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly diagnoses the issue, estimates repair costs, and connects you with <Link to="/find-shops" className="text-primary underline hover:text-primary/80">vetted local shops</Link> or <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY guides</Link>.</>
+    ),
   },
   {
     q: "Is the diagnosis really free?",
     a: "Yes, 100% free. You can diagnose unlimited vehicle issues, get cost estimates, and browse DIY tutorials without paying a thing. You only pay if you choose to book a repair through a partner shop.",
+    richAnswer: (
+      <>Yes, 100% free. You can diagnose unlimited vehicle issues, get cost estimates, and browse <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link> without paying a thing. You only pay if you choose to book a repair through a partner shop.</>
+    ),
   },
   {
     q: "What areas does Wrenchli serve?",
@@ -20,14 +33,23 @@ const FAQ_ITEMS = [
   {
     q: "How accurate are the repair cost estimates?",
     a: "Our estimates are based on real shop pricing data, labor rates, and OEM/aftermarket parts costs for your specific vehicle. They typically fall within 10–15% of the actual quote you'll receive from a shop.",
+    richAnswer: (
+      <>Our estimates are based on real shop pricing data, labor rates, and OEM/aftermarket parts costs for your specific vehicle. They typically fall within 10–15% of the actual quote you'll receive. Browse our <Link to="/repairs" className="text-primary underline hover:text-primary/80">repair cost guides</Link> or <Link to="/get-quote" className="text-primary underline hover:text-primary/80">get a personalized quote</Link>.</>
+    ),
   },
   {
     q: "Can I do the repair myself instead of going to a shop?",
     a: "Absolutely. For many common repairs, Wrenchli provides step-by-step video tutorials, parts lists with direct purchase links, and tool recommendations so you can save money by doing it yourself.",
+    richAnswer: (
+      <>Absolutely. For many common repairs, Wrenchli provides <Link to="/diy" className="text-primary underline hover:text-primary/80">step-by-step video tutorials</Link>, parts lists with direct purchase links, and tool recommendations so you can save money by doing it yourself.</>
+    ),
   },
   {
     q: "Does Wrenchli offer financing for repairs?",
     a: "Yes. We partner with financing providers to offer flexible payment plans for vehicle repairs. All credit types are welcome, and you can see your estimated monthly payment before committing.",
+    richAnswer: (
+      <>Yes. We partner with financing providers to offer <Link to="/financing-options" className="text-primary underline hover:text-primary/80">flexible payment plans</Link> for vehicle repairs. All credit types are welcome, and you can see your estimated monthly payment before committing.</>
+    ),
   },
   {
     q: "How do I identify my vehicle?",
@@ -36,6 +58,9 @@ const FAQ_ITEMS = [
   {
     q: "Is my vehicle data private?",
     a: "Yes. We don't sell your data. Vehicle information is used only to provide accurate diagnoses and estimates. Read our Privacy Policy for full details.",
+    richAnswer: (
+      <>Yes. We don't sell your data. Vehicle information is used only to provide accurate diagnoses and estimates. Read our <Link to="/privacy" className="text-primary underline hover:text-primary/80">Privacy Policy</Link> for full details.</>
+    ),
   },
 ];
 
@@ -83,7 +108,7 @@ export default function HomeFAQ() {
                       className="overflow-hidden"
                     >
                       <p className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed">
-                        {item.a}
+                        {item.richAnswer || item.a}
                       </p>
                     </motion.div>
                   )}

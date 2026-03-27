@@ -3,8 +3,9 @@ import SEO from "@/components/SEO";
 import { FaqJsonLd } from "@/components/JsonLd";
 import SectionReveal from "@/components/SectionReveal";
 import InlineChatWidget from "@/components/InlineChatWidget";
-import { ArrowLeft, Wrench, DollarSign, Clock, AlertTriangle, ChevronDown } from "lucide-react";
+import { ArrowLeft, Wrench, DollarSign, Clock, AlertTriangle, ChevronDown, ExternalLink } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import React from "react";
 
 interface RepairData {
   slug: string;
@@ -18,12 +19,13 @@ interface RepairData {
   timeEstimate: string;
   urgency: "low" | "medium" | "high";
   urgencyLabel: string;
-  description: string[];
+  description: React.ReactNode[];
   symptoms: string[];
   causes: string[];
-  diyFeasibility: string;
+  diyFeasibility: React.ReactNode;
   chatPrompt: string;
   faqs: { q: string; a: string }[];
+  relatedLinks: { label: string; to: string }[];
 }
 
 const REPAIRS: Record<string, RepairData> = {
@@ -41,7 +43,7 @@ const REPAIRS: Record<string, RepairData> = {
     urgency: "medium",
     urgencyLabel: "Don't ignore — diagnose soon",
     description: [
-      "The check engine light (CEL) is your vehicle's way of telling you something needs attention in the engine, emissions, or powertrain system. It can indicate anything from a loose gas cap to a failing catalytic converter.",
+      <>The check engine light (CEL) is your vehicle's way of telling you something needs attention in the engine, emissions, or powertrain system. It can indicate anything from a loose gas cap to a failing <Link to="/repairs/catalytic-converter-replacement" className="text-primary underline hover:text-primary/80">catalytic converter</Link>.</>,
       "Ignoring it can lead to reduced fuel efficiency, increased emissions, and potentially expensive damage if the underlying issue worsens over time.",
     ],
     symptoms: [
@@ -59,9 +61,16 @@ const REPAIRS: Record<string, RepairData> = {
       "Mass airflow sensor malfunction (P0100–P0104)",
       "EGR valve problems",
     ],
-    diyFeasibility:
-      "Some causes like a loose gas cap are trivial DIY fixes. Others like oxygen sensors are moderate. Catalytic converter replacement typically requires a professional shop.",
+    diyFeasibility: (
+      <>Some causes like a loose gas cap are trivial DIY fixes. Others like oxygen sensors are moderate — check our <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorial library</Link>. Catalytic converter replacement typically requires a <Link to="/find-shops" className="text-primary underline hover:text-primary/80">professional shop</Link>.</>
+    ),
     chatPrompt: "My check engine light is on",
+    relatedLinks: [
+      { label: "Browse DIY tutorials", to: "/diy" },
+      { label: "Find a shop near you", to: "/find-shops" },
+      { label: "Get a repair quote", to: "/get-quote" },
+      { label: "Explore financing options", to: "/financing-options" },
+    ],
     faqs: [
       {
         q: "Is it safe to drive with the check engine light on?",
@@ -91,7 +100,7 @@ const REPAIRS: Record<string, RepairData> = {
     urgency: "high",
     urgencyLabel: "Required for emissions — fix soon",
     description: [
-      "The catalytic converter is a critical emissions component that converts toxic exhaust gases into less harmful emissions. When it fails, your vehicle will fail emissions tests and trigger check engine codes like P0420 or P0430.",
+      <>The catalytic converter is a critical emissions component that converts toxic exhaust gases into less harmful emissions. When it fails, your vehicle will fail emissions tests and trigger <Link to="/repairs/check-engine-light" className="text-primary underline hover:text-primary/80">check engine codes</Link> like P0420 or P0430.</>,
       "Replacement costs vary widely depending on your vehicle — some cars use expensive precious metals (platinum, palladium, rhodium) in their converters, driving up parts costs.",
     ],
     symptoms: [
@@ -108,9 +117,15 @@ const REPAIRS: Record<string, RepairData> = {
       "Use of leaded fuel",
       "Physical damage from road debris",
     ],
-    diyFeasibility:
-      "Catalytic converter replacement is generally a professional-level repair requiring welding or specialized tools. Not recommended as a DIY job for most vehicle owners.",
+    diyFeasibility: (
+      <>Catalytic converter replacement is generally a professional-level repair requiring welding or specialized tools. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a trusted shop near you</Link> or explore <Link to="/financing-options" className="text-primary underline hover:text-primary/80">financing options</Link> for this higher-cost repair.</>
+    ),
     chatPrompt: "I need a catalytic converter replacement",
+    relatedLinks: [
+      { label: "Find a shop near you", to: "/find-shops" },
+      { label: "Explore financing options", to: "/financing-options" },
+      { label: "Get a repair quote", to: "/get-quote" },
+    ],
     faqs: [
       {
         q: "Can I drive without a catalytic converter?",
@@ -158,9 +173,16 @@ const REPAIRS: Record<string, RepairData> = {
       "City driving with frequent stops",
       "Low-quality brake pad material",
     ],
-    diyFeasibility:
-      "Brake pad replacement is one of the most common DIY repairs. With basic tools (jack, lug wrench, C-clamp) and 1–2 hours, most vehicle owners can replace their own pads and save 50% or more.",
+    diyFeasibility: (
+      <>Brake pad replacement is one of the most common DIY repairs. Follow our <Link to="/diy" className="text-primary underline hover:text-primary/80">step-by-step brake pad tutorial</Link> — with basic tools and 1–2 hours, most vehicle owners can save 50% or more.</>
+    ),
     chatPrompt: "I need to replace my brake pads",
+    relatedLinks: [
+      { label: "DIY brake pad tutorial", to: "/diy" },
+      { label: "Find a shop near you", to: "/find-shops" },
+      { label: "Get a repair quote", to: "/get-quote" },
+      { label: "Explore financing options", to: "/financing-options" },
+    ],
     faqs: [
       {
         q: "How do I know when my brake pads need replacing?",
@@ -250,7 +272,7 @@ export default function RepairGuide() {
             {[
               { icon: DollarSign, label: "Estimated Cost", value: `$${repair.costLow}–$${repair.costHigh}` },
               { icon: Clock, label: "Time Estimate", value: repair.timeEstimate },
-              { icon: Wrench, label: "DIY?", value: repair.diyFeasibility.split(".")[0] },
+              { icon: Wrench, label: "DIY?", value: repair.urgency === "high" ? "Shop recommended" : "Possible" },
               { icon: AlertTriangle, label: "Urgency", value: repair.urgencyLabel },
             ].map((s) => (
               <div key={s.label} className="rounded-xl border border-border bg-card p-4 text-center">
@@ -300,6 +322,23 @@ export default function RepairGuide() {
           <SectionReveal>
             <h2 className="font-heading text-xl font-bold mb-3">Can I Do This Myself?</h2>
             <p className="text-muted-foreground leading-relaxed">{repair.diyFeasibility}</p>
+          </SectionReveal>
+
+          {/* Related Links */}
+          <SectionReveal>
+            <h2 className="font-heading text-xl font-bold mb-3">Helpful Resources</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {repair.relatedLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4 shrink-0 text-accent" />
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </SectionReveal>
         </div>
       </section>
