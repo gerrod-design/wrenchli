@@ -15,6 +15,8 @@ import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import WaitlistForm from "@/components/WaitlistForm";
 import { useLocation } from "@/contexts/LocationContext";
 import MILoanBanner from "@/components/MILoanBanner";
+import { HomeJsonLd } from "@/components/JsonLd";
+import HomeFAQ from "@/components/HomeFAQ";
 
 const valueProps = [
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
@@ -34,6 +36,7 @@ export default function Index() {
         description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Michigan and Ohio."
         path="/"
       />
+      <HomeJsonLd />
       <MILoanBanner />
 
       {/* Cinematic Hero */}
@@ -65,6 +68,8 @@ export default function Index() {
       </section>
 
       <TestimonialsCarousel />
+
+      <HomeFAQ />
 
       {/* Waitlist Signup */}
       <section className="section-padding bg-secondary">
