@@ -136,11 +136,9 @@ export default function InlineChatWidget() {
                   return (
                     <div className="flex flex-col items-center gap-0.5 shrink-0">
                       <MechanicAvatar size={36} className="mt-0.5" agent={agent} />
-                      {agent !== "mike" && (
-                        <span className="text-[10px] font-medium text-muted-foreground leading-none">
-                          {agent === "sam" ? "Sam" : "Jess"}
-                        </span>
-                      )}
+                      <span className="text-[10px] font-medium text-muted-foreground leading-none">
+                        {agent === "sam" ? "Sam" : agent === "jess" ? "Jess" : "Mike"}
+                      </span>
                     </div>
                   );
                 })()}
