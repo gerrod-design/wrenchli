@@ -79,39 +79,6 @@ export default function InlineChatWidget() {
 
   const removePendingPhoto = (i: number) => setPendingPhotos((p) => p.filter((_, idx) => idx !== i));
 
-  const handleVinDecoded = useCallback((vehicle: DecodedVehicle) => {
-    setVinModalOpen(false);
-    setVinText("");
-    setVinError("");
-    const desc = `My vehicle is a ${vehicle.year} ${vehicle.make} ${vehicle.model}${vehicle.trim ? ` ${vehicle.trim}` : ""}${vehicle.engine ? `, ${vehicle.engine}` : ""}`;
-    send(desc);
-  }, [send]);
-
-  const handleVinSubmit = async () => {
-    const cleaned = sanitizeVin(vinText);
-    if (!isValidVin(cleaned)) {
-      setVinError("VINs are exactly 17 characters (no I, O, or Q).");
-      return;
-    }
-    setVinLoading(true);
-    setVinError("");
-    try {
-      const vehicle = await decodeVin(cleaned);
-      handleVinDecoded(vehicle);
-    } catch {
-      setVinError("Couldn't decode that VIN. Please try again.");
-    } finally {
-      setVinLoading(false);
-    }
-  };
-
-  const handleVinCamera = async (file: File) => {
-    // For VIN camera capture, we use the barcode scanner approach
-    // but as a simple fallback, prompt manual entry
-    toast.info("Please enter your VIN manually or scan the barcode.");
-    setVinModalOpen(true);
-  };
-
   const send = useCallback(async (override?: string) => {
     const text = (override ?? input).trim();
     if ((!text && pendingPhotos.length === 0) || loading) return;
