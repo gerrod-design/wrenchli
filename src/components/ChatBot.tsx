@@ -12,6 +12,7 @@ import { streamChat } from "./chatbot/streamChat";
 import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
+import { useVoiceChat } from "@/hooks/useVoiceChat";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.`;
 
