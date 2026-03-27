@@ -131,9 +131,19 @@ export default function InlineChatWidget() {
           <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px" }}>
             {messages.map((m, i) => (
               <div key={i} className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                {m.role === "assistant" && (
-                  <MechanicAvatar size={36} className="mt-0.5" agent={detectAgent(m.content)} />
-                )}
+                {m.role === "assistant" && (() => {
+                  const agent = detectAgent(m.content);
+                  return (
+                    <div className="flex flex-col items-center gap-0.5 shrink-0">
+                      <MechanicAvatar size={36} className="mt-0.5" agent={agent} />
+                      {agent !== "mike" && (
+                        <span className="text-[10px] font-medium text-muted-foreground leading-none">
+                          {agent === "sam" ? "Sam" : "Jess"}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm ${
                   m.role === "user"
                     ? "bg-primary text-primary-foreground rounded-br-md"
