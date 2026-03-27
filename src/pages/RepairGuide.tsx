@@ -3,7 +3,7 @@ import SEO from "@/components/SEO";
 import { FaqJsonLd } from "@/components/JsonLd";
 import SectionReveal from "@/components/SectionReveal";
 import InlineChatWidget from "@/components/InlineChatWidget";
-import { ArrowLeft, Wrench, DollarSign, Clock, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Wrench, DollarSign, Clock, AlertTriangle, ChevronDown } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 
 interface RepairData {
