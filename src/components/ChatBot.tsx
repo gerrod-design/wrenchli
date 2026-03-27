@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus } from "lucide-react";
+import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -12,6 +12,7 @@ import { streamChat } from "./chatbot/streamChat";
 import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
+import { useVoiceChat } from "@/hooks/useVoiceChat";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.`;
 
@@ -46,6 +47,41 @@ export default function ChatBot() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const {
+    voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
+    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS,
+  } = useVoiceChat();
+
+  // Auto-speak new assistant messages when voice is enabled
+  const lastSpokenIndexRef = useRef(-1);
+  useEffect(() => {
+    if (!voiceEnabled || messages.length === 0) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.role === "assistant" && !loading && messages.length - 1 > lastSpokenIndexRef.current) {
+      lastSpokenIndexRef.current = messages.length - 1;
+      speak(lastMsg.content, detectAgent(lastMsg.content));
+    }
+  }, [voiceEnabled, messages, loading, speak]);
+
+  // When transcript changes (from voice input), update input field
+  useEffect(() => {
+    if (transcript) setInput(transcript);
+  }, [transcript]);
+
+  // Auto-send when voice recognition ends with transcript
+  const prevListeningRef = useRef(false);
+  useEffect(() => {
+    if (prevListeningRef.current && !isListening && transcript.trim()) {
+      // Small delay to ensure final transcript is captured
+      const t = setTimeout(() => {
+        send(transcript.trim());
+        setTranscript("");
+        setInput("");
+      }, 300);
+      return () => clearTimeout(t);
+    }
+    prevListeningRef.current = isListening;
+  }, [isListening, transcript]);
 
   // Mark as interacted
   const markInteracted = useCallback(() => {
@@ -196,6 +232,16 @@ export default function ChatBot() {
             <div className="flex items-center justify-between bg-primary px-4 py-3">
               <span className="font-semibold text-primary-foreground text-sm">Wrenchli Assistant</span>
               <div className="flex items-center gap-1.5">
+                {(supportsSTT || supportsTTS) && (
+                  <button
+                    onClick={toggleVoice}
+                    className={`transition-colors ${voiceEnabled ? "text-primary-foreground" : "text-primary-foreground/60 hover:text-primary-foreground"}`}
+                    aria-label={voiceEnabled ? "Disable voice mode" : "Enable voice mode"}
+                    title={voiceEnabled ? "Voice mode on" : "Voice mode off"}
+                  >
+                    {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                  </button>
+                )}
                 <button
                   onClick={() => { startNewChat(); setShowHistory(false); }}
                   className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"
@@ -344,6 +390,29 @@ export default function ChatBot() {
                   </div>
                 )}
 
+                {/* Voice status indicator */}
+                {voiceEnabled && (isSpeaking || isListening) && (
+                  <div className="border-t border-border px-3 py-1.5 flex items-center gap-2 bg-accent/5">
+                    {isSpeaking && (
+                      <>
+                        <div className="flex gap-0.5 items-end h-4">
+                          {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="w-1 bg-primary rounded-full animate-pulse" style={{ height: `${8 + Math.random() * 8}px`, animationDelay: `${i * 0.15}s` }} />
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground">Speaking…</span>
+                        <button onClick={stopSpeaking} className="ml-auto text-xs text-muted-foreground hover:text-foreground">Skip</button>
+                      </>
+                    )}
+                    {isListening && !isSpeaking && (
+                      <>
+                        <div className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
+                        <span className="text-xs text-muted-foreground">Listening…</span>
+                      </>
+                    )}
+                  </div>
+                )}
+
                 {/* Input */}
                 <div className="border-t border-border">
                   <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2">
@@ -358,9 +427,25 @@ export default function ChatBot() {
                       </button>
                     )}
                     <input value={input} onChange={(e) => setInput(e.target.value)}
-                      placeholder={pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Type a message…"}
+                      placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : voiceEnabled ? "Tap mic or type…" : "Type a message…"}
                       maxLength={8000}
                       className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring" disabled={loading} />
+                    {voiceEnabled && supportsSTT && (
+                      <button
+                        type="button"
+                        onClick={isListening ? stopListening : startListening}
+                        disabled={loading || isSpeaking}
+                        className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
+                          isListening
+                            ? "bg-destructive text-destructive-foreground animate-pulse"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        }`}
+                        aria-label={isListening ? "Stop listening" : "Start listening"}
+                        title={isListening ? "Stop listening" : "Speak your message"}
+                      >
+                        {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                      </button>
+                    )}
                     <button type="submit" disabled={loading || (!input.trim() && pendingPhotos.length === 0)}
                       className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground disabled:opacity-40" aria-label="Send">
                       <Send className="h-4 w-4" />
