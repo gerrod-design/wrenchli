@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Loader2, ImagePlus, Camera } from "lucide-react";
+import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import type { Msg } from "./chatbot/types";
 import { streamChat } from "./chatbot/streamChat";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
+import { sanitizeVin, isValidVin, decodeVin, type DecodedVehicle } from "@/lib/vinDecoder";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. I've been working on cars for over 15 years, so you're in good hands. What's your name?";
 
@@ -34,9 +38,14 @@ export default function InlineChatWidget() {
   const [loading, setLoading] = useState(false);
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [vinModalOpen, setVinModalOpen] = useState(false);
+  const [vinText, setVinText] = useState("");
+  const [vinLoading, setVinLoading] = useState(false);
+  const [vinError, setVinError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const vinCameraRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -108,11 +117,38 @@ export default function InlineChatWidget() {
     }
   }, [input, loading, messages, pendingPhotos]);
 
+  const handleVinDecoded = useCallback((vehicle: DecodedVehicle) => {
+    setVinModalOpen(false);
+    setVinText("");
+    setVinError("");
+    const desc = `My vehicle is a ${vehicle.year} ${vehicle.make} ${vehicle.model}${vehicle.trim ? ` ${vehicle.trim}` : ""}${vehicle.engine ? `, ${vehicle.engine}` : ""}`;
+    send(desc);
+  }, [send]);
+
+  const handleVinSubmit = async () => {
+    const cleaned = sanitizeVin(vinText);
+    if (!isValidVin(cleaned)) {
+      setVinError("VINs are exactly 17 characters (no I, O, or Q).");
+      return;
+    }
+    setVinLoading(true);
+    setVinError("");
+    try {
+      const vehicle = await decodeVin(cleaned);
+      handleVinDecoded(vehicle);
+    } catch {
+      setVinError("Couldn't decode that VIN. Please try again.");
+    } finally {
+      setVinLoading(false);
+    }
+  };
+
   const QUICK_PROMPTS = [
     "My check engine light is on",
     "I hear a strange noise",
     "What's my car worth?",
     "📸 Show damage photo",
+    "🔍 Scan VIN",
   ];
 
   return (
@@ -203,7 +239,11 @@ export default function InlineChatWidget() {
                 <button
                   key={chip}
                   type="button"
-                  onClick={() => chip.includes("photo") ? fileInputRef.current?.click() : send(chip)}
+                  onClick={() => {
+                    if (chip.includes("photo")) fileInputRef.current?.click();
+                    else if (chip.includes("VIN")) setVinModalOpen(true);
+                    else send(chip);
+                  }}
                   className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   {chip}
@@ -258,6 +298,40 @@ export default function InlineChatWidget() {
           </div>
         </div>
       </div>
+
+      {/* VIN Scan/Entry Modal */}
+      <Dialog open={vinModalOpen} onOpenChange={setVinModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-heading">Identify Your Vehicle</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">Enter your 17-character VIN to instantly identify your vehicle.</p>
+
+          <div className="space-y-3 mt-2">
+            {/* Manual VIN entry */}
+            <div className="flex gap-2">
+              <Input
+                value={vinText}
+                onChange={(e) => { setVinText(sanitizeVin(e.target.value)); setVinError(""); }}
+                placeholder="e.g. 1HGCV1F34LA000001"
+                maxLength={17}
+                className="font-mono tracking-wider uppercase"
+                disabled={vinLoading}
+              />
+              <Button onClick={handleVinSubmit} disabled={vinLoading || vinText.length < 17} size="sm">
+                {vinLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Decode"}
+              </Button>
+            </div>
+
+            {vinError && <p className="text-xs text-destructive">{vinError}</p>}
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <Keyboard className="inline h-3 w-3 mr-1 -mt-0.5" />
+              Find your VIN on the driver-side door jamb sticker or the bottom-left corner of your windshield.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
