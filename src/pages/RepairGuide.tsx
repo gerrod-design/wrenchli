@@ -198,6 +198,175 @@ const REPAIRS: Record<string, RepairData> = {
       },
     ],
   },
+  "oil-change": {
+    slug: "oil-change",
+    title: "Oil Change",
+    seoTitle: "Oil Change Cost — $30–$125 | DIY or Shop Estimates",
+    seoDescription:
+      "How much does an oil change cost? Get instant estimates for conventional or synthetic oil, compare shop prices, or follow our DIY guide to save.",
+    heroHeading: "Time for an Oil Change?",
+    heroSub: "Compare shop prices or do it yourself — we'll walk you through both.",
+    costLow: 30,
+    costHigh: 125,
+    timeEstimate: "30–60 minutes",
+    urgency: "medium",
+    urgencyLabel: "Overdue oil damages your engine",
+    description: [
+      "Regular oil changes are the single most important maintenance you can do for your engine. Motor oil lubricates moving parts, reduces friction, and carries away heat and contaminants.",
+      <>Skipping oil changes leads to sludge buildup, accelerated engine wear, and eventually catastrophic failure. Most vehicles need an oil change every 5,000–7,500 miles for synthetic oil, or 3,000–5,000 miles for conventional. Check our <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY oil change tutorial</Link> to save 50% or more.</>,
+    ],
+    symptoms: [
+      "Oil change reminder light or maintenance minder",
+      "Dark, gritty oil on the dipstick",
+      "Engine running louder than normal",
+      "Decreased fuel economy",
+      "Oil smell inside the cabin",
+    ],
+    causes: [
+      "Exceeded mileage or time interval since last change",
+      "Severe driving conditions (short trips, dusty roads, towing)",
+      "Oil leak causing low oil level",
+      "Using incorrect oil weight or quality",
+    ],
+    diyFeasibility: (
+      <>Oil changes are one of the easiest and most rewarding DIY jobs. Follow our <Link to="/diy" className="text-primary underline hover:text-primary/80">step-by-step oil change tutorial</Link> — you'll need a jack, drain pan, wrench, and about 30 minutes.</>
+    ),
+    chatPrompt: "I need an oil change",
+    relatedLinks: [
+      { label: "DIY oil change tutorial", to: "/diy" },
+      { label: "Find a shop near you", to: "/find-shops" },
+      { label: "Get a repair quote", to: "/get-quote" },
+    ],
+    faqs: [
+      {
+        q: "How often should I change my oil?",
+        a: "For most modern vehicles using synthetic oil, every 7,500–10,000 miles or once a year. Conventional oil should be changed every 3,000–5,000 miles. Always check your owner's manual for the manufacturer's recommendation.",
+      },
+      {
+        q: "Is synthetic oil worth the extra cost?",
+        a: "Yes, for most vehicles. Synthetic oil lasts longer between changes, performs better in extreme temperatures, and provides superior engine protection. The higher per-quart cost is offset by longer change intervals.",
+      },
+      {
+        q: "Can I switch between conventional and synthetic oil?",
+        a: "Yes, you can switch freely between conventional, synthetic blend, and full synthetic oil. There's no need to flush the engine. Many mechanics recommend upgrading to synthetic for better protection.",
+      },
+    ],
+  },
+  "transmission-repair": {
+    slug: "transmission-repair",
+    title: "Transmission Repair",
+    seoTitle: "Transmission Repair Cost — $150–$5,000+ Estimates",
+    seoDescription:
+      "How much does transmission repair cost? From fluid changes ($150) to full rebuilds ($3,000+). Get instant estimates for your vehicle and compare shop prices.",
+    heroHeading: "Transmission Problems?",
+    heroSub: "Get an instant cost estimate — from a fluid flush to a full rebuild.",
+    costLow: 150,
+    costHigh: 5000,
+    timeEstimate: "2 hours – 3 days",
+    urgency: "high",
+    urgencyLabel: "Driving risks further damage",
+    description: [
+      "The transmission is one of the most complex and expensive components in your vehicle. It transfers power from the engine to the wheels and allows you to shift between gears. When it fails, you may lose the ability to drive altogether.",
+      <>Transmission issues range from simple fixes like a fluid change ($150–$300) to major rebuilds ($2,500–$5,000+). Early diagnosis is critical — catching a problem early can save thousands. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a transmission specialist near you</Link> or explore <Link to="/financing-options" className="text-primary underline hover:text-primary/80">financing options</Link> for larger repairs.</>,
+    ],
+    symptoms: [
+      "Slipping gears or delayed engagement",
+      "Grinding or shaking when shifting",
+      "Transmission warning light on dashboard",
+      "Burning smell from transmission fluid",
+      "Leaking red or brown fluid under the vehicle",
+      "Vehicle won't move in drive or reverse",
+    ],
+    causes: [
+      "Low or degraded transmission fluid",
+      "Worn clutch plates or bands",
+      "Failed solenoids or valve body issues",
+      "Torque converter failure",
+      "Overheating from towing or heavy use",
+      "Normal wear at high mileage (150,000+ miles)",
+    ],
+    diyFeasibility: (
+      <>Transmission fluid changes are a moderate DIY job — check our <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link>. Internal transmission repairs require specialized tools and expertise, so <Link to="/find-shops" className="text-primary underline hover:text-primary/80">find a qualified shop</Link> for anything beyond fluid service.</>
+    ),
+    chatPrompt: "My transmission is having problems",
+    relatedLinks: [
+      { label: "Find a transmission shop", to: "/find-shops" },
+      { label: "Get a repair quote", to: "/get-quote" },
+      { label: "Explore financing options", to: "/financing-options" },
+      { label: "Browse DIY tutorials", to: "/diy" },
+    ],
+    faqs: [
+      {
+        q: "How do I know if my transmission is failing?",
+        a: "Common signs include slipping gears (RPMs rise but the car doesn't accelerate), delayed shifting, grinding noises, and leaking red fluid. A check engine light with transmission-related codes (P0700–P0799) is also a strong indicator.",
+      },
+      {
+        q: "Is it better to rebuild or replace a transmission?",
+        a: "A rebuild is usually cheaper ($2,500–$4,500) and can last just as long as a replacement. A full replacement ($4,000–$8,000) may be better for high-mileage vehicles where other internal components are also worn.",
+      },
+      {
+        q: "How long does a transmission last?",
+        a: "With proper maintenance (regular fluid changes), an automatic transmission can last 200,000+ miles. Manual transmissions often last even longer. Neglecting fluid changes is the #1 cause of premature failure.",
+      },
+    ],
+  },
+  "alternator-replacement": {
+    slug: "alternator-replacement",
+    title: "Alternator Replacement",
+    seoTitle: "Alternator Replacement Cost — $350–$900 Estimates",
+    seoDescription:
+      "How much does alternator replacement cost? Get instant estimates for your specific vehicle, compare shop prices, and learn if it's a DIY-friendly repair.",
+    heroHeading: "Alternator Going Out?",
+    heroSub: "Get an instant cost estimate and find out if you can DIY it.",
+    costLow: 350,
+    costHigh: 900,
+    timeEstimate: "1–3 hours",
+    urgency: "high",
+    urgencyLabel: "Battery will die — fix soon",
+    description: [
+      "The alternator charges your battery and powers electrical systems while the engine is running. When it fails, your battery drains quickly, and you'll eventually be stranded with a vehicle that won't start.",
+      <>A failing alternator is often confused with a bad battery. If you've replaced the battery recently and it keeps dying, the alternator is likely the culprit. Get a <Link to="/get-quote" className="text-primary underline hover:text-primary/80">free diagnosis</Link> to confirm before spending money on the wrong fix.</>,
+    ],
+    symptoms: [
+      "Dimming or flickering headlights",
+      "Battery warning light on dashboard",
+      "Dead battery that keeps recurring",
+      "Whining or grinding noise from the engine",
+      "Electrical accessories (radio, windows) working intermittently",
+      "Burning rubber smell from a slipping belt",
+    ],
+    causes: [
+      "Worn bearings inside the alternator",
+      "Failed voltage regulator",
+      "Broken or worn serpentine belt",
+      "Corroded or loose electrical connections",
+      "Age and normal wear (alternators last 80,000–150,000 miles)",
+    ],
+    diyFeasibility: (
+      <>Alternator replacement is a moderate DIY job on most vehicles — accessible from the top of the engine bay with basic hand tools. Check our <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link> for guidance, or <Link to="/find-shops" className="text-primary underline hover:text-primary/80">find a shop</Link> if your vehicle has a difficult-to-reach alternator.</>
+    ),
+    chatPrompt: "I think my alternator is failing",
+    relatedLinks: [
+      { label: "Browse DIY tutorials", to: "/diy" },
+      { label: "Find a shop near you", to: "/find-shops" },
+      { label: "Get a repair quote", to: "/get-quote" },
+      { label: "Explore financing options", to: "/financing-options" },
+    ],
+    faqs: [
+      {
+        q: "How do I tell if it's the alternator or the battery?",
+        a: "Jump-start your car — if it runs fine but dies again after turning it off, the alternator isn't charging the battery. If it won't hold a jump at all, the battery itself may be the issue. Most auto parts stores will test both for free.",
+      },
+      {
+        q: "Can I drive with a bad alternator?",
+        a: "Only for a very short distance. Once the alternator fails, your car runs entirely on battery power, which typically lasts 20–30 minutes. You'll lose power steering, headlights, and eventually the engine will stall.",
+      },
+      {
+        q: "How long does an alternator last?",
+        a: "Most alternators last 80,000–150,000 miles (7–12 years). Lifespan depends on driving conditions, electrical load, and the quality of the original part.",
+      },
+    ],
+  },
 };
 
 const urgencyColors = {
