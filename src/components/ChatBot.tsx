@@ -106,16 +106,15 @@ export default function ChatBot() {
   const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(false); };
   const removePendingPhoto = (index: number) => setPendingPhotos((prev) => prev.filter((_, i) => i !== index));
 
-  const ensureActiveConversation = useCallback(() => {
-    if (!activeId) {
-      startNewChat();
-    }
+  const ensureActiveConversation = useCallback((): string => {
+    if (activeId) return activeId;
+    return startNewChat();
   }, [activeId, startNewChat]);
 
   const send = useCallback(async (override?: string) => {
     const text = (override ?? input).trim();
     if ((!text && pendingPhotos.length === 0) || loading) return;
-    ensureActiveConversation();
+    const convId = ensureActiveConversation();
     setInput("");
     const userMsg: Msg = {
       role: "user",
@@ -123,7 +122,7 @@ export default function ChatBot() {
       ...(pendingPhotos.length > 0 ? { image_urls: [...pendingPhotos] } : {}),
     };
     setPendingPhotos([]);
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMsg], convId);
     setLoading(true);
 
     let assistantSoFar = "";
@@ -135,7 +134,7 @@ export default function ChatBot() {
           return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
         }
         return [...prev, { role: "assistant", content: assistantSoFar }];
-      });
+      }, convId);
     };
 
     try {

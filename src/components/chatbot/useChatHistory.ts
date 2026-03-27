@@ -49,6 +49,7 @@ export function useChatHistory() {
     const conv = createConversation();
     setConversations((prev) => [conv, ...prev]);
     setActiveId(conv.id);
+    return conv.id;
   }, []);
 
   const switchConversation = useCallback((id: string) => {
