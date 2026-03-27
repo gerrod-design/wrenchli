@@ -28,7 +28,7 @@ export function useVoiceChat() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const synthRef = useRef(typeof window !== "undefined" ? window.speechSynthesis : null);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
   const lastSpokenRef = useRef("");
@@ -62,7 +62,7 @@ export function useVoiceChat() {
     synthRef.current?.cancel();
     setIsSpeaking(false);
 
-    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = true;
