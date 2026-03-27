@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard } from "lucide-react";
+import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -42,10 +42,54 @@ export default function InlineChatWidget() {
   const [vinText, setVinText] = useState("");
   const [vinLoading, setVinLoading] = useState(false);
   const [vinError, setVinError] = useState("");
+  const [isListening, setIsListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const vinCameraRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  // Check for speech recognition support
+  const speechSupported = typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+
+  const toggleListening = useCallback(() => {
+    if (!speechSupported) {
+      toast.error("Voice input isn't supported in this browser.");
+      return;
+    }
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0].transcript)
+        .join("");
+      setInput(transcript);
+    };
+
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      if (event.error === "not-allowed") {
+        toast.error("Microphone access denied. Please allow mic access in your browser settings.");
+      }
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  }, [isListening, speechSupported]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
