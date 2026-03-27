@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Loader2, ImagePlus, Camera } from "lucide-react";
+import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import type { Msg } from "./chatbot/types";
 import { streamChat } from "./chatbot/streamChat";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
+import { sanitizeVin, isValidVin, decodeVin, type DecodedVehicle } from "@/lib/vinDecoder";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. I've been working on cars for over 15 years, so you're in good hands. What's your name?";
 
