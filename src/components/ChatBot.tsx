@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus } from "lucide-react";
-import MechanicAvatar from "./MechanicAvatar";
+import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +13,17 @@ import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
 
-const WELCOME_MESSAGE = `👋 Hey! I'm your Wrenchli advisor. What's your name so I can help you personally?`;
+const WELCOME_MESSAGE = `👋 Hey! I'm Mike, your Wrenchli advisor. I've been working on cars for over 15 years — you're in great hands. What's your name?`;
+
+function detectAgent(content: string): AgentType {
+  if (/\[Agent:\s*Sam\]/i.test(content)) return "sam";
+  if (/\[Agent:\s*Jess\]/i.test(content)) return "jess";
+  return "mike";
+}
+
+function cleanAgentMarker(content: string): string {
+  return content.replace(/\[Agent:\s*(?:Mike|Sam|Jess)\]\s*/gi, "");
+}
 
 export default function ChatBot() {
   const navigate = useNavigate();
@@ -260,7 +270,7 @@ export default function ChatBot() {
 
                   {messages.map((m, i) => (
                     <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                      {m.role === "assistant" && <MechanicAvatar size={32} className="mt-0.5" />}
+                      {m.role === "assistant" && <MechanicAvatar size={32} className="mt-0.5" agent={detectAgent(m.content)} />}
                       <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                         m.role === "user"
                           ? "bg-primary text-primary-foreground"
@@ -295,7 +305,7 @@ export default function ChatBot() {
                               );
                             }
                           }}>
-                            {m.content}
+                            {cleanAgentMarker(m.content)}
                           </ReactMarkdown>
                         )}
                       </div>
