@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. I've been working on cars for over 15 years, so you're in good hands. What's your name?";
+const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.";
 
 /** Detect agent markers like [Agent: Sam] in message content */
 function detectAgent(content: string): AgentType {
