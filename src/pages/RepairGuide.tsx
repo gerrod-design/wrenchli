@@ -272,7 +272,7 @@ export default function RepairGuide() {
             {[
               { icon: DollarSign, label: "Estimated Cost", value: `$${repair.costLow}–$${repair.costHigh}` },
               { icon: Clock, label: "Time Estimate", value: repair.timeEstimate },
-              { icon: Wrench, label: "DIY?", value: repair.diyFeasibility.split(".")[0] },
+              { icon: Wrench, label: "DIY?", value: repair.urgency === "high" ? "Shop recommended" : "Possible" },
               { icon: AlertTriangle, label: "Urgency", value: repair.urgencyLabel },
             ].map((s) => (
               <div key={s.label} className="rounded-xl border border-border bg-card p-4 text-center">
@@ -322,6 +322,23 @@ export default function RepairGuide() {
           <SectionReveal>
             <h2 className="font-heading text-xl font-bold mb-3">Can I Do This Myself?</h2>
             <p className="text-muted-foreground leading-relaxed">{repair.diyFeasibility}</p>
+          </SectionReveal>
+
+          {/* Related Links */}
+          <SectionReveal>
+            <h2 className="font-heading text-xl font-bold mb-3">Helpful Resources</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {repair.relatedLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4 shrink-0 text-accent" />
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </SectionReveal>
         </div>
       </section>
