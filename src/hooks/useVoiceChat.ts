@@ -50,14 +50,14 @@ export function useVoiceChat() {
     setSilenceCountdown(0);
   }, []);
 
-  const startListening = useCallback((owner?: string) => {
+  const startListening = useCallback((owner?: string): boolean => {
     const resolvedOwner = owner ?? voiceOwnerRef.current ?? "global";
     if (owner || !voiceOwnerRef.current) {
       voiceOwnerRef.current = resolvedOwner;
       setVoiceOwner(resolvedOwner);
     }
 
-    if (!supportsSTT || isListening || !voiceEnabledRef.current) return;
+    if (!supportsSTT || isListening || !voiceEnabledRef.current) return false;
     // Stop any ongoing audio before listening
     if (audioRef.current) {
       audioRef.current.pause();
@@ -65,53 +65,66 @@ export function useVoiceChat() {
     }
     setIsSpeaking(false);
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
+    try {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        return false;
+      }
 
-    const resetSilenceTimer = () => {
-      clearSilenceTimer();
-      silenceStartRef.current = Date.now();
-      setSilenceCountdown(1);
-      countdownIntervalRef.current = setInterval(() => {
-        const elapsed = Date.now() - silenceStartRef.current;
-        const remaining = Math.max(0, 1 - elapsed / SILENCE_TIMEOUT_MS);
-        setSilenceCountdown(remaining);
-        if (remaining <= 0 && countdownIntervalRef.current) {
-          clearInterval(countdownIntervalRef.current);
-          countdownIntervalRef.current = null;
-        }
-      }, 50);
-      silenceTimerRef.current = setTimeout(() => {
-        recognition.stop();
-      }, SILENCE_TIMEOUT_MS);
-    };
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
 
-    recognition.onstart = () => {
-      setIsListening(true);
-      resetSilenceTimer();
-    };
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const result = Array.from(event.results)
-        .map((r) => r[0].transcript)
-        .join("");
-      setTranscript(result);
-      resetSilenceTimer();
-    };
-    recognition.onerror = () => {
+      const resetSilenceTimer = () => {
+        clearSilenceTimer();
+        silenceStartRef.current = Date.now();
+        setSilenceCountdown(1);
+        countdownIntervalRef.current = setInterval(() => {
+          const elapsed = Date.now() - silenceStartRef.current;
+          const remaining = Math.max(0, 1 - elapsed / SILENCE_TIMEOUT_MS);
+          setSilenceCountdown(remaining);
+          if (remaining <= 0 && countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+        }, 50);
+        silenceTimerRef.current = setTimeout(() => {
+          recognition.stop();
+        }, SILENCE_TIMEOUT_MS);
+      };
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        resetSilenceTimer();
+      };
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const result = Array.from(event.results)
+          .map((r) => r[0].transcript)
+          .join("");
+        setTranscript(result);
+        resetSilenceTimer();
+      };
+      recognition.onerror = (event: any) => {
+        console.error("Speech recognition error:", event?.error ?? event);
+        clearSilenceTimer();
+        setIsListening(false);
+        setTranscript("");
+      };
+      recognition.onend = () => {
+        clearSilenceTimer();
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+      return true;
+    } catch (err) {
+      console.error("Failed to start speech recognition:", err);
       clearSilenceTimer();
       setIsListening(false);
-      setTranscript("");
-    };
-    recognition.onend = () => {
-      clearSilenceTimer();
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
+      return false;
+    }
   }, [supportsSTT, isListening, clearSilenceTimer]);
 
   const stopListening = useCallback((owner?: string) => {
