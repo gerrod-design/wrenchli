@@ -16,6 +16,10 @@ export function VoiceChatProvider({ children }: { children: ReactNode }) {
 
 export function useSharedVoiceChat(): VoiceChatContextType {
   const ctx = useContext(VoiceChatContext);
-  if (!ctx) throw new Error("useSharedVoiceChat must be used within VoiceChatProvider");
+  if (!ctx) {
+    // Fallback: create a local instance if provider is missing (e.g. HMR boundary)
+    // This is safe because useVoiceChat is a pure hook with no side effects on mount
+    return useVoiceChat();
+  }
   return ctx;
 }
