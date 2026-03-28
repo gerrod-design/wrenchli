@@ -131,7 +131,14 @@ export function useVoiceChat() {
 
   const stopListening = useCallback(() => {
     clearSilenceTimer();
-    recognitionRef.current?.stop();
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {
+        // Already stopped
+      }
+      recognitionRef.current = null;
+    }
     setIsListening(false);
   }, [clearSilenceTimer]);
 
