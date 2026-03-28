@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import ShareWithShopButton from "@/components/ShareWithShopButton";
 
 export interface RepairOption {
   option: string;
@@ -132,7 +133,20 @@ export default function DamageAnalysisResult({ diagnosis, imageUrls, vehicleInfo
         </div>
       </div>
 
-      {/* CTA */}
+      {/* Share + CTA */}
+      <ShareWithShopButton
+        diagnosisTitle={diagnosis.damage_type}
+        diagnosisUrgency={diagnosis.severity}
+        diyFeasibility={diagnosis.repair_options[0]?.difficulty || null}
+        diagnosisDetails={diagnosis}
+        vehicleYear={vehicleInfo?.match(/(\d{4})/)?.[1] || null}
+        vehicleMake={vehicleInfo?.replace(/^\d{4}\s*/, "").split(" ")[0] || null}
+        vehicleModel={vehicleInfo?.replace(/^\d{4}\s*\S+\s*/, "") || null}
+        estimatedCostLow={diagnosis.repair_options[0]?.estimated_cost_low || null}
+        estimatedCostHigh={diagnosis.repair_options[diagnosis.repair_options.length - 1]?.estimated_cost_high || null}
+        photoUrls={imageUrls}
+        className="w-full"
+      />
       <div className="flex flex-col sm:flex-row gap-3">
         <Button asChild className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
           <Link to={`/get-quote?${quoteParams.toString()}`}>
