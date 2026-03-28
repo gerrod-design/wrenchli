@@ -221,7 +221,13 @@ export default function InlineChatWidget() {
                 {m.role === "assistant" && (() => {
                   const agent = detectAgent(m.content);
                   return (
-                    <div className="relative flex flex-col items-center gap-0.5 shrink-0">
+                    <motion.div
+                      key={`${i}-${agent}`}
+                      initial={{ scale: 0.7, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20, duration: 0.3 }}
+                      className="relative flex flex-col items-center gap-0.5 shrink-0"
+                    >
                       <MechanicAvatar size={36} className="mt-0.5" agent={agent} />
                       {voiceEnabled && isSpeaking && i === messages.length - 1 && (
                         <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
@@ -231,7 +237,7 @@ export default function InlineChatWidget() {
                       <span className="text-[10px] font-medium text-muted-foreground leading-none">
                         {agent === "sam" ? "Sam" : agent === "jess" ? "Jess" : "Mike"}
                       </span>
-                    </div>
+                    </motion.div>
                   );
                 })()}
                 <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm ${
