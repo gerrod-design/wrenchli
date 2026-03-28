@@ -76,7 +76,7 @@ export function useVoiceChat() {
   }, []);
 
   const startListening = useCallback(() => {
-    if (!supportsSTT || isListening) return;
+    if (!supportsSTT || isListening || !voiceEnabledRef.current) return;
     // Stop any ongoing speech before listening
     synthRef.current?.cancel();
     setIsSpeaking(false);
