@@ -154,16 +154,19 @@ export default function InlineChatWidget() {
   }, [input, loading, messages, pendingPhotos]);
 
   // Auto-send when voice recognition ends with transcript
+  const sendRef = useRef(send);
+  sendRef.current = send;
   useEffect(() => {
     if (pendingSendRef.current && !isListening && transcript.trim()) {
       pendingSendRef.current = false;
       const text = transcript.trim();
       setTranscript("");
       setInput("");
-      const t = setTimeout(() => send(text), 100);
-      return () => clearTimeout(t);
+      // Use ref to avoid stale closure; call directly instead of setTimeout
+      // (setTimeout gets cancelled by effect cleanup when `send` changes)
+      sendRef.current(text);
     }
-  }, [isListening, transcript, send, setTranscript]);
+  }, [isListening, transcript, setTranscript]);
 
   const handleVinDecoded = useCallback((vehicle: DecodedVehicle) => {
     setVinModalOpen(false);
