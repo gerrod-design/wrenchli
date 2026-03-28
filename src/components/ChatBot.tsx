@@ -547,6 +547,26 @@ export default function ChatBot() {
                     );
                   })}
 
+                  {/* Intent quick-action buttons — show only on welcome message */}
+                  {messages.length === 1 && messages[0]?.role === "assistant" && !loading && (
+                    <div className="flex gap-2 pl-10">
+                      <button
+                        type="button"
+                        onClick={() => send("I have an issue with my vehicle")}
+                        className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+                      >
+                        🔧 I have an issue
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => send("I want to prevent problems and keep my car in good shape")}
+                        className="rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-xs font-semibold text-accent-foreground hover:bg-accent/20 transition-colors"
+                      >
+                        🛡️ Prevent problems
+                      </button>
+                    </div>
+                  )}
+
                   {loading && messages[messages.length - 1]?.role !== "assistant" && (
                     <div className="flex justify-start">
                       <div className="bg-secondary rounded-xl px-3 py-2 flex items-center gap-2">

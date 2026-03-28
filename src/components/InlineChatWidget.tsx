@@ -413,8 +413,28 @@ export default function InlineChatWidget() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Quick prompts — only show when conversation just started */}
-          {messages.length <= 2 && !loading && (
+          {/* Intent quick-action buttons — show only on welcome */}
+          {messages.length === 1 && messages[0]?.role === "assistant" && !loading && (
+            <div className="px-4 pb-2 flex gap-2">
+              <button
+                type="button"
+                onClick={() => send("I have an issue with my vehicle")}
+                className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/20 transition-colors"
+              >
+                🔧 I have an issue
+              </button>
+              <button
+                type="button"
+                onClick={() => send("I want to prevent problems and keep my car in good shape")}
+                className="rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/20 transition-colors"
+              >
+                🛡️ Prevent problems
+              </button>
+            </div>
+          )}
+
+          {/* Quick prompts — show after first exchange */}
+          {messages.length > 1 && messages.length <= 4 && !loading && (
             <div className="px-4 pb-2 flex flex-wrap gap-2">
               {QUICK_PROMPTS.map((chip) => (
                 <button
