@@ -12,7 +12,7 @@ import { streamChat } from "./chatbot/streamChat";
 import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
-import { useVoiceChat } from "@/hooks/useVoiceChat";
+import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 import AudioWaveform from "./chatbot/AudioWaveform";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.`;
@@ -51,7 +51,7 @@ export default function ChatBot() {
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
     startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown,
-  } = useVoiceChat();
+  } = useSharedVoiceChat();
 
   // Auto-speak new assistant messages when voice is enabled
   const lastSpokenIndexRef = useRef(-1);
