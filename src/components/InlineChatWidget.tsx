@@ -31,6 +31,7 @@ function cleanAgentMarker(content: string): string {
 }
 
 export default function InlineChatWidget() {
+  const VOICE_OWNER = "inline-chat-widget";
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [messages, setMessages] = useState<Msg[]>([
@@ -51,7 +52,7 @@ export default function InlineChatWidget() {
 
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
-    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown,
+    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
   // Auto-speak new assistant messages when voice is enabled
@@ -79,18 +80,18 @@ export default function InlineChatWidget() {
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {
-    if (transcript) setInput(transcript);
-  }, [transcript]);
+    if (transcript && voiceOwner === VOICE_OWNER) setInput(transcript);
+  }, [transcript, voiceOwner]);
 
   // Auto-send when voice recognition ends with transcript
   const prevListeningRef = useRef(false);
   const pendingSendRef = useRef(false);
   useEffect(() => {
-    if (prevListeningRef.current && !isListening && transcript.trim()) {
+    if (voiceOwner === VOICE_OWNER && prevListeningRef.current && !isListening && transcript.trim()) {
       pendingSendRef.current = true;
     }
     prevListeningRef.current = isListening;
-  }, [isListening, transcript]);
+  }, [isListening, transcript, voiceOwner]);
 
   useEffect(() => {
     // Only scroll within the chat container, not the whole page
@@ -169,7 +170,7 @@ export default function InlineChatWidget() {
   const sendRef = useRef(send);
   sendRef.current = send;
   useEffect(() => {
-    if (pendingSendRef.current && !isListening && transcript.trim()) {
+    if (voiceOwner === VOICE_OWNER && pendingSendRef.current && !isListening && transcript.trim()) {
       pendingSendRef.current = false;
       const text = transcript.trim();
       setTranscript("");
@@ -178,7 +179,7 @@ export default function InlineChatWidget() {
       // (setTimeout gets cancelled by effect cleanup when `send` changes)
       sendRef.current(text);
     }
-  }, [isListening, transcript, setTranscript]);
+  }, [isListening, transcript, setTranscript, voiceOwner]);
 
   const handleVinDecoded = useCallback((vehicle: DecodedVehicle) => {
     setVinModalOpen(false);
@@ -400,7 +401,16 @@ export default function InlineChatWidget() {
               {voiceEnabled && supportsSTT && (
                 <>
                   {isListening && <AudioWaveform />}
-                  <button type="button" onClick={isListening ? stopListening : startListening} disabled={loading || isSpeaking}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isListening) {
+                        stopListening(VOICE_OWNER);
+                      } else {
+                        startListening(VOICE_OWNER);
+                      }
+                    }}
+                    disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
                     className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
                       isListening
                         ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
