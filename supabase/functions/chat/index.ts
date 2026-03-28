@@ -314,15 +314,22 @@ async function executeTool(
     Authorization: `Bearer ${anonKey}`,
   };
 
+  const toolTimeout = 20000; // 20s timeout per tool
+
   try {
     let resp: Response;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), toolTimeout);
+    const fetchOpts = { signal: controller.signal };
 
+    try {
     switch (name) {
       case "diagnose_vehicle":
         resp = await fetch(`${FUNCTIONS_BASE}/diagnose`, {
           method: "POST",
           headers,
           body: JSON.stringify(rawArgs),
+          ...fetchOpts,
         });
         break;
 
@@ -348,6 +355,7 @@ async function executeTool(
           method: "POST",
           headers,
           body: JSON.stringify(args),
+          ...fetchOpts,
         });
         break;
       }
@@ -357,6 +365,7 @@ async function executeTool(
           method: "POST",
           headers,
           body: JSON.stringify(rawArgs),
+          ...fetchOpts,
         });
         break;
 
@@ -368,6 +377,7 @@ async function executeTool(
         resp = await fetch(`${FUNCTIONS_BASE}/vehicle-search?${params}`, {
           method: "GET",
           headers: { Authorization: `Bearer ${anonKey}` },
+          ...fetchOpts,
         });
         break;
       }
@@ -377,15 +387,22 @@ async function executeTool(
           method: "POST",
           headers,
           body: JSON.stringify(rawArgs),
+          ...fetchOpts,
         });
         break;
 
       default:
+        clearTimeout(timer);
         return JSON.stringify({ error: `Unknown tool: ${name}` });
     }
 
+    clearTimeout(timer);
     const data = await resp.json();
     return JSON.stringify(data);
+    } catch (innerErr) {
+      clearTimeout(timer);
+      throw innerErr;
+    }
   } catch (err) {
     console.error(`Tool ${name} failed:`, err);
     return JSON.stringify({ error: `Tool ${name} failed: ${err instanceof Error ? err.message : "unknown"}` });
@@ -546,20 +563,53 @@ Deno.serve(async (req) => {
     const aiMessages = buildAiMessages(messages);
 
     // ── Turn 1: Non-streaming request (may produce tool calls) ──
-    const turn1Resp = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: aiMessages,
-        tools,
-        tool_choice: "auto",
-        stream: false,
-      }),
-    });
+    const turn1Controller = new AbortController();
+    const turn1Timeout = setTimeout(() => turn1Controller.abort(), 45000); // 45s timeout
+
+    let turn1Resp: Response;
+    try {
+      turn1Resp = await fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: aiMessages,
+          tools,
+          tool_choice: "auto",
+          stream: false,
+        }),
+        signal: turn1Controller.signal,
+      });
+    } catch (abortErr) {
+      clearTimeout(turn1Timeout);
+      console.error("Turn 1 timed out or aborted:", abortErr);
+      // Fall back to a streaming call without tools to avoid timeout
+      const fallbackResp = await fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: aiMessages,
+          stream: true,
+        }),
+      });
+      if (!fallbackResp.ok) {
+        return new Response(
+          JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
+          { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      return new Response(fallbackResp.body, {
+        headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
+      });
+    }
+    clearTimeout(turn1Timeout);
 
     if (!turn1Resp.ok) {
       const status = turn1Resp.status;

@@ -154,7 +154,23 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const params: SearchParams = await req.json();
+    let params: SearchParams;
+
+    // Support both GET (query params from chat function) and POST (JSON body)
+    if (req.method === "GET") {
+      const url = new URL(req.url);
+      params = {
+        zipCode: url.searchParams.get("location") || url.searchParams.get("zipCode") || url.searchParams.get("zip") || "",
+        maxDistance: url.searchParams.has("maxDistance") ? Number(url.searchParams.get("maxDistance")) : undefined,
+        minYear: url.searchParams.has("minYear") ? Number(url.searchParams.get("minYear")) : undefined,
+        maxYear: url.searchParams.has("maxYear") ? Number(url.searchParams.get("maxYear")) : undefined,
+        maxPrice: url.searchParams.has("maxPrice") ? Number(url.searchParams.get("maxPrice")) : undefined,
+        maxMileage: url.searchParams.has("maxMileage") ? Number(url.searchParams.get("maxMileage")) : undefined,
+        makes: url.searchParams.has("vehicle_make") ? [url.searchParams.get("vehicle_make")!] : undefined,
+      };
+    } else {
+      params = await req.json();
+    }
 
     if (!params.zipCode) {
       return new Response(
