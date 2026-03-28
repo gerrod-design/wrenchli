@@ -55,28 +55,19 @@ export default function InlineChatWidget() {
     startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
-  // Auto-speak new assistant messages when voice is enabled
-  const lastSpokenIndexRef = useRef(-1);
-  const prevVoiceEnabledRef = useRef(voiceEnabled);
+  // Speak once when a response finishes streaming for the active voice owner.
+  const prevLoadingRef = useRef(false);
   useEffect(() => {
-    if (!prevVoiceEnabledRef.current && voiceEnabled) {
-      // Don't replay existing chat history when turning voice mode on.
-      lastSpokenIndexRef.current = messages.length - 1;
-    }
-    if (prevVoiceEnabledRef.current && !voiceEnabled) {
-      lastSpokenIndexRef.current = -1;
-    }
-    prevVoiceEnabledRef.current = voiceEnabled;
-  }, [voiceEnabled, messages.length]);
+    const justFinishedStreaming = prevLoadingRef.current && !loading;
+    prevLoadingRef.current = loading;
 
-  useEffect(() => {
-    if (!voiceEnabled || messages.length === 0) return;
+    if (!justFinishedStreaming || !voiceEnabled || voiceOwner !== VOICE_OWNER) return;
+
     const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === "assistant" && !loading && messages.length - 1 > lastSpokenIndexRef.current) {
-      lastSpokenIndexRef.current = messages.length - 1;
+    if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
       speak(lastMsg.content, detectAgent(lastMsg.content));
     }
-  }, [voiceEnabled, messages, loading, speak]);
+  }, [loading, voiceEnabled, voiceOwner, messages, speak]);
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {
