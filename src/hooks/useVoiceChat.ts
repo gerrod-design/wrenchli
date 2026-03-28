@@ -23,13 +23,18 @@ function pickVoice(voices: SpeechSynthesisVoice[], agent: AgentType): SpeechSynt
   return voices.find((v) => /male/i.test(v.name) && !/female/i.test(v.name) && v.lang.startsWith("en")) || voices.find((v) => v.lang.startsWith("en"));
 }
 
+const SILENCE_TIMEOUT_MS = 4500;
+
 export function useVoiceChat() {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [silenceCountdown, setSilenceCountdown] = useState(0); // 0-1 progress (1 = full time left, 0 = about to stop)
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const silenceStartRef = useRef<number>(0);
   const synthRef = useRef(typeof window !== "undefined" ? window.speechSynthesis : null);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
   const lastSpokenRef = useRef("");
@@ -62,6 +67,11 @@ export function useVoiceChat() {
       clearTimeout(silenceTimerRef.current);
       silenceTimerRef.current = null;
     }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    setSilenceCountdown(0);
   }, []);
 
   const startListening = useCallback(() => {
@@ -78,9 +88,20 @@ export function useVoiceChat() {
 
     const resetSilenceTimer = () => {
       clearSilenceTimer();
+      silenceStartRef.current = Date.now();
+      setSilenceCountdown(1);
+      countdownIntervalRef.current = setInterval(() => {
+        const elapsed = Date.now() - silenceStartRef.current;
+        const remaining = Math.max(0, 1 - elapsed / SILENCE_TIMEOUT_MS);
+        setSilenceCountdown(remaining);
+        if (remaining <= 0 && countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+        }
+      }, 50);
       silenceTimerRef.current = setTimeout(() => {
         recognition.stop();
-      }, 4500); // 4.5 seconds of silence → auto-stop
+      }, SILENCE_TIMEOUT_MS);
     };
 
     recognition.onstart = () => {
@@ -176,5 +197,6 @@ export function useVoiceChat() {
     stopSpeaking,
     supportsSTT,
     supportsTTS,
+    silenceCountdown,
   };
 }
