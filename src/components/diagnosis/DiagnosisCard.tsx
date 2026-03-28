@@ -15,6 +15,12 @@ import { cn } from "@/lib/utils";
 import { useSmartRepairIntel } from "@/hooks/useSmartRepairIntel";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
 
+/** Extract numeric value from cost string like "$120–$250" → 120 */
+function parseCost(cost: string): number | null {
+  const match = cost.match(/\$?([\d,]+)/);
+  return match ? parseInt(match[1].replace(/,/g, ""), 10) : null;
+}
+
 const diyConfig = {
   easy: {
     icon: CheckCircle,
