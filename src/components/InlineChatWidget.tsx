@@ -426,7 +426,7 @@ export default function InlineChatWidget() {
               <button
                 type="button"
                 onClick={() => send("I want to prevent problems and keep my car in good shape")}
-                className="rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent/20 transition-colors"
+                className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
               >
                 🛡️ Prevent problems
               </button>
@@ -515,6 +515,11 @@ export default function InlineChatWidget() {
                   <Camera className="h-4 w-4" />
                 </button>
               )}
+              {/* VIN Scan */}
+              <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Scan VIN">
+                <ScanLine className="h-4 w-4" />
+              </button>
               {/* Audio recording for car noises */}
               <AudioRecordButton
                 disabled={loading || uploading}
