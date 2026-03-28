@@ -317,6 +317,38 @@ export default function InlineChatWidget() {
             </div>
           )}
 
+          {/* Voice status indicator */}
+          {voiceEnabled && (isSpeaking || isListening) && (
+            <div className="border-t border-border px-3 py-1.5 flex items-center gap-2 bg-accent/5">
+              {isSpeaking && (
+                <>
+                  <div className="flex gap-0.5 items-end h-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="w-1 bg-primary rounded-full animate-pulse" style={{ height: `${8 + Math.random() * 8}px`, animationDelay: `${i * 0.15}s` }} />
+                    ))}
+                  </div>
+                  <span className="text-xs text-muted-foreground">Speaking…</span>
+                  <button onClick={stopSpeaking} className="ml-auto text-xs text-muted-foreground hover:text-foreground">Skip</button>
+                </>
+              )}
+              {isListening && !isSpeaking && (
+                <>
+                  <div className="relative h-5 w-5 flex items-center justify-center">
+                    <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
+                      <circle cx="10" cy="10" r="8" fill="none" stroke="hsl(var(--muted))" strokeWidth="2" />
+                      <circle cx="10" cy="10" r="8" fill="none" stroke="hsl(var(--destructive))" strokeWidth="2"
+                        strokeDasharray={`${2 * Math.PI * 8}`}
+                        strokeDashoffset={`${2 * Math.PI * 8 * (1 - silenceCountdown)}`}
+                        strokeLinecap="round"
+                        className="transition-[stroke-dashoffset] duration-100 ease-linear" />
+                    </svg>
+                  </div>
+                  <span className="text-xs text-muted-foreground">Listening… <span className="text-[10px] opacity-60">{Math.ceil(silenceCountdown * 4.5)}s</span></span>
+                </>
+              )}
+            </div>
+          )}
+
           {/* Input bar */}
           <div className="border-t border-border">
             <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2.5">
@@ -330,10 +362,25 @@ export default function InlineChatWidget() {
                   <Camera className="h-4 w-4" />
                 </button>
               )}
-              {speechSupported && (
+              {/* Voice toggle */}
+              {(supportsSTT || supportsTTS) && (
+                <button type="button" onClick={() => {
+                  toggleVoice();
+                  if (!voiceEnabled) toast.success("🎙️ Voice mode on — I'll speak my responses!", { duration: 3000 });
+                }} disabled={loading}
+                  className={`flex h-9 items-center justify-center rounded-lg px-2 transition-colors disabled:opacity-40 ${
+                    voiceEnabled
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`} aria-label={voiceEnabled ? "Disable voice mode" : "Enable voice mode"}>
+                  {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+              )}
+              {/* Mic button (only when voice mode is on) */}
+              {voiceEnabled && supportsSTT && (
                 <>
                   {isListening && <AudioWaveform />}
-                  <button type="button" onClick={toggleListening} disabled={loading}
+                  <button type="button" onClick={isListening ? stopListening : startListening} disabled={loading || isSpeaking}
                     className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
                       isListening
                         ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
@@ -352,7 +399,7 @@ export default function InlineChatWidget() {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Tell me what's going on…"}
+                placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : voiceEnabled ? "Tap mic or type…" : "Tell me what's going on…"}
                 maxLength={8000}
                 className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
                 disabled={loading}
