@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat, ShoppingBag } from "lucide-react";
+import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat, ShoppingBag, Share2 } from "lucide-react";
+import ShareWithShopButton from "@/components/ShareWithShopButton";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
