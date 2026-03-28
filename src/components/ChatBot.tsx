@@ -28,6 +28,7 @@ function cleanAgentMarker(content: string): string {
 }
 
 export default function ChatBot() {
+  const VOICE_OWNER = "floating-chatbot";
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -50,7 +51,7 @@ export default function ChatBot() {
   const isMobile = useIsMobile();
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
-    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown,
+    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
   // Auto-speak new assistant messages when voice is enabled
@@ -78,18 +79,8 @@ export default function ChatBot() {
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {
-    if (transcript) setInput(transcript);
-  }, [transcript]);
-
-  // Auto-send when voice recognition ends with transcript
-  const prevListeningRef = useRef(false);
-  const pendingSendRef = useRef(false);
-  useEffect(() => {
-    if (prevListeningRef.current && !isListening && transcript.trim()) {
-      pendingSendRef.current = true;
-    }
-    prevListeningRef.current = isListening;
-  }, [isListening, transcript]);
+    if (transcript && voiceOwner === VOICE_OWNER) setInput(transcript);
+  }, [transcript, voiceOwner]);
 
 
   // Mark as interacted
@@ -197,18 +188,24 @@ export default function ChatBot() {
 
   // Auto-send when voice recognition ends with transcript
   const sendRef = useRef(send);
+  const lastAutoSentTranscriptRef = useRef<string | null>(null);
   sendRef.current = send;
   useEffect(() => {
-    if (pendingSendRef.current && !isListening && transcript.trim()) {
-      pendingSendRef.current = false;
-      const text = transcript.trim();
-      setTranscript("");
-      setInput("");
-      // Use ref to avoid stale closure; call directly instead of timeout
-      // (timeout can be canceled by effect cleanup if dependencies change).
-      sendRef.current(text);
+    if (voiceOwner !== VOICE_OWNER || isListening || loading) return;
+
+    const text = transcript.trim();
+    if (!text) {
+      lastAutoSentTranscriptRef.current = null;
+      return;
     }
-  }, [isListening, transcript, setTranscript]);
+
+    if (lastAutoSentTranscriptRef.current === text) return;
+    lastAutoSentTranscriptRef.current = text;
+
+    setTranscript("");
+    setInput("");
+    sendRef.current(text);
+  }, [isListening, transcript, setTranscript, voiceOwner, loading]);
 
   const SUGGESTION_CHIPS = [
     "My check engine light is on",
@@ -512,8 +509,14 @@ export default function ChatBot() {
                         {isListening && <AudioWaveform />}
                         <button
                           type="button"
-                          onClick={isListening ? stopListening : startListening}
-                          disabled={loading || isSpeaking}
+                          onClick={() => {
+                            if (isListening) {
+                              stopListening(VOICE_OWNER);
+                            } else {
+                              startListening(VOICE_OWNER);
+                            }
+                          }}
+                          disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
                           className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
                             isListening
                               ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
