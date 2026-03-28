@@ -546,20 +546,53 @@ Deno.serve(async (req) => {
     const aiMessages = buildAiMessages(messages);
 
     // ── Turn 1: Non-streaming request (may produce tool calls) ──
-    const turn1Resp = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: aiMessages,
-        tools,
-        tool_choice: "auto",
-        stream: false,
-      }),
-    });
+    const turn1Controller = new AbortController();
+    const turn1Timeout = setTimeout(() => turn1Controller.abort(), 45000); // 45s timeout
+
+    let turn1Resp: Response;
+    try {
+      turn1Resp = await fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: aiMessages,
+          tools,
+          tool_choice: "auto",
+          stream: false,
+        }),
+        signal: turn1Controller.signal,
+      });
+    } catch (abortErr) {
+      clearTimeout(turn1Timeout);
+      console.error("Turn 1 timed out or aborted:", abortErr);
+      // Fall back to a streaming call without tools to avoid timeout
+      const fallbackResp = await fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: aiMessages,
+          stream: true,
+        }),
+      });
+      if (!fallbackResp.ok) {
+        return new Response(
+          JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
+          { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      return new Response(fallbackResp.body, {
+        headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
+      });
+    }
+    clearTimeout(turn1Timeout);
 
     if (!turn1Resp.ok) {
       const status = turn1Resp.status;
