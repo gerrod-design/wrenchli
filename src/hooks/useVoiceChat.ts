@@ -15,8 +15,7 @@ export function useVoiceChat() {
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const silenceStartRef = useRef<number>(0);
-  const synthRef = useRef(typeof window !== "undefined" ? window.speechSynthesis : null);
-  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastSpokenRef = useRef("");
   const voiceEnabledRef = useRef(false);
 
