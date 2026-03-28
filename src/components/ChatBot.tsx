@@ -484,7 +484,7 @@ export default function ChatBot() {
                     const prevAssistant = messages.slice(0, i).reverse().find(msg => msg.role === "assistant");
                     const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
                     const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
-                    const agentName = currentAgent === "sam" ? "Sam" : currentAgent === "jess" ? "Jess" : "Mike";
+                    const agentName = currentAgent === "sam" ? "Sam" : currentAgent === "jess" ? "Jess" : currentAgent === "kai" ? "Kai" : currentAgent === "priya" ? "Priya" : "Mike";
 
                     return (
                     <div key={i}>
