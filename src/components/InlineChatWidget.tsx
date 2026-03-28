@@ -515,6 +515,11 @@ export default function InlineChatWidget() {
                   <Camera className="h-4 w-4" />
                 </button>
               )}
+              {/* VIN Scan */}
+              <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Scan VIN">
+                <ScanLine className="h-4 w-4" />
+              </button>
               {/* Audio recording for car noises */}
               <AudioRecordButton
                 disabled={loading || uploading}
