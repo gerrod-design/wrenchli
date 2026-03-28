@@ -142,6 +142,35 @@ export function useVoiceChat() {
     setIsListening(false);
   }, [clearSilenceTimer]);
 
+  // Browser fallback TTS — must be declared before `speak` to keep hook order stable.
+  const speakWithBrowserTTS = useCallback((text: string, agent: AgentType) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      console.error("Browser speech synthesis not available");
+      setIsSpeaking(false);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = agent === "sam" ? "en-GB" : "en-US";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      if (voiceEnabledRef.current) {
+        setTimeout(() => {
+          if (voiceEnabledRef.current) startListening();
+        }, 400);
+      }
+    };
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }, [startListening]);
+
   const speak = useCallback(async (text: string, agent: AgentType) => {
     if (!voiceEnabled || !text) return;
     // Strip markdown formatting for cleaner speech
@@ -207,35 +236,7 @@ export function useVoiceChat() {
       console.warn("Cloud TTS failed, falling back to browser speech synthesis:", err);
       speakWithBrowserTTS(clean, agent);
     }
-  }, [voiceEnabled, startListening]);
-
-  const speakWithBrowserTTS = useCallback((text: string, agent: AgentType) => {
-    if (typeof window === "undefined" || !window.speechSynthesis) {
-      console.error("Browser speech synthesis not available");
-      setIsSpeaking(false);
-      return;
-    }
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = agent === "sam" ? "en-GB" : "en-US";
-    utterance.rate = 1;
-    utterance.pitch = 1;
-
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      if (voiceEnabledRef.current) {
-        setTimeout(() => {
-          if (voiceEnabledRef.current) startListening();
-        }, 400);
-      }
-    };
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-    };
-
-    window.speechSynthesis.speak(utterance);
-  }, [startListening]);
+  }, [voiceEnabled, startListening, speakWithBrowserTTS]);
 
   const stopSpeaking = useCallback(() => {
     if (audioRef.current) {
