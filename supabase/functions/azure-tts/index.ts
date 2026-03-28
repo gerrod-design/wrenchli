@@ -8,16 +8,20 @@ const corsHeaders = {
 
 // Map agent names to Azure Neural voices
 const VOICE_MAP: Record<string, string> = {
-  mike: "en-US-GuyNeural",
-  sam: "en-GB-SoniaNeural",
-  jess: "es-US-PalomaNeural",
+  mike:  "en-US-GuyNeural",
+  sam:   "en-GB-SoniaNeural",
+  jess:  "es-US-PalomaNeural",
+  kai:   "en-US-BrandonNeural",
+  priya: "en-IN-NeerjaNeural",
 };
 
 // Per-agent prosody tuning for natural conversational tone
 const PROSODY_MAP: Record<string, { rate: string; pitch: string }> = {
-  mike: { rate: "+5%", pitch: "-2%" },   // Steady, confident
-  sam:  { rate: "+3%", pitch: "+0%" },    // Calm, measured
-  jess: { rate: "+8%", pitch: "+4%" },    // Warm, upbeat, conversational
+  mike:  { rate: "+5%", pitch: "-2%" },   // Steady, confident
+  sam:   { rate: "+3%", pitch: "+0%" },    // Calm, measured
+  jess:  { rate: "+8%", pitch: "+4%" },    // Warm, upbeat, conversational
+  kai:   { rate: "+2%", pitch: "-3%" },    // Calm, reassuring, professional
+  priya: { rate: "+5%", pitch: "+2%" },    // Warm, knowledgeable, encouraging
 };
 
 serve(async (req) => {

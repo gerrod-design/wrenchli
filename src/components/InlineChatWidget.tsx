@@ -25,12 +25,14 @@ const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what'
 function detectAgent(content: string): AgentType {
   if (/\[Agent:\s*Sam\]/i.test(content)) return "sam";
   if (/\[Agent:\s*Jess\]/i.test(content)) return "jess";
+  if (/\[Agent:\s*Kai\]/i.test(content)) return "kai";
+  if (/\[Agent:\s*Priya\]/i.test(content)) return "priya";
   return "mike";
 }
 
 /** Strip agent markers from displayed content */
 function cleanAgentMarker(content: string): string {
-  return content.replace(/\[Agent:\s*(?:Mike|Sam|Jess)\]\s*/gi, "");
+  return content.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "");
 }
 
 export default function InlineChatWidget() {
