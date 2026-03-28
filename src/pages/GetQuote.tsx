@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PhotoUploader from "@/components/damage/PhotoUploader";
+import ShareWithShopButton from "@/components/ShareWithShopButton";
 import { useSearchParams, Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import SectionReveal from "@/components/SectionReveal";
@@ -588,9 +589,32 @@ export default function GetQuote() {
                     </li>
                   </ul>
                 </div>
-                <Button asChild variant="outline" className="mt-4">
-                  <Link to="/">Back to Home</Link>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <ShareWithShopButton
+                    diagnosisTitle={diagnosis}
+                    diagnosisCode={code}
+                    diagnosisUrgency={urgency}
+                    diyFeasibility={diyFeasibility}
+                    vehicleYear={year}
+                    vehicleMake={make}
+                    vehicleModel={model}
+                    vehicleTrim={trim}
+                    estimatedCostLow={estimate?.cost_low}
+                    estimatedCostHigh={estimate?.cost_high}
+                    costEstimateDetails={estimate}
+                    metroArea={estimate?.metro_area}
+                    zipCode={zipCode.replace(/\D/g, "").slice(0, 5)}
+                    photoUrls={damagePhotos}
+                    customerName={name}
+                    customerEmail={email}
+                    customerPhone={phone}
+                    customerNotes={notes}
+                    quoteRequestId={quoteId}
+                  />
+                  <Button asChild variant="outline">
+                    <Link to="/">Back to Home</Link>
+                  </Button>
+                </div>
               </div>
             </SectionReveal>
           </div>

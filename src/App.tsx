@@ -58,6 +58,7 @@ import DIYTutorials from "./pages/DIYTutorials";
 import DIYTutorialDetail from "./pages/DIYTutorialDetail";
 import ResetPassword from "./pages/ResetPassword";
 import RepairGuide, { RepairGuidesIndex } from "./pages/RepairGuide";
+import ReferralPackage from "./pages/ReferralPackage";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -118,6 +119,7 @@ function AnimatedRoutes() {
           <Route path="/diy/:slug" element={<DIYTutorialDetail />} />
           <Route path="/repairs" element={<RepairGuidesIndex />} />
           <Route path="/repairs/:slug" element={<RepairGuide />} />
+          <Route path="/referral/:token" element={<ReferralPackage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
