@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PhotoUploader from "@/components/damage/PhotoUploader";
+import ShareWithShopButton from "@/components/ShareWithShopButton";
 import { useSearchParams, Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import SectionReveal from "@/components/SectionReveal";
