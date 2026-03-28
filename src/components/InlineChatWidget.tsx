@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff } from "lucide-react";
+import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AudioWaveform from "./chatbot/AudioWaveform";
+import { useVoiceChat } from "@/hooks/useVoiceChat";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.";
 
@@ -43,54 +44,41 @@ export default function InlineChatWidget() {
   const [vinText, setVinText] = useState("");
   const [vinLoading, setVinLoading] = useState(false);
   const [vinError, setVinError] = useState("");
-  const [isListening, setIsListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const vinCameraRef = useRef<HTMLInputElement>(null);
-  const recognitionRef = useRef<any>(null);
 
-  // Check for speech recognition support
-  const speechSupported = typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+  const {
+    voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
+    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown,
+  } = useVoiceChat();
 
-  const toggleListening = useCallback(() => {
-    if (!speechSupported) {
-      toast.error("Voice input isn't supported in this browser.");
-      return;
+  // Auto-speak new assistant messages when voice is enabled
+  const lastSpokenIndexRef = useRef(-1);
+  useEffect(() => {
+    if (!voiceEnabled || messages.length === 0) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.role === "assistant" && !loading && messages.length - 1 > lastSpokenIndexRef.current) {
+      lastSpokenIndexRef.current = messages.length - 1;
+      speak(lastMsg.content, detectAgent(lastMsg.content));
     }
+  }, [voiceEnabled, messages, loading, speak]);
 
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-      return;
+  // When transcript changes (from voice input), update input field
+  useEffect(() => {
+    if (transcript) setInput(transcript);
+  }, [transcript]);
+
+  // Auto-send when voice recognition ends with transcript
+  const prevListeningRef = useRef(false);
+  const pendingSendRef = useRef(false);
+  useEffect(() => {
+    if (prevListeningRef.current && !isListening && transcript.trim()) {
+      pendingSendRef.current = true;
     }
-
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = true;
-    recognition.continuous = false;
-
-    recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
-        .join("");
-      setInput(transcript);
-    };
-
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = (event: any) => {
-      console.error("Speech recognition error:", event.error);
-      if (event.error === "not-allowed") {
-        toast.error("Microphone access denied. Please allow mic access in your browser settings.");
-      }
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-  }, [isListening, speechSupported]);
+    prevListeningRef.current = isListening;
+  }, [isListening, transcript]);
 
   useEffect(() => {
     // Only scroll within the chat container, not the whole page
