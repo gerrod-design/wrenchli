@@ -242,8 +242,8 @@ export default function InlineChatWidget() {
 
         <div className="rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
           {/* Hidden file inputs */}
-          <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
-          <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
+          <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
+          <input ref={cameraInputRef} type="file" accept="image/*,video/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
 
           {/* Chat messages area */}
           <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px" }}>
