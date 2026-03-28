@@ -32,8 +32,9 @@ Keep it conversational, like talking to a friend. Be specific about what you obs
 If the audio is mostly silence, wind, or ambient noise, say so and focus on the visual analysis. Don't make up sounds you don't hear.`;
 
 Deno.serve(async (req: Request) => {
-  const corsHeaders = getCorsHeaders(req);
-  const optionsResp = handleCorsOptions(req, corsHeaders);
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const optionsResp = handleCorsOptions(req);
   if (optionsResp) return optionsResp;
 
   try {
