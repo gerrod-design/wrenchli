@@ -96,6 +96,73 @@ export default function About() {
         </div>
       </section>
 
+      {/* Meet Your AI Advisors */}
+      <section className="section-padding bg-background">
+        <div className="container-wrenchli max-w-4xl">
+          <SectionReveal>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Meet Your AI Advisors</h2>
+            <p className="mt-3 text-center text-muted-foreground md:text-lg max-w-2xl mx-auto">
+              When you chat with Wrenchli, you're guided by a team of specialized AI advisors — each with a distinct expertise to get you the best outcome.
+            </p>
+          </SectionReveal>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                agent: "mike" as const,
+                name: "Mike",
+                role: "Lead Advisor",
+                color: "bg-primary/10 border-primary/20",
+                iconColor: "text-primary",
+                icon: Wrench,
+                specialties: ["Symptom triage & DTC codes", "Guides you to the right specialist", "Photo & video damage analysis"],
+                description: "Your first point of contact. Mike listens to your car issue, asks the right questions, and connects you with the best specialist for your situation.",
+              },
+              {
+                agent: "sam" as const,
+                name: "Sam",
+                role: "Cost & Value Specialist",
+                color: "bg-amber-500/10 border-amber-500/20",
+                iconColor: "text-amber-500",
+                icon: DollarSign,
+                specialties: ["Repair cost estimates", "Vehicle valuations", "Shop recommendations & financing"],
+                description: "Sam handles the money side — professional repair costs, your car's market value, local shop options, and payment plans to keep repairs affordable.",
+              },
+              {
+                agent: "jess" as const,
+                name: "Jess",
+                role: "Parts & DIY Expert",
+                color: "bg-emerald-500/10 border-emerald-500/20",
+                iconColor: "text-emerald-500",
+                icon: Hammer,
+                specialties: ["Step-by-step repair walkthroughs", "Parts & tools lists", "YouTube tutorial recommendations"],
+                description: "Jess is your hands-on guru. She'll walk you through DIY repairs, tell you exactly what tools and parts you need, and find the best video guides.",
+              },
+            ].map((advisor, idx) => (
+              <SectionReveal key={advisor.agent} delay={idx * 100}>
+                <div className={`rounded-2xl border ${advisor.color} bg-card p-6 shadow-sm h-full flex flex-col items-center text-center`}>
+                  <MechanicAvatar size={80} agent={advisor.agent} showLogo={false} />
+                  <h3 className="mt-4 font-heading text-lg font-bold">{advisor.name}</h3>
+                  <div className={`mt-1 inline-flex items-center gap-1.5 text-xs font-semibold ${advisor.iconColor}`}>
+                    <advisor.icon className="h-3.5 w-3.5" />
+                    {advisor.role}
+                  </div>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{advisor.description}</p>
+                  <ul className="mt-4 space-y-1.5 text-left w-full">
+                    {advisor.specialties.map((s) => (
+                      <li key={s} className="flex items-start gap-2 text-xs text-muted-foreground">
+                        <span className={`mt-1 h-1.5 w-1.5 rounded-full ${advisor.iconColor.replace("text-", "bg-")} shrink-0`} />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </SectionReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Leadership Team */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli max-w-4xl">
