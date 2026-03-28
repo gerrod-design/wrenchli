@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff, Volume2, VolumeX, Film } from "lucide-react";
+import AudioRecordButton from "./chatbot/AudioRecordButton";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -230,6 +231,7 @@ export default function InlineChatWidget() {
     "I hear a strange noise",
     "What's my car worth?",
     "📸 Show damage photo",
+    "🎤 Record car noise",
     "🔍 Scan VIN",
   ];
 
@@ -432,6 +434,16 @@ export default function InlineChatWidget() {
                   <Camera className="h-4 w-4" />
                 </button>
               )}
+              {/* Audio recording for car noises */}
+              <AudioRecordButton
+                disabled={loading || uploading}
+                onAnalysis={(analysis) => {
+                  // Inject the audio analysis as a user message + AI response
+                  const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
+                  const assistantMsg: Msg = { role: "assistant", content: analysis };
+                  setMessages((prev) => [...prev, userMsg, assistantMsg]);
+                }}
+              />
               {/* Voice toggle */}
               {(supportsSTT || supportsTTS) && (
                 <button type="button" onClick={() => {
