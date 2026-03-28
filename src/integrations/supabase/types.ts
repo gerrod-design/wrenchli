@@ -961,6 +961,113 @@ export type Database = {
           },
         ]
       }
+      referral_packages: {
+        Row: {
+          audio_clip_url: string | null
+          chat_summary: string | null
+          cost_estimate_details: Json | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          customer_notes: string | null
+          customer_phone: string | null
+          diagnosis_code: string | null
+          diagnosis_details: Json | null
+          diagnosis_title: string
+          diagnosis_urgency: string | null
+          diy_feasibility: string | null
+          estimated_cost_high: number | null
+          estimated_cost_low: number | null
+          expires_at: string
+          id: string
+          metro_area: string | null
+          pdf_download_count: number
+          photo_urls: string[] | null
+          quote_request_id: string | null
+          token: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_trim: string | null
+          vehicle_year: string | null
+          video_frame_urls: string[] | null
+          view_count: number
+          vin: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          audio_clip_url?: string | null
+          chat_summary?: string | null
+          cost_estimate_details?: Json | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_notes?: string | null
+          customer_phone?: string | null
+          diagnosis_code?: string | null
+          diagnosis_details?: Json | null
+          diagnosis_title: string
+          diagnosis_urgency?: string | null
+          diy_feasibility?: string | null
+          estimated_cost_high?: number | null
+          estimated_cost_low?: number | null
+          expires_at?: string
+          id?: string
+          metro_area?: string | null
+          pdf_download_count?: number
+          photo_urls?: string[] | null
+          quote_request_id?: string | null
+          token?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_trim?: string | null
+          vehicle_year?: string | null
+          video_frame_urls?: string[] | null
+          view_count?: number
+          vin?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          audio_clip_url?: string | null
+          chat_summary?: string | null
+          cost_estimate_details?: Json | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_notes?: string | null
+          customer_phone?: string | null
+          diagnosis_code?: string | null
+          diagnosis_details?: Json | null
+          diagnosis_title?: string
+          diagnosis_urgency?: string | null
+          diy_feasibility?: string | null
+          estimated_cost_high?: number | null
+          estimated_cost_low?: number | null
+          expires_at?: string
+          id?: string
+          metro_area?: string | null
+          pdf_download_count?: number
+          photo_urls?: string[] | null
+          quote_request_id?: string | null
+          token?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_trim?: string | null
+          vehicle_year?: string | null
+          video_frame_urls?: string[] | null
+          view_count?: number
+          vin?: string | null
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_packages_quote_request_id_fkey"
+            columns: ["quote_request_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_applications: {
         Row: {
           city: string | null
