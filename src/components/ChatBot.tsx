@@ -49,7 +49,7 @@ export default function ChatBot() {
   const isMobile = useIsMobile();
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
-    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS,
+    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown,
   } = useVoiceChat();
 
   // Auto-speak new assistant messages when voice is enabled
@@ -451,8 +451,17 @@ export default function ChatBot() {
                     )}
                     {isListening && !isSpeaking && (
                       <>
-                        <div className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
-                        <span className="text-xs text-muted-foreground">Listening…</span>
+                        <div className="relative h-5 w-5 flex items-center justify-center">
+                          <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="8" fill="none" stroke="hsl(var(--muted))" strokeWidth="2" />
+                            <circle cx="10" cy="10" r="8" fill="none" stroke="hsl(var(--destructive))" strokeWidth="2"
+                              strokeDasharray={`${2 * Math.PI * 8}`}
+                              strokeDashoffset={`${2 * Math.PI * 8 * (1 - silenceCountdown)}`}
+                              strokeLinecap="round"
+                              className="transition-[stroke-dashoffset] duration-100 ease-linear" />
+                          </svg>
+                        </div>
+                        <span className="text-xs text-muted-foreground">Listening… <span className="text-[10px] opacity-60">{Math.ceil(silenceCountdown * 4.5)}s</span></span>
                       </>
                     )}
                   </div>
