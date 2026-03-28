@@ -80,7 +80,7 @@ export function useVoiceChat() {
       clearSilenceTimer();
       silenceTimerRef.current = setTimeout(() => {
         recognition.stop();
-      }, 3000); // 3 seconds of silence → auto-stop
+      }, 4500); // 4.5 seconds of silence → auto-stop
     };
 
     recognition.onstart = () => {
