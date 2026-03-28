@@ -271,9 +271,23 @@ export default function ChatBot() {
                   <div className="relative">
                     <button
                       onClick={() => {
+                        const turningOn = !voiceEnabled;
                         toggleVoice();
                         setShowVoiceTip(false);
-                        if (!voiceEnabled) toast.success("🎙️ Voice mode on — I'll speak my responses and listen for yours!", { duration: 3000 });
+                        if (turningOn) {
+                          toast.success("🎙️ Voice mode on — I'll speak my responses and listen for yours!", { duration: 3000 });
+                          if (supportsSTT) {
+                            setTimeout(() => {
+                              const started = startListening(VOICE_OWNER);
+                              if (!started) {
+                                toast.error("Microphone access is blocked. Please allow mic permission and try again.");
+                              }
+                            }, 0);
+                          }
+                        } else {
+                          stopListening(VOICE_OWNER);
+                          stopSpeaking();
+                        }
                       }}
                       className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium transition-all ${
                         voiceEnabled
@@ -513,7 +527,10 @@ export default function ChatBot() {
                             if (isListening) {
                               stopListening(VOICE_OWNER);
                             } else {
-                              startListening(VOICE_OWNER);
+                              const started = startListening(VOICE_OWNER);
+                              if (!started) {
+                                toast.error("Couldn't start listening. Check mic permission and try again.");
+                              }
                             }
                           }}
                           disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
