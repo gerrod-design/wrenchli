@@ -83,16 +83,6 @@ export default function InlineChatWidget() {
     if (transcript && voiceOwner === VOICE_OWNER) setInput(transcript);
   }, [transcript, voiceOwner]);
 
-  // Auto-send when voice recognition ends with transcript
-  const prevListeningRef = useRef(false);
-  const pendingSendRef = useRef(false);
-  useEffect(() => {
-    if (voiceOwner === VOICE_OWNER && prevListeningRef.current && !isListening && transcript.trim()) {
-      pendingSendRef.current = true;
-    }
-    prevListeningRef.current = isListening;
-  }, [isListening, transcript, voiceOwner]);
-
   useEffect(() => {
     // Only scroll within the chat container, not the whole page
     if (messages.length > 1) {
@@ -168,18 +158,24 @@ export default function InlineChatWidget() {
 
   // Auto-send when voice recognition ends with transcript
   const sendRef = useRef(send);
+  const lastAutoSentTranscriptRef = useRef<string | null>(null);
   sendRef.current = send;
   useEffect(() => {
-    if (voiceOwner === VOICE_OWNER && pendingSendRef.current && !isListening && transcript.trim()) {
-      pendingSendRef.current = false;
-      const text = transcript.trim();
-      setTranscript("");
-      setInput("");
-      // Use ref to avoid stale closure; call directly instead of setTimeout
-      // (setTimeout gets cancelled by effect cleanup when `send` changes)
-      sendRef.current(text);
+    if (voiceOwner !== VOICE_OWNER || isListening || loading) return;
+
+    const text = transcript.trim();
+    if (!text) {
+      lastAutoSentTranscriptRef.current = null;
+      return;
     }
-  }, [isListening, transcript, setTranscript, voiceOwner]);
+
+    if (lastAutoSentTranscriptRef.current === text) return;
+    lastAutoSentTranscriptRef.current = text;
+
+    setTranscript("");
+    setInput("");
+    sendRef.current(text);
+  }, [isListening, transcript, setTranscript, voiceOwner, loading]);
 
   const handleVinDecoded = useCallback((vehicle: DecodedVehicle) => {
     setVinModalOpen(false);
