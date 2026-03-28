@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus, Mic, MicOff, Volume2, VolumeX, Film } from "lucide-react";
+import AudioRecordButton from "./chatbot/AudioRecordButton";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
