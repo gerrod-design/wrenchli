@@ -98,12 +98,42 @@ export default function InlineChatWidget() {
     const remaining = 5 - pendingPhotos.length;
     if (remaining <= 0) { toast.error("Maximum 5 photos per message."); return; }
     setUploading(true);
-    const uploaded: string[] = [];
-    for (const file of Array.from(files).slice(0, remaining)) {
-      const url = await uploadPhoto(file);
-      if (url) uploaded.push(url);
+
+    const allFiles = Array.from(files);
+    const videoFile = allFiles.find(isVideoFile);
+
+    if (videoFile) {
+      // Handle video: extract frames client-side
+      if (videoFile.size > MAX_VIDEO_SIZE) {
+        toast.error("Video must be under 50MB.");
+        setUploading(false);
+        return;
+      }
+      toast.info("🎬 Extracting frames from video…", { duration: 5000 });
+      try {
+        const frames = await extractVideoFrames(videoFile, Math.min(4, remaining));
+        const uploaded: string[] = [];
+        for (const frame of frames) {
+          const url = await uploadPhoto(frame);
+          if (url) uploaded.push(url);
+        }
+        if (uploaded.length) {
+          setPendingPhotos((p) => [...p, ...uploaded]);
+          toast.success(`📸 Extracted ${uploaded.length} frames from video`);
+        }
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to process video.");
+      }
+    } else {
+      // Handle images normally
+      const uploaded: string[] = [];
+      for (const file of allFiles.slice(0, remaining)) {
+        const url = await uploadPhoto(file);
+        if (url) uploaded.push(url);
+      }
+      if (uploaded.length) setPendingPhotos((p) => [...p, ...uploaded]);
     }
-    if (uploaded.length) setPendingPhotos((p) => [...p, ...uploaded]);
+
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
