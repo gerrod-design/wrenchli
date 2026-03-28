@@ -13,6 +13,7 @@ import { sanitizeVin, isValidVin, decodeVin, type DecodedVehicle } from "@/lib/v
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import AudioWaveform from "./chatbot/AudioWaveform";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.";
 
