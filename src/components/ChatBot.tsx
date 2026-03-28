@@ -377,14 +377,20 @@ export default function ChatBot() {
                   {messages.map((m, i) => (
                     <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                       {m.role === "assistant" && (
-                        <div className="relative shrink-0">
+                        <motion.div
+                          key={`${i}-${detectAgent(m.content)}`}
+                          initial={{ scale: 0.7, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 20, duration: 0.3 }}
+                          className="relative shrink-0"
+                        >
                           <MechanicAvatar size={32} className="mt-0.5" agent={detectAgent(m.content)} />
                           {voiceEnabled && isSpeaking && i === messages.length - 1 && (
                             <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
                               <Volume2 className="h-2.5 w-2.5 text-primary-foreground animate-pulse" />
                             </span>
                           )}
-                        </div>
+                        </motion.div>
                       )}
                       <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                         m.role === "user"
