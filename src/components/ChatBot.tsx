@@ -282,7 +282,7 @@ export default function ChatBot() {
                         className="absolute right-0 top-full mt-2 z-50 w-48 rounded-lg bg-foreground text-background px-3 py-2 text-xs shadow-lg"
                       >
                         <div className="absolute -top-1 right-3 h-2 w-2 rotate-45 bg-foreground" />
-                        🎙️ Tap here for hands-free voice conversations!
+                        🎙️ Tap here for hands-free conversations — I'll listen and speak my answers back!
                         <button onClick={() => setShowVoiceTip(false)} className="ml-1 underline opacity-70 hover:opacity-100">Got it</button>
                       </motion.div>
                     )}
@@ -361,7 +361,16 @@ export default function ChatBot() {
 
                   {messages.map((m, i) => (
                     <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                      {m.role === "assistant" && <MechanicAvatar size={32} className="mt-0.5" agent={detectAgent(m.content)} />}
+                      {m.role === "assistant" && (
+                        <div className="relative shrink-0">
+                          <MechanicAvatar size={32} className="mt-0.5" agent={detectAgent(m.content)} />
+                          {voiceEnabled && isSpeaking && i === messages.length - 1 && (
+                            <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
+                              <Volume2 className="h-2.5 w-2.5 text-primary-foreground animate-pulse" />
+                            </span>
+                          )}
+                        </div>
+                      )}
                       <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                         m.role === "user"
                           ? "bg-primary text-primary-foreground"
