@@ -13,6 +13,7 @@ import { sanitizeVin, isValidVin, decodeVin, type DecodedVehicle } from "@/lib/v
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import AudioWaveform from "./chatbot/AudioWaveform";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.";
 
@@ -330,20 +331,23 @@ export default function InlineChatWidget() {
                 </button>
               )}
               {speechSupported && (
-                <button type="button" onClick={toggleListening} disabled={loading}
-                  className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
-                    isListening
-                      ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`} aria-label={isListening ? "Stop listening" : "Voice input"}>
-                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                  {isListening && (
-                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
-                    </span>
-                  )}
-                </button>
+                <>
+                  {isListening && <AudioWaveform />}
+                  <button type="button" onClick={toggleListening} disabled={loading}
+                    className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
+                      isListening
+                        ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`} aria-label={isListening ? "Stop listening" : "Voice input"}>
+                    {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    {isListening && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
+                      </span>
+                    )}
+                  </button>
+                </>
               )}
               <input
                 value={input}

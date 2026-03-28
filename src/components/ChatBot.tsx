@@ -13,6 +13,7 @@ import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
 import { useVoiceChat } from "@/hooks/useVoiceChat";
+import AudioWaveform from "./chatbot/AudioWaveform";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.`;
 
@@ -485,26 +486,29 @@ export default function ChatBot() {
                       maxLength={8000}
                       className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring" disabled={loading} />
                     {voiceEnabled && supportsSTT && (
-                      <button
-                        type="button"
-                        onClick={isListening ? stopListening : startListening}
-                        disabled={loading || isSpeaking}
-                        className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
-                          isListening
-                            ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                        }`}
-                        aria-label={isListening ? "Stop listening" : "Start listening"}
-                        title={isListening ? "Stop listening" : "Speak your message"}
-                      >
-                        {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                        {isListening && (
-                          <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
-                          </span>
-                        )}
-                      </button>
+                      <>
+                        {isListening && <AudioWaveform />}
+                        <button
+                          type="button"
+                          onClick={isListening ? stopListening : startListening}
+                          disabled={loading || isSpeaking}
+                          className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
+                            isListening
+                              ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                          }`}
+                          aria-label={isListening ? "Stop listening" : "Start listening"}
+                          title={isListening ? "Stop listening" : "Speak your message"}
+                        >
+                          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                          {isListening && (
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
+                              <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
+                            </span>
+                          )}
+                        </button>
+                      </>
                     )}
                     <button type="submit" disabled={loading || (!input.trim() && pendingPhotos.length === 0)}
                       className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground disabled:opacity-40" aria-label="Send">
