@@ -443,10 +443,26 @@ export default function ChatBot() {
                   )}
 
                   {messages.length === 0 && (
-                    <div className="mt-8 space-y-3">
-                      <p className="text-muted-foreground text-sm text-center">
-                        🔧 Describe your car issue, a warning light, or a DTC code — or drop a photo of damage for instant AI analysis.
+                    <div className="mt-6 space-y-4">
+                      <p className="text-muted-foreground text-sm text-center px-2">
+                        👋 Hey, I'm Mike — your Wrenchli advisor. How can I help?
                       </p>
+                      <div className="flex flex-wrap justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => send("I have an issue with my vehicle")}
+                          className="rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+                        >
+                          🔧 I have an issue
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => send("I want to prevent problems and keep my car in good shape")}
+                          className="rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-xs font-semibold text-accent-foreground hover:bg-accent/20 transition-colors"
+                        >
+                          🛡️ Prevent problems
+                        </button>
+                      </div>
                       <div className="flex flex-wrap justify-center gap-2">
                         {SUGGESTION_CHIPS.map((chip) => (
                           <button
