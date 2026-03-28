@@ -374,8 +374,30 @@ export default function ChatBot() {
                     </div>
                   )}
 
-                  {messages.map((m, i) => (
-                    <div key={i} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  {messages.map((m, i) => {
+                    const currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
+                    const prevAssistant = messages.slice(0, i).reverse().find(msg => msg.role === "assistant");
+                    const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
+                    const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
+                    const agentName = currentAgent === "sam" ? "Sam" : currentAgent === "jess" ? "Jess" : "Mike";
+
+                    return (
+                    <div key={i}>
+                      {isHandoff && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="flex items-center justify-center gap-2 py-1.5 mb-2"
+                        >
+                          <div className="h-px flex-1 bg-border" />
+                          <span className="text-[10px] font-medium text-muted-foreground px-2">
+                            {agentName} is joining…
+                          </span>
+                          <div className="h-px flex-1 bg-border" />
+                        </motion.div>
+                      )}
+                    <div className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                       {m.role === "assistant" && (
                         <motion.div
                           key={`${i}-${detectAgent(m.content)}`}
