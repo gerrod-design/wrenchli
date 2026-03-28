@@ -456,7 +456,9 @@ export default function ChatBot() {
                         <MessageActions content={m.content} />
                       )}
                     </div>
-                  ))}
+                    </div>
+                    );
+                  })}
 
                   {loading && messages[messages.length - 1]?.role !== "assistant" && (
                     <div className="flex justify-start">
