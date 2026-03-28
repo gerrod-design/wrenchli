@@ -288,6 +288,24 @@ export default function InlineChatWidget() {
           <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
           <input ref={cameraInputRef} type="file" accept="image/*,video/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
 
+          {/* Active specialist indicator */}
+          {messages.length > 0 && (() => {
+            const lastAssistant = [...messages].reverse().find(m => m.role === "assistant");
+            const activeAgent = lastAssistant ? detectAgent(lastAssistant.content) : "mike";
+            const agentInfo = {
+              mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
+              sam: { name: "Sam", role: "Cost & Value Specialist", color: "bg-amber-500" },
+              jess: { name: "Jess", role: "Parts & DIY Expert", color: "bg-emerald-500" },
+            }[activeAgent];
+            return (
+              <div className="flex items-center gap-2 px-4 py-1.5 border-b border-border bg-muted/30">
+                <span className={`h-2 w-2 rounded-full ${agentInfo.color} animate-pulse`} />
+                <span className="text-[11px] font-semibold text-foreground">{agentInfo.name}</span>
+                <span className="text-[10px] text-muted-foreground">· {agentInfo.role}</span>
+              </div>
+            );
+          })()}
+
           {/* Chat messages area */}
           <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px" }}>
             {messages.map((m, i) => {
