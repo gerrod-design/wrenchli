@@ -1,27 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import type { AgentType } from "@/components/MechanicAvatar";
 
-// Different voice configs per avatar for distinct personalities
-const VOICE_CONFIGS: Record<AgentType, { pitch: number; rate: number; voiceName?: string }> = {
-  mike: { pitch: 1.0, rate: 1.0, voiceName: "Google US English" },
-  sam: { pitch: 0.85, rate: 0.95, voiceName: "Google UK English Female" },
-  jess: { pitch: 1.15, rate: 1.05, voiceName: "Google US English" },
-};
-
-// Find the best matching voice for an agent
-function pickVoice(voices: SpeechSynthesisVoice[], agent: AgentType): SpeechSynthesisVoice | undefined {
-  const cfg = VOICE_CONFIGS[agent];
-  // Try preferred name first
-  if (cfg.voiceName) {
-    const match = voices.find((v) => v.name.includes(cfg.voiceName!));
-    if (match) return match;
-  }
-  // Fallback: female for jess/sam, male-ish for mike
-  if (agent === "jess" || agent === "sam") {
-    return voices.find((v) => /female/i.test(v.name) && v.lang.startsWith("en")) || voices.find((v) => v.lang.startsWith("en"));
-  }
-  return voices.find((v) => /male/i.test(v.name) && !/female/i.test(v.name) && v.lang.startsWith("en")) || voices.find((v) => v.lang.startsWith("en"));
-}
+const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-tts`;
 
 const SILENCE_TIMEOUT_MS = 4500;
 
@@ -30,38 +10,29 @@ export function useVoiceChat() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const [silenceCountdown, setSilenceCountdown] = useState(0); // 0-1 progress (1 = full time left, 0 = about to stop)
+  const [silenceCountdown, setSilenceCountdown] = useState(0);
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const silenceStartRef = useRef<number>(0);
-  const synthRef = useRef(typeof window !== "undefined" ? window.speechSynthesis : null);
-  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastSpokenRef = useRef("");
   const voiceEnabledRef = useRef(false);
 
-  // Load voices
-  useEffect(() => {
-    if (!synthRef.current) return;
-    const loadVoices = () => {
-      voicesRef.current = synthRef.current?.getVoices() ?? [];
-    };
-    loadVoices();
-    synthRef.current.addEventListener("voiceschanged", loadVoices);
-    return () => synthRef.current?.removeEventListener("voiceschanged", loadVoices);
-  }, []);
-
-  // Cancel speech when voice mode is disabled
+  // Cancel audio when voice mode is disabled
   useEffect(() => {
     if (!voiceEnabled) {
-      synthRef.current?.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
       setIsSpeaking(false);
       stopListening();
     }
   }, [voiceEnabled]);
 
   const supportsSTT = typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
-  const supportsTTS = typeof window !== "undefined" && "speechSynthesis" in window;
+  const supportsTTS = true; // Azure TTS is always available
 
   const clearSilenceTimer = useCallback(() => {
     if (silenceTimerRef.current) {
@@ -77,8 +48,11 @@ export function useVoiceChat() {
 
   const startListening = useCallback(() => {
     if (!supportsSTT || isListening || !voiceEnabledRef.current) return;
-    // Stop any ongoing speech before listening
-    synthRef.current?.cancel();
+    // Stop any ongoing audio before listening
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     setIsSpeaking(false);
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -107,14 +81,14 @@ export function useVoiceChat() {
 
     recognition.onstart = () => {
       setIsListening(true);
-      resetSilenceTimer(); // Start initial timeout
+      resetSilenceTimer();
     };
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       const result = Array.from(event.results)
         .map((r) => r[0].transcript)
         .join("");
       setTranscript(result);
-      resetSilenceTimer(); // Reset timeout on each speech result
+      resetSilenceTimer();
     };
     recognition.onerror = () => {
       clearSilenceTimer();
@@ -143,8 +117,8 @@ export function useVoiceChat() {
     setIsListening(false);
   }, [clearSilenceTimer]);
 
-  const speak = useCallback((text: string, agent: AgentType) => {
-    if (!supportsTTS || !voiceEnabled || !text) return;
+  const speak = useCallback(async (text: string, agent: AgentType) => {
+    if (!voiceEnabled || !text) return;
     // Strip markdown formatting for cleaner speech
     const clean = text
       .replace(/\[Agent:\s*(?:Mike|Sam|Jess)\]\s*/gi, "")
@@ -156,32 +130,65 @@ export function useVoiceChat() {
     if (!clean || clean === lastSpokenRef.current) return;
     lastSpokenRef.current = clean;
 
-    synthRef.current?.cancel();
-    const utterance = new SpeechSynthesisUtterance(clean);
-    const cfg = VOICE_CONFIGS[agent];
-    utterance.pitch = cfg.pitch;
-    utterance.rate = cfg.rate;
+    // Stop any current audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
 
-    const voice = pickVoice(voicesRef.current, agent);
-    if (voice) utterance.voice = voice;
+    setIsSpeaking(true);
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      // Auto-listen after agent finishes speaking — use ref for current value
-      if (voiceEnabledRef.current) {
-        setTimeout(() => {
-          if (voiceEnabledRef.current) startListening();
-        }, 400);
+    try {
+      const response = await fetch(TTS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ text: clean, agent }),
+      });
+
+      if (!response.ok) {
+        console.error("Azure TTS error:", response.status);
+        setIsSpeaking(false);
+        return;
       }
-    };
-    utterance.onerror = () => setIsSpeaking(false);
 
-    synthRef.current?.speak(utterance);
-  }, [supportsTTS, voiceEnabled, startListening]);
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+        // Auto-listen after agent finishes speaking
+        if (voiceEnabledRef.current) {
+          setTimeout(() => {
+            if (voiceEnabledRef.current) startListening();
+          }, 400);
+        }
+      };
+
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.error("TTS playback error:", err);
+      setIsSpeaking(false);
+    }
+  }, [voiceEnabled, startListening]);
 
   const stopSpeaking = useCallback(() => {
-    synthRef.current?.cancel();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
     setIsSpeaking(false);
   }, []);
 
