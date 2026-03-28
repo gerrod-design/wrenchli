@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat, ShoppingBag } from "lucide-react";
+import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat, ShoppingBag, Share2 } from "lucide-react";
+import ShareWithShopButton from "@/components/ShareWithShopButton";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -13,6 +14,12 @@ import type { Diagnosis } from "./types";
 import { cn } from "@/lib/utils";
 import { useSmartRepairIntel } from "@/hooks/useSmartRepairIntel";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
+
+/** Extract numeric value from cost string like "$120–$250" → 120 */
+function parseCost(cost: string): number | null {
+  const match = cost.match(/\$?([\d,]+)/);
+  return match ? parseInt(match[1].replace(/,/g, ""), 10) : null;
+}
 
 const diyConfig = {
   easy: {
@@ -395,6 +402,20 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               <Wrench className="mr-1.5 h-3.5 w-3.5" /> Get Shop Quotes <ArrowRight className="ml-1.5 h-3 w-3" />
             </Link>
           </Button>
+
+          <ShareWithShopButton
+            diagnosisTitle={diagnosis.title}
+            diagnosisCode={diagnosis.code}
+            diagnosisUrgency={diagnosis.urgency}
+            diyFeasibility={diagnosis.diy_feasibility}
+            diagnosisDetails={{ whats_happening: diagnosis.whats_happening, common_causes: diagnosis.common_causes }}
+            vehicleYear={vehicleParts?.year}
+            vehicleMake={vehicleParts?.make}
+            vehicleModel={vehicleParts?.model}
+            estimatedCostLow={parseCost(diagnosis.diy_cost)}
+            estimatedCostHigh={parseCost(diagnosis.shop_cost)}
+            className="w-full text-xs mt-1"
+          />
         </div>
       </div>
 
