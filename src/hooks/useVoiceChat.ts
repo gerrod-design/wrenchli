@@ -38,6 +38,7 @@ export function useVoiceChat() {
   const synthRef = useRef(typeof window !== "undefined" ? window.speechSynthesis : null);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
   const lastSpokenRef = useRef("");
+  const voiceEnabledRef = useRef(false);
 
   // Load voices
   useEffect(() => {
