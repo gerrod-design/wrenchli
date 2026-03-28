@@ -314,15 +314,22 @@ async function executeTool(
     Authorization: `Bearer ${anonKey}`,
   };
 
+  const toolTimeout = 20000; // 20s timeout per tool
+
   try {
     let resp: Response;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), toolTimeout);
+    const fetchOpts = { signal: controller.signal };
 
+    try {
     switch (name) {
       case "diagnose_vehicle":
         resp = await fetch(`${FUNCTIONS_BASE}/diagnose`, {
           method: "POST",
           headers,
           body: JSON.stringify(rawArgs),
+          ...fetchOpts,
         });
         break;
 
