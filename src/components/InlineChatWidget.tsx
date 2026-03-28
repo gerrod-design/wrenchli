@@ -415,7 +415,7 @@ export default function InlineChatWidget() {
 
           {/* Intent quick-action buttons — show only on welcome */}
           {messages.length === 1 && messages[0]?.role === "assistant" && !loading && (
-            <div className="px-4 pb-2 flex gap-2">
+            <div className="px-4 pb-2 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => send("I have an issue with my vehicle")}
