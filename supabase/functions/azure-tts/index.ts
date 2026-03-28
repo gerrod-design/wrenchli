@@ -62,9 +62,11 @@ serve(async (req) => {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&apos;");
 
+    const prosody = PROSODY_MAP[agent] || { rate: "+0%", pitch: "+0%" };
+
     const ssml = `<speak version='1.0' xml:lang='en-US'>
   <voice name='${voiceName}'>
-    <prosody rate='0%' pitch='0%'>${cleanText}</prosody>
+    <prosody rate='${prosody.rate}' pitch='${prosody.pitch}'>${cleanText}</prosody>
   </voice>
 </speak>`;
 
