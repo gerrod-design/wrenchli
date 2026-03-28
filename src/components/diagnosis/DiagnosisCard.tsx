@@ -396,6 +396,20 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               <Wrench className="mr-1.5 h-3.5 w-3.5" /> Get Shop Quotes <ArrowRight className="ml-1.5 h-3 w-3" />
             </Link>
           </Button>
+
+          <ShareWithShopButton
+            diagnosisTitle={diagnosis.title}
+            diagnosisCode={diagnosis.code}
+            diagnosisUrgency={diagnosis.urgency}
+            diyFeasibility={diagnosis.diy_feasibility}
+            diagnosisDetails={{ whats_happening: diagnosis.whats_happening, common_causes: diagnosis.common_causes }}
+            vehicleYear={vehicleParts?.year}
+            vehicleMake={vehicleParts?.make}
+            vehicleModel={vehicleParts?.model}
+            estimatedCostLow={parseCost(diagnosis.diy_cost)}
+            estimatedCostHigh={parseCost(diagnosis.shop_cost)}
+            className="w-full text-xs mt-1"
+          />
         </div>
       </div>
 
