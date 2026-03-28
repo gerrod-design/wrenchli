@@ -175,8 +175,7 @@ export function useVoiceChat() {
 
       if (!response.ok) {
         console.error("Azure TTS error:", response.status);
-        setIsSpeaking(false);
-        return;
+        throw new Error(`Azure TTS ${response.status}`);
       }
 
       const audioBlob = await response.blob();
@@ -197,17 +196,46 @@ export function useVoiceChat() {
       };
 
       audio.onerror = () => {
-        setIsSpeaking(false);
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
+        console.warn("Cloud TTS audio playback failed, falling back to browser speech synthesis");
+        speakWithBrowserTTS(clean, agent);
       };
 
       await audio.play();
     } catch (err) {
-      console.error("TTS playback error:", err);
-      setIsSpeaking(false);
+      console.warn("Cloud TTS failed, falling back to browser speech synthesis:", err);
+      speakWithBrowserTTS(clean, agent);
     }
   }, [voiceEnabled, startListening]);
+
+  const speakWithBrowserTTS = useCallback((text: string, agent: AgentType) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      console.error("Browser speech synthesis not available");
+      setIsSpeaking(false);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = agent === "sam" ? "en-GB" : "en-US";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      if (voiceEnabledRef.current) {
+        setTimeout(() => {
+          if (voiceEnabledRef.current) startListening();
+        }, 400);
+      }
+    };
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }, [startListening]);
 
   const stopSpeaking = useCallback(() => {
     if (audioRef.current) {
