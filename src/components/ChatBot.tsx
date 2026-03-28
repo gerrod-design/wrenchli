@@ -578,7 +578,7 @@ export default function ChatBot() {
                       <button
                         type="button"
                         onClick={() => send("I want to prevent problems and keep my car in good shape")}
-                        className="rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-xs font-semibold text-accent-foreground hover:bg-accent/20 transition-colors"
+                        className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
                       >
                         🛡️ Prevent problems
                       </button>
