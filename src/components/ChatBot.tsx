@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus, Mic, MicOff, Volume2, VolumeX, Film } from "lucide-react";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -14,6 +14,7 @@ import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
 import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 import AudioWaveform from "./chatbot/AudioWaveform";
+import { extractVideoFrames, isVideoFile, MAX_VIDEO_SIZE } from "@/lib/videoFrameExtractor";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.`;
 
@@ -118,12 +119,40 @@ export default function ChatBot() {
     const remaining = 5 - pendingPhotos.length;
     if (remaining <= 0) { toast.error("Maximum 5 photos per message."); return; }
     setUploading(true);
-    const uploaded: string[] = [];
-    for (const file of Array.from(files).slice(0, remaining)) {
-      const url = await uploadPhoto(file);
-      if (url) uploaded.push(url);
+
+    const allFiles = Array.from(files);
+    const videoFile = allFiles.find(isVideoFile);
+
+    if (videoFile) {
+      if (videoFile.size > MAX_VIDEO_SIZE) {
+        toast.error("Video must be under 50MB.");
+        setUploading(false);
+        return;
+      }
+      toast.info("🎬 Extracting frames from video…", { duration: 5000 });
+      try {
+        const frames = await extractVideoFrames(videoFile, Math.min(4, remaining));
+        const uploaded: string[] = [];
+        for (const frame of frames) {
+          const url = await uploadPhoto(frame);
+          if (url) uploaded.push(url);
+        }
+        if (uploaded.length) {
+          setPendingPhotos((prev) => [...prev, ...uploaded]);
+          toast.success(`📸 Extracted ${uploaded.length} frames from video`);
+        }
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to process video.");
+      }
+    } else {
+      const uploaded: string[] = [];
+      for (const file of allFiles.slice(0, remaining)) {
+        const url = await uploadPhoto(file);
+        if (url) uploaded.push(url);
+      }
+      if (uploaded.length > 0) setPendingPhotos((prev) => [...prev, ...uploaded]);
     }
-    if (uploaded.length > 0) setPendingPhotos((prev) => [...prev, ...uploaded]);
+
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -226,8 +255,8 @@ export default function ChatBot() {
 
   return (
     <>
-      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
-      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
+      <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
+      <input ref={cameraInputRef} type="file" accept="image/*,video/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
 
       <AnimatePresence>
         {!open && (

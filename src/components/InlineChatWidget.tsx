@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff, Volume2, VolumeX, Film } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import type { Msg } from "./chatbot/types";
 import { streamChat } from "./chatbot/streamChat";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
 import { sanitizeVin, isValidVin, decodeVin, type DecodedVehicle } from "@/lib/vinDecoder";
+import { extractVideoFrames, isVideoFile, MAX_VIDEO_SIZE } from "@/lib/videoFrameExtractor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -97,12 +98,42 @@ export default function InlineChatWidget() {
     const remaining = 5 - pendingPhotos.length;
     if (remaining <= 0) { toast.error("Maximum 5 photos per message."); return; }
     setUploading(true);
-    const uploaded: string[] = [];
-    for (const file of Array.from(files).slice(0, remaining)) {
-      const url = await uploadPhoto(file);
-      if (url) uploaded.push(url);
+
+    const allFiles = Array.from(files);
+    const videoFile = allFiles.find(isVideoFile);
+
+    if (videoFile) {
+      // Handle video: extract frames client-side
+      if (videoFile.size > MAX_VIDEO_SIZE) {
+        toast.error("Video must be under 50MB.");
+        setUploading(false);
+        return;
+      }
+      toast.info("🎬 Extracting frames from video…", { duration: 5000 });
+      try {
+        const frames = await extractVideoFrames(videoFile, Math.min(4, remaining));
+        const uploaded: string[] = [];
+        for (const frame of frames) {
+          const url = await uploadPhoto(frame);
+          if (url) uploaded.push(url);
+        }
+        if (uploaded.length) {
+          setPendingPhotos((p) => [...p, ...uploaded]);
+          toast.success(`📸 Extracted ${uploaded.length} frames from video`);
+        }
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to process video.");
+      }
+    } else {
+      // Handle images normally
+      const uploaded: string[] = [];
+      for (const file of allFiles.slice(0, remaining)) {
+        const url = await uploadPhoto(file);
+        if (url) uploaded.push(url);
+      }
+      if (uploaded.length) setPendingPhotos((p) => [...p, ...uploaded]);
     }
-    if (uploaded.length) setPendingPhotos((p) => [...p, ...uploaded]);
+
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -211,8 +242,8 @@ export default function InlineChatWidget() {
 
         <div className="rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
           {/* Hidden file inputs */}
-          <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
-          <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
+          <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
+          <input ref={cameraInputRef} type="file" accept="image/*,video/*" capture="environment" className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
 
           {/* Chat messages area */}
           <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px" }}>
