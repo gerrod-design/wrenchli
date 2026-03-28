@@ -1,6 +1,7 @@
 import type { Msg } from "./types";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+const MAX_MESSAGES_TO_SEND = 60;
 
 export async function streamChat({
   messages,
@@ -13,13 +14,18 @@ export async function streamChat({
   onDone: () => void;
   onError: (msg: string) => void;
 }) {
+  // Keep only the most recent messages to stay within API limits
+  const trimmedMessages = messages.length > MAX_MESSAGES_TO_SEND
+    ? messages.slice(-MAX_MESSAGES_TO_SEND)
+    : messages;
+
   const resp = await fetch(CHAT_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
-    body: JSON.stringify({ messages }),
+    body: JSON.stringify({ messages: trimmedMessages }),
   });
 
   console.log("[ChatBot] Chat response status:", resp.status);
