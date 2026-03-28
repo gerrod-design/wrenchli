@@ -56,7 +56,7 @@ export default function SitePasswordGate({ children }: { children: React.ReactNo
           Wrenchli
         </h1>
         <p className="text-sm text-primary-foreground/60 mb-8">
-          This site is currently in private preview. Enter the access password to continue.
+          This site is currently in private preview. Enter the 6-digit passcode to continue.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -64,10 +64,12 @@ export default function SitePasswordGate({ children }: { children: React.ReactNo
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="password"
-              placeholder="Enter password"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="••••••"
               value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="pl-10 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 focus-visible:ring-accent"
+              onChange={(e) => setValue(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              className="pl-10 text-center tracking-[0.5em] text-lg bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 focus-visible:ring-accent"
               autoFocus
               disabled={loading}
             />
