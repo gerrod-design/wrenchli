@@ -14,8 +14,14 @@ export function VoiceChatProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Returns the shared voice chat instance from context.
+ * Falls back to a local instance if the provider is missing
+ * (can happen during Vite HMR boundaries).
+ */
 export function useSharedVoiceChat(): VoiceChatContextType {
   const ctx = useContext(VoiceChatContext);
-  if (!ctx) throw new Error("useSharedVoiceChat must be used within VoiceChatProvider");
-  return ctx;
+  // Always call the hook (Rules of Hooks), but only use as fallback
+  const fallback = useVoiceChat();
+  return ctx ?? fallback;
 }
