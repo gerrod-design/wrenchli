@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import AudioWaveform from "./chatbot/AudioWaveform";
 import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 
-const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.";
+const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.";
 
 /** Detect agent markers like [Agent: Sam] in message content */
 function detectAgent(content: string): AgentType {
