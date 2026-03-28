@@ -21,7 +21,8 @@ export function VoiceChatProvider({ children }: { children: ReactNode }) {
  */
 export function useSharedVoiceChat(): VoiceChatContextType {
   const ctx = useContext(VoiceChatContext);
-  // Always call the hook (Rules of Hooks), but only use as fallback
-  const fallback = useVoiceChat();
-  return ctx ?? fallback;
+  if (!ctx) {
+    throw new Error("useSharedVoiceChat must be used within VoiceChatProvider");
+  }
+  return ctx;
 }
