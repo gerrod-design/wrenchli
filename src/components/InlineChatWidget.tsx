@@ -382,8 +382,23 @@ export default function InlineChatWidget() {
               {/* Voice toggle */}
               {(supportsSTT || supportsTTS) && (
                 <button type="button" onClick={() => {
+                  const turningOn = !voiceEnabled;
                   toggleVoice();
-                  if (!voiceEnabled) toast.success("🎙️ Voice mode on — I'll speak my responses!", { duration: 3000 });
+
+                  if (turningOn) {
+                    toast.success("🎙️ Voice mode on — I'll speak my responses!", { duration: 3000 });
+                    if (supportsSTT) {
+                      setTimeout(() => {
+                        const started = startListening(VOICE_OWNER);
+                        if (!started) {
+                          toast.error("Microphone access is blocked. Please allow mic permission and try again.");
+                        }
+                      }, 0);
+                    }
+                  } else {
+                    stopListening(VOICE_OWNER);
+                    stopSpeaking();
+                  }
                 }} disabled={loading}
                   className={`flex h-9 items-center justify-center rounded-lg px-2 transition-colors disabled:opacity-40 ${
                     voiceEnabled
