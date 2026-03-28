@@ -10,7 +10,7 @@ const corsHeaders = {
 const VOICE_MAP: Record<string, string> = {
   mike: "en-US-GuyNeural",
   sam: "en-GB-SoniaNeural",
-  jess: "en-US-JennyNeural",
+  jess: "es-US-PalomaNeural",
 };
 
 serve(async (req) => {
