@@ -231,6 +231,7 @@ export default function InlineChatWidget() {
     "I hear a strange noise",
     "What's my car worth?",
     "📸 Show damage photo",
+    "🎤 Record car noise",
     "🔍 Scan VIN",
   ];
 
