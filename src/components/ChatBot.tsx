@@ -55,6 +55,18 @@ export default function ChatBot() {
 
   // Auto-speak new assistant messages when voice is enabled
   const lastSpokenIndexRef = useRef(-1);
+  const prevVoiceEnabledRef = useRef(voiceEnabled);
+  useEffect(() => {
+    if (!prevVoiceEnabledRef.current && voiceEnabled) {
+      // Don't replay existing chat history when turning voice mode on.
+      lastSpokenIndexRef.current = messages.length - 1;
+    }
+    if (prevVoiceEnabledRef.current && !voiceEnabled) {
+      lastSpokenIndexRef.current = -1;
+    }
+    prevVoiceEnabledRef.current = voiceEnabled;
+  }, [voiceEnabled, messages.length]);
+
   useEffect(() => {
     if (!voiceEnabled || messages.length === 0) return;
     const lastMsg = messages[messages.length - 1];
@@ -184,18 +196,19 @@ export default function ChatBot() {
   }, [input, loading, messages, pendingPhotos, setMessages, ensureActiveConversation]);
 
   // Auto-send when voice recognition ends with transcript
+  const sendRef = useRef(send);
+  sendRef.current = send;
   useEffect(() => {
     if (pendingSendRef.current && !isListening && transcript.trim()) {
       pendingSendRef.current = false;
       const text = transcript.trim();
-      const t = setTimeout(() => {
-        send(text);
-        setTranscript("");
-        setInput("");
-      }, 300);
-      return () => clearTimeout(t);
+      setTranscript("");
+      setInput("");
+      // Use ref to avoid stale closure; call directly instead of timeout
+      // (timeout can be canceled by effect cleanup if dependencies change).
+      sendRef.current(text);
     }
-  }, [isListening, transcript, send, setTranscript]);
+  }, [isListening, transcript, setTranscript]);
 
   const SUGGESTION_CHIPS = [
     "My check engine light is on",
