@@ -399,7 +399,9 @@ export default function ChatBot() {
                 mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
                 sam: { name: "Sam", role: "Cost & Value Specialist", color: "bg-amber-500" },
                 jess: { name: "Jess", role: "Parts & DIY Expert", color: "bg-emerald-500" },
-              }[activeAgent];
+                kai: { name: "Kai", role: "Finance Specialist", color: "bg-sky-500" },
+                priya: { name: "Priya", role: "Prevention Coach", color: "bg-violet-500" },
+              }[activeAgent] ?? { name: "Mike", role: "Lead Advisor", color: "bg-primary" };
               if (!messages.length || showHistory) return null;
               return (
                 <div className="flex items-center gap-2 px-4 py-1.5 bg-muted/50 border-b border-border">
