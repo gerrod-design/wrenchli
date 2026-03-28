@@ -549,7 +549,7 @@ export default function ChatBot() {
 
                   {/* Intent quick-action buttons — show only on welcome message */}
                   {messages.length === 1 && messages[0]?.role === "assistant" && !loading && (
-                    <div className="flex gap-2 pl-10">
+                    <div className="flex flex-wrap gap-2 pl-10">
                       <button
                         type="button"
                         onClick={() => send("I have an issue with my vehicle")}
