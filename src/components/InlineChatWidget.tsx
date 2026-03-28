@@ -303,7 +303,9 @@ export default function InlineChatWidget() {
                   )}
                 </div>
               </div>
-            ))}
+              </div>
+              );
+            })}
 
             {loading && messages[messages.length - 1]?.role !== "assistant" && (
               <div className="flex gap-2.5 justify-start">
