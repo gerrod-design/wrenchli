@@ -13,6 +13,13 @@ const VOICE_MAP: Record<string, string> = {
   jess: "es-US-PalomaNeural",
 };
 
+// Per-agent prosody tuning for natural conversational tone
+const PROSODY_MAP: Record<string, { rate: string; pitch: string }> = {
+  mike: { rate: "+5%", pitch: "-2%" },   // Steady, confident
+  sam:  { rate: "+3%", pitch: "+0%" },    // Calm, measured
+  jess: { rate: "+8%", pitch: "+4%" },    // Warm, upbeat, conversational
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -55,9 +62,11 @@ serve(async (req) => {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&apos;");
 
+    const prosody = PROSODY_MAP[agent] || { rate: "+0%", pitch: "+0%" };
+
     const ssml = `<speak version='1.0' xml:lang='en-US'>
   <voice name='${voiceName}'>
-    <prosody rate='0%' pitch='0%'>${cleanText}</prosody>
+    <prosody rate='${prosody.rate}' pitch='${prosody.pitch}'>${cleanText}</prosody>
   </voice>
 </speak>`;
 
