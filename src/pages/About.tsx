@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { MapPin, Target, Eye, Rocket, Users, Building, Award, Briefcase, Play } from "lucide-react";
+import { MapPin, Target, Eye, Rocket, Users, Building, Award, Briefcase, Play, Wrench, DollarSign, Hammer } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import SEO from "@/components/SEO";
 import heroAbout from "@/assets/hero-about.jpg";
 import BrandVideoModal from "@/components/BrandVideoModal";
+import MechanicAvatar from "@/components/MechanicAvatar";
 
 export default function About() {
   const [showBrandVideo, setShowBrandVideo] = useState(false);
