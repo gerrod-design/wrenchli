@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AudioWaveform from "./chatbot/AudioWaveform";
-import { useVoiceChat } from "@/hooks/useVoiceChat";
+import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.";
 
@@ -52,7 +52,7 @@ export default function InlineChatWidget() {
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
     startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown,
-  } = useVoiceChat();
+  } = useSharedVoiceChat();
 
   // Auto-speak new assistant messages when voice is enabled
   const lastSpokenIndexRef = useRef(-1);

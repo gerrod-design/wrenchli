@@ -8,6 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LocationProvider } from "@/contexts/LocationContext";
+import { VoiceChatProvider } from "@/contexts/VoiceChatContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -156,11 +157,13 @@ const App = () => (
       <TooltipProvider>
         <AuthProvider>
           <LocationProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <SitePasswordGateWrapper />
-            </BrowserRouter>
+            <VoiceChatProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <SitePasswordGateWrapper />
+              </BrowserRouter>
+            </VoiceChatProvider>
           </LocationProvider>
         </AuthProvider>
       </TooltipProvider>
