@@ -56,6 +56,18 @@ export default function InlineChatWidget() {
 
   // Auto-speak new assistant messages when voice is enabled
   const lastSpokenIndexRef = useRef(-1);
+  const prevVoiceEnabledRef = useRef(voiceEnabled);
+  useEffect(() => {
+    if (!prevVoiceEnabledRef.current && voiceEnabled) {
+      // Don't replay existing chat history when turning voice mode on.
+      lastSpokenIndexRef.current = messages.length - 1;
+    }
+    if (prevVoiceEnabledRef.current && !voiceEnabled) {
+      lastSpokenIndexRef.current = -1;
+    }
+    prevVoiceEnabledRef.current = voiceEnabled;
+  }, [voiceEnabled, messages.length]);
+
   useEffect(() => {
     if (!voiceEnabled || messages.length === 0) return;
     const lastMsg = messages[messages.length - 1];
