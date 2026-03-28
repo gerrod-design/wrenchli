@@ -38,6 +38,7 @@ export function useVoiceChat() {
   const synthRef = useRef(typeof window !== "undefined" ? window.speechSynthesis : null);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
   const lastSpokenRef = useRef("");
+  const voiceEnabledRef = useRef(false);
 
   // Load voices
   useEffect(() => {
@@ -167,9 +168,11 @@ export function useVoiceChat() {
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => {
       setIsSpeaking(false);
-      // Auto-listen after agent finishes speaking
-      if (voiceEnabled) {
-        setTimeout(() => startListening(), 400);
+      // Auto-listen after agent finishes speaking — use ref for current value
+      if (voiceEnabledRef.current) {
+        setTimeout(() => {
+          if (voiceEnabledRef.current) startListening();
+        }, 400);
       }
     };
     utterance.onerror = () => setIsSpeaking(false);
@@ -184,10 +187,12 @@ export function useVoiceChat() {
 
   const toggleVoice = useCallback(() => {
     setVoiceEnabled((prev) => {
+      const next = !prev;
+      voiceEnabledRef.current = next;
       if (prev) {
         lastSpokenRef.current = "";
       }
-      return !prev;
+      return next;
     });
   }, []);
 
