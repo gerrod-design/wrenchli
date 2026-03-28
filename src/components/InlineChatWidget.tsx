@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff } from "lucide-react";
+import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AudioWaveform from "./chatbot/AudioWaveform";
+import { useVoiceChat } from "@/hooks/useVoiceChat";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Tell me what's going on with your car and I'll help you figure it out.";
 
@@ -43,54 +44,41 @@ export default function InlineChatWidget() {
   const [vinText, setVinText] = useState("");
   const [vinLoading, setVinLoading] = useState(false);
   const [vinError, setVinError] = useState("");
-  const [isListening, setIsListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const vinCameraRef = useRef<HTMLInputElement>(null);
-  const recognitionRef = useRef<any>(null);
 
-  // Check for speech recognition support
-  const speechSupported = typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+  const {
+    voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
+    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown,
+  } = useVoiceChat();
 
-  const toggleListening = useCallback(() => {
-    if (!speechSupported) {
-      toast.error("Voice input isn't supported in this browser.");
-      return;
+  // Auto-speak new assistant messages when voice is enabled
+  const lastSpokenIndexRef = useRef(-1);
+  useEffect(() => {
+    if (!voiceEnabled || messages.length === 0) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.role === "assistant" && !loading && messages.length - 1 > lastSpokenIndexRef.current) {
+      lastSpokenIndexRef.current = messages.length - 1;
+      speak(lastMsg.content, detectAgent(lastMsg.content));
     }
+  }, [voiceEnabled, messages, loading, speak]);
 
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-      return;
+  // When transcript changes (from voice input), update input field
+  useEffect(() => {
+    if (transcript) setInput(transcript);
+  }, [transcript]);
+
+  // Auto-send when voice recognition ends with transcript
+  const prevListeningRef = useRef(false);
+  const pendingSendRef = useRef(false);
+  useEffect(() => {
+    if (prevListeningRef.current && !isListening && transcript.trim()) {
+      pendingSendRef.current = true;
     }
-
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = true;
-    recognition.continuous = false;
-
-    recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
-        .join("");
-      setInput(transcript);
-    };
-
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = (event: any) => {
-      console.error("Speech recognition error:", event.error);
-      if (event.error === "not-allowed") {
-        toast.error("Microphone access denied. Please allow mic access in your browser settings.");
-      }
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-  }, [isListening, speechSupported]);
+    prevListeningRef.current = isListening;
+  }, [isListening, transcript]);
 
   useEffect(() => {
     // Only scroll within the chat container, not the whole page
@@ -165,6 +153,18 @@ export default function InlineChatWidget() {
     }
   }, [input, loading, messages, pendingPhotos]);
 
+  // Auto-send when voice recognition ends with transcript
+  useEffect(() => {
+    if (pendingSendRef.current && !isListening && transcript.trim()) {
+      pendingSendRef.current = false;
+      const text = transcript.trim();
+      setTranscript("");
+      setInput("");
+      const t = setTimeout(() => send(text), 100);
+      return () => clearTimeout(t);
+    }
+  }, [isListening, transcript, send, setTranscript]);
+
   const handleVinDecoded = useCallback((vehicle: DecodedVehicle) => {
     setVinModalOpen(false);
     setVinText("");
@@ -218,8 +218,13 @@ export default function InlineChatWidget() {
                 {m.role === "assistant" && (() => {
                   const agent = detectAgent(m.content);
                   return (
-                    <div className="flex flex-col items-center gap-0.5 shrink-0">
+                    <div className="relative flex flex-col items-center gap-0.5 shrink-0">
                       <MechanicAvatar size={36} className="mt-0.5" agent={agent} />
+                      {voiceEnabled && isSpeaking && i === messages.length - 1 && (
+                        <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
+                          <Volume2 className="h-2.5 w-2.5 text-primary-foreground animate-pulse" />
+                        </span>
+                      )}
                       <span className="text-[10px] font-medium text-muted-foreground leading-none">
                         {agent === "sam" ? "Sam" : agent === "jess" ? "Jess" : "Mike"}
                       </span>
@@ -317,6 +322,38 @@ export default function InlineChatWidget() {
             </div>
           )}
 
+          {/* Voice status indicator */}
+          {voiceEnabled && (isSpeaking || isListening) && (
+            <div className="border-t border-border px-3 py-1.5 flex items-center gap-2 bg-accent/5">
+              {isSpeaking && (
+                <>
+                  <div className="flex gap-0.5 items-end h-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="w-1 bg-primary rounded-full animate-pulse" style={{ height: `${8 + Math.random() * 8}px`, animationDelay: `${i * 0.15}s` }} />
+                    ))}
+                  </div>
+                  <span className="text-xs text-muted-foreground">Speaking…</span>
+                  <button onClick={stopSpeaking} className="ml-auto text-xs text-muted-foreground hover:text-foreground">Skip</button>
+                </>
+              )}
+              {isListening && !isSpeaking && (
+                <>
+                  <div className="relative h-5 w-5 flex items-center justify-center">
+                    <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
+                      <circle cx="10" cy="10" r="8" fill="none" stroke="hsl(var(--muted))" strokeWidth="2" />
+                      <circle cx="10" cy="10" r="8" fill="none" stroke="hsl(var(--destructive))" strokeWidth="2"
+                        strokeDasharray={`${2 * Math.PI * 8}`}
+                        strokeDashoffset={`${2 * Math.PI * 8 * (1 - silenceCountdown)}`}
+                        strokeLinecap="round"
+                        className="transition-[stroke-dashoffset] duration-100 ease-linear" />
+                    </svg>
+                  </div>
+                  <span className="text-xs text-muted-foreground">Listening… <span className="text-[10px] opacity-60">{Math.ceil(silenceCountdown * 4.5)}s</span></span>
+                </>
+              )}
+            </div>
+          )}
+
           {/* Input bar */}
           <div className="border-t border-border">
             <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2.5">
@@ -330,10 +367,25 @@ export default function InlineChatWidget() {
                   <Camera className="h-4 w-4" />
                 </button>
               )}
-              {speechSupported && (
+              {/* Voice toggle */}
+              {(supportsSTT || supportsTTS) && (
+                <button type="button" onClick={() => {
+                  toggleVoice();
+                  if (!voiceEnabled) toast.success("🎙️ Voice mode on — I'll speak my responses!", { duration: 3000 });
+                }} disabled={loading}
+                  className={`flex h-9 items-center justify-center rounded-lg px-2 transition-colors disabled:opacity-40 ${
+                    voiceEnabled
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`} aria-label={voiceEnabled ? "Disable voice mode" : "Enable voice mode"}>
+                  {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+              )}
+              {/* Mic button (only when voice mode is on) */}
+              {voiceEnabled && supportsSTT && (
                 <>
                   {isListening && <AudioWaveform />}
-                  <button type="button" onClick={toggleListening} disabled={loading}
+                  <button type="button" onClick={isListening ? stopListening : startListening} disabled={loading || isSpeaking}
                     className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
                       isListening
                         ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
@@ -352,7 +404,7 @@ export default function InlineChatWidget() {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Tell me what's going on…"}
+                placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : voiceEnabled ? "Tap mic or type…" : "Tell me what's going on…"}
                 maxLength={8000}
                 className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
                 disabled={loading}
