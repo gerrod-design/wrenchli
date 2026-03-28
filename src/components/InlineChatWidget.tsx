@@ -12,6 +12,7 @@ import { streamChat } from "./chatbot/streamChat";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
 import { sanitizeVin, isValidVin, decodeVin, type DecodedVehicle } from "@/lib/vinDecoder";
 import { extractVideoFrames, isVideoFile, MAX_VIDEO_SIZE } from "@/lib/videoFrameExtractor";
+import { extractVideoAudio } from "@/lib/videoAudioExtractor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -104,23 +105,63 @@ export default function InlineChatWidget() {
     const videoFile = allFiles.find(isVideoFile);
 
     if (videoFile) {
-      // Handle video: extract frames client-side
+      // Handle video: extract frames + audio for combined analysis
       if (videoFile.size > MAX_VIDEO_SIZE) {
         toast.error("Video must be under 50MB.");
         setUploading(false);
         return;
       }
-      toast.info("🎬 Extracting frames from video…", { duration: 5000 });
+      toast.info("🎬 Extracting frames & audio from video…", { duration: 8000 });
       try {
-        const frames = await extractVideoFrames(videoFile, Math.min(4, remaining));
+        // Extract frames and audio in parallel
+        const [frames, audioBlob] = await Promise.all([
+          extractVideoFrames(videoFile, Math.min(4, remaining)),
+          extractVideoAudio(videoFile),
+        ]);
+
+        // Upload frames
         const uploaded: string[] = [];
         for (const frame of frames) {
           const url = await uploadPhoto(frame);
           if (url) uploaded.push(url);
         }
+
         if (uploaded.length) {
           setPendingPhotos((p) => [...p, ...uploaded]);
-          toast.success(`📸 Extracted ${uploaded.length} frames from video`);
+
+          // Run combined video+audio analysis in background
+          toast.info(audioBlob ? "🔊 Analyzing video frames + audio…" : "📸 Analyzing video frames…", { duration: 10000 });
+
+          const vehicleStr = sessionStorage.getItem("wrenchli_vehicle") || "";
+          const formData = new FormData();
+          formData.append("frame_urls", JSON.stringify(uploaded));
+          if (vehicleStr) formData.append("vehicle_context", vehicleStr);
+          if (audioBlob) {
+            formData.append("audio", new File([audioBlob], "video-audio.wav", { type: "audio/wav" }));
+          }
+
+          const analyzeUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-video-combined`;
+          fetch(analyzeUrl, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
+            body: formData,
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.analysis) {
+                const label = data.has_audio
+                  ? `🎬🔊 [Analyzed video: ${data.frame_count} frames + audio]`
+                  : `🎬 [Analyzed video: ${data.frame_count} frames, no audio detected]`;
+                const userMsg: Msg = { role: "user", content: label, image_urls: uploaded };
+                const assistantMsg: Msg = { role: "assistant", content: data.analysis };
+                setMessages((prev) => [...prev, userMsg, assistantMsg]);
+                // Clear pending photos since they're now in the message
+                setPendingPhotos((p) => p.filter((url) => !uploaded.includes(url)));
+              }
+            })
+            .catch(() => {
+              toast.success(`📸 Extracted ${uploaded.length} frames — send a message to analyze`);
+            });
         }
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Failed to process video.");
