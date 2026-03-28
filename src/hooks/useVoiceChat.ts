@@ -1,27 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import type { AgentType } from "@/components/MechanicAvatar";
 
-// Different voice configs per avatar for distinct personalities
-const VOICE_CONFIGS: Record<AgentType, { pitch: number; rate: number; voiceName?: string }> = {
-  mike: { pitch: 1.0, rate: 1.0, voiceName: "Google US English" },
-  sam: { pitch: 0.85, rate: 0.95, voiceName: "Google UK English Female" },
-  jess: { pitch: 1.15, rate: 1.05, voiceName: "Google US English" },
-};
-
-// Find the best matching voice for an agent
-function pickVoice(voices: SpeechSynthesisVoice[], agent: AgentType): SpeechSynthesisVoice | undefined {
-  const cfg = VOICE_CONFIGS[agent];
-  // Try preferred name first
-  if (cfg.voiceName) {
-    const match = voices.find((v) => v.name.includes(cfg.voiceName!));
-    if (match) return match;
-  }
-  // Fallback: female for jess/sam, male-ish for mike
-  if (agent === "jess" || agent === "sam") {
-    return voices.find((v) => /female/i.test(v.name) && v.lang.startsWith("en")) || voices.find((v) => v.lang.startsWith("en"));
-  }
-  return voices.find((v) => /male/i.test(v.name) && !/female/i.test(v.name) && v.lang.startsWith("en")) || voices.find((v) => v.lang.startsWith("en"));
-}
+const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-tts`;
 
 const SILENCE_TIMEOUT_MS = 4500;
 
