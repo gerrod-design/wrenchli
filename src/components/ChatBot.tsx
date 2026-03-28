@@ -389,6 +389,25 @@ export default function ChatBot() {
               </div>
             </div>
 
+            {/* Active specialist bar */}
+            {(() => {
+              const lastAssistant = [...messages].reverse().find(m => m.role === "assistant");
+              const activeAgent = lastAssistant ? detectAgent(lastAssistant.content) : "mike";
+              const agentInfo = {
+                mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
+                sam: { name: "Sam", role: "Cost & Value Specialist", color: "bg-amber-500" },
+                jess: { name: "Jess", role: "Parts & DIY Expert", color: "bg-emerald-500" },
+              }[activeAgent];
+              if (!messages.length || showHistory) return null;
+              return (
+                <div className="flex items-center gap-2 px-4 py-1.5 bg-muted/50 border-b border-border">
+                  <span className={`h-2 w-2 rounded-full ${agentInfo.color} animate-pulse`} />
+                  <span className="text-[11px] font-semibold text-foreground">{agentInfo.name}</span>
+                  <span className="text-[10px] text-muted-foreground">· {agentInfo.role}</span>
+                </div>
+              );
+            })()}
+
             {/* History panel or Messages */}
             {showHistory ? (
               <div className="flex-1 overflow-hidden">
