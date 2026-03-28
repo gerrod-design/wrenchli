@@ -11,6 +11,7 @@ export function useVoiceChat() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [silenceCountdown, setSilenceCountdown] = useState(0);
+  const [voiceOwner, setVoiceOwner] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -18,6 +19,7 @@ export function useVoiceChat() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastSpokenRef = useRef("");
   const voiceEnabledRef = useRef(false);
+  const voiceOwnerRef = useRef<string | null>(null);
 
   // Cancel audio when voice mode is disabled
   useEffect(() => {
@@ -27,6 +29,8 @@ export function useVoiceChat() {
         audioRef.current = null;
       }
       setIsSpeaking(false);
+      voiceOwnerRef.current = null;
+      setVoiceOwner(null);
       stopListening();
     }
   }, [voiceEnabled]);
@@ -46,7 +50,13 @@ export function useVoiceChat() {
     setSilenceCountdown(0);
   }, []);
 
-  const startListening = useCallback(() => {
+  const startListening = useCallback((owner?: string) => {
+    const resolvedOwner = owner ?? voiceOwnerRef.current ?? "global";
+    if (owner || !voiceOwnerRef.current) {
+      voiceOwnerRef.current = resolvedOwner;
+      setVoiceOwner(resolvedOwner);
+    }
+
     if (!supportsSTT || isListening || !voiceEnabledRef.current) return;
     // Stop any ongoing audio before listening
     if (audioRef.current) {
@@ -104,7 +114,9 @@ export function useVoiceChat() {
     recognition.start();
   }, [supportsSTT, isListening, clearSilenceTimer]);
 
-  const stopListening = useCallback(() => {
+  const stopListening = useCallback((owner?: string) => {
+    if (owner && voiceOwnerRef.current && voiceOwnerRef.current !== owner) return;
+
     clearSilenceTimer();
     if (recognitionRef.current) {
       try {
@@ -209,6 +221,7 @@ export function useVoiceChat() {
     isListening,
     isSpeaking,
     transcript,
+    voiceOwner,
     setTranscript,
     startListening,
     stopListening,
