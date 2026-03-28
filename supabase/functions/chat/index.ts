@@ -355,6 +355,7 @@ async function executeTool(
           method: "POST",
           headers,
           body: JSON.stringify(args),
+          ...fetchOpts,
         });
         break;
       }
@@ -364,6 +365,7 @@ async function executeTool(
           method: "POST",
           headers,
           body: JSON.stringify(rawArgs),
+          ...fetchOpts,
         });
         break;
 
@@ -375,6 +377,7 @@ async function executeTool(
         resp = await fetch(`${FUNCTIONS_BASE}/vehicle-search?${params}`, {
           method: "GET",
           headers: { Authorization: `Bearer ${anonKey}` },
+          ...fetchOpts,
         });
         break;
       }
@@ -384,15 +387,22 @@ async function executeTool(
           method: "POST",
           headers,
           body: JSON.stringify(rawArgs),
+          ...fetchOpts,
         });
         break;
 
       default:
+        clearTimeout(timer);
         return JSON.stringify({ error: `Unknown tool: ${name}` });
     }
 
+    clearTimeout(timer);
     const data = await resp.json();
     return JSON.stringify(data);
+    } catch (innerErr) {
+      clearTimeout(timer);
+      throw innerErr;
+    }
   } catch (err) {
     console.error(`Tool ${name} failed:`, err);
     return JSON.stringify({ error: `Tool ${name} failed: ${err instanceof Error ? err.message : "unknown"}` });
