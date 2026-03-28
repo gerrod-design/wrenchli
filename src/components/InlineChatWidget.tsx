@@ -433,6 +433,16 @@ export default function InlineChatWidget() {
                   <Camera className="h-4 w-4" />
                 </button>
               )}
+              {/* Audio recording for car noises */}
+              <AudioRecordButton
+                disabled={loading || uploading}
+                onAnalysis={(analysis) => {
+                  // Inject the audio analysis as a user message + AI response
+                  const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
+                  const assistantMsg: Msg = { role: "assistant", content: analysis };
+                  setMessages((prev) => [...prev, userMsg, assistantMsg]);
+                }}
+              />
               {/* Voice toggle */}
               {(supportsSTT || supportsTTS) && (
                 <button type="button" onClick={() => {

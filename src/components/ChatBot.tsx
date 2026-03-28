@@ -565,6 +565,16 @@ export default function ChatBot() {
                         <Camera className="h-4 w-4" />
                       </button>
                     )}
+                    {/* Audio recording for car noises */}
+                    <AudioRecordButton
+                      disabled={loading || uploading}
+                      onAnalysis={(analysis) => {
+                        const convId = ensureActiveConversation();
+                        const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
+                        const assistantMsg: Msg = { role: "assistant", content: analysis };
+                        setMessages((prev) => [...prev, userMsg, assistantMsg], convId);
+                      }}
+                    />
                     <input value={input} onChange={(e) => setInput(e.target.value)}
                       placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : voiceEnabled ? "Tap mic or type…" : "Type a message…"}
                       maxLength={8000}
