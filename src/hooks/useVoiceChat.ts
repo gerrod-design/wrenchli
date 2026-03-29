@@ -175,7 +175,7 @@ export function useVoiceChat() {
     if (!voiceEnabled || !text) return;
     // Strip markdown formatting for cleaner speech
     const clean = text
-      .replace(/\[Agent:\s*(?:Mike|Sam|Jess)\]\s*/gi, "")
+      .replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "")
       .replace(/[#*_~`>]/g, "")
       .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
       .replace(/\n+/g, ". ")
