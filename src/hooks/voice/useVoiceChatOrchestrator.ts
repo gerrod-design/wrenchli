@@ -10,49 +10,29 @@ export function useVoiceChat() {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const voiceEnabledRef = useRef(false);
 
-  const {
-    isListening,
-    transcript,
-    setTranscript,
-    silenceCountdown,
-    voiceOwner,
-    voiceOwnerRef,
-    supportsSTT,
-    startListening: sttStart,
-    stopListening,
-    resetOwner,
-  } = useSpeechRecognition();
+  const stt = useSpeechRecognition();
 
-  // Wrap startListening to inject shared refs
+  // Stable ref for the auto-listen callback so TTS can call it without circular deps
+  const autoListenRef = useRef<() => void>(() => {});
+
+  const tts = useTextToSpeech(voiceEnabledRef, () => autoListenRef.current());
+
   const startListening = useCallback(
-    (owner?: string): boolean => sttStart(voiceEnabledRef, tts.stopAudio, owner),
-    // tts.stopAudio is stable (useCallback with []), safe to reference below
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    (owner?: string): boolean => stt.startListening(voiceEnabledRef, tts.stopAudio, owner),
+    [stt.startListening, tts.stopAudio],
   );
 
-  // onSpeechEnd callback: auto-listen after TTS finishes
-  const onSpeechEnd = useCallback(() => {
-    startListening();
-  }, [startListening]);
-
-  const tts = useTextToSpeech(voiceEnabledRef, onSpeechEnd);
-
-  // Re-bind startListening now that tts is available
-  const startListeningBound = useCallback(
-    (owner?: string): boolean => sttStart(voiceEnabledRef, tts.stopAudio, owner),
-    [sttStart, tts.stopAudio],
-  );
+  // Keep the ref up-to-date
+  autoListenRef.current = () => startListening();
 
   // Cancel everything when voice mode is disabled
   useEffect(() => {
     if (!voiceEnabled) {
       tts.stopAudio();
-      resetOwner();
-      stopListening();
+      stt.resetOwner();
+      stt.stopListening();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [voiceEnabled]);
+  }, [voiceEnabled, tts.stopAudio, stt.resetOwner, stt.stopListening]);
 
   const toggleVoice = useCallback(() => {
     setVoiceEnabled((prev) => {
@@ -61,23 +41,22 @@ export function useVoiceChat() {
       if (prev) tts.resetLastSpoken();
       return next;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tts.resetLastSpoken]);
 
   return {
     voiceEnabled,
     toggleVoice,
-    isListening,
+    isListening: stt.isListening,
     isSpeaking: tts.isSpeaking,
-    transcript,
-    voiceOwner,
-    setTranscript,
-    startListening: startListeningBound,
-    stopListening,
+    transcript: stt.transcript,
+    voiceOwner: stt.voiceOwner,
+    setTranscript: stt.setTranscript,
+    startListening,
+    stopListening: stt.stopListening,
     speak: tts.speak,
     stopSpeaking: tts.stopSpeaking,
-    supportsSTT,
+    supportsSTT: stt.supportsSTT,
     supportsTTS: tts.supportsTTS,
-    silenceCountdown,
+    silenceCountdown: stt.silenceCountdown,
   };
 }
