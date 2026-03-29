@@ -1,6 +1,7 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
+import { buildVehicleContext } from "./vehicle-known-issues.ts";
 
 const MAX_MESSAGES = 80;
 const MAX_CONTENT_LENGTH = 8000;
@@ -413,10 +414,14 @@ async function executeTool(
 type ContentPart = { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } };
 
 function buildAiMessages(
-  messages: Array<{ role: string; content: string; image_urls?: string[] }>
+  messages: Array<{ role: string; content: string; image_urls?: string[] }>,
+  vehicleContext?: { year?: string; make?: string; model?: string; mileage?: number },
 ): Array<Record<string, unknown>> {
+  const vehicleContextStr = buildVehicleContext(vehicleContext);
+  const systemContent = SYSTEM_PROMPT + vehicleContextStr;
+
   const aiMessages: Array<Record<string, unknown>> = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: systemContent },
   ];
 
   for (const msg of messages) {
@@ -555,12 +560,17 @@ Deno.serve(async (req) => {
     if (validated instanceof Response) return validated;
     const messages = validated;
 
+    // Extract optional vehicle context for personalized advice
+    const vehicleContext = (body as Record<string, unknown>).vehicleContext as
+      | { year?: string; make?: string; model?: string; mileage?: number }
+      | undefined;
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
-    const aiMessages = buildAiMessages(messages);
+    const aiMessages = buildAiMessages(messages, vehicleContext);
 
     // ── Turn 1: Non-streaming request (may produce tool calls) ──
     const turn1Controller = new AbortController();

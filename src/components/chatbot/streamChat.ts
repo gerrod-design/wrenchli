@@ -8,11 +8,13 @@ export async function streamChat({
   onDelta,
   onDone,
   onError,
+  vehicleContext,
 }: {
   messages: Msg[];
   onDelta: (t: string) => void;
   onDone: () => void;
   onError: (msg: string) => void;
+  vehicleContext?: { year?: string; make?: string; model?: string; mileage?: number };
 }) {
   // Keep only the most recent messages to stay within API limits
   const trimmedMessages = messages.length > MAX_MESSAGES_TO_SEND
@@ -25,7 +27,7 @@ export async function streamChat({
       "Content-Type": "application/json",
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
-    body: JSON.stringify({ messages: trimmedMessages }),
+    body: JSON.stringify({ messages: trimmedMessages, vehicleContext }),
   });
 
   console.log("[ChatBot] Chat response status:", resp.status);

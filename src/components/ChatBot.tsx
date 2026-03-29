@@ -246,9 +246,31 @@ export default function ChatBot() {
       }, convId);
     };
 
+    // Build vehicle context from sessionStorage
+    const vehicleStr = sessionStorage.getItem("wrenchli_vehicle") || "";
+    let vehicleContext: { year?: string; make?: string; model?: string; mileage?: number } | undefined;
+    if (vehicleStr) {
+      const parts = vehicleStr.split(" ");
+      if (parts.length >= 3) {
+        vehicleContext = { year: parts[0], make: parts[1], model: parts.slice(2).join(" ") };
+      }
+    }
+    // Also check for mileage in garage vehicles via localStorage
+    try {
+      const garageData = localStorage.getItem("wrenchli_garage");
+      if (garageData && vehicleContext) {
+        const garage = JSON.parse(garageData);
+        const match = Array.isArray(garage) && garage.find((v: any) =>
+          v.year === vehicleContext!.year && v.make === vehicleContext!.make && v.model === vehicleContext!.model
+        );
+        if (match?.mileage) vehicleContext.mileage = match.mileage;
+      }
+    } catch { /* ignore */ }
+
     try {
       await streamChat({
         messages: [...messages, userMsg],
+        vehicleContext,
         onDelta: upsert,
         onDone: () => {
           setLoading(false);
