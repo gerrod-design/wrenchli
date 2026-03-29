@@ -50,7 +50,7 @@ export function useTextToSpeech(
       // in response to a user gesture and fully unlock subsequent audio.
       primer.muted = false;
       primer.volume = 1;
-      primer.playsInline = true;
+      primer.setAttribute("playsinline", "true");
       primer.preload = "auto";
       await primer.play();
       primer.pause();
@@ -130,7 +130,7 @@ export function useTextToSpeech(
         audio.muted = false;
         audio.volume = 1;
         audio.preload = "auto";
-        audio.playsInline = true;
+        audio.setAttribute("playsinline", "true");
 
         audio.onended = () => {
           setIsSpeaking(false);
