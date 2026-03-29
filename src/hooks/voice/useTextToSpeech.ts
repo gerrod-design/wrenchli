@@ -138,10 +138,17 @@ export function useTextToSpeech(
 
   const speak = useCallback(
     async (text: string, agent: AgentType) => {
-      if (!voiceEnabledRef.current || !text) return;
+      console.log("[VoiceDebug:TTS] speak() called, voiceEnabledRef:", voiceEnabledRef.current, "textLen:", text?.length);
+      if (!voiceEnabledRef.current || !text) {
+        console.log("[VoiceDebug:TTS] speak() bailed: voiceEnabled=", voiceEnabledRef.current, "hasText=", !!text);
+        return;
+      }
 
       const clean = cleanTextForSpeech(text);
-      if (!clean || clean === lastSpokenRef.current) return;
+      if (!clean || clean === lastSpokenRef.current) {
+        console.log("[VoiceDebug:TTS] speak() dedup skip, clean===last:", clean === lastSpokenRef.current);
+        return;
+      }
       lastSpokenRef.current = clean;
 
       stopAudio();
@@ -162,7 +169,10 @@ export function useTextToSpeech(
           throw new Error(`Azure TTS ${response.status}`);
         }
 
+        console.log("[VoiceDebug:TTS] fetch response ok:", response.ok, "status:", response.status, "contentType:", response.headers.get("content-type"));
+
         const audioBlob = await response.blob();
+        console.log("[VoiceDebug:TTS] blob size:", audioBlob.size, "type:", audioBlob.type);
         const audioUrl = URL.createObjectURL(audioBlob);
         activeObjectUrlRef.current = audioUrl;
 
@@ -197,7 +207,9 @@ export function useTextToSpeech(
 
         try {
           await audio.play();
+          console.log("[VoiceDebug:TTS] audio.play() succeeded");
         } catch (playErr) {
+          console.warn("[VoiceDebug:TTS] audio.play() failed, retrying after unlock:", playErr);
           // Mobile browsers can still reject play() if unlock wasn't fully registered.
           // Retry once after explicit unlock before falling back.
           const unlocked = await unlockAudioPlayback();
