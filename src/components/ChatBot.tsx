@@ -542,13 +542,13 @@ export default function ChatBot() {
                     <div className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                       {m.role === "assistant" && (
                         <motion.div
-                          key={`${i}-${detectAgent(m.content)}`}
+                          key={`${i}-${currentAgent}`}
                           initial={{ scale: 0.7, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ type: "spring", stiffness: 400, damping: 20, duration: 0.3 }}
                           className="relative shrink-0"
                         >
-                          <MechanicAvatar size={32} className="mt-0.5" agent={detectAgent(m.content)} />
+                          <MechanicAvatar size={32} className="mt-0.5" agent={currentAgent ?? "mike"} />
                           {voiceEnabled && isSpeaking && i === messages.length - 1 && (
                             <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
                               <Volume2 className="h-2.5 w-2.5 text-primary-foreground animate-pulse" />
