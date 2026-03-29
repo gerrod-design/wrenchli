@@ -293,13 +293,16 @@ export default function InlineChatWidget() {
 
           {/* Active specialist indicator */}
           {messages.length > 0 && (() => {
-            const lastAssistant = [...messages].reverse().find(m => m.role === "assistant");
+            const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
             const activeAgent = lastAssistant ? detectAgent(lastAssistant.content) : "mike";
             const agentInfo = {
               mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
               sam: { name: "Sam", role: "Cost & Value Specialist", color: "bg-amber-500" },
               jess: { name: "Jess", role: "Parts & DIY Expert", color: "bg-emerald-500" },
-            }[activeAgent];
+              kai: { name: "Kai", role: "Finance Specialist", color: "bg-sky-500" },
+              priya: { name: "Priya", role: "Prevention Coach", color: "bg-violet-500" },
+            }[activeAgent] ?? { name: "Mike", role: "Lead Advisor", color: "bg-primary" };
+
             return (
               <div className="flex items-center gap-2 px-4 py-1.5 border-b border-border bg-muted/30">
                 <span className={`h-2 w-2 rounded-full ${agentInfo.color} animate-pulse`} />
@@ -314,10 +317,18 @@ export default function InlineChatWidget() {
             {messages.map((m, i) => {
               // Detect agent handoff
               const currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
-              const prevAssistant = messages.slice(0, i).reverse().find(msg => msg.role === "assistant");
+              const prevAssistant = messages.slice(0, i).reverse().find((msg) => msg.role === "assistant");
               const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
               const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
-              const agentName = currentAgent === "sam" ? "Sam" : currentAgent === "jess" ? "Jess" : "Mike";
+              const agentName = currentAgent === "sam"
+                ? "Sam"
+                : currentAgent === "jess"
+                  ? "Jess"
+                  : currentAgent === "kai"
+                    ? "Kai"
+                    : currentAgent === "priya"
+                      ? "Priya"
+                      : "Mike";
 
               return (
               <div key={i}>
@@ -353,7 +364,15 @@ export default function InlineChatWidget() {
                         </span>
                       )}
                       <span className="text-[10px] font-medium text-muted-foreground leading-none">
-                        {agent === "sam" ? "Sam" : agent === "jess" ? "Jess" : "Mike"}
+                        {agent === "sam"
+                          ? "Sam"
+                          : agent === "jess"
+                            ? "Jess"
+                            : agent === "kai"
+                              ? "Kai"
+                              : agent === "priya"
+                                ? "Priya"
+                                : "Mike"}
                       </span>
                     </motion.div>
                   );
