@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff, Volume2, VolumeX, Film } from "lucide-react";
 import AudioRecordButton from "./chatbot/AudioRecordButton";
+import ToolHint from "./chatbot/ToolHint";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
