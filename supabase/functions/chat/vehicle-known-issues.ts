@@ -222,6 +222,44 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Heat pump / HVAC compressor issues (cold climates)", minMiles: 20000, maxMiles: 60000, preventiveCost: "N/A", repairCost: "$1,000–2,500", severity: "medium", systems: "HVAC" },
     { issue: "Infotainment Android Automotive lag / crashes", minMiles: 0, maxMiles: 40000, preventiveCost: "N/A (OTA updates)", repairCost: "$0–500", severity: "low", systems: "electrical" },
   ],
+  "Aston Martin": [
+    { issue: "Coil pack / ignition failure (V8 Vantage, DB9)", minMiles: 20000, maxMiles: 60000, preventiveCost: "$100–200 (inspection)", repairCost: "$400–800 per coil", severity: "medium", systems: "engine" },
+    { issue: "Hydraulic suspension damper leak (DB11, DBS)", minMiles: 30000, maxMiles: 70000, preventiveCost: "$200–400 (inspection)", repairCost: "$2,000–5,000 per corner", severity: "high", systems: "suspension" },
+    { issue: "Clutch / transmission judder (Sportshift / Touchtronic)", minMiles: 20000, maxMiles: 50000, preventiveCost: "$200–400 (fluid service)", repairCost: "$3,000–8,000", severity: "high", systems: "transmission" },
+    { issue: "Electrical harness / battery drain", minMiles: 20000, maxMiles: 60000, preventiveCost: "$50–100 (trickle charger)", repairCost: "$500–2,000", severity: "medium", systems: "electrical" },
+  ],
+  Bentley: [
+    { issue: "Air suspension strut / compressor failure", minMiles: 40000, maxMiles: 90000, preventiveCost: "$200–400 (inspection)", repairCost: "$3,000–6,000 per corner", severity: "high", systems: "suspension" },
+    { issue: "Turbo coolant line leak (W12)", minMiles: 30000, maxMiles: 70000, preventiveCost: "$100–200", repairCost: "$1,500–3,500", severity: "high", systems: "cooling" },
+    { issue: "Infotainment / rotating display failure (Continental GT)", minMiles: 30000, maxMiles: 80000, preventiveCost: "N/A", repairCost: "$2,000–5,000", severity: "low", systems: "electrical" },
+    { issue: "Coil pack / ignition failure (W12, V8)", minMiles: 30000, maxMiles: 60000, preventiveCost: "$100–200", repairCost: "$500–1,200", severity: "medium", systems: "engine" },
+  ],
+  Ferrari: [
+    { issue: "F1 / DCT gearbox actuator wear", minMiles: 15000, maxMiles: 40000, preventiveCost: "$500–1,000 (fluid service)", repairCost: "$5,000–15,000", severity: "high", systems: "transmission" },
+    { issue: "Sticky interior trim (dashboard, center console)", minMiles: 20000, maxMiles: 80000, preventiveCost: "$100–200 (protectant)", repairCost: "$2,000–5,000 (re-trim)", severity: "low", systems: "interior" },
+    { issue: "Exhaust manifold cracking (V8 turbo models)", minMiles: 20000, maxMiles: 50000, preventiveCost: "N/A", repairCost: "$3,000–8,000", severity: "high", systems: "exhaust" },
+    { issue: "Engine timing belt/chain service (flat-plane V8)", minMiles: 15000, maxMiles: 30000, preventiveCost: "$3,000–5,000 (scheduled service)", repairCost: "$10,000–20,000 (if skipped)", severity: "high", systems: "engine" },
+    { issue: "Suspension ball joint / bushing wear (track use)", minMiles: 15000, maxMiles: 40000, preventiveCost: "$200–400 (inspection)", repairCost: "$1,500–4,000", severity: "medium", systems: "suspension" },
+  ],
+  Lamborghini: [
+    { issue: "E-gear / ISR actuator wear", minMiles: 10000, maxMiles: 30000, preventiveCost: "$500–1,000 (fluid service)", repairCost: "$5,000–12,000", severity: "high", systems: "transmission" },
+    { issue: "Magnetic ride damper failure (Huracán, Aventador)", minMiles: 20000, maxMiles: 50000, preventiveCost: "$200–400 (inspection)", repairCost: "$3,000–6,000 per corner", severity: "high", systems: "suspension" },
+    { issue: "Carbon-ceramic brake rotor wear", minMiles: 20000, maxMiles: 40000, preventiveCost: "$200–400 (inspection)", repairCost: "$5,000–15,000 (set)", severity: "high", systems: "brakes" },
+    { issue: "Engine oil leak (dry-sump system seals)", minMiles: 20000, maxMiles: 50000, preventiveCost: "$100–200 (frequent checks)", repairCost: "$1,500–4,000", severity: "medium", systems: "engine" },
+  ],
+  Lotus: [
+    { issue: "Toyota 2ZZ-GE / 2GR-FE engine oil consumption (Elise, Evora)", minMiles: 50000, maxMiles: 100000, preventiveCost: "$100–200 (frequent checks)", repairCost: "$1,500–3,000", severity: "medium", systems: "engine" },
+    { issue: "Clutch cable stretch / hydraulic clutch failure", minMiles: 30000, maxMiles: 70000, preventiveCost: "$50–100 (adjustment)", repairCost: "$500–1,200", severity: "medium", systems: "transmission" },
+    { issue: "Chassis / fiberglass gel coat cracking", minMiles: 30000, maxMiles: 80000, preventiveCost: "$100–200 (protective coating)", repairCost: "$500–2,000", severity: "low", systems: "body" },
+    { issue: "A/C system failure (Elise/Exige — minimal design)", minMiles: 20000, maxMiles: 60000, preventiveCost: "$50–100 (recharge)", repairCost: "$500–1,500", severity: "low", systems: "HVAC" },
+  ],
+  McLaren: [
+    { issue: "Hydraulic suspension actuator leak/failure", minMiles: 10000, maxMiles: 40000, preventiveCost: "$200–400 (inspection)", repairCost: "$5,000–12,000", severity: "high", systems: "suspension" },
+    { issue: "Engine bay wiring harness heat damage", minMiles: 15000, maxMiles: 40000, preventiveCost: "$100–200 (heat wrap)", repairCost: "$2,000–5,000", severity: "high", systems: "electrical" },
+    { issue: "Carbon-ceramic brake rotor wear", minMiles: 15000, maxMiles: 35000, preventiveCost: "$200–400 (inspection)", repairCost: "$8,000–20,000 (set)", severity: "high", systems: "brakes" },
+    { issue: "Door dihedral hinge strut weakening", minMiles: 15000, maxMiles: 40000, preventiveCost: "N/A", repairCost: "$1,500–3,500", severity: "medium", systems: "body" },
+    { issue: "Infotainment / IRIS system freezing", minMiles: 10000, maxMiles: 40000, preventiveCost: "N/A", repairCost: "$500–2,000", severity: "low", systems: "electrical" },
+  ],
 };
 
 /**
