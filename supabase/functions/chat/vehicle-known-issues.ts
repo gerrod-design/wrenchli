@@ -433,6 +433,30 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Hydra-Matic / overdrive shift linkage wear", minMiles: 30000, maxMiles: 80000, preventiveCost: "$50–100 (adjustment)", repairCost: "$200–600", severity: "medium", systems: "transmission" },
     { issue: "Dual ignition system point wear (Ambassador)", minMiles: 10000, maxMiles: 30000, preventiveCost: "$20–40 (point replacement)", repairCost: "$100–250", severity: "low", systems: "engine" },
   ],
+  Packard: [
+    { issue: "Ultramatic transmission slippage", minMiles: 30000, maxMiles: 80000, preventiveCost: "$100–200 (fluid service)", repairCost: "$500–1,500", severity: "high", systems: "transmission" },
+    { issue: "Cormorant hood ornament / trim chrome pitting", minMiles: 0, maxMiles: 200000, preventiveCost: "$50–100 (polish/seal)", repairCost: "$200–800 (re-chrome)", severity: "low", systems: "body" },
+    { issue: "Mechanical fuel pump diaphragm failure", minMiles: 20000, maxMiles: 60000, preventiveCost: "$20–40 (inspection)", repairCost: "$100–300", severity: "medium", systems: "fuel" },
+    { issue: "Generator brush / voltage regulator wear", minMiles: 25000, maxMiles: 60000, preventiveCost: "$30–60 (inspection)", repairCost: "$150–400", severity: "medium", systems: "electrical" },
+  ],
+  Hudson: [
+    { issue: "Step-down unibody rocker panel rust", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (rust treatment)", repairCost: "$1,000–4,000", severity: "high", systems: "body" },
+    { issue: "Twin H-Power carburetor synchronization", minMiles: 15000, maxMiles: 40000, preventiveCost: "$30–60 (adjustment)", repairCost: "$200–500", severity: "medium", systems: "fuel" },
+    { issue: "Cork clutch facing wear (pre-1954)", minMiles: 20000, maxMiles: 50000, preventiveCost: "$30–60 (adjustment)", repairCost: "$300–700", severity: "medium", systems: "transmission" },
+    { issue: "King pin and front trunnion wear", minMiles: 30000, maxMiles: 70000, preventiveCost: "$30–60 (greasing)", repairCost: "$250–600", severity: "medium", systems: "suspension" },
+  ],
+  "Kaiser-Frazer": [
+    { issue: "Continental flathead six oil leak (rear main seal)", minMiles: 30000, maxMiles: 80000, preventiveCost: "$50–100 (monitoring)", repairCost: "$300–800", severity: "medium", systems: "engine" },
+    { issue: "Hydra-Matic / manual overdrive linkage wear", minMiles: 30000, maxMiles: 70000, preventiveCost: "$30–60 (adjustment)", repairCost: "$200–500", severity: "medium", systems: "transmission" },
+    { issue: "Body seam rust (unibody construction)", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (seam sealer)", repairCost: "$800–3,000", severity: "high", systems: "body" },
+    { issue: "Mechanical brake adjustment drift (early models)", minMiles: 10000, maxMiles: 30000, preventiveCost: "$20–40 (adjustment)", repairCost: "$100–300", severity: "medium", systems: "brakes" },
+  ],
+  Willys: [
+    { issue: "Go-Devil / Hurricane L-head valve seat recession", minMiles: 40000, maxMiles: 100000, preventiveCost: "$50–100 (valve adjustment)", repairCost: "$400–1,000", severity: "medium", systems: "engine" },
+    { issue: "Dana 18 transfer case seal leak", minMiles: 30000, maxMiles: 80000, preventiveCost: "$30–60 (inspection)", repairCost: "$200–500", severity: "medium", systems: "drivetrain" },
+    { issue: "Body tub floor rust-through (CJ / wagon)", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (rust treatment)", repairCost: "$800–3,000", severity: "high", systems: "body" },
+    { issue: "Ross steering box play / wander", minMiles: 30000, maxMiles: 70000, preventiveCost: "$30–60 (adjustment)", repairCost: "$200–600", severity: "medium", systems: "steering" },
+  ],
 };
 
 /**
