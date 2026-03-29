@@ -383,7 +383,7 @@ export default function InlineChatWidget() {
                 )}
                 <div className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 {m.role === "assistant" && (() => {
-                  const agent = detectAgent(m.content);
+                  const agent = currentAgent ?? "mike";
                   return (
                     <motion.div
                       key={`${i}-${agent}`}
