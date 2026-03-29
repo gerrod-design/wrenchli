@@ -15,7 +15,12 @@ export function useVoiceChat() {
   // Stable ref for the auto-listen callback so TTS can call it without circular deps
   const autoListenRef = useRef<() => void>(() => {});
 
-  const tts = useTextToSpeech(voiceEnabledRef, () => autoListenRef.current());
+  // IMPORTANT: Use a stable callback reference so speak doesn't get recreated every render
+  const onSpeechEndStable = useCallback(() => {
+    autoListenRef.current();
+  }, []);
+
+  const tts = useTextToSpeech(voiceEnabledRef, onSpeechEndStable);
 
   const startListening = useCallback(
     (owner?: string): boolean => stt.startListening(voiceEnabledRef, tts.stopAudio, owner),

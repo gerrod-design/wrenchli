@@ -75,19 +75,26 @@ export default function ChatBot() {
 
   // Speak once when a response finishes streaming for the active voice owner.
   const prevLoadingRef = useRef(false);
+  const speakRef = useRef(speak);
+  speakRef.current = speak;
+
   useEffect(() => {
     const justFinishedStreaming = prevLoadingRef.current && !loading;
     prevLoadingRef.current = loading;
+
+    console.log("[SpeakTrace] effect:", { justFinishedStreaming, voiceEnabled, voiceOwner, VOICE_OWNER, loading, msgCount: messages.length });
 
     if (!justFinishedStreaming || !voiceEnabled) return;
     // Allow speak if this component owns voice OR if no specific owner is set
     if (voiceOwner && voiceOwner !== VOICE_OWNER) return;
 
     const lastMsg = messages[messages.length - 1];
+    console.log("[SpeakTrace] lastMsg role:", lastMsg?.role, "len:", lastMsg?.content?.length);
     if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
-      speak(lastMsg.content, detectAgent(lastMsg.content));
+      console.log("[SpeakTrace] calling speak()");
+      speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
     }
-  }, [loading, voiceEnabled, voiceOwner, messages, speak]);
+  }, [loading, voiceEnabled, voiceOwner, messages]);
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {

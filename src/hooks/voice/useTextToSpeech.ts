@@ -64,9 +64,11 @@ export function useTextToSpeech(
 
   const speak = useCallback(
     async (text: string, agent: AgentType) => {
+      console.log("[SpeakTrace] speak() called, voiceEnabledRef:", voiceEnabledRef.current, "textLen:", text?.length);
       if (!voiceEnabledRef.current || !text) return;
 
       const clean = cleanTextForSpeech(text);
+      console.log("[SpeakTrace] dedup check:", clean === lastSpokenRef.current, "cleanLen:", clean.length);
       if (!clean || clean === lastSpokenRef.current) return;
       lastSpokenRef.current = clean;
 
