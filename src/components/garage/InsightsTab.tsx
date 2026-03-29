@@ -110,19 +110,51 @@ export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: 
         </p>
       </div>
 
-      {/* Known issues for this make */}
+      {/* Known issues for this make at current mileage */}
       {relevantIssues.length > 0 && (
         <div className="rounded-xl border border-wrenchli-amber/20 bg-wrenchli-amber/5 p-4 space-y-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-wrenchli-amber" />
-            <h4 className="text-sm font-semibold">Common Issues at This Mileage</h4>
+            <h4 className="text-sm font-semibold">
+              {mileage ? "Common Issues at This Mileage" : `Known ${vehicle.make} Issues`}
+            </h4>
           </div>
           {relevantIssues.map((issue, i) => (
             <div key={i} className="text-xs space-y-1">
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-foreground">{issue.issue}</p>
+                <span className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-medium capitalize",
+                  issue.severity === "high" ? "bg-destructive/10 text-destructive" :
+                  issue.severity === "medium" ? "bg-wrenchli-amber/10 text-wrenchli-amber" :
+                  "bg-muted text-muted-foreground"
+                )}>
+                  {issue.severity}
+                </span>
+              </div>
+              <p className="text-muted-foreground">
+                <span className="capitalize">{issue.systems}</span>
+                {" · "}Preventive: <span className="text-wrenchli-teal font-medium">{issue.preventiveCost}</span>
+                {" · "}Repair: <span className="text-destructive font-medium">{issue.repairCost}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Upcoming issues to watch */}
+      {upcomingIssues.length > 0 && mileage && (
+        <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <h4 className="text-sm font-semibold">Upcoming Issues to Watch</h4>
+          </div>
+          {upcomingIssues.slice(0, 3).map((issue, i) => (
+            <div key={i} className="text-xs">
               <p className="font-medium text-foreground">{issue.issue}</p>
               <p className="text-muted-foreground">
-                Preventive service: <span className="text-wrenchli-teal font-medium">{issue.preventiveCost}</span>
-                {" · "}Repair if ignored: <span className="text-destructive font-medium">{issue.repairCost}</span>
+                Typically {issue.minMiles.toLocaleString()}–{issue.maxMiles.toLocaleString()} mi
+                {" · "}<span className="capitalize">{issue.systems}</span>
               </p>
             </div>
           ))}
