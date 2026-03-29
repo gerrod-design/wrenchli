@@ -99,7 +99,10 @@ export default function ChatBot() {
     if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
       shouldSpeakAfterLoadRef.current = false;
       void speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
+      return;
     }
+
+    shouldSpeakAfterLoadRef.current = false;
   }, [loading, voiceEnabled, voiceOwner, messages]);
 
   // When transcript changes (from voice input), update input field
