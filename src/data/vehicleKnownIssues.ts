@@ -322,6 +322,33 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Spirit of Ecstasy retraction mechanism failure", minMiles: 30000, maxMiles: 70000, preventiveCost: "N/A", repairCost: "$1,500–3,500", severity: "low", systems: "body" },
     { issue: "BMW N74 V12 coil pack / injector issues", minMiles: 40000, maxMiles: 80000, preventiveCost: "$200–400", repairCost: "$1,000–3,000", severity: "medium", systems: "engine" },
   ],
+  Eagle: [
+    { issue: "Head gasket failure (2.0L 420A — Talon)", minMiles: 70000, maxMiles: 130000, preventiveCost: "$100–200 (coolant monitoring)", repairCost: "$1,200–2,500", severity: "high", systems: "engine" },
+    { issue: "AWD transfer case leak (Talon TSi AWD)", minMiles: 60000, maxMiles: 110000, preventiveCost: "$80–150 (fluid change)", repairCost: "$500–1,200", severity: "medium", systems: "drivetrain" },
+    { issue: "Distributor failure (4G63 turbo)", minMiles: 80000, maxMiles: 130000, preventiveCost: "N/A", repairCost: "$200–500", severity: "medium", systems: "engine" },
+  ],
+  Geo: [
+    { issue: "Head gasket failure (1.6L — Tracker)", minMiles: 80000, maxMiles: 140000, preventiveCost: "$100–200 (coolant monitoring)", repairCost: "$800–1,500", severity: "high", systems: "engine" },
+    { issue: "Distributor cap / rotor wear (Metro, Prizm)", minMiles: 50000, maxMiles: 90000, preventiveCost: "$30–60 (replacement)", repairCost: "$100–250", severity: "low", systems: "engine" },
+    { issue: "Rust-through (rocker panels, wheel wells)", minMiles: 60000, maxMiles: 150000, preventiveCost: "$100–300 (undercoating)", repairCost: "$500–2,000", severity: "medium", systems: "body" },
+  ],
+  Hummer: [
+    { issue: "Transfer case chain stretch (H3)", minMiles: 60000, maxMiles: 110000, preventiveCost: "$200–400 (fluid service)", repairCost: "$1,500–3,000", severity: "high", systems: "drivetrain" },
+    { issue: "Cylinder head cracking (H3 3.5L I5)", minMiles: 80000, maxMiles: 130000, preventiveCost: "N/A", repairCost: "$2,000–4,000", severity: "high", systems: "engine" },
+    { issue: "Fuel injector failure (6.5L diesel — H1)", minMiles: 80000, maxMiles: 150000, preventiveCost: "$100–200 (fuel additive)", repairCost: "$800–2,000", severity: "high", systems: "engine" },
+    { issue: "Glow plug failure (diesel H1)", minMiles: 60000, maxMiles: 120000, preventiveCost: "N/A", repairCost: "$300–700", severity: "medium", systems: "engine" },
+  ],
+  Mercury: [
+    { issue: "Transmission failure (CD4E — Cougar, Mystique)", minMiles: 60000, maxMiles: 110000, preventiveCost: "$200–400 (fluid service)", repairCost: "$2,000–3,500", severity: "high", systems: "transmission" },
+    { issue: "Intake manifold runner control failure (Duratec V6)", minMiles: 60000, maxMiles: 100000, preventiveCost: "N/A", repairCost: "$300–700", severity: "medium", systems: "engine" },
+    { issue: "Window regulator failure (Grand Marquis, Mountaineer)", minMiles: 60000, maxMiles: 120000, preventiveCost: "N/A", repairCost: "$200–400", severity: "low", systems: "electrical" },
+    { issue: "Air suspension leak (Grand Marquis)", minMiles: 70000, maxMiles: 130000, preventiveCost: "$100–200 (inspection)", repairCost: "$500–1,200 per corner", severity: "medium", systems: "suspension" },
+  ],
+  Plymouth: [
+    { issue: "Transmission failure (41TE / 42LE)", minMiles: 70000, maxMiles: 130000, preventiveCost: "$200–400 (fluid service)", repairCost: "$1,500–3,000", severity: "high", systems: "transmission" },
+    { issue: "Head gasket failure (2.4L — Breeze, Voyager)", minMiles: 80000, maxMiles: 140000, preventiveCost: "$100–200 (coolant monitoring)", repairCost: "$1,000–2,000", severity: "high", systems: "engine" },
+    { issue: "Ball joint / tie rod wear (Voyager / Grand Voyager)", minMiles: 60000, maxMiles: 100000, preventiveCost: "$100–200 (inspection)", repairCost: "$300–700", severity: "medium", systems: "suspension" },
+  ],
 };
 
 /** Reliable brands for the brand reliability insight */
