@@ -8,7 +8,7 @@ import {
   Smartphone, ChevronDown, ChevronUp, Shield
 } from "lucide-react";
 import { getDtcEntry, isValidDtcPattern } from "@/data/dtcCodes";
-import { VEHICLE_KNOWN_ISSUES } from "@/data/vehicleKnownIssues";
+import { useKnownIssuesBrandCount } from "@/hooks/useKnownIssues";
 import SectionReveal from "@/components/SectionReveal";
 import DiagnosisResult from "@/components/DiagnosisResult";
 import { Button } from "@/components/ui/button";
