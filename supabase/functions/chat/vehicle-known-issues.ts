@@ -184,6 +184,44 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "12V battery drain / BMS issues", minMiles: 10000, maxMiles: 50000, preventiveCost: "N/A", repairCost: "$150–400", severity: "medium", systems: "electrical" },
     { issue: "Infotainment screen lag / reboot loops", minMiles: 0, maxMiles: 40000, preventiveCost: "N/A (OTA updates)", repairCost: "$0–800", severity: "low", systems: "electrical" },
   ],
+  "Alfa Romeo": [
+    { issue: "Engine oil leak (MultiAir actuator)", minMiles: 30000, maxMiles: 80000, preventiveCost: "$100–200 (inspection)", repairCost: "$800–1,500", severity: "high", systems: "engine" },
+    { issue: "Electrical gremlins (dashboard warnings, sensor faults)", minMiles: 20000, maxMiles: 70000, preventiveCost: "N/A", repairCost: "$300–1,200", severity: "medium", systems: "electrical" },
+    { issue: "Transmission shudder (ZF 8-speed in Giulia/Stelvio)", minMiles: 40000, maxMiles: 90000, preventiveCost: "$200–400 (fluid service)", repairCost: "$1,500–3,500", severity: "high", systems: "transmission" },
+    { issue: "Turbo wastegate rattle (2.0T)", minMiles: 30000, maxMiles: 70000, preventiveCost: "N/A", repairCost: "$600–1,200", severity: "medium", systems: "engine" },
+  ],
+  Fiat: [
+    { issue: "MultiAir unit failure (1.4L turbo)", minMiles: 40000, maxMiles: 90000, preventiveCost: "$100–200 (oil changes on schedule)", repairCost: "$1,500–3,000", severity: "high", systems: "engine" },
+    { issue: "Clutch actuator failure (500 automated manual)", minMiles: 30000, maxMiles: 70000, preventiveCost: "N/A", repairCost: "$800–1,500", severity: "high", systems: "transmission" },
+    { issue: "Electrical system issues (body control module)", minMiles: 30000, maxMiles: 80000, preventiveCost: "N/A", repairCost: "$400–1,000", severity: "medium", systems: "electrical" },
+    { issue: "Turbo boost leak / intercooler hose failure", minMiles: 40000, maxMiles: 80000, preventiveCost: "$50–100 (inspection)", repairCost: "$200–500", severity: "medium", systems: "engine" },
+  ],
+  Jaguar: [
+    { issue: "Air suspension compressor / strut failure", minMiles: 50000, maxMiles: 100000, preventiveCost: "$100–200 (inspection)", repairCost: "$1,500–3,500", severity: "high", systems: "suspension" },
+    { issue: "Timing chain tensioner failure (AJ-V6/V8)", minMiles: 60000, maxMiles: 110000, preventiveCost: "$200–400 (inspection)", repairCost: "$3,000–6,000", severity: "high", systems: "engine" },
+    { issue: "Supercharger nose cone bearing wear (5.0 V8)", minMiles: 60000, maxMiles: 100000, preventiveCost: "$200–400 (inspection)", repairCost: "$1,500–3,000", severity: "high", systems: "engine" },
+    { issue: "Infotainment / touchscreen freezing", minMiles: 30000, maxMiles: 80000, preventiveCost: "N/A", repairCost: "$500–1,500", severity: "low", systems: "electrical" },
+    { issue: "Coolant crossover pipe leak (V6/V8)", minMiles: 50000, maxMiles: 90000, preventiveCost: "$100–200", repairCost: "$800–1,500", severity: "medium", systems: "cooling" },
+  ],
+  MINI: [
+    { issue: "Timing chain tensioner failure (N14/N18 turbo)", minMiles: 40000, maxMiles: 90000, preventiveCost: "$200–400 (inspection)", repairCost: "$2,000–4,000", severity: "high", systems: "engine" },
+    { issue: "Thermostat / water pump failure", minMiles: 50000, maxMiles: 90000, preventiveCost: "$100–200", repairCost: "$600–1,200", severity: "medium", systems: "cooling" },
+    { issue: "Oil leak (valve cover, oil filter housing)", minMiles: 50000, maxMiles: 100000, preventiveCost: "$100–200", repairCost: "$400–900", severity: "medium", systems: "engine" },
+    { issue: "Clutch wear (manual transmission models)", minMiles: 50000, maxMiles: 90000, preventiveCost: "N/A", repairCost: "$1,200–2,500", severity: "medium", systems: "transmission" },
+    { issue: "Electric power steering pump failure", minMiles: 60000, maxMiles: 100000, preventiveCost: "N/A", repairCost: "$500–1,000", severity: "medium", systems: "steering" },
+  ],
+  Maserati: [
+    { issue: "F1 / Cambiocorsa hydraulic actuator failure (older models)", minMiles: 30000, maxMiles: 70000, preventiveCost: "$200–400 (fluid service)", repairCost: "$3,000–6,000", severity: "high", systems: "transmission" },
+    { issue: "Variator / cam timing solenoid failure (V8)", minMiles: 50000, maxMiles: 100000, preventiveCost: "$100–200 (oil changes)", repairCost: "$1,500–3,000", severity: "high", systems: "engine" },
+    { issue: "Electrical sensor failures (O2, MAF, crank position)", minMiles: 40000, maxMiles: 90000, preventiveCost: "N/A", repairCost: "$300–800", severity: "medium", systems: "electrical" },
+    { issue: "Suspension bushing / control arm wear (Ghibli, Levante)", minMiles: 40000, maxMiles: 80000, preventiveCost: "$100–200 (inspection)", repairCost: "$600–1,500", severity: "medium", systems: "suspension" },
+  ],
+  Polestar: [
+    { issue: "12V battery drain (Polestar 2)", minMiles: 5000, maxMiles: 40000, preventiveCost: "N/A", repairCost: "$150–300", severity: "low", systems: "electrical" },
+    { issue: "TCAM (connectivity module) failure", minMiles: 10000, maxMiles: 50000, preventiveCost: "N/A", repairCost: "$500–1,200", severity: "medium", systems: "electrical" },
+    { issue: "Heat pump / HVAC compressor issues (cold climates)", minMiles: 20000, maxMiles: 60000, preventiveCost: "N/A", repairCost: "$1,000–2,500", severity: "medium", systems: "HVAC" },
+    { issue: "Infotainment Android Automotive lag / crashes", minMiles: 0, maxMiles: 40000, preventiveCost: "N/A (OTA updates)", repairCost: "$0–500", severity: "low", systems: "electrical" },
+  ],
 };
 
 /**
