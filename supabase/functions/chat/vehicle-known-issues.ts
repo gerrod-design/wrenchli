@@ -373,6 +373,30 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "HV battery contactor wear", minMiles: 50000, maxMiles: 100000, preventiveCost: "$100–200 (inspection)", repairCost: "$800–2,000", severity: "high", systems: "battery" },
     { issue: "Power tailgate strut failure", minMiles: 30000, maxMiles: 60000, preventiveCost: "N/A", repairCost: "$200–400", severity: "low", systems: "body" },
   ],
+  smart: [
+    { issue: "Turbo actuator failure (ForTwo 451)", minMiles: 40000, maxMiles: 80000, preventiveCost: "$100–200 (inspection)", repairCost: "$600–1,200", severity: "high", systems: "engine" },
+    { issue: "SAM (Signal Acquisition Module) water intrusion", minMiles: 30000, maxMiles: 70000, preventiveCost: "$50–100 (seal inspection)", repairCost: "$500–1,500", severity: "high", systems: "electrical" },
+    { issue: "Clutch actuator wear (automated manual)", minMiles: 30000, maxMiles: 60000, preventiveCost: "$100–200 (fluid service)", repairCost: "$800–1,800", severity: "high", systems: "transmission" },
+    { issue: "Intercooler hose failure", minMiles: 40000, maxMiles: 80000, preventiveCost: "$30–60 (inspection)", repairCost: "$150–400", severity: "medium", systems: "engine" },
+  ],
+  AMC: [
+    { issue: "Carburetor rebuild needed (all models)", minMiles: 40000, maxMiles: 80000, preventiveCost: "$50–100 (cleaning/adjustment)", repairCost: "$300–700", severity: "medium", systems: "fuel" },
+    { issue: "Rear main seal oil leak (I6 engines)", minMiles: 50000, maxMiles: 100000, preventiveCost: "$50–100 (monitoring)", repairCost: "$400–900", severity: "medium", systems: "engine" },
+    { issue: "Transfer case chain stretch (Eagle / 4WD)", minMiles: 60000, maxMiles: 120000, preventiveCost: "$100–200 (fluid service)", repairCost: "$500–1,200", severity: "medium", systems: "drivetrain" },
+    { issue: "Rust-through on unibody (Pacer, Gremlin, Spirit)", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (rust treatment)", repairCost: "$1,000–5,000+", severity: "high", systems: "body" },
+  ],
+  DeLorean: [
+    { issue: "PRV V6 fuel injection relay failure", minMiles: 20000, maxMiles: 60000, preventiveCost: "$30–60 (relay replacement)", repairCost: "$200–500", severity: "medium", systems: "fuel" },
+    { issue: "Stainless steel panel dent / gull-wing door alignment", minMiles: 0, maxMiles: 200000, preventiveCost: "$100–300 (adjustment)", repairCost: "$500–2,000", severity: "medium", systems: "body" },
+    { issue: "Alternator / voltage regulator failure", minMiles: 30000, maxMiles: 70000, preventiveCost: "$50–100 (testing)", repairCost: "$300–700", severity: "medium", systems: "electrical" },
+    { issue: "Coolant hose deterioration (PRV V6)", minMiles: 20000, maxMiles: 50000, preventiveCost: "$50–100 (hose replacement)", repairCost: "$200–500", severity: "high", systems: "cooling" },
+  ],
+  Datsun: [
+    { issue: "L-series engine head gasket failure", minMiles: 60000, maxMiles: 120000, preventiveCost: "$100–200 (coolant maintenance)", repairCost: "$600–1,500", severity: "high", systems: "engine" },
+    { issue: "SU / Hitachi carburetor float needle wear", minMiles: 30000, maxMiles: 70000, preventiveCost: "$30–60 (inspection)", repairCost: "$150–400", severity: "medium", systems: "fuel" },
+    { issue: "Leaf spring sag / bushing wear (trucks, 510)", minMiles: 50000, maxMiles: 100000, preventiveCost: "$50–100 (inspection)", repairCost: "$300–700", severity: "medium", systems: "suspension" },
+    { issue: "Rust-through on fenders and rocker panels", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (rust treatment)", repairCost: "$800–3,000", severity: "high", systems: "body" },
+  ],
 };
 
 /**
