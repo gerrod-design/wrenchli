@@ -414,10 +414,14 @@ async function executeTool(
 type ContentPart = { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } };
 
 function buildAiMessages(
-  messages: Array<{ role: string; content: string; image_urls?: string[] }>
+  messages: Array<{ role: string; content: string; image_urls?: string[] }>,
+  vehicleContext?: { year?: string; make?: string; model?: string; mileage?: number },
 ): Array<Record<string, unknown>> {
+  const vehicleContextStr = buildVehicleContext(vehicleContext);
+  const systemContent = SYSTEM_PROMPT + vehicleContextStr;
+
   const aiMessages: Array<Record<string, unknown>> = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: systemContent },
   ];
 
   for (const msg of messages) {
