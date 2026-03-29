@@ -44,7 +44,7 @@ export default function MechanicAvatar({
         width={size}
         height={size}
       />
-      {showLogo && size >= 36 && (
+      {showLogo && size >= 28 && (
         <img
           src={wrenchliLogo}
           alt=""
