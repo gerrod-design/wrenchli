@@ -345,9 +345,23 @@ export default function InlineChatWidget() {
                 }
               }
               // Detect agent handoff
-              const currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
+              let currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
               const prevAssistant = messages.slice(0, i).reverse().find((msg) => msg.role === "assistant");
               const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
+              // While streaming the latest message, if no marker detected yet and the
+              // previous message announced a handoff, suppress the default "mike" avatar
+              const isLastMsg = i === messages.length - 1;
+              if (isLastMsg && loading && currentAgent === "mike" && prevAgent && prevAgent !== "mike") {
+                // Keep previous agent until marker arrives — avoids mike flash
+                currentAgent = prevAgent;
+              } else if (isLastMsg && loading && currentAgent === "mike" && prevAssistant) {
+                // Check if the previous message text announces bringing in a specific agent
+                const prevText = typeof prevAssistant.content === "string" ? prevAssistant.content : "";
+                const handoffMatch = prevText.match(/\b(Priya|Sam|Jess|Kai)\b/i);
+                if (handoffMatch) {
+                  currentAgent = handoffMatch[1].toLowerCase() as AgentType;
+                }
+              }
               const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
               const agentName = getAgentMeta(currentAgent).name;
 
