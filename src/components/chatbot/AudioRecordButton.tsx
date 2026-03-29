@@ -1,5 +1,5 @@
 import { memo, useCallback, useState } from "react";
-import { Mic, Square, Loader2, X } from "lucide-react";
+import { AudioLines, Square, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 
@@ -114,7 +114,7 @@ const AudioRecordButton = memo(function AudioRecordButton({
           : "text-muted-foreground hover:text-foreground hover:bg-muted"
       }`}
       aria-label={isRecording ? "Stop recording" : "Record car noise"}
-      title={isRecording ? `Recording… ${recordingDuration}s` : "Record a car noise clip"}
+      title={isRecording ? `Recording… ${recordingDuration}s` : "Record car noise"}
     >
       {isRecording ? (
         <>
@@ -125,7 +125,7 @@ const AudioRecordButton = memo(function AudioRecordButton({
           </span>
         </>
       ) : (
-        <Mic className="h-4 w-4" />
+        <AudioLines className="h-4 w-4" />
       )}
     </button>
   );
