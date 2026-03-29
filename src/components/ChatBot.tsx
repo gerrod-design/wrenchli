@@ -374,9 +374,15 @@ export default function ChatBot() {
                 {(supportsSTT || supportsTTS) && (
                   <div className="relative">
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const turningOn = !voiceEnabled;
-                        if (turningOn) void unlockAudioPlayback();
+                        if (turningOn) {
+                          const unlocked = await unlockAudioPlayback();
+                          if (!unlocked) {
+                            toast.error("Audio playback is blocked. Tap Voice again after interacting with the page.");
+                            return;
+                          }
+                        }
                         toggleVoice();
                         setShowVoiceTip(false);
                         if (turningOn) {
@@ -737,16 +743,19 @@ export default function ChatBot() {
                         {isListening && <AudioWaveform />}
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={async () => {
                             if (isListening) {
                               stopListening(VOICE_OWNER);
                             } else {
-                              void unlockAudioPlayback().finally(() => {
-                                const started = startListening(VOICE_OWNER);
-                                if (!started) {
-                                  toast.error("Couldn't start listening. Check mic permission and try again.");
-                                }
-                              });
+                              const unlocked = await unlockAudioPlayback();
+                              if (!unlocked) {
+                                toast.error("Audio playback is blocked. Tap the mic again.");
+                                return;
+                              }
+                              const started = startListening(VOICE_OWNER);
+                              if (!started) {
+                                toast.error("Couldn't start listening. Check mic permission and try again.");
+                              }
                             }
                           }}
                           disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
