@@ -336,6 +336,14 @@ export default function InlineChatWidget() {
           {/* Chat messages area */}
           <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px" }}>
             {messages.map((m, i) => {
+              // Hide auto-handoff "ok" messages from user
+              if (m.role === "user" && /^ok$/i.test(m.content.trim())) {
+                const nextMsg = messages[i + 1];
+                const prevMsg = messages[i - 1];
+                if (prevMsg?.role === "assistant" && nextMsg?.role === "assistant" && detectAgent(prevMsg.content) !== detectAgent(nextMsg.content)) {
+                  return null;
+                }
+              }
               // Detect agent handoff
               const currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
               const prevAssistant = messages.slice(0, i).reverse().find((msg) => msg.role === "assistant");
