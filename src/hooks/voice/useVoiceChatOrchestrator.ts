@@ -60,6 +60,7 @@ export function useVoiceChat() {
     stopListening: stt.stopListening,
     speak: tts.speak,
     stopSpeaking: tts.stopSpeaking,
+    unlockAudioPlayback: tts.unlockAudioPlayback,
     supportsSTT: stt.supportsSTT,
     supportsTTS: tts.supportsTTS,
     silenceCountdown: stt.silenceCountdown,
