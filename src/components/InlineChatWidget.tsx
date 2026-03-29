@@ -75,22 +75,12 @@ export default function InlineChatWidget() {
     startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
-  // Speak once when a response finishes streaming for the active voice owner.
-  const prevLoadingRef = useRef(false);
   const speakRef = useRef(speak);
+  const voiceEnabledStateRef = useRef(voiceEnabled);
+  const voiceOwnerRef = useRef<string | null>(voiceOwner);
   speakRef.current = speak;
-
-  useEffect(() => {
-    const justFinishedStreaming = prevLoadingRef.current && !loading;
-    prevLoadingRef.current = loading;
-
-    if (!justFinishedStreaming || !voiceEnabled || voiceOwner !== VOICE_OWNER) return;
-
-    const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
-      speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
-    }
-  }, [loading, voiceEnabled, voiceOwner, messages]);
+  voiceEnabledStateRef.current = voiceEnabled;
+  voiceOwnerRef.current = voiceOwner;
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {
@@ -233,6 +223,12 @@ export default function InlineChatWidget() {
         onDelta: upsert,
         onDone: () => {
           setLoading(false);
+          const activeOwner = voiceOwnerRef.current;
+          const canSpeak =
+            voiceEnabledStateRef.current && activeOwner === VOICE_OWNER;
+          if (canSpeak && assistantSoFar.trim()) {
+            void speakRef.current(assistantSoFar, detectAgent(assistantSoFar));
+          }
           // Auto-follow-up when Mike announces a handoff to another agent
           // so the new specialist responds without waiting for user input
           const finalText = assistantSoFar;

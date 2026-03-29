@@ -73,28 +73,12 @@ export default function ChatBot() {
     startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
-  // Speak once when a response finishes streaming for the active voice owner.
-  const prevLoadingRef = useRef(false);
   const speakRef = useRef(speak);
+  const voiceEnabledStateRef = useRef(voiceEnabled);
+  const voiceOwnerRef = useRef<string | null>(voiceOwner);
   speakRef.current = speak;
-
-  useEffect(() => {
-    const justFinishedStreaming = prevLoadingRef.current && !loading;
-    prevLoadingRef.current = loading;
-
-    console.log("[SpeakTrace] effect:", { justFinishedStreaming, voiceEnabled, voiceOwner, VOICE_OWNER, loading, msgCount: messages.length });
-
-    if (!justFinishedStreaming || !voiceEnabled) return;
-    // Allow speak if this component owns voice OR if no specific owner is set
-    if (voiceOwner && voiceOwner !== VOICE_OWNER) return;
-
-    const lastMsg = messages[messages.length - 1];
-    console.log("[SpeakTrace] lastMsg role:", lastMsg?.role, "len:", lastMsg?.content?.length);
-    if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
-      console.log("[SpeakTrace] calling speak()");
-      speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
-    }
-  }, [loading, voiceEnabled, voiceOwner, messages]);
+  voiceEnabledStateRef.current = voiceEnabled;
+  voiceOwnerRef.current = voiceOwner;
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {
@@ -283,6 +267,12 @@ export default function ChatBot() {
         onDelta: upsert,
         onDone: () => {
           setLoading(false);
+          const activeOwner = voiceOwnerRef.current;
+          const canSpeak =
+            voiceEnabledStateRef.current && (!activeOwner || activeOwner === VOICE_OWNER);
+          if (canSpeak && assistantSoFar.trim()) {
+            void speakRef.current(assistantSoFar, detectAgent(assistantSoFar));
+          }
           // Auto-follow-up when Mike announces a handoff to another agent
           const finalText = assistantSoFar;
           const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Priya|Sam|Jess|Kai)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll) (?:going to )?(?:bring|connect|hand)/i.test(finalText);
