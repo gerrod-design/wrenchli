@@ -172,6 +172,7 @@ export function useVoiceChat() {
   }, [startListening]);
 
   const speak = useCallback(async (text: string, agent: AgentType) => {
+    console.log("[VoiceDebug] speak() called, voiceEnabledRef:", voiceEnabledRef.current, "textLen:", text?.length);
     if (!voiceEnabledRef.current || !text) return;
     // Strip markdown formatting for cleaner speech
     const clean = text
@@ -181,6 +182,7 @@ export function useVoiceChat() {
       .replace(/\n+/g, ". ")
       .trim();
 
+    console.log("[VoiceDebug] clean text matches lastSpoken?", clean === lastSpokenRef.current, "cleanLen:", clean.length);
     if (!clean || clean === lastSpokenRef.current) return;
     lastSpokenRef.current = clean;
 

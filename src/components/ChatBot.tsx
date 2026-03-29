@@ -79,12 +79,15 @@ export default function ChatBot() {
     const justFinishedStreaming = prevLoadingRef.current && !loading;
     prevLoadingRef.current = loading;
 
+    console.log("[VoiceDebug] speak effect:", { justFinishedStreaming, voiceEnabled, voiceOwner, VOICE_OWNER, loading, msgCount: messages.length });
+
     if (!justFinishedStreaming || !voiceEnabled) return;
     // Allow speak if this component owns voice OR if no specific owner is set
     if (voiceOwner && voiceOwner !== VOICE_OWNER) return;
 
     const lastMsg = messages[messages.length - 1];
     if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
+      console.log("[VoiceDebug] calling speak, agent:", detectAgent(lastMsg.content));
       speak(lastMsg.content, detectAgent(lastMsg.content));
     }
   }, [loading, voiceEnabled, voiceOwner, messages, speak]);
