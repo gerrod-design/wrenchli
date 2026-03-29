@@ -1,7 +1,8 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import type { AgentType } from "@/components/MechanicAvatar";
 
 const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-tts`;
+const AUDIO_UNLOCK_PRIMER = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
 
 /** Strip markdown / agent tags for cleaner speech output. */
 function cleanTextForSpeech(text: string): string {
@@ -22,32 +23,76 @@ export function useTextToSpeech(
   const activeObjectUrlRef = useRef<string | null>(null);
   const lastSpokenRef = useRef("");
   const playbackUnlockedRef = useRef(false);
+  const mountedRef = useRef(true);
+  const speechEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const supportsTTS = true; // Azure TTS is always available
 
+  const clearSpeechEndTimeout = useCallback(() => {
+    if (speechEndTimeoutRef.current) {
+      clearTimeout(speechEndTimeoutRef.current);
+      speechEndTimeoutRef.current = null;
+    }
+  }, []);
+
+  const queueResumeListening = useCallback(() => {
+    clearSpeechEndTimeout();
+    if (!voiceEnabledRef.current) return;
+    speechEndTimeoutRef.current = setTimeout(() => {
+      if (!mountedRef.current || !voiceEnabledRef.current) return;
+      onSpeechEnd();
+    }, 400);
+  }, [clearSpeechEndTimeout, onSpeechEnd, voiceEnabledRef]);
+
+  const setSpeakingSafe = useCallback((value: boolean) => {
+    if (!mountedRef.current) return;
+    setIsSpeaking(value);
+  }, []);
+
   const stopAudio = useCallback(() => {
+    clearSpeechEndTimeout();
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-      audioRef.current = null;
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current.src = "";
     }
     if (activeObjectUrlRef.current) {
       URL.revokeObjectURL(activeObjectUrlRef.current);
       activeObjectUrlRef.current = null;
     }
-    setIsSpeaking(false);
-  }, []);
+    setSpeakingSafe(false);
+  }, [clearSpeechEndTimeout, setSpeakingSafe]);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      clearSpeechEndTimeout();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current.onended = null;
+        audioRef.current.onerror = null;
+        audioRef.current = null;
+      }
+      if (activeObjectUrlRef.current) {
+        URL.revokeObjectURL(activeObjectUrlRef.current);
+        activeObjectUrlRef.current = null;
+      }
+    };
+  }, [clearSpeechEndTimeout]);
 
   const unlockAudioPlayback = useCallback(async () => {
     if (playbackUnlockedRef.current) return true;
     if (typeof window === "undefined") return false;
 
     try {
-      const primer = new Audio(
-        "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=",
-      );
+      const primer = audioRef.current ?? new Audio();
+      audioRef.current = primer;
       // IMPORTANT: keep this unmuted so browsers treat it as real media playback
       // in response to a user gesture and fully unlock subsequent audio.
+      primer.src = AUDIO_UNLOCK_PRIMER;
       primer.muted = false;
       primer.volume = 1;
       if (typeof (primer as HTMLAudioElement & { setAttribute?: (name: string, value: string) => void }).setAttribute === "function") {
@@ -68,7 +113,7 @@ export function useTextToSpeech(
     (text: string, agent: AgentType) => {
       if (typeof window === "undefined" || !window.speechSynthesis) {
         console.error("Browser speech synthesis not available");
-        setIsSpeaking(false);
+        setSpeakingSafe(false);
         return;
       }
 
@@ -79,20 +124,16 @@ export function useTextToSpeech(
       utterance.pitch = 1;
 
       utterance.onend = () => {
-        setIsSpeaking(false);
-        if (voiceEnabledRef.current) {
-          setTimeout(() => {
-            if (voiceEnabledRef.current) onSpeechEnd();
-          }, 400);
-        }
+        setSpeakingSafe(false);
+        queueResumeListening();
       };
       utterance.onerror = () => {
-        setIsSpeaking(false);
+        setSpeakingSafe(false);
       };
 
       window.speechSynthesis.speak(utterance);
     },
-    [voiceEnabledRef, onSpeechEnd],
+    [queueResumeListening, setSpeakingSafe],
   );
 
   const speak = useCallback(
@@ -104,7 +145,7 @@ export function useTextToSpeech(
       lastSpokenRef.current = clean;
 
       stopAudio();
-      setIsSpeaking(true);
+      setSpeakingSafe(true);
 
       try {
         const response = await fetch(TTS_URL, {
@@ -137,16 +178,12 @@ export function useTextToSpeech(
         }
 
         audio.onended = () => {
-          setIsSpeaking(false);
+          setSpeakingSafe(false);
           if (activeObjectUrlRef.current) {
             URL.revokeObjectURL(activeObjectUrlRef.current);
             activeObjectUrlRef.current = null;
           }
-          if (voiceEnabledRef.current) {
-            setTimeout(() => {
-              if (voiceEnabledRef.current) onSpeechEnd();
-            }, 400);
-          }
+          queueResumeListening();
         };
 
         audio.onerror = () => {
@@ -175,7 +212,7 @@ export function useTextToSpeech(
         speakWithBrowserTTS(clean, agent);
       }
     },
-    [voiceEnabledRef, onSpeechEnd, stopAudio, speakWithBrowserTTS, unlockAudioPlayback],
+    [stopAudio, speakWithBrowserTTS, unlockAudioPlayback, setSpeakingSafe, queueResumeListening],
   );
 
   const resetLastSpoken = useCallback(() => {
