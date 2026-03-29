@@ -19,6 +19,7 @@ export function useTextToSpeech(
 ) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const activeObjectUrlRef = useRef<string | null>(null);
   const lastSpokenRef = useRef("");
   const playbackUnlockedRef = useRef(false);
 
@@ -27,7 +28,12 @@ export function useTextToSpeech(
   const stopAudio = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
+      audioRef.current.currentTime = 0;
       audioRef.current = null;
+    }
+    if (activeObjectUrlRef.current) {
+      URL.revokeObjectURL(activeObjectUrlRef.current);
+      activeObjectUrlRef.current = null;
     }
     setIsSpeaking(false);
   }, []);
@@ -40,8 +46,12 @@ export function useTextToSpeech(
       const primer = new Audio(
         "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=",
       );
-      primer.muted = true;
-      primer.volume = 0;
+      // IMPORTANT: keep this unmuted so browsers treat it as real media playback
+      // in response to a user gesture and fully unlock subsequent audio.
+      primer.muted = false;
+      primer.volume = 1;
+      primer.playsInline = true;
+      primer.preload = "auto";
       await primer.play();
       primer.pause();
       playbackUnlockedRef.current = true;
@@ -85,11 +95,9 @@ export function useTextToSpeech(
 
   const speak = useCallback(
     async (text: string, agent: AgentType) => {
-      console.log("[SpeakTrace] speak() called, voiceEnabledRef:", voiceEnabledRef.current, "textLen:", text?.length);
       if (!voiceEnabledRef.current || !text) return;
 
       const clean = cleanTextForSpeech(text);
-      console.log("[SpeakTrace] dedup check:", clean === lastSpokenRef.current, "cleanLen:", clean.length);
       if (!clean || clean === lastSpokenRef.current) return;
       lastSpokenRef.current = clean;
 
@@ -113,13 +121,23 @@ export function useTextToSpeech(
 
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
+        activeObjectUrlRef.current = audioUrl;
+
+        // Reuse one audio element to keep playback unlocked on mobile browsers.
+        const audio = audioRef.current ?? new Audio();
         audioRef.current = audio;
+        audio.src = audioUrl;
+        audio.muted = false;
+        audio.volume = 1;
+        audio.preload = "auto";
+        audio.playsInline = true;
 
         audio.onended = () => {
           setIsSpeaking(false);
-          URL.revokeObjectURL(audioUrl);
-          audioRef.current = null;
+          if (activeObjectUrlRef.current) {
+            URL.revokeObjectURL(activeObjectUrlRef.current);
+            activeObjectUrlRef.current = null;
+          }
           if (voiceEnabledRef.current) {
             setTimeout(() => {
               if (voiceEnabledRef.current) onSpeechEnd();
@@ -128,19 +146,32 @@ export function useTextToSpeech(
         };
 
         audio.onerror = () => {
-          URL.revokeObjectURL(audioUrl);
-          audioRef.current = null;
+          if (activeObjectUrlRef.current) {
+            URL.revokeObjectURL(activeObjectUrlRef.current);
+            activeObjectUrlRef.current = null;
+          }
           console.warn("Cloud TTS playback failed, falling back to browser speech synthesis");
           speakWithBrowserTTS(clean, agent);
         };
 
-        await audio.play();
+        try {
+          await audio.play();
+        } catch (playErr) {
+          // Mobile browsers can still reject play() if unlock wasn't fully registered.
+          // Retry once after explicit unlock before falling back.
+          const unlocked = await unlockAudioPlayback();
+          if (unlocked) {
+            await audio.play();
+          } else {
+            throw playErr;
+          }
+        }
       } catch (err) {
         console.warn("Cloud TTS failed, falling back to browser speech synthesis:", err);
         speakWithBrowserTTS(clean, agent);
       }
     },
-    [voiceEnabledRef, onSpeechEnd, stopAudio, speakWithBrowserTTS],
+    [voiceEnabledRef, onSpeechEnd, stopAudio, speakWithBrowserTTS, unlockAudioPlayback],
   );
 
   const resetLastSpoken = useCallback(() => {
