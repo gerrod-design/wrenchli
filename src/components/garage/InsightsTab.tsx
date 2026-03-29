@@ -55,11 +55,8 @@ export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: 
   const mileage = cloudVehicle?.current_mileage;
   const isReliable = RELIABLE_BRANDS.includes(vehicle.make);
 
-  // Generate insights
-  const knownIssues = KNOWN_ISSUES[vehicle.make] || [];
-  const relevantIssues = mileage
-    ? knownIssues.filter((i) => mileage >= i.minMiles - 10000 && mileage <= i.maxMiles)
-    : [];
+  // Generate insights using shared known issues database
+  const { relevant: relevantIssues, upcoming: upcomingIssues } = getRelevantIssues(vehicle.make, mileage);
 
   // Ownership phase
   const getOwnershipPhase = () => {
