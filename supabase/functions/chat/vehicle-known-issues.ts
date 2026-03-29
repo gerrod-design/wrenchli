@@ -299,6 +299,29 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Transfer case actuator failure (4WD models)", minMiles: 60000, maxMiles: 110000, preventiveCost: "N/A", repairCost: "$400–900", severity: "medium", systems: "drivetrain" },
     { issue: "Coil pack failure (Kizashi)", minMiles: 50000, maxMiles: 100000, preventiveCost: "N/A", repairCost: "$200–400", severity: "medium", systems: "engine" },
   ],
+  Bugatti: [
+    { issue: "Turbocharger replacement (quad-turbo W16)", minMiles: 5000, maxMiles: 20000, preventiveCost: "$2,000–5,000 (inspection)", repairCost: "$30,000–60,000", severity: "high", systems: "engine" },
+    { issue: "Gearbox mechatronic unit service (DSG)", minMiles: 5000, maxMiles: 15000, preventiveCost: "$3,000–5,000 (fluid service)", repairCost: "$20,000–40,000", severity: "high", systems: "transmission" },
+    { issue: "Carbon-ceramic brake rotor wear", minMiles: 5000, maxMiles: 15000, preventiveCost: "$1,000–2,000 (inspection)", repairCost: "$30,000–50,000 (set)", severity: "high", systems: "brakes" },
+    { issue: "Hydraulic suspension system service", minMiles: 5000, maxMiles: 15000, preventiveCost: "$1,000–2,000 (fluid service)", repairCost: "$10,000–25,000", severity: "high", systems: "suspension" },
+  ],
+  Koenigsegg: [
+    { issue: "Hydraulic door actuator service", minMiles: 5000, maxMiles: 20000, preventiveCost: "$500–1,000 (inspection)", repairCost: "$5,000–15,000", severity: "medium", systems: "body" },
+    { issue: "Carbon fiber body panel repair (impact damage)", minMiles: 0, maxMiles: 50000, preventiveCost: "$500–1,000 (PPF wrap)", repairCost: "$10,000–50,000+", severity: "high", systems: "body" },
+    { issue: "Dry-sump oiling system seal leak", minMiles: 10000, maxMiles: 30000, preventiveCost: "$500–1,000 (inspection)", repairCost: "$3,000–8,000", severity: "medium", systems: "engine" },
+  ],
+  Pagani: [
+    { issue: "AMG V12 engine service (specialist required)", minMiles: 5000, maxMiles: 15000, preventiveCost: "$3,000–5,000 (scheduled service)", repairCost: "$15,000–40,000", severity: "high", systems: "engine" },
+    { issue: "Sequential gearbox actuator wear", minMiles: 5000, maxMiles: 15000, preventiveCost: "$1,000–2,000 (fluid service)", repairCost: "$10,000–25,000", severity: "high", systems: "transmission" },
+    { issue: "Carbon-titanium body panel repair", minMiles: 0, maxMiles: 50000, preventiveCost: "$1,000–2,000 (PPF wrap)", repairCost: "$20,000–100,000+", severity: "high", systems: "body" },
+  ],
+  "Rolls-Royce": [
+    { issue: "Air suspension strut / compressor failure", minMiles: 40000, maxMiles: 80000, preventiveCost: "$200–400 (inspection)", repairCost: "$4,000–8,000 per corner", severity: "high", systems: "suspension" },
+    { issue: "Self-closing door mechanism failure", minMiles: 30000, maxMiles: 70000, preventiveCost: "N/A", repairCost: "$2,000–5,000", severity: "medium", systems: "body" },
+    { issue: "Starlight headliner LED / fiber optic failure", minMiles: 30000, maxMiles: 80000, preventiveCost: "N/A", repairCost: "$3,000–8,000", severity: "low", systems: "electrical" },
+    { issue: "Spirit of Ecstasy retraction mechanism failure", minMiles: 30000, maxMiles: 70000, preventiveCost: "N/A", repairCost: "$1,500–3,500", severity: "low", systems: "body" },
+    { issue: "BMW N74 V12 coil pack / injector issues", minMiles: 40000, maxMiles: 80000, preventiveCost: "$200–400", repairCost: "$1,000–3,000", severity: "medium", systems: "engine" },
+  ],
 };
 
 /**
