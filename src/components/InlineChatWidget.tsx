@@ -77,6 +77,9 @@ export default function InlineChatWidget() {
 
   // Speak once when a response finishes streaming for the active voice owner.
   const prevLoadingRef = useRef(false);
+  const speakRef = useRef(speak);
+  speakRef.current = speak;
+
   useEffect(() => {
     const justFinishedStreaming = prevLoadingRef.current && !loading;
     prevLoadingRef.current = loading;
@@ -85,9 +88,9 @@ export default function InlineChatWidget() {
 
     const lastMsg = messages[messages.length - 1];
     if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
-      speak(lastMsg.content, detectAgent(lastMsg.content));
+      speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
     }
-  }, [loading, voiceEnabled, voiceOwner, messages, speak]);
+  }, [loading, voiceEnabled, voiceOwner, messages]);
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {
