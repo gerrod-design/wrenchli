@@ -37,7 +37,7 @@ export function useKnownIssues(make: string, mileage?: number | null) {
 
         if (error || !data || data.length === 0) throw new Error("No DB data");
 
-        const dbIssues: KnownIssue[] = (data as DbKnownIssue[]).map((d) => ({
+        const dbIssues: KnownIssue[] = (data as unknown as DbKnownIssue[]).map((d) => ({
           issue: d.description,
           minMiles: d.mileage_min || 0,
           maxMiles: d.mileage_max || 999999,
