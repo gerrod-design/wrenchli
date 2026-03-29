@@ -38,7 +38,10 @@ export function useSpeechRecognition() {
         setVoiceOwner(resolvedOwner);
       }
 
-      if (!supportsSTT || isListening || !voiceEnabledRef.current) return false;
+      if (!supportsSTT || isListening || !voiceEnabledRef.current) {
+        console.log("[VoiceDebug:STT] startListening bail → supportsSTT:", supportsSTT, "isListening:", isListening, "voiceEnabled:", voiceEnabledRef.current);
+        return false;
+      }
       stopAudio();
 
       try {
@@ -71,6 +74,7 @@ export function useSpeechRecognition() {
 
         recognition.onstart = () => {
           setIsListening(true);
+          console.log("[VoiceDebug:STT] recognition.onstart fired");
           resetSilenceTimer();
         };
         recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -81,12 +85,13 @@ export function useSpeechRecognition() {
           resetSilenceTimer();
         };
         recognition.onerror = (event: any) => {
-          console.error("Speech recognition error:", event?.error ?? event);
+          console.error("[VoiceDebug:STT] recognition.onerror:", event?.error ?? event);
           clearSilenceTimer();
           setIsListening(false);
           setTranscript("");
         };
         recognition.onend = () => {
+          console.log("[VoiceDebug:STT] recognition.onend fired");
           clearSilenceTimer();
           setIsListening(false);
         };
@@ -95,7 +100,7 @@ export function useSpeechRecognition() {
         recognition.start();
         return true;
       } catch (err) {
-        console.error("Failed to start speech recognition:", err);
+        console.error("[VoiceDebug:STT] Failed to start speech recognition:", err);
         clearSilenceTimer();
         setIsListening(false);
         return false;
