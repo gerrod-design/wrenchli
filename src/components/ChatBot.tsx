@@ -73,26 +73,32 @@ export default function ChatBot() {
     startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
-  // Speak once when a response finishes streaming for the active voice owner.
-  const prevLoadingRef = useRef(false);
+  // Speak once after each completed streaming response for the active voice owner.
+  const shouldSpeakAfterLoadRef = useRef(false);
   const speakRef = useRef(speak);
   speakRef.current = speak;
 
   useEffect(() => {
-    const justFinishedStreaming = prevLoadingRef.current && !loading;
-    prevLoadingRef.current = loading;
+    if (loading) {
+      shouldSpeakAfterLoadRef.current = true;
+      return;
+    }
 
-    console.log("[SpeakTrace] effect:", { justFinishedStreaming, voiceEnabled, voiceOwner, VOICE_OWNER, loading, msgCount: messages.length });
-
-    if (!justFinishedStreaming || !voiceEnabled) return;
-    // Allow speak if this component owns voice OR if no specific owner is set
-    if (voiceOwner && voiceOwner !== VOICE_OWNER) return;
+    if (!shouldSpeakAfterLoadRef.current) return;
+    if (!voiceEnabled) {
+      shouldSpeakAfterLoadRef.current = false;
+      return;
+    }
+    // Allow speak if this component owns voice OR if no specific owner is set.
+    if (voiceOwner && voiceOwner !== VOICE_OWNER) {
+      shouldSpeakAfterLoadRef.current = false;
+      return;
+    }
 
     const lastMsg = messages[messages.length - 1];
-    console.log("[SpeakTrace] lastMsg role:", lastMsg?.role, "len:", lastMsg?.content?.length);
     if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
-      console.log("[SpeakTrace] calling speak()");
-      speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
+      shouldSpeakAfterLoadRef.current = false;
+      void speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
     }
   }, [loading, voiceEnabled, voiceOwner, messages]);
 
