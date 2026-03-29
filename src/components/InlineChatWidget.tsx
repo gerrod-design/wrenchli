@@ -228,7 +228,20 @@ export default function InlineChatWidget() {
       await streamChat({
         messages: [...messages, userMsg],
         onDelta: upsert,
-        onDone: () => setLoading(false),
+        onDone: () => {
+          setLoading(false);
+          // Auto-follow-up when Mike announces a handoff to another agent
+          // so the new specialist responds without waiting for user input
+          const finalText = assistantSoFar;
+          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Priya|Sam|Jess|Kai)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll) (?:going to )?(?:bring|connect|hand)/i.test(finalText);
+          const responseAgent = detectAgent(finalText);
+          if (announcesHandoff && responseAgent === "mike") {
+            // Mike announced the handoff but hasn't switched yet — auto-trigger
+            setTimeout(() => {
+              sendRef.current("ok");
+            }, 800);
+          }
+        },
         onError: (msg) => { upsert(msg); setLoading(false); },
       });
     } catch {
@@ -323,6 +336,14 @@ export default function InlineChatWidget() {
           {/* Chat messages area */}
           <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px" }}>
             {messages.map((m, i) => {
+              // Hide auto-handoff "ok" messages from user
+              if (m.role === "user" && /^ok$/i.test(m.content.trim())) {
+                const nextMsg = messages[i + 1];
+                const prevMsg = messages[i - 1];
+                if (prevMsg?.role === "assistant" && nextMsg?.role === "assistant" && detectAgent(prevMsg.content) !== detectAgent(nextMsg.content)) {
+                  return null;
+                }
+              }
               // Detect agent handoff
               const currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
               const prevAssistant = messages.slice(0, i).reverse().find((msg) => msg.role === "assistant");
