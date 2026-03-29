@@ -79,7 +79,9 @@ export default function ChatBot() {
     const justFinishedStreaming = prevLoadingRef.current && !loading;
     prevLoadingRef.current = loading;
 
-    if (!justFinishedStreaming || !voiceEnabled || voiceOwner !== VOICE_OWNER) return;
+    if (!justFinishedStreaming || !voiceEnabled) return;
+    // Allow speak if this component owns voice OR if no specific owner is set
+    if (voiceOwner && voiceOwner !== VOICE_OWNER) return;
 
     const lastMsg = messages[messages.length - 1];
     if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
