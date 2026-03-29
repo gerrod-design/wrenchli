@@ -260,6 +260,45 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Door dihedral hinge strut weakening", minMiles: 15000, maxMiles: 40000, preventiveCost: "N/A", repairCost: "$1,500–3,500", severity: "medium", systems: "body" },
     { issue: "Infotainment / IRIS system freezing", minMiles: 10000, maxMiles: 40000, preventiveCost: "N/A", repairCost: "$500–2,000", severity: "low", systems: "electrical" },
   ],
+  Isuzu: [
+    { issue: "Fuel injector failure (diesel models)", minMiles: 80000, maxMiles: 150000, preventiveCost: "$100–200 (fuel additive)", repairCost: "$800–2,000", severity: "high", systems: "engine" },
+    { issue: "4WD actuator / shift-on-the-fly failure", minMiles: 60000, maxMiles: 120000, preventiveCost: "N/A", repairCost: "$400–900", severity: "medium", systems: "drivetrain" },
+    { issue: "Exhaust manifold cracking (Rodeo, Trooper)", minMiles: 80000, maxMiles: 130000, preventiveCost: "N/A", repairCost: "$400–800", severity: "medium", systems: "exhaust" },
+  ],
+  Oldsmobile: [
+    { issue: "Intake manifold gasket leak (3.1L, 3.4L, 3.8L V6)", minMiles: 60000, maxMiles: 120000, preventiveCost: "$100–200 (coolant flush)", repairCost: "$500–1,000", severity: "high", systems: "engine" },
+    { issue: "Transmission pressure control solenoid failure", minMiles: 70000, maxMiles: 130000, preventiveCost: "$200–400 (fluid service)", repairCost: "$500–1,200", severity: "medium", systems: "transmission" },
+    { issue: "Power window motor / regulator failure", minMiles: 60000, maxMiles: 120000, preventiveCost: "N/A", repairCost: "$200–400", severity: "low", systems: "electrical" },
+  ],
+  Pontiac: [
+    { issue: "Intake manifold gasket leak (3.1L, 3.4L, 3.8L V6)", minMiles: 60000, maxMiles: 120000, preventiveCost: "$100–200 (coolant flush)", repairCost: "$500–1,000", severity: "high", systems: "engine" },
+    { issue: "Head gasket failure (2.2L/2.4L Ecotec)", minMiles: 80000, maxMiles: 140000, preventiveCost: "$100–200 (coolant monitoring)", repairCost: "$1,200–2,500", severity: "high", systems: "engine" },
+    { issue: "Power steering pump whine/failure", minMiles: 70000, maxMiles: 120000, preventiveCost: "$50–100 (fluid flush)", repairCost: "$300–700", severity: "medium", systems: "steering" },
+    { issue: "Rear axle bearing noise (GTO, G8)", minMiles: 60000, maxMiles: 100000, preventiveCost: "N/A", repairCost: "$400–800", severity: "medium", systems: "drivetrain" },
+  ],
+  Saab: [
+    { issue: "DI (Direct Ignition) cassette failure", minMiles: 60000, maxMiles: 120000, preventiveCost: "N/A", repairCost: "$300–600", severity: "high", systems: "engine" },
+    { issue: "Turbo sludge / wastegate failure", minMiles: 60000, maxMiles: 110000, preventiveCost: "$100–200 (oil changes on schedule)", repairCost: "$1,000–2,500", severity: "high", systems: "engine" },
+    { issue: "Crankshaft position sensor failure", minMiles: 70000, maxMiles: 130000, preventiveCost: "N/A", repairCost: "$200–500", severity: "medium", systems: "electrical" },
+    { issue: "SID (Saab Information Display) pixel loss", minMiles: 40000, maxMiles: 100000, preventiveCost: "N/A", repairCost: "$100–300 (repair kit)", severity: "low", systems: "electrical" },
+  ],
+  Saturn: [
+    { issue: "Transmission failure (TAAT / CVT)", minMiles: 80000, maxMiles: 140000, preventiveCost: "$200–400 (fluid service)", repairCost: "$1,500–3,000", severity: "high", systems: "transmission" },
+    { issue: "Coolant leak (intake manifold, water pump)", minMiles: 70000, maxMiles: 120000, preventiveCost: "$100–200", repairCost: "$400–900", severity: "medium", systems: "cooling" },
+    { issue: "Power steering rack leak (Vue, Aura)", minMiles: 60000, maxMiles: 110000, preventiveCost: "$50–100", repairCost: "$500–1,000", severity: "medium", systems: "steering" },
+  ],
+  Scion: [
+    { issue: "Oil consumption (2AZ-FE 2.4L in tC)", minMiles: 60000, maxMiles: 120000, preventiveCost: "$100–200 (frequent checks)", repairCost: "$2,000–4,000 (piston rings)", severity: "high", systems: "engine" },
+    { issue: "Throw-out bearing noise (manual transmission)", minMiles: 40000, maxMiles: 90000, preventiveCost: "N/A", repairCost: "$600–1,200", severity: "medium", systems: "transmission" },
+    { issue: "Dashboard rattle (xB, xD)", minMiles: 30000, maxMiles: 80000, preventiveCost: "N/A", repairCost: "$100–300", severity: "low", systems: "interior" },
+    { issue: "Rear wheel bearing noise", minMiles: 60000, maxMiles: 100000, preventiveCost: "N/A", repairCost: "$300–600", severity: "medium", systems: "drivetrain" },
+  ],
+  Suzuki: [
+    { issue: "Head gasket failure (2.5L/2.7L V6 — Grand Vitara, XL-7)", minMiles: 80000, maxMiles: 140000, preventiveCost: "$100–200 (coolant monitoring)", repairCost: "$1,500–3,000", severity: "high", systems: "engine" },
+    { issue: "Timing chain tensioner rattle (J-series V6)", minMiles: 80000, maxMiles: 130000, preventiveCost: "$100–200 (oil changes)", repairCost: "$1,000–2,500", severity: "high", systems: "engine" },
+    { issue: "Transfer case actuator failure (4WD models)", minMiles: 60000, maxMiles: 110000, preventiveCost: "N/A", repairCost: "$400–900", severity: "medium", systems: "drivetrain" },
+    { issue: "Coil pack failure (Kizashi)", minMiles: 50000, maxMiles: 100000, preventiveCost: "N/A", repairCost: "$200–400", severity: "medium", systems: "engine" },
+  ],
 };
 
 /**
