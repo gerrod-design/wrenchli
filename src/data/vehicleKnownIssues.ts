@@ -141,6 +141,49 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "ETM (Electronic Throttle Module) failure (older models)", minMiles: 60000, maxMiles: 120000, preventiveCost: "N/A", repairCost: "$400–900", severity: "medium", systems: "engine" },
     { issue: "Transmission solenoid issues", minMiles: 80000, maxMiles: 130000, preventiveCost: "$200–400 (fluid service)", repairCost: "$800–2,000", severity: "medium", systems: "transmission" },
   ],
+  Genesis: [
+    { issue: "Turbo wastegate rattle (3.3T V6)", minMiles: 40000, maxMiles: 80000, preventiveCost: "N/A", repairCost: "$800–1,500", severity: "medium", systems: "engine" },
+    { issue: "Infotainment system freezing/rebooting", minMiles: 20000, maxMiles: 60000, preventiveCost: "N/A", repairCost: "$500–1,200 (module replacement)", severity: "low", systems: "electrical" },
+    { issue: "Suspension bushing wear (G70, G80)", minMiles: 50000, maxMiles: 90000, preventiveCost: "$100–200 (inspection)", repairCost: "$400–800", severity: "medium", systems: "suspension" },
+  ],
+  "Land Rover": [
+    { issue: "Air suspension compressor failure", minMiles: 50000, maxMiles: 100000, preventiveCost: "$100–200 (inspection)", repairCost: "$1,500–3,500", severity: "high", systems: "suspension" },
+    { issue: "Timing chain tensioner failure (AJ-V6/V8)", minMiles: 60000, maxMiles: 110000, preventiveCost: "$200–400 (inspection)", repairCost: "$3,000–6,000", severity: "high", systems: "engine" },
+    { issue: "Coolant leak (crossover pipe / thermostat housing)", minMiles: 50000, maxMiles: 90000, preventiveCost: "$100–200", repairCost: "$800–1,500", severity: "high", systems: "cooling" },
+    { issue: "Terrain Response module failure", minMiles: 60000, maxMiles: 120000, preventiveCost: "N/A", repairCost: "$600–1,200", severity: "medium", systems: "electrical" },
+    { issue: "Sunroof drain blockage causing water intrusion", minMiles: 40000, maxMiles: 100000, preventiveCost: "$50–100 (drain cleaning)", repairCost: "$500–2,000", severity: "medium", systems: "body" },
+  ],
+  Lincoln: [
+    { issue: "Cam phaser rattle (shared Ford EcoBoost)", minMiles: 60000, maxMiles: 120000, preventiveCost: "$100–200 (oil changes)", repairCost: "$2,000–4,000", severity: "high", systems: "engine" },
+    { issue: "Transmission shudder (10-speed, shared Ford 10R80)", minMiles: 20000, maxMiles: 70000, preventiveCost: "$200–400 (fluid flush)", repairCost: "$2,000–4,500", severity: "high", systems: "transmission" },
+    { issue: "Air suspension strut leak (Continental, Navigator)", minMiles: 60000, maxMiles: 110000, preventiveCost: "$100–200 (inspection)", repairCost: "$1,200–2,500 per corner", severity: "high", systems: "suspension" },
+    { issue: "Door handle electronics failure", minMiles: 40000, maxMiles: 80000, preventiveCost: "N/A", repairCost: "$300–700", severity: "low", systems: "electrical" },
+  ],
+  Lucid: [
+    { issue: "12V auxiliary battery drain", minMiles: 10000, maxMiles: 50000, preventiveCost: "N/A", repairCost: "$150–300", severity: "low", systems: "electrical" },
+    { issue: "Door alignment / panel gap inconsistency", minMiles: 0, maxMiles: 30000, preventiveCost: "N/A", repairCost: "$200–600 (warranty adjustment)", severity: "low", systems: "body" },
+    { issue: "Software-related charging interruptions", minMiles: 0, maxMiles: 50000, preventiveCost: "N/A (OTA updates)", repairCost: "$0–500 (service visit)", severity: "medium", systems: "electrical" },
+    { issue: "Suspension damper calibration issues", minMiles: 15000, maxMiles: 50000, preventiveCost: "N/A", repairCost: "$800–2,000", severity: "medium", systems: "suspension" },
+  ],
+  Mitsubishi: [
+    { issue: "CVT transmission shudder/failure (Outlander, Eclipse Cross)", minMiles: 60000, maxMiles: 110000, preventiveCost: "$200–400 (fluid service)", repairCost: "$3,000–5,500", severity: "high", systems: "transmission" },
+    { issue: "Timing chain stretch (4B11 engine)", minMiles: 80000, maxMiles: 130000, preventiveCost: "$100–200 (oil changes)", repairCost: "$1,500–3,000", severity: "high", systems: "engine" },
+    { issue: "AC compressor failure", minMiles: 70000, maxMiles: 120000, preventiveCost: "N/A", repairCost: "$600–1,200", severity: "medium", systems: "HVAC" },
+    { issue: "Rear differential seal leak (AWD models)", minMiles: 60000, maxMiles: 100000, preventiveCost: "$80–150 (fluid change)", repairCost: "$400–800", severity: "medium", systems: "drivetrain" },
+  ],
+  Porsche: [
+    { issue: "IMS bearing failure (996/997 flat-six)", minMiles: 40000, maxMiles: 100000, preventiveCost: "$2,000–3,000 (IMS retrofit)", repairCost: "$8,000–20,000 (engine rebuild)", severity: "high", systems: "engine" },
+    { issue: "Coolant pipe leak (Cayenne, Panamera V8)", minMiles: 60000, maxMiles: 100000, preventiveCost: "$100–200", repairCost: "$1,500–3,000", severity: "high", systems: "cooling" },
+    { issue: "PDK mechatronic unit issues", minMiles: 70000, maxMiles: 120000, preventiveCost: "$300–500 (fluid service)", repairCost: "$3,000–6,000", severity: "high", systems: "transmission" },
+    { issue: "Air-cooled cylinder bore scoring (older 911)", minMiles: 60000, maxMiles: 120000, preventiveCost: "$200–400 (oil analysis)", repairCost: "$10,000–25,000 (engine rebuild)", severity: "high", systems: "engine" },
+    { issue: "HVAC blower motor / regulator failure", minMiles: 60000, maxMiles: 100000, preventiveCost: "N/A", repairCost: "$500–1,000", severity: "low", systems: "HVAC" },
+  ],
+  Rivian: [
+    { issue: "Drive unit noise / whine", minMiles: 10000, maxMiles: 50000, preventiveCost: "N/A", repairCost: "$2,000–5,000 (motor replacement)", severity: "medium", systems: "drivetrain" },
+    { issue: "Tonneau cover motor failure (R1T)", minMiles: 5000, maxMiles: 40000, preventiveCost: "N/A", repairCost: "$500–1,500", severity: "low", systems: "body" },
+    { issue: "12V battery drain / BMS issues", minMiles: 10000, maxMiles: 50000, preventiveCost: "N/A", repairCost: "$150–400", severity: "medium", systems: "electrical" },
+    { issue: "Infotainment screen lag / reboot loops", minMiles: 0, maxMiles: 40000, preventiveCost: "N/A (OTA updates)", repairCost: "$0–800", severity: "low", systems: "electrical" },
+  ],
 };
 
 /** Reliable brands for the brand reliability insight */
