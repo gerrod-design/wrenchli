@@ -236,7 +236,7 @@ export function useVoiceChat() {
       console.warn("Cloud TTS failed, falling back to browser speech synthesis:", err);
       speakWithBrowserTTS(clean, agent);
     }
-  }, [voiceEnabled, startListening, speakWithBrowserTTS]);
+  }, [startListening, speakWithBrowserTTS]);
 
   const stopSpeaking = useCallback(() => {
     if (audioRef.current) {
