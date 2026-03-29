@@ -172,7 +172,7 @@ export function useVoiceChat() {
   }, [startListening]);
 
   const speak = useCallback(async (text: string, agent: AgentType) => {
-    if (!voiceEnabled || !text) return;
+    if (!voiceEnabledRef.current || !text) return;
     // Strip markdown formatting for cleaner speech
     const clean = text
       .replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "")
