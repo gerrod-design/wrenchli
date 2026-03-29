@@ -380,8 +380,7 @@ export default function ChatBot() {
                         if (turningOn) {
                           const unlocked = await unlockAudioPlayback();
                           if (!unlocked) {
-                            toast.error("Audio playback is blocked. Tap Voice again after interacting with the page.");
-                            return;
+                            toast.warning("Speaker audio may stay muted for now, but voice mode is still enabled.");
                           }
                         }
                         toggleVoice();
@@ -750,8 +749,7 @@ export default function ChatBot() {
                             } else {
                               const unlocked = await unlockAudioPlayback();
                               if (!unlocked) {
-                                toast.error("Audio playback is blocked. Tap the mic again.");
-                                return;
+                                toast.warning("Mic is on. If replies are muted, tap Voice once more to unlock speaker audio.");
                               }
                               const started = startListening(VOICE_OWNER);
                               if (!started) {
