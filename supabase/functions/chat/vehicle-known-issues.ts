@@ -415,6 +415,24 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Coil spring snap (Mégane / Scénic)", minMiles: 40000, maxMiles: 90000, preventiveCost: "$50–100 (inspection)", repairCost: "$200–500 per corner", severity: "medium", systems: "suspension" },
     { issue: "Key card reader malfunction", minMiles: 30000, maxMiles: 70000, preventiveCost: "N/A", repairCost: "$300–700", severity: "medium", systems: "electrical" },
   ],
+  Studebaker: [
+    { issue: "Generator-to-alternator conversion issues", minMiles: 0, maxMiles: 200000, preventiveCost: "$50–100 (wiring inspection)", repairCost: "$200–500", severity: "medium", systems: "electrical" },
+    { issue: "Vacuum-operated windshield wiper failure", minMiles: 0, maxMiles: 200000, preventiveCost: "$30–60 (hose inspection)", repairCost: "$100–300", severity: "low", systems: "body" },
+    { issue: "King pin wear (front suspension)", minMiles: 30000, maxMiles: 80000, preventiveCost: "$50–100 (greasing)", repairCost: "$300–700", severity: "medium", systems: "suspension" },
+    { issue: "Overdrive unit failure (Borg-Warner)", minMiles: 40000, maxMiles: 100000, preventiveCost: "$50–100 (fluid service)", repairCost: "$400–1,000", severity: "medium", systems: "transmission" },
+  ],
+  "International Harvester": [
+    { issue: "Transfer case seal leak (Scout / Scout II)", minMiles: 30000, maxMiles: 80000, preventiveCost: "$50–100 (inspection)", repairCost: "$300–700", severity: "medium", systems: "drivetrain" },
+    { issue: "Diesel injection pump wear (DT-series)", minMiles: 60000, maxMiles: 120000, preventiveCost: "$100–200 (fuel additive)", repairCost: "$800–2,000", severity: "high", systems: "fuel" },
+    { issue: "Leaf spring center bolt shear", minMiles: 40000, maxMiles: 100000, preventiveCost: "$30–60 (inspection)", repairCost: "$200–500", severity: "medium", systems: "suspension" },
+    { issue: "Cab mount rust-through (Travelall / pickup)", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (rust treatment)", repairCost: "$1,000–4,000", severity: "high", systems: "body" },
+  ],
+  Nash: [
+    { issue: "Unibody floor pan rust (Rambler / Metropolitan)", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (undercoating)", repairCost: "$1,000–5,000", severity: "high", systems: "body" },
+    { issue: "Weather Eye heater valve leak", minMiles: 20000, maxMiles: 60000, preventiveCost: "$30–60 (inspection)", repairCost: "$100–300", severity: "low", systems: "cooling" },
+    { issue: "Hydra-Matic / overdrive shift linkage wear", minMiles: 30000, maxMiles: 80000, preventiveCost: "$50–100 (adjustment)", repairCost: "$200–600", severity: "medium", systems: "transmission" },
+    { issue: "Dual ignition system point wear (Ambassador)", minMiles: 10000, maxMiles: 30000, preventiveCost: "$20–40 (point replacement)", repairCost: "$100–250", severity: "low", systems: "engine" },
+  ],
 };
 
 /**
