@@ -457,6 +457,31 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Body tub floor rust-through (CJ / wagon)", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (rust treatment)", repairCost: "$800–3,000", severity: "high", systems: "body" },
     { issue: "Ross steering box play / wander", minMiles: 30000, maxMiles: 70000, preventiveCost: "$30–60 (adjustment)", repairCost: "$200–600", severity: "medium", systems: "steering" },
   ],
+  Crosley: [
+    { issue: "COBRA copper-brazed block cracking", minMiles: 20000, maxMiles: 60000, preventiveCost: "$50–100 (coolant maintenance)", repairCost: "$500–1,500 (block replacement)", severity: "high", systems: "engine" },
+    { issue: "6-volt electrical system grounding issues", minMiles: 0, maxMiles: 200000, preventiveCost: "$20–40 (ground strap refresh)", repairCost: "$100–300", severity: "medium", systems: "electrical" },
+    { issue: "Disc brake caliper seizure (early Goodyear-Hawley)", minMiles: 10000, maxMiles: 40000, preventiveCost: "$30–60 (rebuild kit)", repairCost: "$150–400", severity: "medium", systems: "brakes" },
+  ],
+  Tucker: [
+    { issue: "Franklin flat-six oil cooler leak", minMiles: 15000, maxMiles: 50000, preventiveCost: "$50–100 (inspection)", repairCost: "$300–800", severity: "medium", systems: "engine" },
+    { issue: "Pre-select Tuckermatic transmission linkage wear", minMiles: 10000, maxMiles: 40000, preventiveCost: "$30–60 (adjustment)", repairCost: "$500–2,000", severity: "high", systems: "transmission" },
+    { issue: "Cyclops headlight motor failure", minMiles: 10000, maxMiles: 40000, preventiveCost: "$30–60 (lubrication)", repairCost: "$200–600", severity: "low", systems: "electrical" },
+  ],
+  Cord: [
+    { issue: "Supercharged Lycoming 812 boost leak", minMiles: 15000, maxMiles: 50000, preventiveCost: "$50–100 (gasket inspection)", repairCost: "$400–1,200", severity: "high", systems: "engine" },
+    { issue: "Front-wheel-drive CV joint wear", minMiles: 20000, maxMiles: 60000, preventiveCost: "$30–60 (greasing)", repairCost: "$300–800", severity: "medium", systems: "drivetrain" },
+    { issue: "Electric pre-selector gearbox solenoid failure", minMiles: 15000, maxMiles: 50000, preventiveCost: "$30–60 (cleaning)", repairCost: "$500–1,500", severity: "high", systems: "transmission" },
+  ],
+  Auburn: [
+    { issue: "Lycoming straight-eight oil pump wear", minMiles: 25000, maxMiles: 70000, preventiveCost: "$50–100 (oil monitoring)", repairCost: "$300–900", severity: "medium", systems: "engine" },
+    { issue: "Columbia two-speed rear axle engagement issues", minMiles: 20000, maxMiles: 60000, preventiveCost: "$30–60 (adjustment)", repairCost: "$300–800", severity: "medium", systems: "drivetrain" },
+    { issue: "Hydraulic brake master cylinder leak (Lockheed)", minMiles: 15000, maxMiles: 50000, preventiveCost: "$30–60 (fluid flush)", repairCost: "$200–500", severity: "high", systems: "brakes" },
+  ],
+  Duesenberg: [
+    { issue: "DOHC straight-eight valve adjustment drift", minMiles: 5000, maxMiles: 20000, preventiveCost: "$100–300 (adjustment)", repairCost: "$500–2,000", severity: "medium", systems: "engine" },
+    { issue: "Supercharger seal leak (SJ models)", minMiles: 10000, maxMiles: 40000, preventiveCost: "$100–200 (inspection)", repairCost: "$1,000–5,000", severity: "high", systems: "engine" },
+    { issue: "Chassis lubrication system (bijur) blockage", minMiles: 5000, maxMiles: 25000, preventiveCost: "$50–100 (flushing)", repairCost: "$300–1,000", severity: "medium", systems: "chassis" },
+  ],
 };
 
 /** Reliable brands for the brand reliability insight */
