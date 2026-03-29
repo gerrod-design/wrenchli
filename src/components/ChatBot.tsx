@@ -507,9 +507,19 @@ export default function ChatBot() {
                         return null;
                       }
                     }
-                    const currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
+                    let currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
                     const prevAssistant = messages.slice(0, i).reverse().find(msg => msg.role === "assistant");
                     const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
+                    const isLastMsg = i === messages.length - 1;
+                    if (isLastMsg && loading && currentAgent === "mike" && prevAgent && prevAgent !== "mike") {
+                      currentAgent = prevAgent;
+                    } else if (isLastMsg && loading && currentAgent === "mike" && prevAssistant) {
+                      const prevText = typeof prevAssistant.content === "string" ? prevAssistant.content : "";
+                      const handoffMatch = prevText.match(/\b(Priya|Sam|Jess|Kai)\b/i);
+                      if (handoffMatch) {
+                        currentAgent = handoffMatch[1].toLowerCase() as AgentType;
+                      }
+                    }
                     const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
                     const agentName = getAgentMeta(currentAgent).name;
 
@@ -532,13 +542,13 @@ export default function ChatBot() {
                     <div className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                       {m.role === "assistant" && (
                         <motion.div
-                          key={`${i}-${detectAgent(m.content)}`}
+                          key={`${i}-${currentAgent}`}
                           initial={{ scale: 0.7, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ type: "spring", stiffness: 400, damping: 20, duration: 0.3 }}
                           className="relative shrink-0"
                         >
-                          <MechanicAvatar size={32} className="mt-0.5" agent={detectAgent(m.content)} />
+                          <MechanicAvatar size={32} className="mt-0.5" agent={currentAgent ?? "mike"} />
                           {voiceEnabled && isSpeaking && i === messages.length - 1 && (
                             <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
                               <Volume2 className="h-2.5 w-2.5 text-primary-foreground animate-pulse" />
