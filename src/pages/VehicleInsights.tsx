@@ -16,6 +16,16 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VehicleIdentifier, { type VehicleData } from "@/components/vehicle/VehicleIdentifier";
 
+function BrandCoverageBadge() {
+  const brandCount = useKnownIssuesBrandCount();
+  return (
+    <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-muted/30 border border-border/50 px-4 py-1.5 text-xs font-medium text-primary-foreground/70">
+      <Shield className="h-3.5 w-3.5 text-wrenchli-teal" />
+      {brandCount}+ Brands Covered
+    </div>
+  );
+}
+
 const placeholders = [
   "My brakes are squeaking",
   "There's a burning smell from the engine",
