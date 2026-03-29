@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RELIABLE_BRANDS, getRelevantIssues } from "@/data/vehicleKnownIssues";
 import type { GarageVehicle } from "@/hooks/useGarage";
 import type { CloudVehicle } from "@/hooks/useGarageSync";
 
@@ -12,23 +13,6 @@ interface Props {
   cloudVehicle?: CloudVehicle;
   isAuthenticated: boolean;
 }
-
-const RELIABLE_BRANDS = ["Honda", "Toyota", "Mazda", "Subaru", "Lexus"];
-const KNOWN_ISSUES: Record<string, { minMiles: number; maxMiles: number; issue: string; preventiveCost: string; repairCost: string }[]> = {
-  BMW: [
-    { minMiles: 60000, maxMiles: 100000, issue: "Cooling system failure", preventiveCost: "$300–500", repairCost: "$1,500–3,000" },
-    { minMiles: 80000, maxMiles: 120000, issue: "Oil leak (valve cover gasket)", preventiveCost: "$200–400", repairCost: "$800–1,500" },
-  ],
-  "Mercedes-Benz": [
-    { minMiles: 70000, maxMiles: 110000, issue: "Transmission conductor plate failure", preventiveCost: "$150–300", repairCost: "$1,500–3,500" },
-  ],
-  Ford: [
-    { minMiles: 80000, maxMiles: 120000, issue: "Spark plug ejection (V8 engines)", preventiveCost: "$150–300", repairCost: "$500–1,200" },
-  ],
-  Nissan: [
-    { minMiles: 60000, maxMiles: 100000, issue: "CVT transmission issues", preventiveCost: "$200–400", repairCost: "$3,000–5,000" },
-  ],
-};
 
 export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: Props) {
   // Fetch maintenance cost data for chart
@@ -71,11 +55,8 @@ export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: 
   const mileage = cloudVehicle?.current_mileage;
   const isReliable = RELIABLE_BRANDS.includes(vehicle.make);
 
-  // Generate insights
-  const knownIssues = KNOWN_ISSUES[vehicle.make] || [];
-  const relevantIssues = mileage
-    ? knownIssues.filter((i) => mileage >= i.minMiles - 10000 && mileage <= i.maxMiles)
-    : [];
+  // Generate insights using shared known issues database
+  const { relevant: relevantIssues, upcoming: upcomingIssues } = getRelevantIssues(vehicle.make, mileage);
 
   // Ownership phase
   const getOwnershipPhase = () => {
@@ -129,19 +110,51 @@ export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: 
         </p>
       </div>
 
-      {/* Known issues for this make */}
+      {/* Known issues for this make at current mileage */}
       {relevantIssues.length > 0 && (
         <div className="rounded-xl border border-wrenchli-amber/20 bg-wrenchli-amber/5 p-4 space-y-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-wrenchli-amber" />
-            <h4 className="text-sm font-semibold">Common Issues at This Mileage</h4>
+            <h4 className="text-sm font-semibold">
+              {mileage ? "Common Issues at This Mileage" : `Known ${vehicle.make} Issues`}
+            </h4>
           </div>
           {relevantIssues.map((issue, i) => (
             <div key={i} className="text-xs space-y-1">
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-foreground">{issue.issue}</p>
+                <span className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-medium capitalize",
+                  issue.severity === "high" ? "bg-destructive/10 text-destructive" :
+                  issue.severity === "medium" ? "bg-wrenchli-amber/10 text-wrenchli-amber" :
+                  "bg-muted text-muted-foreground"
+                )}>
+                  {issue.severity}
+                </span>
+              </div>
+              <p className="text-muted-foreground">
+                <span className="capitalize">{issue.systems}</span>
+                {" · "}Preventive: <span className="text-wrenchli-teal font-medium">{issue.preventiveCost}</span>
+                {" · "}Repair: <span className="text-destructive font-medium">{issue.repairCost}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Upcoming issues to watch */}
+      {upcomingIssues.length > 0 && mileage && (
+        <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <h4 className="text-sm font-semibold">Upcoming Issues to Watch</h4>
+          </div>
+          {upcomingIssues.slice(0, 3).map((issue, i) => (
+            <div key={i} className="text-xs">
               <p className="font-medium text-foreground">{issue.issue}</p>
               <p className="text-muted-foreground">
-                Preventive service: <span className="text-wrenchli-teal font-medium">{issue.preventiveCost}</span>
-                {" · "}Repair if ignored: <span className="text-destructive font-medium">{issue.repairCost}</span>
+                Typically {issue.minMiles.toLocaleString()}–{issue.maxMiles.toLocaleString()} mi
+                {" · "}<span className="capitalize">{issue.systems}</span>
               </p>
             </div>
           ))}
