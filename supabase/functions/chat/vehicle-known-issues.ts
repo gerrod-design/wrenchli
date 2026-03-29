@@ -349,6 +349,30 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Head gasket failure (2.4L — Breeze, Voyager)", minMiles: 80000, maxMiles: 140000, preventiveCost: "$100–200 (coolant monitoring)", repairCost: "$1,000–2,000", severity: "high", systems: "engine" },
     { issue: "Ball joint / tie rod wear (Voyager / Grand Voyager)", minMiles: 60000, maxMiles: 100000, preventiveCost: "$100–200 (inspection)", repairCost: "$300–700", severity: "medium", systems: "suspension" },
   ],
+  BYD: [
+    { issue: "12V auxiliary battery drain", minMiles: 20000, maxMiles: 60000, preventiveCost: "$50–100 (monitoring)", repairCost: "$200–500", severity: "medium", systems: "electrical" },
+    { issue: "Blade battery coolant leak", minMiles: 40000, maxMiles: 90000, preventiveCost: "$100–200 (inspection)", repairCost: "$1,500–4,000", severity: "high", systems: "battery" },
+    { issue: "Infotainment screen glitch / reboot loop", minMiles: 15000, maxMiles: 50000, preventiveCost: "N/A (software update)", repairCost: "$500–1,500", severity: "medium", systems: "electrical" },
+    { issue: "Brake-by-wire pedal feel inconsistency", minMiles: 30000, maxMiles: 70000, preventiveCost: "$50–100 (calibration)", repairCost: "$400–900", severity: "medium", systems: "brakes" },
+  ],
+  NIO: [
+    { issue: "Battery swap mechanism alignment wear", minMiles: 25000, maxMiles: 60000, preventiveCost: "$100–200 (alignment check)", repairCost: "$800–2,000", severity: "medium", systems: "battery" },
+    { issue: "Air suspension compressor failure", minMiles: 40000, maxMiles: 80000, preventiveCost: "$100–200 (inspection)", repairCost: "$1,200–2,500", severity: "high", systems: "suspension" },
+    { issue: "NOMI AI companion hardware failure", minMiles: 20000, maxMiles: 60000, preventiveCost: "N/A", repairCost: "$300–700", severity: "low", systems: "electrical" },
+    { issue: "Drive unit bearing noise", minMiles: 50000, maxMiles: 100000, preventiveCost: "$50–100 (fluid check)", repairCost: "$1,500–3,500", severity: "high", systems: "drivetrain" },
+  ],
+  VinFast: [
+    { issue: "ADAS sensor calibration drift", minMiles: 15000, maxMiles: 50000, preventiveCost: "$100–200 (recalibration)", repairCost: "$500–1,500", severity: "medium", systems: "safety systems" },
+    { issue: "Infotainment freezing / OTA update failures", minMiles: 10000, maxMiles: 40000, preventiveCost: "N/A (software update)", repairCost: "$300–800", severity: "medium", systems: "electrical" },
+    { issue: "Battery thermal management inefficiency (hot climates)", minMiles: 30000, maxMiles: 70000, preventiveCost: "$100–200 (coolant service)", repairCost: "$1,000–3,000", severity: "high", systems: "battery" },
+    { issue: "Door handle actuator sticking", minMiles: 20000, maxMiles: 50000, preventiveCost: "$30–60 (lubrication)", repairCost: "$200–500", severity: "low", systems: "body" },
+  ],
+  XPeng: [
+    { issue: "LiDAR unit condensation / failure", minMiles: 20000, maxMiles: 60000, preventiveCost: "N/A", repairCost: "$1,000–3,000", severity: "high", systems: "safety systems" },
+    { issue: "Regenerative braking calibration loss", minMiles: 25000, maxMiles: 60000, preventiveCost: "$50–100 (software reset)", repairCost: "$300–800", severity: "medium", systems: "brakes" },
+    { issue: "HV battery contactor wear", minMiles: 50000, maxMiles: 100000, preventiveCost: "$100–200 (inspection)", repairCost: "$800–2,000", severity: "high", systems: "battery" },
+    { issue: "Power tailgate strut failure", minMiles: 30000, maxMiles: 60000, preventiveCost: "N/A", repairCost: "$200–400", severity: "low", systems: "body" },
+  ],
 };
 
 /**
