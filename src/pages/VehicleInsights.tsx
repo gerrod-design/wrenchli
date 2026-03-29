@@ -8,13 +8,23 @@ import {
   Smartphone, ChevronDown, ChevronUp, Shield
 } from "lucide-react";
 import { getDtcEntry, isValidDtcPattern } from "@/data/dtcCodes";
-import { VEHICLE_KNOWN_ISSUES } from "@/data/vehicleKnownIssues";
+import { useKnownIssuesBrandCount } from "@/hooks/useKnownIssues";
 import SectionReveal from "@/components/SectionReveal";
 import DiagnosisResult from "@/components/DiagnosisResult";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VehicleIdentifier, { type VehicleData } from "@/components/vehicle/VehicleIdentifier";
+
+function BrandCoverageBadge() {
+  const brandCount = useKnownIssuesBrandCount();
+  return (
+    <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-muted/30 border border-border/50 px-4 py-1.5 text-xs font-medium text-primary-foreground/70">
+      <Shield className="h-3.5 w-3.5 text-wrenchli-teal" />
+      {brandCount}+ Brands Covered
+    </div>
+  );
+}
 
 const placeholders = [
   "My brakes are squeaking",
@@ -129,10 +139,8 @@ export default function VehicleInsights() {
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
               Not every vehicle problem needs a trip to the shop. Wrenchli Vehicle Insights helps you understand what might be wrong with your vehicle and gives you real choices — watch a step-by-step video tutorial and order the parts to fix it yourself, or get quotes from trusted local shops if you'd rather leave it to a professional. Either way, you're in control.
             </p>
-            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-muted/30 border border-border/50 px-4 py-1.5 text-xs font-medium text-primary-foreground/70">
-              <Shield className="h-3.5 w-3.5 text-wrenchli-teal" />
-              {Object.keys(VEHICLE_KNOWN_ISSUES).length}+ Brands Covered
-            </div>
+            <BrandCoverageBadge />
+
             <Button
               size="lg"
               className="mt-8 h-14 px-10 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-bold text-lg transition-transform hover:scale-[1.02]"

@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RELIABLE_BRANDS, getRelevantIssues } from "@/data/vehicleKnownIssues";
+import { RELIABLE_BRANDS, useKnownIssues } from "@/hooks/useKnownIssues";
 import type { GarageVehicle } from "@/hooks/useGarage";
 import type { CloudVehicle } from "@/hooks/useGarageSync";
 
@@ -55,8 +55,8 @@ export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: 
   const mileage = cloudVehicle?.current_mileage;
   const isReliable = RELIABLE_BRANDS.includes(vehicle.make);
 
-  // Generate insights using shared known issues database
-  const { relevant: relevantIssues, upcoming: upcomingIssues } = getRelevantIssues(vehicle.make, mileage);
+  // Generate insights using DB-backed known issues (with static fallback)
+  const { relevant: relevantIssues, upcoming: upcomingIssues } = useKnownIssues(vehicle.make, mileage);
 
   // Ownership phase
   const getOwnershipPhase = () => {
