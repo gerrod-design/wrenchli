@@ -72,7 +72,7 @@ export default function InlineChatWidget() {
 
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
-    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
+    startListening, stopListening, speak, stopSpeaking, unlockAudioPlayback, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
   const speakRef = useRef(speak);
@@ -589,6 +589,7 @@ export default function InlineChatWidget() {
                 <ToolHint id="voice-mode" label="🎙️ Talk hands-free with your advisor" delay={4500}>
                   <button type="button" onClick={() => {
                     const turningOn = !voiceEnabled;
+                    if (turningOn) void unlockAudioPlayback();
                     toggleVoice();
 
                     if (turningOn) {
@@ -625,7 +626,9 @@ export default function InlineChatWidget() {
                       if (isListening) {
                         stopListening(VOICE_OWNER);
                       } else {
-                        startListening(VOICE_OWNER);
+                        void unlockAudioPlayback().finally(() => {
+                          startListening(VOICE_OWNER);
+                        });
                       }
                     }}
                     disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
