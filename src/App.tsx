@@ -19,11 +19,8 @@ import SitePasswordGate from "@/components/SitePasswordGate";
 import ScrollToTop from "@/components/ScrollToTop";
 
 function SitePasswordGateWrapper() {
-  return (
-    <SitePasswordGate>
-      <AppLayout />
-    </SitePasswordGate>
-  );
+  // Password gate temporarily disabled for testing
+  return <AppLayout />;
 }
 import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
