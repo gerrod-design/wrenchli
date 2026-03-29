@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RELIABLE_BRANDS, getRelevantIssues } from "@/data/vehicleKnownIssues";
 import type { GarageVehicle } from "@/hooks/useGarage";
 import type { CloudVehicle } from "@/hooks/useGarageSync";
 
@@ -12,23 +13,6 @@ interface Props {
   cloudVehicle?: CloudVehicle;
   isAuthenticated: boolean;
 }
-
-const RELIABLE_BRANDS = ["Honda", "Toyota", "Mazda", "Subaru", "Lexus"];
-const KNOWN_ISSUES: Record<string, { minMiles: number; maxMiles: number; issue: string; preventiveCost: string; repairCost: string }[]> = {
-  BMW: [
-    { minMiles: 60000, maxMiles: 100000, issue: "Cooling system failure", preventiveCost: "$300–500", repairCost: "$1,500–3,000" },
-    { minMiles: 80000, maxMiles: 120000, issue: "Oil leak (valve cover gasket)", preventiveCost: "$200–400", repairCost: "$800–1,500" },
-  ],
-  "Mercedes-Benz": [
-    { minMiles: 70000, maxMiles: 110000, issue: "Transmission conductor plate failure", preventiveCost: "$150–300", repairCost: "$1,500–3,500" },
-  ],
-  Ford: [
-    { minMiles: 80000, maxMiles: 120000, issue: "Spark plug ejection (V8 engines)", preventiveCost: "$150–300", repairCost: "$500–1,200" },
-  ],
-  Nissan: [
-    { minMiles: 60000, maxMiles: 100000, issue: "CVT transmission issues", preventiveCost: "$200–400", repairCost: "$3,000–5,000" },
-  ],
-};
 
 export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: Props) {
   // Fetch maintenance cost data for chart
