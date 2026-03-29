@@ -210,16 +210,15 @@ describe("useSpeechRecognition", () => {
       result.current.startListening({ current: true }, vi.fn());
     });
 
-    // Simulate result event
+    const mockResult = { 0: { transcript: "hello world" }, length: 1 };
     const fakeEvent = {
-      results: [{ 0: { transcript: "hello world" }, length: 1 }],
-      [Symbol.iterator]: function* () {
-        yield* this.results;
+      results: {
+        length: 1,
+        0: mockResult,
+        [Symbol.iterator]: function* () {
+          for (let i = 0; i < this.length; i++) yield this[i];
+        },
       },
-    };
-    // SpeechRecognitionResultList is array-like
-    (fakeEvent.results as any)[Symbol.iterator] = function* () {
-      for (const r of fakeEvent.results) yield r;
     };
 
     act(() => {
