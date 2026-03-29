@@ -129,10 +129,11 @@ export function useTextToSpeech(
     if (playbackUnlockedRef.current) return true;
     if (typeof window === "undefined") return false;
 
+    let primerUrl: string | null = null;
     try {
       const primer = audioRef.current ?? new Audio();
       audioRef.current = primer;
-      const primerUrl = URL.createObjectURL(createSilentWavBlob());
+      primerUrl = URL.createObjectURL(createSilentWavBlob());
       primer.src = primerUrl;
       primer.muted = true;
       primer.volume = 0;
@@ -145,7 +146,6 @@ export function useTextToSpeech(
       primer.currentTime = 0;
       primer.muted = false;
       primer.volume = 1;
-      URL.revokeObjectURL(primerUrl);
       playbackUnlockedRef.current = true;
       return true;
     } catch (mediaErr) {
@@ -170,6 +170,8 @@ export function useTextToSpeech(
         console.warn("Audio playback unlock failed:", ctxErr);
         return false;
       }
+    } finally {
+      if (primerUrl) URL.revokeObjectURL(primerUrl);
     }
   }, []);
 
