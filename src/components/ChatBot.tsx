@@ -20,16 +20,30 @@ import { extractVideoAudio } from "@/lib/videoAudioExtractor";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
 
-function detectAgent(content: string): AgentType {
-  if (/\[Agent:\s*Sam\]/i.test(content)) return "sam";
-  if (/\[Agent:\s*Jess\]/i.test(content)) return "jess";
-  if (/\[Agent:\s*Kai\]/i.test(content)) return "kai";
-  if (/\[Agent:\s*Priya\]/i.test(content)) return "priya";
+const AGENT_META: Record<AgentType, { name: string; role: string; color: string }> = {
+  mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
+  sam: { name: "Sam", role: "Cost & Value Specialist", color: "bg-amber-500" },
+  jess: { name: "Jess", role: "Parts & DIY Expert", color: "bg-emerald-500" },
+  kai: { name: "Kai", role: "Finance Specialist", color: "bg-sky-500" },
+  priya: { name: "Priya", role: "Prevention Coach", color: "bg-violet-500" },
+};
+
+function detectAgent(content: unknown): AgentType {
+  const text = typeof content === "string" ? content : "";
+  if (/\[Agent:\s*Sam\]/i.test(text)) return "sam";
+  if (/\[Agent:\s*Jess\]/i.test(text)) return "jess";
+  if (/\[Agent:\s*Kai\]/i.test(text)) return "kai";
+  if (/\[Agent:\s*Priya\]/i.test(text)) return "priya";
   return "mike";
 }
 
-function cleanAgentMarker(content: string): string {
-  return content.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "");
+function cleanAgentMarker(content: unknown): string {
+  const text = typeof content === "string" ? content : "";
+  return text.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "");
+}
+
+function getAgentMeta(agent: AgentType | null | undefined) {
+  return AGENT_META[agent ?? "mike"] ?? AGENT_META.mike;
 }
 
 export default function ChatBot() {
@@ -393,15 +407,9 @@ export default function ChatBot() {
 
             {/* Active specialist bar */}
             {(() => {
-              const lastAssistant = [...messages].reverse().find(m => m.role === "assistant");
+              const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
               const activeAgent = lastAssistant ? detectAgent(lastAssistant.content) : "mike";
-              const agentInfo = {
-                mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
-                sam: { name: "Sam", role: "Cost & Value Specialist", color: "bg-amber-500" },
-                jess: { name: "Jess", role: "Parts & DIY Expert", color: "bg-emerald-500" },
-                kai: { name: "Kai", role: "Finance Specialist", color: "bg-sky-500" },
-                priya: { name: "Priya", role: "Prevention Coach", color: "bg-violet-500" },
-              }[activeAgent] ?? { name: "Mike", role: "Lead Advisor", color: "bg-primary" };
+              const agentInfo = getAgentMeta(activeAgent);
               if (!messages.length || showHistory) return null;
               return (
                 <div className="flex items-center gap-2 px-4 py-1.5 bg-muted/50 border-b border-border">
@@ -484,7 +492,7 @@ export default function ChatBot() {
                     const prevAssistant = messages.slice(0, i).reverse().find(msg => msg.role === "assistant");
                     const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
                     const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
-                    const agentName = currentAgent === "sam" ? "Sam" : currentAgent === "jess" ? "Jess" : currentAgent === "kai" ? "Kai" : currentAgent === "priya" ? "Priya" : "Mike";
+                    const agentName = getAgentMeta(currentAgent).name;
 
                     return (
                     <div key={i}>
