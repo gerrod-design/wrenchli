@@ -75,6 +75,9 @@ export default function ChatBot() {
 
   // Speak once when a response finishes streaming for the active voice owner.
   const prevLoadingRef = useRef(false);
+  const speakRef = useRef(speak);
+  speakRef.current = speak;
+
   useEffect(() => {
     const justFinishedStreaming = prevLoadingRef.current && !loading;
     prevLoadingRef.current = loading;
@@ -89,9 +92,9 @@ export default function ChatBot() {
     console.log("[SpeakTrace] lastMsg role:", lastMsg?.role, "len:", lastMsg?.content?.length);
     if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
       console.log("[SpeakTrace] calling speak()");
-      speak(lastMsg.content, detectAgent(lastMsg.content));
+      speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
     }
-  }, [loading, voiceEnabled, voiceOwner, messages, speak]);
+  }, [loading, voiceEnabled, voiceOwner, messages]);
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {
