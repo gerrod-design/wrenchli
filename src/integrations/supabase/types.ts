@@ -1242,6 +1242,78 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_known_issues: {
+        Row: {
+          category: string | null
+          complaint_count: number | null
+          confidence_score: number
+          created_at: string
+          description: string
+          estimated_cost: string | null
+          id: string
+          make: string
+          mileage_max: number | null
+          mileage_min: number | null
+          model: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: string
+          source: string
+          source_url: string | null
+          status: string
+          tags: string[] | null
+          updated_at: string
+          year_end: number | null
+          year_start: number | null
+        }
+        Insert: {
+          category?: string | null
+          complaint_count?: number | null
+          confidence_score?: number
+          created_at?: string
+          description: string
+          estimated_cost?: string | null
+          id?: string
+          make: string
+          mileage_max?: number | null
+          mileage_min?: number | null
+          model?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          source?: string
+          source_url?: string | null
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Update: {
+          category?: string | null
+          complaint_count?: number | null
+          confidence_score?: number
+          created_at?: string
+          description?: string
+          estimated_cost?: string | null
+          id?: string
+          make?: string
+          mileage_max?: number | null
+          mileage_min?: number | null
+          model?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          source?: string
+          source_url?: string | null
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Relationships: []
+      }
       vehicle_value_history: {
         Row: {
           confidence_score: number | null
