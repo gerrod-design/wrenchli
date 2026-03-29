@@ -2,7 +2,49 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import type { AgentType } from "@/components/MechanicAvatar";
 
 const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/azure-tts`;
-const AUDIO_UNLOCK_PRIMER = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
+
+function createSilentWavBlob(durationMs = 120, sampleRate = 8000): Blob {
+  const numChannels = 1;
+  const bitsPerSample = 16;
+  const numSamples = Math.max(1, Math.floor((durationMs / 1000) * sampleRate));
+  const blockAlign = (numChannels * bitsPerSample) / 8;
+  const byteRate = sampleRate * blockAlign;
+  const dataSize = numSamples * blockAlign;
+  const buffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(buffer);
+
+  let offset = 0;
+  const writeString = (value: string) => {
+    for (let i = 0; i < value.length; i += 1) {
+      view.setUint8(offset + i, value.charCodeAt(i));
+    }
+    offset += value.length;
+  };
+
+  writeString("RIFF");
+  view.setUint32(offset, 36 + dataSize, true);
+  offset += 4;
+  writeString("WAVE");
+  writeString("fmt ");
+  view.setUint32(offset, 16, true);
+  offset += 4;
+  view.setUint16(offset, 1, true);
+  offset += 2;
+  view.setUint16(offset, numChannels, true);
+  offset += 2;
+  view.setUint32(offset, sampleRate, true);
+  offset += 4;
+  view.setUint32(offset, byteRate, true);
+  offset += 4;
+  view.setUint16(offset, blockAlign, true);
+  offset += 2;
+  view.setUint16(offset, bitsPerSample, true);
+  offset += 2;
+  writeString("data");
+  view.setUint32(offset, dataSize, true);
+
+  return new Blob([buffer], { type: "audio/wav" });
+}
 
 /** Strip markdown / agent tags for cleaner speech output. */
 function cleanTextForSpeech(text: string): string {
@@ -87,25 +129,49 @@ export function useTextToSpeech(
     if (playbackUnlockedRef.current) return true;
     if (typeof window === "undefined") return false;
 
+    let primerUrl: string | null = null;
     try {
       const primer = audioRef.current ?? new Audio();
       audioRef.current = primer;
-      // IMPORTANT: keep this unmuted so browsers treat it as real media playback
-      // in response to a user gesture and fully unlock subsequent audio.
-      primer.src = AUDIO_UNLOCK_PRIMER;
-      primer.muted = false;
-      primer.volume = 1;
+      primerUrl = URL.createObjectURL(createSilentWavBlob());
+      primer.src = primerUrl;
+      primer.muted = true;
+      primer.volume = 0;
       if (typeof (primer as HTMLAudioElement & { setAttribute?: (name: string, value: string) => void }).setAttribute === "function") {
         primer.setAttribute("playsinline", "true");
       }
       primer.preload = "auto";
       await primer.play();
       primer.pause();
+      primer.currentTime = 0;
+      primer.muted = false;
+      primer.volume = 1;
       playbackUnlockedRef.current = true;
       return true;
-    } catch (err) {
-      console.warn("Audio playback unlock failed:", err);
-      return false;
+    } catch (mediaErr) {
+      console.warn("Audio element unlock failed, trying AudioContext fallback:", mediaErr);
+
+      try {
+        const AudioContextCtor = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        if (!AudioContextCtor) return false;
+
+        const ctx = new AudioContextCtor();
+        await ctx.resume();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = 0;
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.02);
+        playbackUnlockedRef.current = true;
+        return true;
+      } catch (ctxErr) {
+        console.warn("Audio playback unlock failed:", ctxErr);
+        return false;
+      }
+    } finally {
+      if (primerUrl) URL.revokeObjectURL(primerUrl);
     }
   }, []);
 
