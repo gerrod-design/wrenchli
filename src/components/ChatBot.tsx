@@ -70,7 +70,7 @@ export default function ChatBot() {
   const isMobile = useIsMobile();
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
-    startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
+    startListening, stopListening, speak, stopSpeaking, unlockAudioPlayback, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
   const speakRef = useRef(speak);
@@ -376,6 +376,7 @@ export default function ChatBot() {
                     <button
                       onClick={() => {
                         const turningOn = !voiceEnabled;
+                        if (turningOn) void unlockAudioPlayback();
                         toggleVoice();
                         setShowVoiceTip(false);
                         if (turningOn) {
@@ -740,10 +741,12 @@ export default function ChatBot() {
                             if (isListening) {
                               stopListening(VOICE_OWNER);
                             } else {
-                              const started = startListening(VOICE_OWNER);
-                              if (!started) {
-                                toast.error("Couldn't start listening. Check mic permission and try again.");
-                              }
+                              void unlockAudioPlayback().finally(() => {
+                                const started = startListening(VOICE_OWNER);
+                                if (!started) {
+                                  toast.error("Couldn't start listening. Check mic permission and try again.");
+                                }
+                              });
                             }
                           }}
                           disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
