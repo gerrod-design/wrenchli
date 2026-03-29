@@ -270,6 +270,7 @@ export default function ChatBot() {
           const activeOwner = voiceOwnerRef.current;
           const canSpeak =
             voiceEnabledStateRef.current && (!activeOwner || activeOwner === VOICE_OWNER);
+          console.log("[VoiceDebug:ChatBot] onDone → voiceEnabled:", voiceEnabledStateRef.current, "owner:", activeOwner, "VOICE_OWNER:", VOICE_OWNER, "canSpeak:", canSpeak, "textLen:", assistantSoFar.trim().length);
           if (canSpeak && assistantSoFar.trim()) {
             void speakRef.current(assistantSoFar, detectAgent(assistantSoFar));
           }
