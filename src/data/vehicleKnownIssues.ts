@@ -397,6 +397,24 @@ export const VEHICLE_KNOWN_ISSUES: Record<string, KnownIssue[]> = {
     { issue: "Leaf spring sag / bushing wear (trucks, 510)", minMiles: 50000, maxMiles: 100000, preventiveCost: "$50–100 (inspection)", repairCost: "$300–700", severity: "medium", systems: "suspension" },
     { issue: "Rust-through on fenders and rocker panels", minMiles: 0, maxMiles: 200000, preventiveCost: "$200–500 (rust treatment)", repairCost: "$800–3,000", severity: "high", systems: "body" },
   ],
+  "Citroën": [
+    { issue: "Hydraulic suspension sphere failure", minMiles: 40000, maxMiles: 90000, preventiveCost: "$100–200 (inspection)", repairCost: "$400–1,000 per sphere", severity: "high", systems: "suspension" },
+    { issue: "Turbo oil feed pipe clogging (HDi diesels)", minMiles: 50000, maxMiles: 100000, preventiveCost: "$100–200 (oil service)", repairCost: "$800–2,000", severity: "high", systems: "engine" },
+    { issue: "BSI (Body Systems Interface) electronic glitches", minMiles: 30000, maxMiles: 80000, preventiveCost: "N/A (software reset)", repairCost: "$500–1,500", severity: "medium", systems: "electrical" },
+    { issue: "Window regulator cable snap", minMiles: 40000, maxMiles: 80000, preventiveCost: "N/A", repairCost: "$200–500", severity: "low", systems: "electrical" },
+  ],
+  Peugeot: [
+    { issue: "DPF (diesel particulate filter) clogging", minMiles: 40000, maxMiles: 90000, preventiveCost: "$100–200 (forced regen)", repairCost: "$1,000–2,500", severity: "high", systems: "exhaust" },
+    { issue: "Timing belt tensioner failure (TU/EP engines)", minMiles: 50000, maxMiles: 80000, preventiveCost: "$400–700 (belt kit replacement)", repairCost: "$2,000–4,000 (engine damage)", severity: "high", systems: "engine" },
+    { issue: "Power steering pump leak (electric-hydraulic)", minMiles: 40000, maxMiles: 90000, preventiveCost: "$50–100 (fluid check)", repairCost: "$500–1,200", severity: "medium", systems: "steering" },
+    { issue: "Rear axle bearing collapse (206/207)", minMiles: 60000, maxMiles: 120000, preventiveCost: "$50–100 (inspection)", repairCost: "$400–900", severity: "medium", systems: "suspension" },
+  ],
+  Renault: [
+    { issue: "Turbo cartridge failure (1.2 TCe / 1.5 dCi)", minMiles: 40000, maxMiles: 80000, preventiveCost: "$100–200 (oil service)", repairCost: "$1,000–2,500", severity: "high", systems: "engine" },
+    { issue: "Dual-clutch (EDC) gearbox shudder", minMiles: 30000, maxMiles: 70000, preventiveCost: "$200–400 (fluid service)", repairCost: "$1,500–3,500", severity: "high", systems: "transmission" },
+    { issue: "Coil spring snap (Mégane / Scénic)", minMiles: 40000, maxMiles: 90000, preventiveCost: "$50–100 (inspection)", repairCost: "$200–500 per corner", severity: "medium", systems: "suspension" },
+    { issue: "Key card reader malfunction", minMiles: 30000, maxMiles: 70000, preventiveCost: "N/A", repairCost: "$300–700", severity: "medium", systems: "electrical" },
+  ],
 };
 
 /** Reliable brands for the brand reliability insight */
