@@ -234,9 +234,8 @@ export default function InlineChatWidget() {
           // so the new specialist responds without waiting for user input
           const finalText = assistantSoFar;
           const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Priya|Sam|Jess|Kai)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll) (?:going to )?(?:bring|connect|hand)/i.test(finalText);
-          const responseAgent = detectAgent(finalText);
-          if (announcesHandoff && responseAgent === "mike") {
-            // Mike announced the handoff but hasn't switched yet — auto-trigger
+          if (announcesHandoff) {
+            // Current agent announced a handoff — auto-trigger so the new specialist responds
             setTimeout(() => {
               sendRef.current("ok");
             }, 800);
