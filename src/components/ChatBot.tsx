@@ -255,8 +255,7 @@ export default function ChatBot() {
           // Auto-follow-up when Mike announces a handoff to another agent
           const finalText = assistantSoFar;
           const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Priya|Sam|Jess|Kai)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll) (?:going to )?(?:bring|connect|hand)/i.test(finalText);
-          const responseAgent = detectAgent(finalText);
-          if (announcesHandoff && responseAgent === "mike") {
+          if (announcesHandoff) {
             setTimeout(() => {
               sendRef.current("ok");
             }, 800);
