@@ -1,6 +1,7 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
+import { buildVehicleContext } from "./vehicle-known-issues.ts";
 
 const MAX_MESSAGES = 80;
 const MAX_CONTENT_LENGTH = 8000;
