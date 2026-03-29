@@ -20,6 +20,7 @@ export function useTextToSpeech(
   const [isSpeaking, setIsSpeaking] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastSpokenRef = useRef("");
+  const playbackUnlockedRef = useRef(false);
 
   const supportsTTS = true; // Azure TTS is always available
 
@@ -29,6 +30,26 @@ export function useTextToSpeech(
       audioRef.current = null;
     }
     setIsSpeaking(false);
+  }, []);
+
+  const unlockAudioPlayback = useCallback(async () => {
+    if (playbackUnlockedRef.current) return true;
+    if (typeof window === "undefined") return false;
+
+    try {
+      const primer = new Audio(
+        "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=",
+      );
+      primer.muted = true;
+      primer.volume = 0;
+      await primer.play();
+      primer.pause();
+      playbackUnlockedRef.current = true;
+      return true;
+    } catch (err) {
+      console.warn("Audio playback unlock failed:", err);
+      return false;
+    }
   }, []);
 
   const speakWithBrowserTTS = useCallback(
@@ -132,6 +153,7 @@ export function useTextToSpeech(
     speak,
     stopSpeaking: stopAudio,
     stopAudio,
+    unlockAudioPlayback,
     resetLastSpoken,
   };
 }
