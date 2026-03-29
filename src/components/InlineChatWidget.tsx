@@ -75,20 +75,23 @@ export default function InlineChatWidget() {
     startListening, stopListening, speak, stopSpeaking, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
   } = useSharedVoiceChat();
 
-  // Speak once when a response finishes streaming for the active voice owner.
-  const prevLoadingRef = useRef(false);
+  // Speak once after each completed streaming response for the active voice owner.
+  const shouldSpeakAfterLoadRef = useRef(false);
   const speakRef = useRef(speak);
   speakRef.current = speak;
 
   useEffect(() => {
-    const justFinishedStreaming = prevLoadingRef.current && !loading;
-    prevLoadingRef.current = loading;
+    if (loading) {
+      shouldSpeakAfterLoadRef.current = true;
+      return;
+    }
 
-    if (!justFinishedStreaming || !voiceEnabled || voiceOwner !== VOICE_OWNER) return;
+    if (!shouldSpeakAfterLoadRef.current || !voiceEnabled || voiceOwner !== VOICE_OWNER) return;
 
     const lastMsg = messages[messages.length - 1];
     if (lastMsg?.role === "assistant" && lastMsg.content.trim()) {
-      speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
+      shouldSpeakAfterLoadRef.current = false;
+      void speakRef.current(lastMsg.content, detectAgent(lastMsg.content));
     }
   }, [loading, voiceEnabled, voiceOwner, messages]);
 
