@@ -587,9 +587,15 @@ export default function InlineChatWidget() {
               {/* Voice toggle */}
               {(supportsSTT || supportsTTS) && (
                 <ToolHint id="voice-mode" label="🎙️ Talk hands-free with your advisor" delay={4500}>
-                  <button type="button" onClick={() => {
+                  <button type="button" onClick={async () => {
                     const turningOn = !voiceEnabled;
-                    if (turningOn) void unlockAudioPlayback();
+                    if (turningOn) {
+                      const unlocked = await unlockAudioPlayback();
+                      if (!unlocked) {
+                        toast.error("Audio playback is blocked. Tap Voice again after interacting with the page.");
+                        return;
+                      }
+                    }
                     toggleVoice();
 
                     if (turningOn) {
@@ -622,13 +628,19 @@ export default function InlineChatWidget() {
                   {isListening && <AudioWaveform />}
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
                       if (isListening) {
                         stopListening(VOICE_OWNER);
                       } else {
-                        void unlockAudioPlayback().finally(() => {
-                          startListening(VOICE_OWNER);
-                        });
+                        const unlocked = await unlockAudioPlayback();
+                        if (!unlocked) {
+                          toast.error("Audio playback is blocked. Tap the mic again.");
+                          return;
+                        }
+                        const started = startListening(VOICE_OWNER);
+                        if (!started) {
+                          toast.error("Couldn't start listening. Check mic permission and try again.");
+                        }
                       }
                     }}
                     disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
