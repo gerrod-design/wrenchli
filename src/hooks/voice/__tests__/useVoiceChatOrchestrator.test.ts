@@ -62,7 +62,13 @@ beforeEach(() => {
     },
   );
 
-  // Mock speechSynthesis
+  // Mock speechSynthesis + SpeechSynthesisUtterance
+  vi.stubGlobal("SpeechSynthesisUtterance", class {
+    text = ""; lang = ""; rate = 1; pitch = 1;
+    onend: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    constructor(t?: string) { this.text = t ?? ""; }
+  });
   vi.stubGlobal("speechSynthesis", {
     cancel: vi.fn(),
     speak: vi.fn((utterance: any) => {
