@@ -83,21 +83,22 @@ export function useTextToSpeech(
     }
   }, []);
 
-  const resolveSpeechDone = useCallback(() => {
+  // Plain helper functions (NOT hooks) to manage speech-done promises
+  function resolveSpeechDone() {
     const resolvers = speechDoneResolversRef.current;
     speechDoneResolversRef.current = [];
     currentSpeechPromiseRef.current = null;
     for (const resolve of resolvers) resolve();
-  }, []);
+  }
 
-  const createSpeechDonePromise = useCallback((): Promise<void> => {
+  function createSpeechDonePromise(): Promise<void> {
     if (currentSpeechPromiseRef.current) return currentSpeechPromiseRef.current;
     const promise = new Promise<void>((resolve) => {
       speechDoneResolversRef.current.push(resolve);
     });
     currentSpeechPromiseRef.current = promise;
     return promise;
-  }, []);
+  }
 
   const queueResumeListening = useCallback(() => {
     clearSpeechEndTimeout();
@@ -128,7 +129,7 @@ export function useTextToSpeech(
     }
     resolveSpeechDone();
     setSpeakingSafe(false);
-  }, [clearSpeechEndTimeout, resolveSpeechDone, setSpeakingSafe]);
+  }, [clearSpeechEndTimeout, setSpeakingSafe]);
 
   useEffect(() => {
     return () => {
@@ -147,7 +148,7 @@ export function useTextToSpeech(
       }
       resolveSpeechDone();
     };
-  }, [clearSpeechEndTimeout, resolveSpeechDone]);
+  }, [clearSpeechEndTimeout]);
 
   const unlockAudioPlayback = useCallback(async () => {
     if (playbackUnlockedRef.current) return true;
@@ -226,7 +227,7 @@ export function useTextToSpeech(
 
       window.speechSynthesis.speak(utterance);
     },
-    [queueResumeListening, resolveSpeechDone, setSpeakingSafe],
+    [queueResumeListening, setSpeakingSafe],
   );
 
   const speak = useCallback(
@@ -324,11 +325,9 @@ export function useTextToSpeech(
     },
     [
       stopAudio,
-      createSpeechDonePromise,
       speakWithBrowserTTS,
       unlockAudioPlayback,
       setSpeakingSafe,
-      resolveSpeechDone,
       queueResumeListening,
       voiceEnabledRef,
     ],
