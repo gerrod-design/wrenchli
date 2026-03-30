@@ -7,21 +7,32 @@ const corsHeaders = {
 };
 
 // Map agent names to Azure Neural voices
+// Using conversational-style voices where available for podcast-like delivery
 const VOICE_MAP: Record<string, string> = {
-  mike:  "en-US-GuyNeural",
-  sam:   "en-GB-SoniaNeural",
-  jess:  "es-US-PalomaNeural",
-  kai:   "en-US-BrandonNeural",
-  priya: "en-IN-NeerjaNeural",
+  mike:  "en-US-DavisNeural",       // Warm, conversational American male
+  sam:   "en-GB-SoniaNeural",       // Polished, confident British female
+  jess:  "en-US-JaneNeural",        // Friendly, relatable American female
+  kai:   "en-US-JasonNeural",       // Clear, trustworthy American male
+  priya: "en-IN-NeerjaNeural",      // Warm, knowledgeable Indian female
 };
 
-// Per-agent prosody tuning for natural conversational tone
+// Per-agent speaking style (Azure Neural voices support named styles)
+// Styles: "chat", "cheerful", "friendly", "customerservice", "calm", etc.
+const STYLE_MAP: Record<string, { style: string; styleDegree: string }> = {
+  mike:  { style: "chat",            styleDegree: "1.2" },  // Relaxed, podcast host
+  sam:   { style: "customerservice",  styleDegree: "0.8" },  // Professional but warm
+  jess:  { style: "friendly",        styleDegree: "1.3" },  // Approachable, encouraging
+  kai:   { style: "calm",            styleDegree: "1.0" },  // Steady, reassuring
+  priya: { style: "chat",            styleDegree: "1.0" },  // Conversational, coaching
+};
+
+// Per-agent prosody — slower rates sound more natural and podcast-like
 const PROSODY_MAP: Record<string, { rate: string; pitch: string }> = {
-  mike:  { rate: "+5%", pitch: "-2%" },   // Steady, confident
-  sam:   { rate: "+3%", pitch: "+0%" },    // Calm, measured
-  jess:  { rate: "+8%", pitch: "+4%" },    // Warm, upbeat, conversational
-  kai:   { rate: "+2%", pitch: "-3%" },    // Calm, reassuring, professional
-  priya: { rate: "+5%", pitch: "+2%" },    // Warm, knowledgeable, encouraging
+  mike:  { rate: "-2%",  pitch: "+0%" },   // Relaxed, natural pace
+  sam:   { rate: "+0%",  pitch: "+0%" },    // Natural default
+  jess:  { rate: "+3%",  pitch: "+1%" },    // Slightly upbeat energy
+  kai:   { rate: "-3%",  pitch: "-1%" },    // Deliberate, trustworthy
+  priya: { rate: "+0%",  pitch: "+1%" },    // Warm, engaged
 };
 
 serve(async (req) => {
@@ -73,19 +84,19 @@ serve(async (req) => {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&apos;");
 
-    // Add SSML break tags for natural prosody at punctuation boundaries
-    // Periods / question marks / exclamation points → shorter natural pause
-    cleanText = cleanText.replace(/([.!?])\s+/g, '$1<break time="250ms"/> ');
-    // Em-dash or double-dash → short pause
-    cleanText = cleanText.replace(/\s*[—–]\s*/g, ' <break time="150ms"/> ');
-    // Ellipsis → longer pause
-    cleanText = cleanText.replace(/\.{3}/g, '<break time="400ms"/>');
+    // Minimal SSML breaks — let the speaking style handle most pacing naturally
+    // Only add breaks for longer structural pauses
+    cleanText = cleanText.replace(/\s*[—–]\s*/g, ' <break time="120ms"/> ');
+    cleanText = cleanText.replace(/\.{3}/g, '<break time="350ms"/>');
 
     const prosody = PROSODY_MAP[agent] || { rate: "+0%", pitch: "+0%" };
+    const styleInfo = STYLE_MAP[agent] || { style: "chat", styleDegree: "1.0" };
 
-    const ssml = `<speak version='1.0' xml:lang='en-US'>
+    const ssml = `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xml:lang='en-US'>
   <voice name='${voiceName}'>
-    <prosody rate='${prosody.rate}' pitch='${prosody.pitch}'>${cleanText}</prosody>
+    <mstts:express-as style='${styleInfo.style}' styledegree='${styleInfo.styleDegree}'>
+      <prosody rate='${prosody.rate}' pitch='${prosody.pitch}'>${cleanText}</prosody>
+    </mstts:express-as>
   </voice>
 </speak>`;
 
