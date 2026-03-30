@@ -195,10 +195,12 @@ export function useTextToSpeech(
 
       utterance.onend = () => {
         setSpeakingSafe(false);
+        if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
         queueResumeListening();
       };
       utterance.onerror = () => {
         setSpeakingSafe(false);
+        if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
       };
 
       window.speechSynthesis.speak(utterance);
@@ -263,6 +265,7 @@ export function useTextToSpeech(
             URL.revokeObjectURL(activeObjectUrlRef.current);
             activeObjectUrlRef.current = null;
           }
+          if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
           queueResumeListening();
         };
 
