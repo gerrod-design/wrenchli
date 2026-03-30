@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import {
   LogOut, CreditCard, FileText, Users, Store, TrendingUp,
-  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2, MousePointerClick,
+  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2, MousePointerClick, Youtube,
 } from "lucide-react";
 import { Key, Landmark, Wrench } from "lucide-react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
@@ -23,6 +23,7 @@ import ReferralAnalytics from "@/components/ReferralAnalytics";
 import MILoanFunnel from "@/components/MILoanFunnel";
 import ConversionMetrics from "@/components/ConversionMetrics";
 import KnownIssuesManager from "@/components/KnownIssuesManager";
+import YouTubeEngagement from "@/components/YouTubeEngagement";
 
 interface FinanceSelection {
   id: string;
@@ -309,8 +310,14 @@ export default function AdminDashboard() {
             <TabsTrigger value="conversion"><MousePointerClick className="h-4 w-4 mr-1.5 hidden sm:inline" />Conversion</TabsTrigger>
             <TabsTrigger value="analytics"><BarChart3 className="h-4 w-4 mr-1.5 hidden sm:inline" />Analytics</TabsTrigger>
             <TabsTrigger value="optimization"><TrendingUp className="h-4 w-4 mr-1.5 hidden sm:inline" />Optimize</TabsTrigger>
+            <TabsTrigger value="youtube"><Youtube className="h-4 w-4 mr-1.5 hidden sm:inline" />YouTube</TabsTrigger>
             <TabsTrigger value="known-issues"><Wrench className="h-4 w-4 mr-1.5 hidden sm:inline" />Known Issues</TabsTrigger>
           </TabsList>
+
+          {/* YouTube Engagement Tab */}
+          <TabsContent value="youtube" className="mt-6">
+            <YouTubeEngagement />
+          </TabsContent>
 
           {/* Known Issues Tab */}
           <TabsContent value="known-issues" className="mt-6">
