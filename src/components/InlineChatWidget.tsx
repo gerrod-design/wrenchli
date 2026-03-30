@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff, Film } from "lucide-react";
+import { Send, Loader2, ImagePlus, Camera, ScanLine, Keyboard, Mic, MicOff, Volume2, Film } from "lucide-react";
 import AudioRecordButton from "./chatbot/AudioRecordButton";
 import ToolHint from "./chatbot/ToolHint";
 import { motion } from "framer-motion";
