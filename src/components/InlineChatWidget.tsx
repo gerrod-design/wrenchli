@@ -563,30 +563,36 @@ export default function InlineChatWidget() {
           )}
 
           {/* Tools row */}
-          <div className="border-t border-border px-3 py-1.5 flex items-center gap-1">
-            <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mr-1">Tools</span>
+          <div className="border-t border-border px-3 py-1.5 flex items-center gap-2">
+            <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mr-0.5">Tools</span>
             <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Attach photo">
+              className="flex flex-col items-center justify-center gap-0.5 rounded-md px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Attach photo">
               <ImagePlus className="h-3.5 w-3.5" />
+              <span className="text-[9px] leading-none font-medium">Photo</span>
             </button>
             {isMobile && (
               <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Take photo">
+                className="flex flex-col items-center justify-center gap-0.5 rounded-md px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Take photo">
                 <Camera className="h-3.5 w-3.5" />
+                <span className="text-[9px] leading-none font-medium">Camera</span>
               </button>
             )}
             <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Scan VIN">
+              className="flex flex-col items-center justify-center gap-0.5 rounded-md px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Scan VIN">
               <ScanLine className="h-3.5 w-3.5" />
+              <span className="text-[9px] leading-none font-medium">VIN</span>
             </button>
-            <AudioRecordButton
-              disabled={loading || uploading}
-              onAnalysis={(analysis) => {
-                const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
-                const assistantMsg: Msg = { role: "assistant", content: analysis };
-                setMessages((prev) => [...prev, userMsg, assistantMsg]);
-              }}
-            />
+            <div className="flex flex-col items-center gap-0.5">
+              <AudioRecordButton
+                disabled={loading || uploading}
+                onAnalysis={(analysis) => {
+                  const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
+                  const assistantMsg: Msg = { role: "assistant", content: analysis };
+                  setMessages((prev) => [...prev, userMsg, assistantMsg]);
+                }}
+              />
+              <span className="text-[9px] leading-none font-medium text-muted-foreground">Audio</span>
+            </div>
           </div>
 
           {/* Primary input: Type or Talk */}
