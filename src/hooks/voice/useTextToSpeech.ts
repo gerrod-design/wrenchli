@@ -58,8 +58,7 @@ function cleanTextForSpeech(text: string): string {
     .trim();
 }
 
-// Resolves when the current speak() call finishes playback (or immediately if nothing is playing).
-type SpeakDoneResolver = (() => void) | null;
+type SpeakDoneResolver = () => void;
 
 export function useTextToSpeech(
   voiceEnabledRef: React.RefObject<boolean>,
@@ -72,7 +71,8 @@ export function useTextToSpeech(
   const playbackUnlockedRef = useRef(false);
   const mountedRef = useRef(true);
   const speechEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const speakDoneResolverRef = useRef<SpeakDoneResolver>(null);
+  const speechDoneResolversRef = useRef<SpeakDoneResolver[]>([]);
+  const currentSpeechPromiseRef = useRef<Promise<void> | null>(null);
 
   const supportsTTS = true; // Azure TTS is always available
 
@@ -81,6 +81,22 @@ export function useTextToSpeech(
       clearTimeout(speechEndTimeoutRef.current);
       speechEndTimeoutRef.current = null;
     }
+  }, []);
+
+  const resolveSpeechDone = useCallback(() => {
+    const resolvers = speechDoneResolversRef.current;
+    speechDoneResolversRef.current = [];
+    currentSpeechPromiseRef.current = null;
+    for (const resolve of resolvers) resolve();
+  }, []);
+
+  const createSpeechDonePromise = useCallback((): Promise<void> => {
+    if (currentSpeechPromiseRef.current) return currentSpeechPromiseRef.current;
+    const promise = new Promise<void>((resolve) => {
+      speechDoneResolversRef.current.push(resolve);
+    });
+    currentSpeechPromiseRef.current = promise;
+    return promise;
   }, []);
 
   const queueResumeListening = useCallback(() => {
@@ -110,8 +126,9 @@ export function useTextToSpeech(
       URL.revokeObjectURL(activeObjectUrlRef.current);
       activeObjectUrlRef.current = null;
     }
+    resolveSpeechDone();
     setSpeakingSafe(false);
-  }, [clearSpeechEndTimeout, setSpeakingSafe]);
+  }, [clearSpeechEndTimeout, resolveSpeechDone, setSpeakingSafe]);
 
   useEffect(() => {
     return () => {
@@ -128,8 +145,9 @@ export function useTextToSpeech(
         URL.revokeObjectURL(activeObjectUrlRef.current);
         activeObjectUrlRef.current = null;
       }
+      resolveSpeechDone();
     };
-  }, [clearSpeechEndTimeout]);
+  }, [clearSpeechEndTimeout, resolveSpeechDone]);
 
   const unlockAudioPlayback = useCallback(async () => {
     if (playbackUnlockedRef.current) return true;
@@ -186,6 +204,7 @@ export function useTextToSpeech(
       if (typeof window === "undefined" || !window.speechSynthesis) {
         console.error("Browser speech synthesis not available");
         setSpeakingSafe(false);
+        resolveSpeechDone();
         return;
       }
 
@@ -197,17 +216,17 @@ export function useTextToSpeech(
 
       utterance.onend = () => {
         setSpeakingSafe(false);
-        if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
+        resolveSpeechDone();
         queueResumeListening();
       };
       utterance.onerror = () => {
         setSpeakingSafe(false);
-        if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
+        resolveSpeechDone();
       };
 
       window.speechSynthesis.speak(utterance);
     },
-    [queueResumeListening, setSpeakingSafe],
+    [queueResumeListening, resolveSpeechDone, setSpeakingSafe],
   );
 
   const speak = useCallback(
@@ -226,6 +245,7 @@ export function useTextToSpeech(
       lastSpokenRef.current = clean;
 
       stopAudio();
+      const speechDonePromise = createSpeechDonePromise();
       setSpeakingSafe(true);
 
       try {
@@ -267,7 +287,7 @@ export function useTextToSpeech(
             URL.revokeObjectURL(activeObjectUrlRef.current);
             activeObjectUrlRef.current = null;
           }
-          if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
+          resolveSpeechDone();
           queueResumeListening();
         };
 
@@ -294,12 +314,24 @@ export function useTextToSpeech(
             throw playErr;
           }
         }
+
+        await speechDonePromise;
       } catch (err) {
         console.warn("Cloud TTS failed, falling back to browser speech synthesis:", err);
         speakWithBrowserTTS(clean, agent);
+        await speechDonePromise;
       }
     },
-    [stopAudio, speakWithBrowserTTS, unlockAudioPlayback, setSpeakingSafe, queueResumeListening],
+    [
+      stopAudio,
+      createSpeechDonePromise,
+      speakWithBrowserTTS,
+      unlockAudioPlayback,
+      setSpeakingSafe,
+      resolveSpeechDone,
+      queueResumeListening,
+      voiceEnabledRef,
+    ],
   );
 
   const resetLastSpoken = useCallback(() => {
@@ -308,11 +340,8 @@ export function useTextToSpeech(
 
   /** Returns a promise that resolves when the current speech finishes (or immediately if silent). */
   const waitForSpeechEnd = useCallback((): Promise<void> => {
-    if (!isSpeaking) return Promise.resolve();
-    return new Promise<void>((resolve) => {
-      speakDoneResolverRef.current = resolve;
-    });
-  }, [isSpeaking]);
+    return currentSpeechPromiseRef.current ?? Promise.resolve();
+  }, []);
 
   return {
     isSpeaking,
