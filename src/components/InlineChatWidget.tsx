@@ -563,7 +563,7 @@ export default function InlineChatWidget() {
           )}
 
           {/* Tools row */}
-          <div className="border-t border-border px-3 py-1.5 flex items-end gap-3">
+          <div className="border-t border-border px-3 py-1.5 flex items-end justify-evenly">
             <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider hidden min-[360px]:inline pb-0.5">Tools</span>
             <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
               className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Upload photo">
