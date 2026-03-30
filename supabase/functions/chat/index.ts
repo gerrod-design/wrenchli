@@ -286,6 +286,8 @@ You have tools to:
 3. **estimate_vehicle_value** — Check vehicle worth → bring in Sam
 4. **find_local_shops** — Find trusted mechanics nearby → bring in Sam
 5. **diagnose_damage_photo** — Analyze photos of vehicle damage
+6. **search_repair_videos** — Find vehicle-specific YouTube tutorial videos
+7. **lookup_diy_tutorial** — Check if Wrenchli has a matching step-by-step written guide
 
 IMPORTANT: When calling estimate_repair_cost, use exact parameter names: "diagnosis_title", "vehicle_year", "vehicle_make", "vehicle_model", "zip_code".
 
