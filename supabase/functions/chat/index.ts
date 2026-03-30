@@ -110,6 +110,25 @@ const tools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "search_repair_videos",
+      description:
+        "Search for vehicle-specific DIY repair tutorial videos on YouTube. Returns optimized search queries with direct YouTube links. Use this when recommending video tutorials for a specific vehicle and repair.",
+      parameters: {
+        type: "object",
+        properties: {
+          repair_title: { type: "string", description: "The repair or maintenance task, e.g. 'Replace Brake Pads'" },
+          diagnosis_code: { type: "string", description: "DTC code if applicable, e.g. 'P0420'" },
+          vehicle_year: { type: "string", description: "Vehicle year, e.g. '2018'" },
+          vehicle_make: { type: "string", description: "Vehicle make, e.g. 'Honda'" },
+          vehicle_model: { type: "string", description: "Vehicle model, e.g. 'Civic'" },
+        },
+        required: ["repair_title"],
+      },
+    },
+  },
 ];
 
 const SYSTEM_PROMPT = `You are Mike — a friendly, knowledgeable vehicle advisor at Wrenchli. You work with a small team of specialists. You genuinely care about helping people with their cars.
