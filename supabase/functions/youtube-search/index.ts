@@ -1,7 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3/search";
+const CACHE_TTL_HOURS = 24;
+
+function hashQuery(query: string): string {
+  // Simple deterministic hash for cache key
+  let hash = 0;
+  const normalized = query.trim().toLowerCase();
+  for (let i = 0; i < normalized.length; i++) {
+    const char = normalized.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash |= 0;
+  }
+  return `yt_${hash.toString(36)}`;
+}
 
 serve(async (req) => {
   const corsRes = handleCorsOptions(req);
@@ -17,12 +31,35 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "A search query of at least 3 characters is required." }), { status: 400, headers });
     }
 
+    const clampedMax = Math.min(Math.max(Number(max_results) || 4, 1), 10);
+    const queryHash = hashQuery(query);
+
+    // ── Check cache first ──
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    const { data: cached } = await supabase
+      .from("youtube_search_cache")
+      .select("results")
+      .eq("query_hash", queryHash)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
+
+    if (cached?.results) {
+      console.log("YouTube cache HIT:", queryHash);
+      const cachedVideos = cached.results as unknown[];
+      // Return up to the requested number from cache
+      return new Response(JSON.stringify({ videos: cachedVideos.slice(0, clampedMax), cached: true }), { status: 200, headers });
+    }
+
+    // ── Cache miss — call YouTube API ──
     const apiKey = Deno.env.get("YOUTUBE_API_KEY");
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "YouTube API key not configured." }), { status: 500, headers });
     }
 
-    const clampedMax = Math.min(Math.max(Number(max_results) || 4, 1), 10);
+    console.log("YouTube cache MISS:", queryHash, "— calling API");
 
     const params = new URLSearchParams({
       part: "snippet",
@@ -54,7 +91,27 @@ serve(async (req) => {
       url: `https://www.youtube.com/watch?v=${item.id?.videoId}`,
     }));
 
-    return new Response(JSON.stringify({ videos }), { status: 200, headers });
+    // ── Store in cache (fire-and-forget) ──
+    if (videos.length > 0) {
+      const expiresAt = new Date(Date.now() + CACHE_TTL_HOURS * 60 * 60 * 1000).toISOString();
+      supabase
+        .from("youtube_search_cache")
+        .upsert(
+          {
+            query_hash: queryHash,
+            search_query: query.trim(),
+            results: videos,
+            expires_at: expiresAt,
+          },
+          { onConflict: "query_hash" }
+        )
+        .then(({ error }) => {
+          if (error) console.error("Cache write error:", error.message);
+          else console.log("Cached YouTube results for:", queryHash);
+        });
+    }
+
+    return new Response(JSON.stringify({ videos, cached: false }), { status: 200, headers });
   } catch (err) {
     console.error("youtube-search error:", err);
     return new Response(JSON.stringify({ error: "Internal server error." }), { status: 500, headers });
