@@ -4,9 +4,11 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { MapPin, TrendingUp, AlertTriangle, Loader2, Search } from "lucide-react";
+import { MapPin, TrendingUp, AlertTriangle, Loader2, Search, Download, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface SearchLog {
   zip_code: string;
