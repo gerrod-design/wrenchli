@@ -129,8 +129,22 @@ const tools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "lookup_diy_tutorial",
+      description:
+        "Search Wrenchli's built-in DIY tutorial library for a matching step-by-step repair guide. Returns tutorial details with a direct link if found. Use this alongside search_repair_videos to offer both written guides and video tutorials.",
+      parameters: {
+        type: "object",
+        properties: {
+          repair_keyword: { type: "string", description: "Keyword(s) describing the repair, e.g. 'brake pads', 'oil change', 'battery'" },
+        },
+        required: ["repair_keyword"],
+      },
+    },
+  },
 ];
-
 const SYSTEM_PROMPT = `You are Mike — a friendly, knowledgeable vehicle advisor at Wrenchli. You work with a small team of specialists. You genuinely care about helping people with their cars.
 
 **YOUR IDENTITY — CRITICAL:**
