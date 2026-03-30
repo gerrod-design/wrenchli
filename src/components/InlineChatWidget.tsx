@@ -237,11 +237,13 @@ export default function InlineChatWidget() {
           const finalText = assistantSoFar;
           const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Priya|Sam|Jess|Kai)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll)\s+(?:going to\s+)?(?:bring|connect|hand|let|get)|(?:let|pass(?:ing)?\s+(?:it|this)\s+to)\s+(?:Priya|Sam|Jess|Kai)\b/i.test(finalText);
           if (announcesHandoff) {
-            // In voice mode, wait for TTS to finish before triggering the handoff
-            const delay = canSpeak ? 4000 : 800;
-            setTimeout(() => {
-              sendRef.current("ok");
-            }, delay);
+            if (canSpeak) {
+              waitForSpeechEndRef.current().then(() => {
+                setTimeout(() => sendRef.current("ok"), 600);
+              });
+            } else {
+              setTimeout(() => sendRef.current("ok"), 800);
+            }
           }
         },
         onError: (msg) => { upsert(msg); setLoading(false); },
