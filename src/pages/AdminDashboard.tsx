@@ -326,6 +326,11 @@ export default function AdminDashboard() {
             <KnownIssuesManager />
           </TabsContent>
 
+          {/* Shop Interest Tab */}
+          <TabsContent value="shop-interest" className="mt-6">
+            <ShopInterestAnalytics />
+          </TabsContent>
+
           {/* MI Loan Funnel Tab */}
           <TabsContent value="mi-loan" className="mt-6">
             <MILoanFunnel />
