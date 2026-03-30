@@ -570,13 +570,11 @@ export default function InlineChatWidget() {
               <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><ImagePlus className="h-4 w-4" /></span>
               <span className="text-[11px] leading-none font-medium whitespace-nowrap">Upload Photo</span>
             </button>
-            {isMobile && (
-              <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Take photo">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><Camera className="h-4 w-4" /></span>
-                <span className="text-[11px] leading-none font-medium whitespace-nowrap">Take Photo</span>
-              </button>
-            )}
+            <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
+              className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Take photo">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><Camera className="h-4 w-4" /></span>
+              <span className="text-[11px] leading-none font-medium whitespace-nowrap">Take Photo</span>
+            </button>
             <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
               className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Scan VIN">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><ScanLine className="h-4 w-4" /></span>
