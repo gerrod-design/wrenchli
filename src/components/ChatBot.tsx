@@ -18,6 +18,10 @@ import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 import AudioWaveform from "./chatbot/AudioWaveform";
 import { extractVideoFrames, isVideoFile, MAX_VIDEO_SIZE } from "@/lib/videoFrameExtractor";
 import { extractVideoAudio } from "@/lib/videoAudioExtractor";
+import { decodeVin, sanitizeVin, isValidVin, type DecodedVehicle } from "@/lib/vinDecoder";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
 
