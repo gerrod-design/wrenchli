@@ -35,6 +35,23 @@ function priceTierFromYelp(price?: string): string {
   return "premium";
 }
 
+const FRANCHISE_PATTERNS = [
+  'firestone', 'aamco', 'meineke', 'jiffy lube', 'midas',
+  'pep boys', 'pepboys', 'valvoline', 'take 5', 'maaco',
+  'safelite', 'tuffy', 'goodyear', 'ntb ', 'national tire',
+  'big o tire', 'les schwab', 'christian brothers',
+  'grease monkey', 'express oil', 'pennzoil', 'brake masters',
+  'sun devil', 'monro ', 'tire kingdom', 'tires plus',
+  'sullivan tire', 'belle tire', 'discount tire',
+  'napa autocare', 'precision tune', 'car-x', 'speedy auto',
+  'sears auto', 'walmart auto',
+];
+
+function isFranchise(name: string): boolean {
+  const lower = name.toLowerCase();
+  return FRANCHISE_PATTERNS.some((p) => lower.includes(p));
+}
+
 function specialtiesFromCategories(
   cats: { alias: string; title: string }[]
 ): string[] {
