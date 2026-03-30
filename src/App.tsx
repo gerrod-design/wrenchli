@@ -18,9 +18,8 @@ import ChatBot from "@/components/ChatBot";
 import SitePasswordGate from "@/components/SitePasswordGate";
 import ScrollToTop from "@/components/ScrollToTop";
 
-// Password gate temporarily disabled for testing
 function SitePasswordGateWrapper() {
-  return <AppLayout />;
+  return <SitePasswordGate><AppLayout /></SitePasswordGate>;
 }
 import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
