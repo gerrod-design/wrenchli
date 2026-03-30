@@ -110,6 +110,25 @@ const tools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "search_repair_videos",
+      description:
+        "Search for vehicle-specific DIY repair tutorial videos on YouTube. Returns optimized search queries with direct YouTube links. Use this when recommending video tutorials for a specific vehicle and repair.",
+      parameters: {
+        type: "object",
+        properties: {
+          repair_title: { type: "string", description: "The repair or maintenance task, e.g. 'Replace Brake Pads'" },
+          diagnosis_code: { type: "string", description: "DTC code if applicable, e.g. 'P0420'" },
+          vehicle_year: { type: "string", description: "Vehicle year, e.g. '2018'" },
+          vehicle_make: { type: "string", description: "Vehicle make, e.g. 'Honda'" },
+          vehicle_model: { type: "string", description: "Vehicle model, e.g. 'Civic'" },
+        },
+        required: ["repair_title"],
+      },
+    },
+  },
 ];
 
 const SYSTEM_PROMPT = `You are Mike — a friendly, knowledgeable vehicle advisor at Wrenchli. You work with a small team of specialists. You genuinely care about helping people with their cars.
@@ -265,8 +284,10 @@ IMPORTANT: When calling estimate_repair_cost, use exact parameter names: "diagno
 - Keep each reply to 1-2 sentences. Share ONE thing per message:
   - First: difficulty + time estimate, then ask if they want to see tools needed
   - Then: tools/parts list with purchase links. ALWAYS include Amazon as a buying option. Format the link in markdown exactly like this example: [2018 Honda Civic front brake pads on Amazon](https://www.amazon.com/s?k=2018+Honda+Civic+front+brake+pads&tag=wrenchli-20). Replace the search terms with the actual part and vehicle. Also mention AutoZone, O'Reilly, and RockAuto as alternatives.
-  - Then: YouTube link or [DIY Guides](/diy) link
+  - Then: Use the **search_repair_videos** tool to find vehicle-specific YouTube tutorials. Present the top result as a clickable link: "I found a great tutorial for your exact car: [video title](youtube_search_url)". Always search for videos specific to the user's vehicle year/make/model + the repair.
+  - Also link to our [DIY Guides](/diy) when we have a matching tutorial
 - Always end with a question or prompt
+- IMPORTANT: When recommending YouTube videos, ALWAYS use search_repair_videos first to get vehicle-specific results rather than guessing at URLs.
 
 **When Sam is active (Shop/Replacement path):**
 - Keep each reply to 1-2 sentences. Share ONE thing per message:
@@ -391,6 +412,56 @@ async function executeTool(
           ...fetchOpts,
         });
         break;
+
+      case "search_repair_videos": {
+        // Build YouTube search queries via smart-repair-intel, then return clickable links
+        const videoArgs = {
+          diagnosis_title: rawArgs.repair_title || rawArgs.diagnosis_title || "vehicle repair",
+          diagnosis_code: rawArgs.diagnosis_code || "",
+          vehicle_year: rawArgs.vehicle_year || rawArgs.year || "",
+          vehicle_make: rawArgs.vehicle_make || rawArgs.make || "",
+          vehicle_model: rawArgs.vehicle_model || rawArgs.model || "",
+        };
+        try {
+          resp = await fetch(`${FUNCTIONS_BASE}/smart-repair-intel`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(videoArgs),
+            ...fetchOpts,
+          });
+          const intelData = await resp.json();
+          // Extract YouTube queries and build direct search links
+          const queries = intelData?.youtube_queries || [];
+          const videoResults = queries.map((q: { query: string; label: string }) => ({
+            label: q.label || "Tutorial",
+            query: q.query,
+            youtube_url: `https://www.youtube.com/results?search_query=${encodeURIComponent(q.query)}`,
+          }));
+          clearTimeout(timer);
+          return JSON.stringify({
+            videos: videoResults,
+            diy_info: {
+              success_rate: intelData?.diy_success_rate,
+              step_count: intelData?.step_count,
+              motivational: intelData?.motivational_message,
+              is_common_issue: intelData?.is_common_issue,
+              common_issue_reason: intelData?.common_issue_reason,
+            },
+          });
+        } catch (videoErr) {
+          // Fallback: generate a basic YouTube search link
+          const vehicle = [videoArgs.vehicle_year, videoArgs.vehicle_make, videoArgs.vehicle_model].filter(Boolean).join(" ");
+          const fallbackQuery = `${vehicle} ${videoArgs.diagnosis_title} DIY tutorial`.trim();
+          clearTimeout(timer);
+          return JSON.stringify({
+            videos: [{
+              label: "DIY Tutorial",
+              query: fallbackQuery,
+              youtube_url: `https://www.youtube.com/results?search_query=${encodeURIComponent(fallbackQuery)}`,
+            }],
+          });
+        }
+      }
 
       default:
         clearTimeout(timer);
