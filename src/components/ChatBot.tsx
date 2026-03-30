@@ -301,6 +301,32 @@ export default function ChatBot() {
     }
   }, [input, loading, messages, pendingPhotos, setMessages, ensureActiveConversation]);
 
+  const handleVinDecoded = useCallback((vehicle: DecodedVehicle) => {
+    setVinModalOpen(false);
+    setVinText("");
+    setVinError("");
+    const desc = `My vehicle is a ${vehicle.year} ${vehicle.make} ${vehicle.model}${vehicle.trim ? ` ${vehicle.trim}` : ""}${vehicle.engine ? `, ${vehicle.engine}` : ""}`;
+    send(desc);
+  }, [send]);
+
+  const handleVinSubmit = async () => {
+    const cleaned = sanitizeVin(vinText);
+    if (!isValidVin(cleaned)) {
+      setVinError("VINs are exactly 17 characters (no I, O, or Q).");
+      return;
+    }
+    setVinLoading(true);
+    setVinError("");
+    try {
+      const vehicle = await decodeVin(cleaned);
+      handleVinDecoded(vehicle);
+    } catch {
+      setVinError("Couldn't decode that VIN. Please try again.");
+    } finally {
+      setVinLoading(false);
+    }
+  };
+
   // Auto-send when voice recognition ends with transcript
   const sendRef = useRef(send);
   const lastAutoSentTranscriptRef = useRef<string | null>(null);
