@@ -83,21 +83,22 @@ export function useTextToSpeech(
     }
   }, []);
 
-  const resolveSpeechDone = useCallback(() => {
+  // Plain helper functions (NOT hooks) to manage speech-done promises
+  function resolveSpeechDone() {
     const resolvers = speechDoneResolversRef.current;
     speechDoneResolversRef.current = [];
     currentSpeechPromiseRef.current = null;
     for (const resolve of resolvers) resolve();
-  }, []);
+  }
 
-  const createSpeechDonePromise = useCallback((): Promise<void> => {
+  function createSpeechDonePromise(): Promise<void> {
     if (currentSpeechPromiseRef.current) return currentSpeechPromiseRef.current;
     const promise = new Promise<void>((resolve) => {
       speechDoneResolversRef.current.push(resolve);
     });
     currentSpeechPromiseRef.current = promise;
     return promise;
-  }, []);
+  }
 
   const queueResumeListening = useCallback(() => {
     clearSpeechEndTimeout();
