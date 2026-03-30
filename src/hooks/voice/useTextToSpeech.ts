@@ -129,7 +129,7 @@ export function useTextToSpeech(
     }
     resolveSpeechDone();
     setSpeakingSafe(false);
-  }, [clearSpeechEndTimeout, resolveSpeechDone, setSpeakingSafe]);
+  }, [clearSpeechEndTimeout, setSpeakingSafe]);
 
   useEffect(() => {
     return () => {
@@ -148,7 +148,7 @@ export function useTextToSpeech(
       }
       resolveSpeechDone();
     };
-  }, [clearSpeechEndTimeout, resolveSpeechDone]);
+  }, [clearSpeechEndTimeout]);
 
   const unlockAudioPlayback = useCallback(async () => {
     if (playbackUnlockedRef.current) return true;
@@ -227,7 +227,7 @@ export function useTextToSpeech(
 
       window.speechSynthesis.speak(utterance);
     },
-    [queueResumeListening, resolveSpeechDone, setSpeakingSafe],
+    [queueResumeListening, setSpeakingSafe],
   );
 
   const speak = useCallback(
@@ -325,11 +325,9 @@ export function useTextToSpeech(
     },
     [
       stopAudio,
-      createSpeechDonePromise,
       speakWithBrowserTTS,
       unlockAudioPlayback,
       setSpeakingSafe,
-      resolveSpeechDone,
       queueResumeListening,
       voiceEnabledRef,
     ],
