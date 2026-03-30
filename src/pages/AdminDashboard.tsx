@@ -314,6 +314,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="optimization"><TrendingUp className="h-4 w-4 mr-1.5 hidden sm:inline" />Optimize</TabsTrigger>
             <TabsTrigger value="youtube"><Youtube className="h-4 w-4 mr-1.5 hidden sm:inline" />YouTube</TabsTrigger>
             <TabsTrigger value="shop-interest"><Heart className="h-4 w-4 mr-1.5 hidden sm:inline" />Shop Interest</TabsTrigger>
+            <TabsTrigger value="zip-demand"><MapPin className="h-4 w-4 mr-1.5 hidden sm:inline" />ZIP Demand</TabsTrigger>
             <TabsTrigger value="known-issues"><Wrench className="h-4 w-4 mr-1.5 hidden sm:inline" />Known Issues</TabsTrigger>
           </TabsList>
 
