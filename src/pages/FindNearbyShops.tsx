@@ -242,8 +242,9 @@ export default function FindNearbyShops() {
   return (
     <main className="min-h-screen bg-background pb-24">
       <SEO
-        title="Find Nearby Auto Repair Shops | Wrenchli"
+        title="Find Nearby Auto Repair Shops"
         description="Search for top-rated auto repair shops near you. See ratings, reviews, photos, and contact info powered by Yelp."
+        path="/find-nearby-shops"
       />
 
       {/* Hero */}
