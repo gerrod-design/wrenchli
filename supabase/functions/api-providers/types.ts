@@ -17,4 +17,5 @@ export interface ServiceProvider {
   booking_url?: string;
   is_dealer?: boolean;
   dealer_brands?: string[];
+  is_partnered?: boolean;
 }

@@ -21,6 +21,7 @@ interface ServiceProvider {
   quote_url: string;
   is_dealer?: boolean;
   dealer_brands?: string[];
+  is_partnered?: boolean;
 }
 
 /* ── Location Mapping ── */
@@ -416,6 +417,7 @@ serve(async (req) => {
     const coords = city ? cityCoords[city] : cityCoords["Detroit"];
     const providersWithCoords = providers.map((p, i) => ({
       ...p,
+      is_partnered: p.is_partnered !== false, // All current DB entries are partnered
       lat: coords ? coords.lat + (i * 0.008 - 0.02) * (i % 2 === 0 ? 1 : -1) : undefined,
       lng: coords ? coords.lng + (i * 0.006 - 0.015) * (i % 2 === 0 ? -1 : 1) : undefined,
     }));
