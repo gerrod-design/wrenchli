@@ -594,6 +594,19 @@ export default function ChatBot() {
                     const prevAssistant = messages.slice(0, i).reverse().find(msg => msg.role === "assistant");
                     const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
                     const isLastMsg = i === messages.length - 1;
+                    // If no explicit marker found (defaults to mike) but previous agent was a specialist,
+                    // check if Mike is actually announcing himself or if the marker was just omitted.
+                    // An explicit handoff back to Mike requires handoff language in the previous message.
+                    const hasExplicitMarker = m.role === "assistant" && /\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]/i.test(typeof m.content === "string" ? m.content : "");
+                    if (m.role === "assistant" && currentAgent === "mike" && !hasExplicitMarker && prevAgent && prevAgent !== "mike") {
+                      // Check if the previous specialist message explicitly handed back to Mike
+                      const prevText = typeof prevAssistant?.content === "string" ? prevAssistant.content : "";
+                      const handsBackToMike = /\b(?:hand(?:ing)?\s+(?:it\s+)?(?:back|over)\s+to\s+Mike|let me get Mike|bringing Mike back|Mike (?:will|can) take it from here)\b/i.test(prevText);
+                      if (!handsBackToMike) {
+                        // Assume the specialist is still active — marker was omitted
+                        currentAgent = prevAgent;
+                      }
+                    }
                     if (isLastMsg && loading && currentAgent === "mike" && prevAgent && prevAgent !== "mike") {
                       currentAgent = prevAgent;
                     } else if (isLastMsg && loading && currentAgent === "mike" && prevAssistant) {
