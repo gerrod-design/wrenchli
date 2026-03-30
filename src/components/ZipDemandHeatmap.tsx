@@ -8,6 +8,11 @@ import { MapPin, TrendingUp, AlertTriangle, Loader2, Search, Download, CheckCirc
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
 interface SearchLog {
@@ -324,17 +329,50 @@ export default function ZipDemandHeatmap() {
           <div className="rounded-xl border border-border bg-card p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-heading font-semibold">Expansion Priority List</h3>
-              {unservedByZip.length > 0 && (
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={handleIngestAll}
-                  disabled={unservedByZip.every((z) => ingested[z.zip] !== undefined)}
-                >
-                  <Download className="h-4 w-4 mr-1" />
-                  Fill All Gaps
-                </Button>
-              )}
+                {(() => {
+                  const remaining = unservedByZip.filter((z) => ingested[z.zip] === undefined);
+                  const allDone = remaining.length === 0;
+                  const estimatedCalls = remaining.length;
+                  return remaining.length > 0 || unservedByZip.length > 0 ? (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="default" disabled={allDone}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Fill All Gaps
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Confirm Bulk Yelp Ingestion</AlertDialogTitle>
+                          <AlertDialogDescription asChild>
+                            <div className="space-y-3">
+                              <p>This will query the Yelp Fusion API for <strong>{estimatedCalls}</strong> unserved ZIP code{estimatedCalls !== 1 ? "s" : ""}.</p>
+                              <div className="rounded-lg bg-muted p-3 space-y-1 text-sm">
+                                <div className="flex justify-between"><span className="text-muted-foreground">API calls:</span><span className="font-mono font-semibold">{estimatedCalls}</span></div>
+                                <div className="flex justify-between"><span className="text-muted-foreground">Est. shops per call:</span><span className="font-mono">~20–50</span></div>
+                                <div className="flex justify-between"><span className="text-muted-foreground">Total est. shops:</span><span className="font-mono font-semibold">~{estimatedCalls * 20}–{estimatedCalls * 50}</span></div>
+                              </div>
+                              <p className="text-xs text-muted-foreground">Yelp Fusion free tier allows 5,000 calls/day. Each ZIP uses 1 call.</p>
+                              <div className="text-xs font-medium">ZIPs to process:</div>
+                              <div className="flex flex-wrap gap-1">
+                                {remaining.map((z) => (
+                                  <Badge key={z.zip} variant="outline" className="font-mono text-xs">{z.zip}</Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleIngestAll}>
+                            Proceed ({estimatedCalls} call{estimatedCalls !== 1 ? "s" : ""})
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : null;
+                })()}
+
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
