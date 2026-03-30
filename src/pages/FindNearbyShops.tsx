@@ -116,6 +116,7 @@ function PhotoCarousel({ photos, name }: { photos: string[]; name: string }) {
 
 function ShopCard({ shop }: { shop: YelpShop }) {
   const firstReview = shop.reviews[0];
+  const franchise = isFranchise(shop.name);
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow border-border/60">
       <CardContent className="p-0">
@@ -140,6 +141,12 @@ function ShopCard({ shop }: { shop: YelpShop }) {
                 </span>
                 {shop.price && (
                   <Badge variant="secondary" className="text-xs">{shop.price}</Badge>
+                )}
+                {!franchise && (
+                  <Badge variant="outline" className="text-xs gap-1 border-accent/40 text-accent">
+                    <ShieldCheck className="h-3 w-3" />
+                    Local Independent
+                  </Badge>
                 )}
               </div>
             </div>
