@@ -2,6 +2,7 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 import { buildVehicleContext } from "./vehicle-known-issues.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const MAX_MESSAGES = 80;
 const MAX_CONTENT_LENGTH = 8000;
@@ -129,8 +130,22 @@ const tools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "lookup_diy_tutorial",
+      description:
+        "Search Wrenchli's built-in DIY tutorial library for a matching step-by-step repair guide. Returns tutorial details with a direct link if found. Use this alongside search_repair_videos to offer both written guides and video tutorials.",
+      parameters: {
+        type: "object",
+        properties: {
+          repair_keyword: { type: "string", description: "Keyword(s) describing the repair, e.g. 'brake pads', 'oil change', 'battery'" },
+        },
+        required: ["repair_keyword"],
+      },
+    },
+  },
 ];
-
 const SYSTEM_PROMPT = `You are Mike — a friendly, knowledgeable vehicle advisor at Wrenchli. You work with a small team of specialists. You genuinely care about helping people with their cars.
 
 **YOUR IDENTITY — CRITICAL:**
@@ -271,6 +286,8 @@ You have tools to:
 3. **estimate_vehicle_value** — Check vehicle worth → bring in Sam
 4. **find_local_shops** — Find trusted mechanics nearby → bring in Sam
 5. **diagnose_damage_photo** — Analyze photos of vehicle damage
+6. **search_repair_videos** — Find vehicle-specific YouTube tutorial videos
+7. **lookup_diy_tutorial** — Check if Wrenchli has a matching step-by-step written guide
 
 IMPORTANT: When calling estimate_repair_cost, use exact parameter names: "diagnosis_title", "vehicle_year", "vehicle_make", "vehicle_model", "zip_code".
 
@@ -284,8 +301,12 @@ IMPORTANT: When calling estimate_repair_cost, use exact parameter names: "diagno
 - Keep each reply to 1-2 sentences. Share ONE thing per message:
   - First: difficulty + time estimate, then ask if they want to see tools needed
   - Then: tools/parts list with purchase links. ALWAYS include Amazon as a buying option. Format the link in markdown exactly like this example: [2018 Honda Civic front brake pads on Amazon](https://www.amazon.com/s?k=2018+Honda+Civic+front+brake+pads&tag=wrenchli-20). Replace the search terms with the actual part and vehicle. Also mention AutoZone, O'Reilly, and RockAuto as alternatives.
-  - Then: Use the **search_repair_videos** tool to find vehicle-specific YouTube tutorials. The tool returns REAL video results with titles and URLs. Present the top result as a clickable markdown link: "[Video Title](video_url)". Always search for videos specific to the user's vehicle year/make/model + the repair.
-  - Also link to our [DIY Guides](/diy) when we have a matching tutorial
+  - Then: Use BOTH **lookup_diy_tutorial** AND **search_repair_videos** tools to offer the best resources:
+    - Call lookup_diy_tutorial first to check if Wrenchli has a matching step-by-step written guide. If found, share it as a markdown link: "[Guide Title](/diy/slug)". Present it as "We have a step-by-step guide for this" — it's a first-party resource.
+    - Also call search_repair_videos for vehicle-specific YouTube video tutorials. Present the top result as a clickable markdown link: "[Video Title](video_url)".
+    - When BOTH are available, share them together naturally: "Here's our [step-by-step guide](/diy/slug) — and here's a great video specific to your car: [Video Title](url)"
+    - If only one is found, share whichever is available.
+  - Also link to our [DIY Guides](/diy) when relevant
 - Always end with a question or prompt
 - IMPORTANT: When recommending YouTube videos, ALWAYS use search_repair_videos first to get vehicle-specific results rather than guessing at URLs.
 
@@ -449,6 +470,48 @@ async function executeTool(
           }],
           search_query: searchQuery,
         });
+      }
+
+      case "lookup_diy_tutorial": {
+        const keyword = String(rawArgs.repair_keyword || "").toLowerCase().trim();
+        if (!keyword) {
+          clearTimeout(timer);
+          return JSON.stringify({ found: false, message: "No keyword provided" });
+        }
+        try {
+          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+          const sb = createClient(supabaseUrl, serviceKey);
+
+          const { data: tutorials } = await sb
+            .from("diy_tutorials")
+            .select("slug, title, description, difficulty, estimated_time_minutes, category")
+            .eq("is_published", true);
+
+          // Simple keyword matching against title and category
+          const matches = (tutorials || []).filter((t: { title: string; category: string }) =>
+            t.title.toLowerCase().includes(keyword) ||
+            keyword.split(/\s+/).some((w: string) => t.title.toLowerCase().includes(w))
+          );
+
+          if (matches.length > 0) {
+            const results = matches.slice(0, 3).map((t: { slug: string; title: string; description: string; difficulty: string; estimated_time_minutes: number }) => ({
+              title: t.title,
+              url: `/diy/${t.slug}`,
+              description: t.description,
+              difficulty: t.difficulty,
+              estimated_time_minutes: t.estimated_time_minutes,
+            }));
+            clearTimeout(timer);
+            return JSON.stringify({ found: true, tutorials: results });
+          }
+          clearTimeout(timer);
+          return JSON.stringify({ found: false, message: "No matching tutorial found", all_guides_url: "/diy" });
+        } catch (dbErr) {
+          console.error("lookup_diy_tutorial error:", dbErr);
+          clearTimeout(timer);
+          return JSON.stringify({ found: false, message: "Could not search tutorials", all_guides_url: "/diy" });
+        }
       }
 
       default:
