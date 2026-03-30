@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Json } from "@/integrations/supabase/types";
+import RelatedVideos from "@/components/diy/RelatedVideos";
 
 interface PartItem {
   name: string;
@@ -399,6 +400,12 @@ export default function DIYTutorialDetail() {
             )}
           </div>
         )}
+
+        {/* Related YouTube Videos */}
+        <RelatedVideos
+          tutorialTitle={tutorial.title}
+          vehicleTypes={tutorial.vehicle_types}
+        />
 
         {/* FTC Disclosure */}
         <div className="rounded-xl border border-accent/30 bg-accent/10 p-4 text-sm text-muted-foreground" role="note">
