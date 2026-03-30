@@ -304,6 +304,14 @@ export function useTextToSpeech(
     lastSpokenRef.current = "";
   }, []);
 
+  /** Returns a promise that resolves when the current speech finishes (or immediately if silent). */
+  const waitForSpeechEnd = useCallback((): Promise<void> => {
+    if (!isSpeaking) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      speakDoneResolverRef.current = resolve;
+    });
+  }, [isSpeaking]);
+
   return {
     isSpeaking,
     supportsTTS,
@@ -312,5 +320,6 @@ export function useTextToSpeech(
     stopAudio,
     unlockAudioPlayback,
     resetLastSpoken,
+    waitForSpeechEnd,
   };
 }
