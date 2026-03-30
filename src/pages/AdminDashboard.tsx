@@ -333,6 +333,11 @@ export default function AdminDashboard() {
             <ShopInterestAnalytics />
           </TabsContent>
 
+          {/* ZIP Demand Heatmap Tab */}
+          <TabsContent value="zip-demand" className="mt-6">
+            <ZipDemandHeatmap />
+          </TabsContent>
+
           {/* MI Loan Funnel Tab */}
           <TabsContent value="mi-loan" className="mt-6">
             <MILoanFunnel />
