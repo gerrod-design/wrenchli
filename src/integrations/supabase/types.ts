@@ -1068,6 +1068,99 @@ export type Database = {
           },
         ]
       }
+      service_providers: {
+        Row: {
+          address: string
+          availability: string | null
+          booking_url: string | null
+          city: string | null
+          created_at: string
+          data_source: string
+          data_source_id: string | null
+          dealer_brands: string[] | null
+          external_id: string | null
+          id: string
+          is_active: boolean | null
+          is_dealer: boolean | null
+          is_partnered: boolean | null
+          last_refreshed_at: string | null
+          lat: number | null
+          lng: number | null
+          name: string
+          phone: string | null
+          price_tier: string | null
+          quote_url: string | null
+          rating: number | null
+          response_time: string | null
+          review_count: number | null
+          specialties: string[] | null
+          state: string | null
+          updated_at: string
+          wrenchli_verified: boolean | null
+          zip_code: string
+        }
+        Insert: {
+          address: string
+          availability?: string | null
+          booking_url?: string | null
+          city?: string | null
+          created_at?: string
+          data_source?: string
+          data_source_id?: string | null
+          dealer_brands?: string[] | null
+          external_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_dealer?: boolean | null
+          is_partnered?: boolean | null
+          last_refreshed_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          name: string
+          phone?: string | null
+          price_tier?: string | null
+          quote_url?: string | null
+          rating?: number | null
+          response_time?: string | null
+          review_count?: number | null
+          specialties?: string[] | null
+          state?: string | null
+          updated_at?: string
+          wrenchli_verified?: boolean | null
+          zip_code: string
+        }
+        Update: {
+          address?: string
+          availability?: string | null
+          booking_url?: string | null
+          city?: string | null
+          created_at?: string
+          data_source?: string
+          data_source_id?: string | null
+          dealer_brands?: string[] | null
+          external_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_dealer?: boolean | null
+          is_partnered?: boolean | null
+          last_refreshed_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          phone?: string | null
+          price_tier?: string | null
+          quote_url?: string | null
+          rating?: number | null
+          response_time?: string | null
+          review_count?: number | null
+          specialties?: string[] | null
+          state?: string | null
+          updated_at?: string
+          wrenchli_verified?: boolean | null
+          zip_code?: string
+        }
+        Relationships: []
+      }
       shop_applications: {
         Row: {
           city: string | null
