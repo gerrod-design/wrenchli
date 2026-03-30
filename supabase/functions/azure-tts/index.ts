@@ -58,8 +58,15 @@ serve(async (req) => {
 
     const voiceName = VOICE_MAP[agent] || VOICE_MAP.mike;
 
+    // Preprocess dollar amounts so TTS reads them naturally
+    // "$1,200" → "1200 dollars", "$700" → "700 dollars"
+    let preprocessed = text.replace(/\$(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)/g, (_match, num) => {
+      const plain = num.replace(/,/g, "");
+      return `${plain} dollars`;
+    });
+
     // Clean text for SSML (escape XML special chars)
-    let cleanText = text
+    let cleanText = preprocessed
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -67,14 +74,14 @@ serve(async (req) => {
       .replace(/'/g, "&apos;");
 
     // Add SSML break tags for natural prosody at punctuation boundaries
-    // Periods / question marks / exclamation points → medium pause
-    cleanText = cleanText.replace(/([.!?])\s+/g, '$1<break time="350ms"/> ');
-    // Commas → short pause
-    cleanText = cleanText.replace(/,\s*/g, ',<break time="150ms"/> ');
+    // Periods / question marks / exclamation points → shorter natural pause
+    cleanText = cleanText.replace(/([.!?])\s+/g, '$1<break time="250ms"/> ');
+    // Commas → very brief pause (avoid robotic gaps around names)
+    cleanText = cleanText.replace(/,\s*/g, ',<break time="80ms"/> ');
     // Em-dash or double-dash → short pause
-    cleanText = cleanText.replace(/\s*[—–]\s*/g, ' <break time="200ms"/> ');
+    cleanText = cleanText.replace(/\s*[—–]\s*/g, ' <break time="150ms"/> ');
     // Ellipsis → longer pause
-    cleanText = cleanText.replace(/\.{3}/g, '<break time="500ms"/>');
+    cleanText = cleanText.replace(/\.{3}/g, '<break time="400ms"/>');
 
     const prosody = PROSODY_MAP[agent] || { rate: "+0%", pitch: "+0%" };
 
