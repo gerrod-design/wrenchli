@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "@/hooks/use-toast";
 import CustomerRecommendationSection from "@/components/recommend/CustomerRecommendationSection";
+import { QRCodeSVG } from "qrcode.react";
 
 const steps = [
   { step: 1, title: "Join the Network", desc: "Submit your application, verify credentials, and go live in days — not weeks." },
