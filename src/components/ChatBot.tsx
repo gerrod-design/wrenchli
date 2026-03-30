@@ -65,6 +65,10 @@ export default function ChatBot() {
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [vinModalOpen, setVinModalOpen] = useState(false);
+  const [vinText, setVinText] = useState("");
+  const [vinLoading, setVinLoading] = useState(false);
+  const [vinError, setVinError] = useState("");
   const [hasInteracted, setHasInteracted] = useState(() =>
     localStorage.getItem("wrenchli_chat_interacted") === "true"
   );
