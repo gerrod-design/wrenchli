@@ -4,7 +4,7 @@ import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Loader2, Star, Phone, ExternalLink, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
+import { Search, MapPin, Loader2, Star, Phone, ExternalLink, ChevronLeft, ChevronRight, MessageSquare, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,23 @@ interface YelpShop {
   distance_miles: number | null;
   is_closed: boolean;
   reviews: YelpReview[];
+}
+
+const FRANCHISE_PATTERNS = [
+  'firestone', 'aamco', 'meineke', 'jiffy lube', 'midas',
+  'pep boys', 'pepboys', 'valvoline', 'take 5', 'maaco',
+  'safelite', 'tuffy', 'goodyear', 'ntb ', 'national tire',
+  'big o tire', 'les schwab', 'christian brothers',
+  'grease monkey', 'express oil', 'pennzoil', 'brake masters',
+  'sun devil', 'monro ', 'tire kingdom', 'tires plus',
+  'sullivan tire', 'belle tire', 'discount tire',
+  'napa autocare', 'precision tune', 'car-x', 'speedy auto',
+  'sears auto', 'walmart auto',
+];
+
+function isFranchise(name: string): boolean {
+  const lower = name.toLowerCase();
+  return FRANCHISE_PATTERNS.some((p) => lower.includes(p));
 }
 
 function StarRating({ rating }: { rating: number }) {
@@ -99,6 +116,7 @@ function PhotoCarousel({ photos, name }: { photos: string[]; name: string }) {
 
 function ShopCard({ shop }: { shop: YelpShop }) {
   const firstReview = shop.reviews[0];
+  const franchise = isFranchise(shop.name);
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow border-border/60">
       <CardContent className="p-0">
@@ -123,6 +141,12 @@ function ShopCard({ shop }: { shop: YelpShop }) {
                 </span>
                 {shop.price && (
                   <Badge variant="secondary" className="text-xs">{shop.price}</Badge>
+                )}
+                {!franchise && (
+                  <Badge variant="outline" className="text-xs gap-1 border-accent/40 text-accent">
+                    <ShieldCheck className="h-3 w-3" />
+                    Local Independent
+                  </Badge>
                 )}
               </div>
             </div>

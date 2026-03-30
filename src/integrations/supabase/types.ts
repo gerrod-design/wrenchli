@@ -1082,6 +1082,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_dealer: boolean | null
+          is_franchise: boolean
           is_partnered: boolean | null
           last_refreshed_at: string | null
           lat: number | null
@@ -1112,6 +1113,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_dealer?: boolean | null
+          is_franchise?: boolean
           is_partnered?: boolean | null
           last_refreshed_at?: string | null
           lat?: number | null
@@ -1142,6 +1144,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_dealer?: boolean | null
+          is_franchise?: boolean
           is_partnered?: boolean | null
           last_refreshed_at?: string | null
           lat?: number | null

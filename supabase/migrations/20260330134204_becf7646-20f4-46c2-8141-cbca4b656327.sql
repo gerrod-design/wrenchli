@@ -1,0 +1,1 @@
+UPDATE public.service_providers SET is_franchise = false WHERE name = 'Monroeville Transmission';
