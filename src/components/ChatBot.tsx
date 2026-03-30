@@ -90,6 +90,20 @@ export default function ChatBot() {
   waitForSpeechEndRef.current = waitForSpeechEnd;
   voiceEnabledStateRef.current = voiceEnabled;
   voiceOwnerRef.current = voiceOwner;
+  // Show toast when chat opens with restored conversations
+  const hasShownRestoredToast = useRef(false);
+  useEffect(() => {
+    if (open && !hasShownRestoredToast.current) {
+      const restoredCount = conversations.filter((c) => c.messages.length > 0).length;
+      if (restoredCount > 0) {
+        toast.info(
+          `${restoredCount} previous conversation${restoredCount > 1 ? "s" : ""} restored`,
+          { duration: 3000 }
+        );
+      }
+      hasShownRestoredToast.current = true;
+    }
+  }, [open, conversations]);
 
   // When transcript changes (from voice input), update input field
   useEffect(() => {
