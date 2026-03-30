@@ -4,6 +4,7 @@ import AudioRecordButton from "./chatbot/AudioRecordButton";
 import ToolHint from "./chatbot/ToolHint";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import YouTubePreviewCard, { isYouTubeUrl } from "./chatbot/YouTubePreviewCard";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
