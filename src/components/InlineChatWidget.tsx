@@ -556,121 +556,149 @@ export default function InlineChatWidget() {
             </div>
           )}
 
-          {/* Input bar */}
-          <div className="border-t border-border">
-            <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2.5">
-              <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Attach photo">
-                <ImagePlus className="h-4 w-4" />
+          {/* Tools row */}
+          <div className="border-t border-border px-3 py-1.5 flex items-center gap-1">
+            <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mr-1">Tools</span>
+            <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Attach photo">
+              <ImagePlus className="h-3.5 w-3.5" />
+            </button>
+            {isMobile && (
+              <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
+                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Take photo">
+                <Camera className="h-3.5 w-3.5" />
               </button>
-              {isMobile && (
-                <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Take photo">
-                  <Camera className="h-4 w-4" />
-                </button>
-              )}
-              {/* VIN Scan */}
-              <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Scan VIN">
-                <ScanLine className="h-4 w-4" />
-              </button>
-              {/* Audio recording for car noises */}
-              <ToolHint id="car-noise" label="🔊 Record engine sounds for diagnosis" delay={3000}>
-                <AudioRecordButton
-                  disabled={loading || uploading}
-                  onAnalysis={(analysis) => {
-                    const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
-                    const assistantMsg: Msg = { role: "assistant", content: analysis };
-                    setMessages((prev) => [...prev, userMsg, assistantMsg]);
-                  }}
-                />
-              </ToolHint>
-              {/* Voice toggle */}
-              {(supportsSTT || supportsTTS) && (
-                <ToolHint id="voice-mode" label="🎙️ Talk hands-free with your advisor" delay={4500}>
-                  <button type="button" onClick={async () => {
-                    const turningOn = !voiceEnabled;
-                    if (turningOn) {
-                      const unlocked = await unlockAudioPlayback();
-                      if (!unlocked) {
-                        toast.warning("Speaker audio may stay muted for now, but voice mode is still enabled.");
+            )}
+            <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Scan VIN">
+              <ScanLine className="h-3.5 w-3.5" />
+            </button>
+            <AudioRecordButton
+              disabled={loading || uploading}
+              onAnalysis={(analysis) => {
+                const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
+                const assistantMsg: Msg = { role: "assistant", content: analysis };
+                setMessages((prev) => [...prev, userMsg, assistantMsg]);
+              }}
+            />
+          </div>
+
+          {/* Primary input: Type or Talk */}
+          <div className="border-t border-border px-3 py-2.5">
+            {voiceEnabled ? (
+              /* ── Voice mode active ── */
+              <div className="flex items-center gap-2">
+                {isListening && <AudioWaveform />}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (isListening) {
+                      stopListening(VOICE_OWNER);
+                    } else {
+                      await unlockAudioPlayback();
+                      const started = startListening(VOICE_OWNER);
+                      if (!started) {
+                        toast.error("Couldn't start listening. Check mic permission and try again.");
                       }
                     }
-                    toggleVoice();
-
-                    if (turningOn) {
+                  }}
+                  disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
+                  className={`relative flex h-11 flex-1 items-center justify-center gap-2 rounded-xl font-medium text-sm transition-all disabled:opacity-40 ${
+                    isListening
+                      ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/30"
+                      : "bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20"
+                  }`}
+                  aria-label={isListening ? "Stop listening" : "Tap to speak"}
+                >
+                  {isListening ? (
+                    <>
+                      <MicOff className="h-4 w-4" />
+                      <span>Tap to stop</span>
+                      <span className="absolute top-1 right-2 flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive-foreground opacity-60" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-destructive-foreground" />
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="h-4 w-4" />
+                      <span>Tap to speak</span>
+                    </>
+                  )}
+                </button>
+                {/* Switch to type */}
+                <button
+                  type="button"
+                  onClick={() => { stopListening(VOICE_OWNER); stopSpeaking(); toggleVoice(); }}
+                  className="flex h-11 items-center gap-1.5 rounded-xl border border-border px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  aria-label="Switch to typing"
+                >
+                  <Keyboard className="h-3.5 w-3.5" />
+                  <span>Type</span>
+                </button>
+              </div>
+            ) : (
+              /* ── Text mode (default) ── */
+              <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2">
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Tell me what's going on…"}
+                  maxLength={8000}
+                  className="flex-1 rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-ring"
+                  disabled={loading}
+                />
+                <button type="submit" disabled={loading || (!input.trim() && pendingPhotos.length === 0)}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground disabled:opacity-40" aria-label="Send">
+                  <Send className="h-4 w-4" />
+                </button>
+                {/* Switch to talk */}
+                {(supportsSTT || supportsTTS) && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const unlocked = await unlockAudioPlayback();
+                      if (!unlocked) {
+                        toast.warning("Speaker audio may stay muted — but voice mode is on.");
+                      }
+                      toggleVoice();
                       toast.success("🎙️ Voice mode on — I'll speak my responses!", { duration: 3000 });
                       if (supportsSTT) {
                         setTimeout(() => {
                           const started = startListening(VOICE_OWNER);
                           if (!started) {
-                            toast.error("Microphone access is blocked. Please allow mic permission and try again.");
+                            toast.error("Microphone access is blocked. Allow mic permission and try again.");
                           }
                         }, 0);
                       }
-                    } else {
-                      stopListening(VOICE_OWNER);
-                      stopSpeaking();
-                    }
-                  }} disabled={loading}
-                    className={`flex h-9 items-center justify-center rounded-lg px-2 transition-colors disabled:opacity-40 ${
-                      voiceEnabled
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`} aria-label={voiceEnabled ? "Disable voice mode" : "Enable voice mode"}>
-                    {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                  </button>
-                </ToolHint>
-              )}
-              {/* Mic button (only when voice mode is on) */}
-              {voiceEnabled && supportsSTT && (
-                <>
-                  {isListening && <AudioWaveform />}
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      if (isListening) {
-                        stopListening(VOICE_OWNER);
-                      } else {
-                        const unlocked = await unlockAudioPlayback();
-                        if (!unlocked) {
-                          toast.warning("Mic is on. If replies are muted, tap Voice once more to unlock speaker audio.");
-                        }
-                        const started = startListening(VOICE_OWNER);
-                        if (!started) {
-                          toast.error("Couldn't start listening. Check mic permission and try again.");
-                        }
-                      }
                     }}
-                    disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
-                    className={`relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
-                      isListening
-                        ? "bg-destructive text-destructive-foreground ring-2 ring-destructive/50 ring-offset-1 ring-offset-background"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`} aria-label={isListening ? "Stop listening" : "Voice input"}>
-                    {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                    {isListening && (
-                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
-                      </span>
-                    )}
+                    disabled={loading}
+                    className="flex h-10 items-center gap-1.5 rounded-xl bg-emerald-500/10 border border-emerald-400/30 px-3 text-sm font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors disabled:opacity-40"
+                    aria-label="Switch to voice mode"
+                  >
+                    <Mic className="h-4 w-4" />
+                    <span className="hidden sm:inline">Talk</span>
                   </button>
-                </>
-              )}
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : voiceEnabled ? "Tap mic or type…" : "Tell me what's going on…"}
-                maxLength={8000}
-                className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
-                disabled={loading}
-              />
-              <button type="submit" disabled={loading || (!input.trim() && pendingPhotos.length === 0)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground disabled:opacity-40" aria-label="Send">
-                <Send className="h-4 w-4" />
-              </button>
-            </form>
+                )}
+              </form>
+            )}
+            {/* Transcript preview in voice mode with text input for editing */}
+            {voiceEnabled && input && !isListening && (
+              <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 mt-2">
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Edit before sending…"
+                  maxLength={8000}
+                  className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+                  disabled={loading}
+                />
+                <button type="submit" disabled={loading || !input.trim()}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground disabled:opacity-40" aria-label="Send">
+                  <Send className="h-4 w-4" />
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
