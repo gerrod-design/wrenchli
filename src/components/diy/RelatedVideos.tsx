@@ -112,6 +112,19 @@ export default function RelatedVideos({
             target="_blank"
             rel="noopener noreferrer"
             className="group block"
+            onClick={() => {
+              trackEvent({
+                event_type: "ad_click",
+                category: "diy_product",
+                action: "youtube_tutorial_click",
+                label: tutorialTitle,
+                item_id: v.video_id,
+                item_title: decodeHtml(v.title),
+                item_brand: v.channel,
+                item_url: v.url,
+                metadata: { search_query: searchQuery },
+              });
+            }}
           >
             <Card className="overflow-hidden border hover:shadow-md transition-shadow h-full">
               <div className="relative aspect-video bg-muted">
