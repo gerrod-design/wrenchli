@@ -56,6 +56,9 @@ function cleanTextForSpeech(text: string): string {
     .trim();
 }
 
+// Resolves when the current speak() call finishes playback (or immediately if nothing is playing).
+type SpeakDoneResolver = (() => void) | null;
+
 export function useTextToSpeech(
   voiceEnabledRef: React.RefObject<boolean>,
   onSpeechEnd: () => void,
@@ -67,6 +70,7 @@ export function useTextToSpeech(
   const playbackUnlockedRef = useRef(false);
   const mountedRef = useRef(true);
   const speechEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const speakDoneResolverRef = useRef<SpeakDoneResolver>(null);
 
   const supportsTTS = true; // Azure TTS is always available
 
