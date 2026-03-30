@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Youtube } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 interface Video {
   video_id: string;
