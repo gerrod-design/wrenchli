@@ -563,26 +563,26 @@ export default function InlineChatWidget() {
           )}
 
           {/* Tools row */}
-          <div className="border-t border-border px-3 py-1.5 flex items-center gap-1.5 min-[360px]:gap-2">
-            <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider mr-0.5 hidden min-[360px]:inline">Tools</span>
+          <div className="border-t border-border px-3 py-1.5 flex items-end gap-3">
+            <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider hidden min-[360px]:inline pb-0.5">Tools</span>
             <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-              className="flex flex-col items-center justify-center gap-0.5 rounded-md px-1 min-[360px]:px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40 min-w-[36px]" aria-label="Attach photo">
-              <ImagePlus className="h-3.5 w-3.5" />
-              <span className="text-[8px] min-[360px]:text-[9px] leading-none font-medium truncate">Upload Photo</span>
+              className="flex flex-col items-center justify-end gap-1 rounded-md px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Upload photo">
+              <ImagePlus className="h-4 w-4" />
+              <span className="text-[9px] leading-none font-medium whitespace-nowrap">Upload Photo</span>
             </button>
             {isMobile && (
               <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                className="flex flex-col items-center justify-center gap-0.5 rounded-md px-1 min-[360px]:px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40 min-w-[36px]" aria-label="Take photo">
-                <Camera className="h-3.5 w-3.5" />
-                <span className="text-[8px] min-[360px]:text-[9px] leading-none font-medium truncate">Take Photo</span>
+                className="flex flex-col items-center justify-end gap-1 rounded-md px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Take photo">
+                <Camera className="h-4 w-4" />
+                <span className="text-[9px] leading-none font-medium whitespace-nowrap">Take Photo</span>
               </button>
             )}
             <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
-              className="flex flex-col items-center justify-center gap-0.5 rounded-md px-1 min-[360px]:px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40 min-w-[36px]" aria-label="Scan VIN">
-              <ScanLine className="h-3.5 w-3.5" />
-              <span className="text-[8px] min-[360px]:text-[9px] leading-none font-medium truncate">Scan VIN</span>
+              className="flex flex-col items-center justify-end gap-1 rounded-md px-1.5 py-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Scan VIN">
+              <ScanLine className="h-4 w-4" />
+              <span className="text-[9px] leading-none font-medium whitespace-nowrap">Scan VIN</span>
             </button>
-            <div className="flex flex-col items-center gap-0.5 min-w-[36px]">
+            <div className="flex flex-col items-center justify-end gap-1 rounded-md px-1.5 py-1">
               <AudioRecordButton
                 disabled={loading || uploading}
                 onAnalysis={(analysis) => {
@@ -591,7 +591,7 @@ export default function InlineChatWidget() {
                   setMessages((prev) => [...prev, userMsg, assistantMsg]);
                 }}
               />
-              <span className="text-[8px] min-[360px]:text-[9px] leading-none font-medium text-muted-foreground truncate">Record Sound</span>
+              <span className="text-[9px] leading-none font-medium text-muted-foreground whitespace-nowrap">Record Sound</span>
             </div>
           </div>
 
