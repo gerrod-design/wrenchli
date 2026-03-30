@@ -4,7 +4,7 @@ import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Loader2, Star, Phone, ExternalLink, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
+import { Search, MapPin, Loader2, Star, Phone, ExternalLink, ChevronLeft, ChevronRight, MessageSquare, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
