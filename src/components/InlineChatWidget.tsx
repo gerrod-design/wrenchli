@@ -582,16 +582,18 @@ export default function InlineChatWidget() {
               <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><ScanLine className="h-4 w-4" /></span>
               <span className="text-[11px] leading-none font-medium whitespace-nowrap">Scan VIN</span>
             </button>
-            <div className="flex flex-col items-center gap-1">
-              <AudioRecordButton
-                disabled={loading || uploading}
-                onAnalysis={(analysis) => {
-                  const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
-                  const assistantMsg: Msg = { role: "assistant", content: analysis };
-                  setMessages((prev) => [...prev, userMsg, assistantMsg]);
-                }}
-              />
-              <span className="text-[11px] leading-none font-medium text-muted-foreground whitespace-nowrap">Record Sound</span>
+            <div className="flex flex-col items-center gap-1 text-muted-foreground">
+              <span className="flex h-9 w-9 items-center justify-center">
+                <AudioRecordButton
+                  disabled={loading || uploading}
+                  onAnalysis={(analysis) => {
+                    const userMsg: Msg = { role: "user", content: "🔊 [Recorded a car noise clip for analysis]" };
+                    const assistantMsg: Msg = { role: "assistant", content: analysis };
+                    setMessages((prev) => [...prev, userMsg, assistantMsg]);
+                  }}
+                />
+              </span>
+              <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Sound</span>
             </div>
           </div>
 
