@@ -466,6 +466,48 @@ async function executeTool(
         });
       }
 
+      case "lookup_diy_tutorial": {
+        const keyword = String(rawArgs.repair_keyword || "").toLowerCase().trim();
+        if (!keyword) {
+          clearTimeout(timer);
+          return JSON.stringify({ found: false, message: "No keyword provided" });
+        }
+        try {
+          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+          const sb = createClient(supabaseUrl, serviceKey);
+
+          const { data: tutorials } = await sb
+            .from("diy_tutorials")
+            .select("slug, title, description, difficulty, estimated_time_minutes, category")
+            .eq("is_published", true);
+
+          // Simple keyword matching against title and category
+          const matches = (tutorials || []).filter((t: { title: string; category: string }) =>
+            t.title.toLowerCase().includes(keyword) ||
+            keyword.split(/\s+/).some((w: string) => t.title.toLowerCase().includes(w))
+          );
+
+          if (matches.length > 0) {
+            const results = matches.slice(0, 3).map((t: { slug: string; title: string; description: string; difficulty: string; estimated_time_minutes: number }) => ({
+              title: t.title,
+              url: `/diy/${t.slug}`,
+              description: t.description,
+              difficulty: t.difficulty,
+              estimated_time_minutes: t.estimated_time_minutes,
+            }));
+            clearTimeout(timer);
+            return JSON.stringify({ found: true, tutorials: results });
+          }
+          clearTimeout(timer);
+          return JSON.stringify({ found: false, message: "No matching tutorial found", all_guides_url: "/diy" });
+        } catch (dbErr) {
+          console.error("lookup_diy_tutorial error:", dbErr);
+          clearTimeout(timer);
+          return JSON.stringify({ found: false, message: "Could not search tutorials", all_guides_url: "/diy" });
+        }
+      }
+
       default:
         clearTimeout(timer);
         return JSON.stringify({ error: `Unknown tool: ${name}` });
