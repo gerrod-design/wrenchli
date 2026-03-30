@@ -127,6 +127,7 @@ Deno.serve(async (req) => {
       price_tier: priceTierFromYelp(b.price),
       is_dealer: false,
       is_partnered: false,
+      is_franchise: isFranchise(b.name),
       wrenchli_verified: false,
       data_source: "yelp",
       data_source_id: b.id,
