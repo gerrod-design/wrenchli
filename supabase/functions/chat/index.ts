@@ -414,53 +414,41 @@ async function executeTool(
         break;
 
       case "search_repair_videos": {
-        // Build YouTube search queries via smart-repair-intel, then return clickable links
-        const videoArgs = {
-          diagnosis_title: rawArgs.repair_title || rawArgs.diagnosis_title || "vehicle repair",
-          diagnosis_code: rawArgs.diagnosis_code || "",
-          vehicle_year: rawArgs.vehicle_year || rawArgs.year || "",
-          vehicle_make: rawArgs.vehicle_make || rawArgs.make || "",
-          vehicle_model: rawArgs.vehicle_model || rawArgs.model || "",
-        };
+        // Use the youtube-search edge function for real video results
+        const vehicle = [rawArgs.vehicle_year || rawArgs.year || "", rawArgs.vehicle_make || rawArgs.make || "", rawArgs.vehicle_model || rawArgs.model || ""].filter(Boolean).join(" ");
+        const repairTitle = String(rawArgs.repair_title || rawArgs.diagnosis_title || "vehicle repair");
+        const searchQuery = `${vehicle} ${repairTitle} DIY tutorial`.trim();
         try {
-          resp = await fetch(`${FUNCTIONS_BASE}/smart-repair-intel`, {
+          resp = await fetch(`${FUNCTIONS_BASE}/youtube-search`, {
             method: "POST",
             headers,
-            body: JSON.stringify(videoArgs),
+            body: JSON.stringify({ query: searchQuery, max_results: 3 }),
             ...fetchOpts,
           });
-          const intelData = await resp.json();
-          // Extract YouTube queries and build direct search links
-          const queries = intelData?.youtube_queries || [];
-          const videoResults = queries.map((q: { query: string; label: string }) => ({
-            label: q.label || "Tutorial",
-            query: q.query,
-            youtube_url: `https://www.youtube.com/results?search_query=${encodeURIComponent(q.query)}`,
+          const ytData = await resp.json();
+          const videos = (ytData?.videos || []).map((v: { title: string; url: string; channel: string; thumbnail: string }) => ({
+            title: v.title,
+            url: v.url,
+            channel: v.channel,
+            thumbnail: v.thumbnail,
           }));
-          clearTimeout(timer);
-          return JSON.stringify({
-            videos: videoResults,
-            diy_info: {
-              success_rate: intelData?.diy_success_rate,
-              step_count: intelData?.step_count,
-              motivational: intelData?.motivational_message,
-              is_common_issue: intelData?.is_common_issue,
-              common_issue_reason: intelData?.common_issue_reason,
-            },
-          });
-        } catch (videoErr) {
-          // Fallback: generate a basic YouTube search link
-          const vehicle = [videoArgs.vehicle_year, videoArgs.vehicle_make, videoArgs.vehicle_model].filter(Boolean).join(" ");
-          const fallbackQuery = `${vehicle} ${videoArgs.diagnosis_title} DIY tutorial`.trim();
-          clearTimeout(timer);
-          return JSON.stringify({
-            videos: [{
-              label: "DIY Tutorial",
-              query: fallbackQuery,
-              youtube_url: `https://www.youtube.com/results?search_query=${encodeURIComponent(fallbackQuery)}`,
-            }],
-          });
+          if (videos.length > 0) {
+            clearTimeout(timer);
+            return JSON.stringify({ videos, search_query: searchQuery });
+          }
+        } catch (ytErr) {
+          console.error("youtube-search tool error, falling back:", ytErr);
         }
+        // Fallback: return a YouTube search link
+        clearTimeout(timer);
+        return JSON.stringify({
+          videos: [{
+            title: `${vehicle} ${repairTitle} — DIY Tutorial`,
+            url: `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`,
+            channel: "YouTube Search",
+          }],
+          search_query: searchQuery,
+        });
       }
 
       default:
