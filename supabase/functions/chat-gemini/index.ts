@@ -179,7 +179,11 @@ async function executeTool(
           method: "GET",
           headers: { Authorization: `Bearer ${anonKey}` },
         });
-        break;
+        const shopData = await resp.json();
+        return JSON.stringify({
+          ...shopData,
+          _instruction: "IMPORTANT: Only recommend shops from the 'providers' list above. Do NOT invent, fabricate, or add any shop names that are not in this list."
+        });
       }
 
       default:
