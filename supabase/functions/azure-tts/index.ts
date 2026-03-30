@@ -59,12 +59,22 @@ serve(async (req) => {
     const voiceName = VOICE_MAP[agent] || VOICE_MAP.mike;
 
     // Clean text for SSML (escape XML special chars)
-    const cleanText = text
+    let cleanText = text
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&apos;");
+
+    // Add SSML break tags for natural prosody at punctuation boundaries
+    // Periods / question marks / exclamation points → medium pause
+    cleanText = cleanText.replace(/([.!?])\s+/g, '$1<break time="350ms"/> ');
+    // Commas → short pause
+    cleanText = cleanText.replace(/,\s*/g, ',<break time="150ms"/> ');
+    // Em-dash or double-dash → short pause
+    cleanText = cleanText.replace(/\s*[—–]\s*/g, ' <break time="200ms"/> ');
+    // Ellipsis → longer pause
+    cleanText = cleanText.replace(/\.{3}/g, '<break time="500ms"/>');
 
     const prosody = PROSODY_MAP[agent] || { rate: "+0%", pitch: "+0%" };
 

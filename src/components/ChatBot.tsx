@@ -274,13 +274,14 @@ export default function ChatBot() {
           if (canSpeak && assistantSoFar.trim()) {
             void speakRef.current(assistantSoFar, detectAgent(assistantSoFar));
           }
-          // Auto-follow-up when Mike announces a handoff to another agent
+          // Auto-follow-up when an agent announces a handoff to another specialist
           const finalText = assistantSoFar;
-          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Priya|Sam|Jess|Kai)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll) (?:going to )?(?:bring|connect|hand)/i.test(finalText);
+          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Priya|Sam|Jess|Kai)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll)\s+(?:going to\s+)?(?:bring|connect|hand|let|get)|(?:let|pass(?:ing)?\s+(?:it|this)\s+to)\s+(?:Priya|Sam|Jess|Kai)\b/i.test(finalText);
           if (announcesHandoff) {
+            const delay = canSpeak ? 4000 : 800;
             setTimeout(() => {
               sendRef.current("ok");
-            }, 800);
+            }, delay);
           }
         },
         onError: (msg) => { upsert(msg); setLoading(false); },
