@@ -64,5 +64,6 @@ export function useVoiceChat() {
     supportsSTT: stt.supportsSTT,
     supportsTTS: tts.supportsTTS,
     silenceCountdown: stt.silenceCountdown,
+    waitForSpeechEnd: tts.waitForSpeechEnd,
   };
 }
