@@ -39,6 +39,32 @@ export default function ZipDemandHeatmap() {
   const [loading, setLoading] = useState(true);
   const [stateFilter, setStateFilter] = useState<string>("all");
   const [timeRange, setTimeRange] = useState<string>("30");
+  const [ingesting, setIngesting] = useState<Record<string, boolean>>({});
+  const [ingested, setIngested] = useState<Record<string, number>>({});
+
+  const handleIngest = async (zip: string) => {
+    setIngesting((prev) => ({ ...prev, [zip]: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke("ingest-yelp-shops", {
+        body: { zip_code: zip },
+      });
+      if (error) throw error;
+      const count = data?.upserted || 0;
+      setIngested((prev) => ({ ...prev, [zip]: count }));
+      toast.success(`Ingested ${count} shops for ZIP ${zip}`);
+    } catch (err: any) {
+      toast.error(`Failed: ${err.message || "Unknown error"}`);
+    } finally {
+      setIngesting((prev) => ({ ...prev, [zip]: false }));
+    }
+  };
+
+  const handleIngestAll = async () => {
+    const zips = unservedByZip.filter((z) => !ingested[z.zip]).map((z) => z.zip);
+    for (const zip of zips) {
+      await handleIngest(zip);
+    }
+  };
 
   useEffect(() => {
     const fetchLogs = async () => {
