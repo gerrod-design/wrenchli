@@ -1104,6 +1104,51 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_interest_events: {
+        Row: {
+          created_at: string
+          id: string
+          shop_address: string | null
+          shop_id: string
+          shop_name: string
+          shop_type: string | null
+          source: string | null
+          user_email: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          shop_address?: string | null
+          shop_id: string
+          shop_name: string
+          shop_type?: string | null
+          source?: string | null
+          user_email?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          shop_address?: string | null
+          shop_id?: string
+          shop_name?: string
+          shop_type?: string | null
+          source?: string | null
+          user_email?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       shop_recommendations: {
         Row: {
           created_at: string
