@@ -776,6 +776,11 @@ export default function ChatBot() {
                     />
                     <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Sound</span>
                   </span>
+                  <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
+                    className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Scan VIN">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><ScanLine className="h-4 w-4" /></span>
+                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Scan VIN</span>
+                  </button>
                 </div>
 
                 {/* Input */}
