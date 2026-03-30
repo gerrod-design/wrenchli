@@ -25,6 +25,7 @@ import ConversionMetrics from "@/components/ConversionMetrics";
 import KnownIssuesManager from "@/components/KnownIssuesManager";
 import YouTubeEngagement from "@/components/YouTubeEngagement";
 import ShopInterestAnalytics from "@/components/ShopInterestAnalytics";
+import ZipDemandHeatmap from "@/components/ZipDemandHeatmap";
 
 interface FinanceSelection {
   id: string;
