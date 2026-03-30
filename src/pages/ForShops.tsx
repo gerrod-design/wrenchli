@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "@/hooks/use-toast";
 import CustomerRecommendationSection from "@/components/recommend/CustomerRecommendationSection";
+import { QRCodeSVG } from "qrcode.react";
 
 const steps = [
   { step: 1, title: "Join the Network", desc: "Submit your application, verify credentials, and go live in days — not weeks." },
@@ -342,6 +343,29 @@ export default function ForShops() {
                 {loading ? "Submitting..." : "Request Partnership Info"}
               </Button>
             </form>
+          </SectionReveal>
+        </div>
+      </section>
+
+      {/* Partner QR Code */}
+      <section className="section-padding bg-secondary">
+        <div className="container-wrenchli max-w-md text-center">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-3xl mb-3">Scan to Learn More</h2>
+            <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
+              Share this QR code with prospective partners for a quick link to Wrenchli.
+            </p>
+            <div className="inline-flex rounded-2xl bg-white p-5 shadow-lg">
+              <QRCodeSVG
+                value="https://wrenchli.lovable.app/for-shops"
+                size={200}
+                level="H"
+                includeMargin={false}
+                fgColor="hsl(220, 25%, 15%)"
+                bgColor="#ffffff"
+              />
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">wrenchli.lovable.app/for-shops</p>
           </SectionReveal>
         </div>
       </section>
