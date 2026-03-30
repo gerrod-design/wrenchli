@@ -4,6 +4,7 @@ import AudioRecordButton from "./chatbot/AudioRecordButton";
 import ToolHint from "./chatbot/ToolHint";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import YouTubePreviewCard, { isYouTubeUrl } from "./chatbot/YouTubePreviewCard";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -429,6 +430,11 @@ export default function InlineChatWidget() {
                     <ReactMarkdown components={{
 
                       a: ({ href, children }) => {
+                        if (href && isYouTubeUrl(href)) {
+                          const linkText = typeof children === "string" ? children
+                            : Array.isArray(children) ? children.map(c => (typeof c === "string" ? c : "")).join("") : undefined;
+                          return <YouTubePreviewCard href={href} title={linkText || undefined} />;
+                        }
                         if (href && href.startsWith('/')) {
                           return (
                             <button
