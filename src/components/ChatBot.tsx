@@ -791,7 +791,41 @@ export default function ChatBot() {
                       maxLength={8000}
                       className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring" disabled={loading} />
                     {voiceEnabled && supportsSTT && (
-                      <>
+    <>
+
+      {/* VIN Scan/Entry Modal */}
+      <Dialog open={vinModalOpen} onOpenChange={setVinModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-heading">Identify Your Vehicle</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">Enter your 17-character VIN to instantly identify your vehicle.</p>
+
+          <div className="space-y-3 mt-2">
+            <div className="flex gap-2">
+              <Input
+                value={vinText}
+                onChange={(e) => { setVinText(sanitizeVin(e.target.value)); setVinError(""); }}
+                placeholder="e.g. 1HGCV1F34LA000001"
+                maxLength={17}
+                className="font-mono tracking-wider uppercase"
+                disabled={vinLoading}
+              />
+              <Button onClick={handleVinSubmit} disabled={vinLoading || vinText.length < 17} size="sm">
+                {vinLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Decode"}
+              </Button>
+            </div>
+
+            {vinError && <p className="text-xs text-destructive">{vinError}</p>}
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <Keyboard className="inline h-3 w-3 mr-1 -mt-0.5" />
+              Find your VIN on the driver-side door jamb sticker or the bottom-left corner of your windshield.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
                         {isListening && <AudioWaveform />}
                         <button
                           type="button"
