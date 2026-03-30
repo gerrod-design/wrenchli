@@ -1,4 +1,5 @@
 import { Play } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 /** Extract YouTube video ID from various URL formats */
 function extractYouTubeId(url: string): string | null {
@@ -34,6 +35,17 @@ export default function YouTubePreviewCard({ href, title }: YouTubePreviewCardPr
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent({
+          event_type: "ad_click",
+          category: "diy_product",
+          action: "chat_youtube_click",
+          item_id: videoId,
+          item_title: displayTitle,
+          item_url: href,
+          metadata: { placement: "chat_inline" },
+        });
+      }}
       className="group flex gap-2.5 items-start rounded-lg border border-border bg-background/60 p-2 my-1.5 hover:bg-accent/40 transition-colors no-underline"
     >
       <div className="relative flex-shrink-0 w-28 h-[72px] rounded-md overflow-hidden bg-muted">
