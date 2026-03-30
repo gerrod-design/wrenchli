@@ -73,13 +73,15 @@ export default function InlineChatWidget() {
 
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
-    startListening, stopListening, speak, stopSpeaking, unlockAudioPlayback, supportsSTT, supportsTTS, silenceCountdown, voiceOwner,
+    startListening, stopListening, speak, stopSpeaking, unlockAudioPlayback, supportsSTT, supportsTTS, silenceCountdown, voiceOwner, waitForSpeechEnd,
   } = useSharedVoiceChat();
 
   const speakRef = useRef(speak);
+  const waitForSpeechEndRef = useRef(waitForSpeechEnd);
   const voiceEnabledStateRef = useRef(voiceEnabled);
   const voiceOwnerRef = useRef<string | null>(voiceOwner);
   speakRef.current = speak;
+  waitForSpeechEndRef.current = waitForSpeechEnd;
   voiceEnabledStateRef.current = voiceEnabled;
   voiceOwnerRef.current = voiceOwner;
 
