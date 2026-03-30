@@ -718,18 +718,19 @@ export default function ChatBot() {
                   </div>
                 )}
 
-                {/* Input */}
-                <div className="border-t border-border">
-                  <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2">
-                    <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Attach photo" title="Attach damage photo">
-                      <ImagePlus className="h-4 w-4" />
-                    </button>
-                    <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
-                      className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40" aria-label="Take photo" title="Take a photo with camera">
-                      <Camera className="h-4 w-4" />
-                    </button>
-                    {/* Audio recording for car noises */}
+                {/* Tool row with labels */}
+                <div className="border-t border-border px-3 py-1.5 flex flex-wrap items-end justify-evenly gap-y-1.5">
+                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
+                    className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Upload photo">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><ImagePlus className="h-4 w-4" /></span>
+                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Upload Photo</span>
+                  </button>
+                  <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
+                    className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Take photo">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><Camera className="h-4 w-4" /></span>
+                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Take Photo</span>
+                  </button>
+                  <span className="flex flex-col items-center gap-1 text-muted-foreground">
                     <AudioRecordButton
                       disabled={loading || uploading}
                       onAnalysis={(analysis) => {
@@ -739,6 +740,13 @@ export default function ChatBot() {
                         setMessages((prev) => [...prev, userMsg, assistantMsg], convId);
                       }}
                     />
+                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Sound</span>
+                  </span>
+                </div>
+
+                {/* Input */}
+                <div className="border-t border-border">
+                  <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2">
                     <input value={input} onChange={(e) => setInput(e.target.value)}
                       placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : voiceEnabled ? "Tap mic or type…" : "Type a message…"}
                       maxLength={8000}
