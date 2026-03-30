@@ -442,7 +442,14 @@ async function executeTool(
           headers: { Authorization: `Bearer ${anonKey}` },
           ...fetchOpts,
         });
-        break;
+        const shopData = await resp.json();
+        console.log("find_local_shops returned:", JSON.stringify(shopData?.providers?.map((p: { name: string }) => p.name) || []));
+        clearTimeout(timer);
+        // Wrap results with an explicit instruction to prevent hallucination
+        return JSON.stringify({
+          ...shopData,
+          _instruction: "IMPORTANT: Only recommend shops from the 'providers' list above. Do NOT invent, fabricate, or add any shop names that are not in this list."
+        });
       }
 
       case "diagnose_damage_photo":
