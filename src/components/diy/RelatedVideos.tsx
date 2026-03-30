@@ -46,12 +46,14 @@ export default function RelatedVideos({
     ? `${tutorialTitle} ${vehicleTypes[0]} DIY tutorial`
     : `${tutorialTitle} car DIY tutorial`;
 
-  const { data: videos, isLoading } = useQuery({
+  const { data: videos, isLoading, isError } = useQuery({
     queryKey: ["youtube-search", searchQuery],
     queryFn: () => fetchVideos(searchQuery),
     staleTime: 1000 * 60 * 30, // 30 min cache
     retry: 1,
   });
+
+  const fallbackUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
 
   if (isLoading) {
     return (
@@ -68,7 +70,33 @@ export default function RelatedVideos({
     );
   }
 
-  if (!videos || videos.length === 0) return null;
+  if (isError || !videos || videos.length === 0) {
+    return (
+      <div>
+        <h2 className="font-heading text-xl font-bold mb-4 flex items-center gap-2">
+          <Youtube className="h-5 w-5 text-destructive" /> Related Videos
+        </h2>
+        <a
+          href={fallbackUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 rounded-xl border border-border p-4 hover:bg-muted/50 transition-colors group"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-destructive/10">
+            <ExternalLink className="h-5 w-5 text-destructive" />
+          </div>
+          <div>
+            <p className="font-medium text-sm group-hover:text-primary transition-colors">
+              Search YouTube for "{tutorialTitle}"
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Find step-by-step video tutorials on YouTube
+            </p>
+          </div>
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div>
