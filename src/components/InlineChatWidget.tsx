@@ -430,6 +430,11 @@ export default function InlineChatWidget() {
                     <ReactMarkdown components={{
 
                       a: ({ href, children }) => {
+                        if (href && isYouTubeUrl(href)) {
+                          const linkText = typeof children === "string" ? children
+                            : Array.isArray(children) ? children.map(c => (typeof c === "string" ? c : "")).join("") : undefined;
+                          return <YouTubePreviewCard href={href} title={linkText || undefined} />;
+                        }
                         if (href && href.startsWith('/')) {
                           return (
                             <button
