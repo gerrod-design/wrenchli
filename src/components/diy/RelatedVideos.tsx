@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,6 +35,93 @@ function decodeHtml(html: string) {
   const txt = document.createElement("textarea");
   txt.innerHTML = html;
   return txt.value;
+}
+
+/** Track impression when a video card enters the viewport (once per video) */
+function VideoCard({
+  video,
+  tutorialTitle,
+  searchQuery,
+}: {
+  video: Video;
+  tutorialTitle: string;
+  searchQuery: string;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const tracked = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || tracked.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked.current) {
+          tracked.current = true;
+          trackEvent({
+            event_type: "ad_impression",
+            category: "diy_product",
+            action: "youtube_video_impression",
+            label: tutorialTitle,
+            item_id: video.video_id,
+            item_title: decodeHtml(video.title),
+            item_brand: video.channel,
+            item_url: video.url,
+            metadata: { search_query: searchQuery },
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [video, tutorialTitle, searchQuery]);
+
+  return (
+    <a
+      ref={ref}
+      key={video.video_id}
+      href={video.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block"
+      onClick={() => {
+        trackEvent({
+          event_type: "ad_click",
+          category: "diy_product",
+          action: "youtube_tutorial_click",
+          label: tutorialTitle,
+          item_id: video.video_id,
+          item_title: decodeHtml(video.title),
+          item_brand: video.channel,
+          item_url: video.url,
+          metadata: { search_query: searchQuery },
+        });
+      }}
+    >
+      <Card className="overflow-hidden border hover:shadow-md transition-shadow h-full">
+        <div className="relative aspect-video bg-muted">
+          <img
+            src={video.thumbnail}
+            alt={decodeHtml(video.title)}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+            <ExternalLink className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+          </div>
+        </div>
+        <CardContent className="p-3">
+          <h3 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
+            {decodeHtml(video.title)}
+          </h3>
+          <p className="text-xs text-muted-foreground mt-1">{video.channel}</p>
+        </CardContent>
+      </Card>
+    </a>
+  );
 }
 
 export default function RelatedVideos({
@@ -116,46 +204,12 @@ export default function RelatedVideos({
       </h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {videos.map((v) => (
-          <a
+          <VideoCard
             key={v.video_id}
-            href={v.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group block"
-            onClick={() => {
-              trackEvent({
-                event_type: "ad_click",
-                category: "diy_product",
-                action: "youtube_tutorial_click",
-                label: tutorialTitle,
-                item_id: v.video_id,
-                item_title: decodeHtml(v.title),
-                item_brand: v.channel,
-                item_url: v.url,
-                metadata: { search_query: searchQuery },
-              });
-            }}
-          >
-            <Card className="overflow-hidden border hover:shadow-md transition-shadow h-full">
-              <div className="relative aspect-video bg-muted">
-                <img
-                  src={v.thumbnail}
-                  alt={decodeHtml(v.title)}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                  <ExternalLink className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
-                </div>
-              </div>
-              <CardContent className="p-3">
-                <h3 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                  {decodeHtml(v.title)}
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1">{v.channel}</p>
-              </CardContent>
-            </Card>
-          </a>
+            video={v}
+            tutorialTitle={tutorialTitle}
+            searchQuery={searchQuery}
+          />
         ))}
       </div>
     </div>
