@@ -24,6 +24,7 @@ import MILoanFunnel from "@/components/MILoanFunnel";
 import ConversionMetrics from "@/components/ConversionMetrics";
 import KnownIssuesManager from "@/components/KnownIssuesManager";
 import YouTubeEngagement from "@/components/YouTubeEngagement";
+import ShopInterestAnalytics from "@/components/ShopInterestAnalytics";
 
 interface FinanceSelection {
   id: string;
