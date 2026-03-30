@@ -21,6 +21,7 @@ interface ServiceProvider {
   quote_url: string;
   is_dealer?: boolean;
   dealer_brands?: string[];
+  is_partnered?: boolean;
 }
 
 /* ── Location Mapping ── */

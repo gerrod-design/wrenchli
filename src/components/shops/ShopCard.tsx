@@ -1,6 +1,9 @@
-import { MapPin, Phone, Star, Clock, Shield, Building2 } from "lucide-react";
+import { MapPin, Phone, Star, Clock, Shield, Building2, Heart, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface Shop {
   id: string;
@@ -21,6 +24,7 @@ export interface Shop {
   lng?: number;
   is_dealer?: boolean;
   dealer_brands?: string[];
+  is_partnered?: boolean;
 }
 
 interface ShopCardProps {
@@ -41,15 +45,50 @@ const availabilityLabels = {
 };
 
 export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
+  const [interestLogged, setInterestLogged] = useState(false);
+  const [loggingInterest, setLoggingInterest] = useState(false);
+
   const handleCall = () => {
     window.location.href = `tel:${shop.phone}`;
   };
 
   const isDealer = shop.is_dealer === true;
+  const isPartnered = shop.is_partnered !== false; // default true for backward compat
+
+  const handleInterestClick = async () => {
+    setLoggingInterest(true);
+    try {
+      // Extract zip from address
+      const zipMatch = shop.address.match(/\b(\d{5})\b/);
+      const zip = zipMatch ? zipMatch[1] : null;
+
+      const { error } = await supabase.from("shop_interest_events").insert({
+        shop_id: shop.id,
+        shop_name: shop.name,
+        shop_address: shop.address,
+        shop_type: isDealer ? "dealer" : "independent",
+        zip_code: zip,
+        source: "find_shops",
+      });
+
+      if (error) throw error;
+      setInterestLogged(true);
+      toast.success(`We're bringing ${shop.name} onto Wrenchli — we'll notify you when they're ready!`);
+    } catch (e) {
+      console.error("Failed to log interest:", e);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoggingInterest(false);
+    }
+  };
 
   return (
     <div className={`group rounded-lg border bg-card p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
-      isDealer ? "border-primary/30 hover:border-primary/50" : "border-border hover:border-accent/50"
+      !isPartnered
+        ? "border-muted-foreground/20 hover:border-muted-foreground/40"
+        : isDealer
+          ? "border-primary/30 hover:border-primary/50"
+          : "border-border hover:border-accent/50"
     }`}>
       {/* Dealer Badge */}
       {isDealer && (
@@ -73,6 +112,16 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
         </div>
       )}
 
+      {/* Not yet partnered badge */}
+      {!isPartnered && (
+        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-muted-foreground/15">
+          <Mail className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Coming Soon to Wrenchli
+          </span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1">
@@ -80,7 +129,7 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
             <h3 className="font-heading text-lg font-semibold text-card-foreground group-hover:text-accent transition-colors">
               {shop.name}
             </h3>
-            {shop.wrenchli_verified && !isDealer && (
+            {shop.wrenchli_verified && isPartnered && !isDealer && (
               <span title="Wrenchli Verified">
                 <Shield className="h-4 w-4 text-wrenchli-teal flex-shrink-0" />
               </span>
@@ -108,7 +157,7 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
         <span>{shop.address}</span>
       </div>
 
-      {/* Specialties — hide dealer-specific tags, show service-relevant ones */}
+      {/* Specialties */}
       {shop.specialties.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-4">
           {shop.specialties
@@ -136,22 +185,41 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
         <span>Typical response: {shop.response_time}</span>
       </div>
 
-      {/* Actions */}
+      {/* Actions — Two-tier system */}
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" className="flex-1 gap-2" onClick={handleCall}>
-          <Phone className="h-4 w-4" />
-          Call
-        </Button>
-        <Button
-          asChild
-          variant="default"
-          size="sm"
-          className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90"
-        >
-          <Link to={isDealer ? "/get-quote" : `/get-quote?shop=${shop.id}`}>
-            {isDealer ? "Get Trade-In Value" : "Get Quote"}
-          </Link>
-        </Button>
+        {isPartnered ? (
+          <>
+            <Button variant="outline" size="sm" className="flex-1 gap-2" onClick={handleCall}>
+              <Phone className="h-4 w-4" />
+              Call
+            </Button>
+            <Button
+              asChild
+              variant="default"
+              size="sm"
+              className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              <Link to={isDealer ? "/get-quote" : `/get-quote?shop=${shop.id}`}>
+                {isDealer ? "Get Trade-In Value" : "Get Quote"}
+              </Link>
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={handleInterestClick}
+            disabled={interestLogged || loggingInterest}
+          >
+            <Heart className={`h-4 w-4 ${interestLogged ? "fill-current" : ""}`} />
+            {interestLogged
+              ? "Interest Logged — We'll Notify You"
+              : loggingInterest
+                ? "Logging..."
+                : "I'm Interested"}
+          </Button>
+        )}
       </div>
     </div>
   );
