@@ -46,15 +46,20 @@ function createSilentWavBlob(durationMs = 120, sampleRate = 8000): Blob {
   return new Blob([buffer], { type: "audio/wav" });
 }
 
-/** Strip markdown / agent tags for cleaner speech output. */
+/** Strip markdown / agent tags and normalize speech-unfriendly patterns. */
 function cleanTextForSpeech(text: string): string {
   return text
     .replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "")
     .replace(/[#*_~`>]/g, "")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    // Convert "$1,200" → "1200 dollars" so TTS reads amounts naturally
+    .replace(/\$(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)/g, (_m, num) => `${num.replace(/,/g, "")} dollars`)
     .replace(/\n+/g, ". ")
     .trim();
 }
+
+// Resolves when the current speak() call finishes playback (or immediately if nothing is playing).
+type SpeakDoneResolver = (() => void) | null;
 
 export function useTextToSpeech(
   voiceEnabledRef: React.RefObject<boolean>,
@@ -67,6 +72,7 @@ export function useTextToSpeech(
   const playbackUnlockedRef = useRef(false);
   const mountedRef = useRef(true);
   const speechEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const speakDoneResolverRef = useRef<SpeakDoneResolver>(null);
 
   const supportsTTS = true; // Azure TTS is always available
 
@@ -191,10 +197,12 @@ export function useTextToSpeech(
 
       utterance.onend = () => {
         setSpeakingSafe(false);
+        if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
         queueResumeListening();
       };
       utterance.onerror = () => {
         setSpeakingSafe(false);
+        if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
       };
 
       window.speechSynthesis.speak(utterance);
@@ -259,6 +267,7 @@ export function useTextToSpeech(
             URL.revokeObjectURL(activeObjectUrlRef.current);
             activeObjectUrlRef.current = null;
           }
+          if (speakDoneResolverRef.current) { speakDoneResolverRef.current(); speakDoneResolverRef.current = null; }
           queueResumeListening();
         };
 
@@ -297,6 +306,14 @@ export function useTextToSpeech(
     lastSpokenRef.current = "";
   }, []);
 
+  /** Returns a promise that resolves when the current speech finishes (or immediately if silent). */
+  const waitForSpeechEnd = useCallback((): Promise<void> => {
+    if (!isSpeaking) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      speakDoneResolverRef.current = resolve;
+    });
+  }, [isSpeaking]);
+
   return {
     isSpeaking,
     supportsTTS,
@@ -305,5 +322,6 @@ export function useTextToSpeech(
     stopAudio,
     unlockAudioPlayback,
     resetLastSpoken,
+    waitForSpeechEnd,
   };
 }
