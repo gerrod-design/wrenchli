@@ -260,12 +260,16 @@ serve(async (req) => {
     const resolved = resolveLocation(location);
     const { providers, city } = await findServiceProviders(supabase, { location, service_type, price_range, vehicle_make });
 
-    // Log search attempt asynchronously (fire-and-forget)
+    // Derive state from ZIP prefix for logging
     const zip = location.replace(/\D/g, "").slice(0, 5);
+    const zipPrefix = zip.length >= 3 ? zip.substring(0, 3) : "";
+    const logState = resolved.state || zipPrefixToState[zipPrefix] || null;
+
+    // Log search attempt asynchronously (fire-and-forget)
     supabase.from("shop_search_logs").insert({
       zip_code: zip || location,
       city_resolved: city,
-      state: resolved.state || (city ? (cityCoords[city]?.lat > 40.5 ? "MI" : "OH") : null),
+      state: logState,
       service_type,
       vehicle_make: vehicle_make || null,
       results_count: providers.length,
