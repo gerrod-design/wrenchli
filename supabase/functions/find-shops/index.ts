@@ -257,7 +257,23 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    const resolved = resolveLocation(location);
     const { providers, city } = await findServiceProviders(supabase, { location, service_type, price_range, vehicle_make });
+
+    // Derive state from ZIP prefix for logging
+    const zip = location.replace(/\D/g, "").slice(0, 5);
+    const zipPrefix = zip.length >= 3 ? zip.substring(0, 3) : "";
+    const logState = resolved.state || zipPrefixToState[zipPrefix] || null;
+
+    // Log search attempt asynchronously (fire-and-forget)
+    supabase.from("shop_search_logs").insert({
+      zip_code: zip || location,
+      city_resolved: city,
+      state: logState,
+      service_type,
+      vehicle_make: vehicle_make || null,
+      results_count: providers.length,
+    }).then(() => {});
 
     const coords = city ? cityCoords[city] : cityCoords["Detroit"];
     const providersWithCoords = providers.map((p: any, i: number) => ({

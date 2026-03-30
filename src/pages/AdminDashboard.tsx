@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import {
   LogOut, CreditCard, FileText, Users, Store, TrendingUp,
-  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2, MousePointerClick, Youtube, Heart,
+  Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2, MousePointerClick, Youtube, Heart, MapPin,
 } from "lucide-react";
 import { Key, Landmark, Wrench } from "lucide-react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
@@ -25,6 +25,7 @@ import ConversionMetrics from "@/components/ConversionMetrics";
 import KnownIssuesManager from "@/components/KnownIssuesManager";
 import YouTubeEngagement from "@/components/YouTubeEngagement";
 import ShopInterestAnalytics from "@/components/ShopInterestAnalytics";
+import ZipDemandHeatmap from "@/components/ZipDemandHeatmap";
 
 interface FinanceSelection {
   id: string;
@@ -313,6 +314,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="optimization"><TrendingUp className="h-4 w-4 mr-1.5 hidden sm:inline" />Optimize</TabsTrigger>
             <TabsTrigger value="youtube"><Youtube className="h-4 w-4 mr-1.5 hidden sm:inline" />YouTube</TabsTrigger>
             <TabsTrigger value="shop-interest"><Heart className="h-4 w-4 mr-1.5 hidden sm:inline" />Shop Interest</TabsTrigger>
+            <TabsTrigger value="zip-demand"><MapPin className="h-4 w-4 mr-1.5 hidden sm:inline" />ZIP Demand</TabsTrigger>
             <TabsTrigger value="known-issues"><Wrench className="h-4 w-4 mr-1.5 hidden sm:inline" />Known Issues</TabsTrigger>
           </TabsList>
 
@@ -329,6 +331,11 @@ export default function AdminDashboard() {
           {/* Shop Interest Tab */}
           <TabsContent value="shop-interest" className="mt-6">
             <ShopInterestAnalytics />
+          </TabsContent>
+
+          {/* ZIP Demand Heatmap Tab */}
+          <TabsContent value="zip-demand" className="mt-6">
+            <ZipDemandHeatmap />
           </TabsContent>
 
           {/* MI Loan Funnel Tab */}

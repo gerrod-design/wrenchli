@@ -1275,6 +1275,39 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_search_logs: {
+        Row: {
+          city_resolved: string | null
+          id: string
+          results_count: number
+          searched_at: string
+          service_type: string | null
+          state: string | null
+          vehicle_make: string | null
+          zip_code: string
+        }
+        Insert: {
+          city_resolved?: string | null
+          id?: string
+          results_count?: number
+          searched_at?: string
+          service_type?: string | null
+          state?: string | null
+          vehicle_make?: string | null
+          zip_code: string
+        }
+        Update: {
+          city_resolved?: string | null
+          id?: string
+          results_count?: number
+          searched_at?: string
+          service_type?: string | null
+          state?: string | null
+          vehicle_make?: string | null
+          zip_code?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
