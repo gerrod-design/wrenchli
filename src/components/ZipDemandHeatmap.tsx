@@ -322,7 +322,20 @@ export default function ZipDemandHeatmap() {
 
           {/* Unserved ZIPs Table */}
           <div className="rounded-xl border border-border bg-card p-6">
-            <h3 className="font-heading font-semibold mb-4">Expansion Priority List</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-heading font-semibold">Expansion Priority List</h3>
+              {unservedByZip.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={handleIngestAll}
+                  disabled={unservedByZip.every((z) => ingested[z.zip] !== undefined)}
+                >
+                  <Download className="h-4 w-4 mr-1" />
+                  Fill All Gaps
+                </Button>
+              )}
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -332,6 +345,7 @@ export default function ZipDemandHeatmap() {
                     <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground">State</th>
                     <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground">Search Count</th>
                     <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground">Priority</th>
+                    <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wider text-muted-foreground">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -346,11 +360,35 @@ export default function ZipDemandHeatmap() {
                           {row.count >= 10 ? "🔥 High" : row.count >= 5 ? "⚠️ Medium" : "Low"}
                         </Badge>
                       </td>
+                      <td className="px-4 py-3">
+                        {ingested[row.zip] !== undefined ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-green-600">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            {ingested[row.zip]} added
+                          </span>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleIngest(row.zip)}
+                            disabled={ingesting[row.zip]}
+                          >
+                            {ingesting[row.zip] ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <>
+                                <Download className="h-3.5 w-3.5 mr-1" />
+                                Fill
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                   {unservedByZip.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                      <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                         No unserved ZIP codes — great coverage!
                       </td>
                     </tr>
