@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Youtube } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 interface Video {
   video_id: string;
@@ -81,6 +82,16 @@ export default function RelatedVideos({
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-3 rounded-xl border border-border p-4 hover:bg-muted/50 transition-colors group"
+          onClick={() => {
+            trackEvent({
+              event_type: "ad_click",
+              category: "diy_product",
+              action: "youtube_fallback_click",
+              label: tutorialTitle,
+              item_url: fallbackUrl,
+              metadata: { search_query: searchQuery },
+            });
+          }}
         >
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-destructive/10">
             <ExternalLink className="h-5 w-5 text-destructive" />
@@ -111,6 +122,19 @@ export default function RelatedVideos({
             target="_blank"
             rel="noopener noreferrer"
             className="group block"
+            onClick={() => {
+              trackEvent({
+                event_type: "ad_click",
+                category: "diy_product",
+                action: "youtube_tutorial_click",
+                label: tutorialTitle,
+                item_id: v.video_id,
+                item_title: decodeHtml(v.title),
+                item_brand: v.channel,
+                item_url: v.url,
+                metadata: { search_query: searchQuery },
+              });
+            }}
           >
             <Card className="overflow-hidden border hover:shadow-md transition-shadow h-full">
               <div className="relative aspect-video bg-muted">
