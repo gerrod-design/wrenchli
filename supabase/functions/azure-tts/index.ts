@@ -76,8 +76,6 @@ serve(async (req) => {
     // Add SSML break tags for natural prosody at punctuation boundaries
     // Periods / question marks / exclamation points → shorter natural pause
     cleanText = cleanText.replace(/([.!?])\s+/g, '$1<break time="250ms"/> ');
-    // Commas → very brief pause (avoid robotic gaps around names)
-    cleanText = cleanText.replace(/,\s*/g, ',<break time="80ms"/> ');
     // Em-dash or double-dash → short pause
     cleanText = cleanText.replace(/\s*[—–]\s*/g, ' <break time="150ms"/> ');
     // Ellipsis → longer pause
