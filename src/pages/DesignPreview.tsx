@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Shield, Zap, Wrench, ChevronRight, AlertTriangle, CheckCircle2, Activity, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
 const mockCauses = [
   { name: "Dead Battery", probability: 0.78, costLow: 150, costHigh: 350, difficulty: "easy" },
