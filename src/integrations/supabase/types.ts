@@ -2467,6 +2467,7 @@ export type Database = {
       vehicles: {
         Row: {
           created_at: string | null
+          decoded_specs: Json | null
           id: string
           make: string
           mileage: number | null
@@ -2480,6 +2481,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          decoded_specs?: Json | null
           id?: string
           make: string
           mileage?: number | null
@@ -2493,6 +2495,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          decoded_specs?: Json | null
           id?: string
           make?: string
           mileage?: number | null
