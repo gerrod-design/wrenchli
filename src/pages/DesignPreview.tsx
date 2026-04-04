@@ -160,7 +160,7 @@ export default function DesignPreview() {
           </div>
 
           {/* Right: Sample Readout (static example of output) */}
-          <div className="md:col-span-3 rounded-xl p-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
+          <div className="md:col-span-2 rounded-xl p-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
             <div className="flex items-center justify-between mb-6">
               <div className="text-xs font-mono" style={{ color: "#E07B39" }}>SAMPLE DIAGNOSTIC READOUT</div>
               <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "#E07B3915", border: "1px solid #E07B39", color: "#E07B39" }}>
