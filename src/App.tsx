@@ -121,6 +121,7 @@ function AnimatedRoutes() {
           <Route path="/repairs/:slug" element={<RepairGuide />} />
           <Route path="/referral/:token" element={<ReferralPackage />} />
           <Route path="/find-nearby-shops" element={<FindNearbyShops />} />
+          <Route path="/agent-diagnosis" element={<AgentDiagnosisFlow />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
