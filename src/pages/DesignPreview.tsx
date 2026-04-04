@@ -344,7 +344,7 @@ export default function DesignPreview() {
             </div>
 
             <Link
-              to="/for-shops"
+              to="/design-preview/for-shops"
               className="inline-flex items-center gap-2 mt-10 px-8 py-3.5 rounded-lg font-semibold text-base transition-opacity hover:opacity-90"
               style={{ background: "#E07B39", color: "#FFFFFF" }}
             >
