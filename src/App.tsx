@@ -19,7 +19,7 @@ import SitePasswordGate from "@/components/SitePasswordGate";
 import ScrollToTop from "@/components/ScrollToTop";
 
 function SitePasswordGateWrapper() {
-  return <AppLayout />;
+  return <SitePasswordGate><AppLayout /></SitePasswordGate>;
 }
 import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
