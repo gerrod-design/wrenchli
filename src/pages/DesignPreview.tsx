@@ -101,7 +101,7 @@ export default function DesignPreview() {
       </nav>
 
       {/* ── HERO with cinematic video background ── */}
-      <section className="relative overflow-hidden" style={{ minHeight: "70vh" }}>
+      <section className="relative overflow-hidden" style={{ minHeight: "100vh" }}>
         {/* Video background — same asset as wrenchli.net hero */}
         <video
           className="absolute inset-0 w-full h-full object-cover z-0"
