@@ -73,10 +73,6 @@ function AnimatedRoutes() {
     location.pathname.startsWith("/reset-password");
   const isDesignPreview = location.pathname === "/design-preview";
 
-  if (isDesignPreview) {
-    return <DesignPreview />;
-  }
-
   if (isAdmin) {
     return (
       <Routes location={location}>
