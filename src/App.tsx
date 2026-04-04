@@ -64,6 +64,7 @@ import AgentDiagnosisFlow from "./pages/AgentDiagnosisFlow";
 import ShopLogin from "./pages/ShopLogin";
 import ShopPortal from "./pages/ShopPortal";
 import DesignPreview from "./pages/DesignPreview";
+import ForShopsPreview from "./pages/ForShopsPreview";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
