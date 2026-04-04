@@ -29,6 +29,13 @@ const FONT = "'Plus Jakarta Sans', 'DM Sans', sans-serif";
 export default function DesignPreview() {
   const [activeStage, setActiveStage] = useState(2);
   const chatRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.6;
+    }
+  }, []);
 
   useEffect(() => {
     const link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
@@ -101,9 +108,10 @@ export default function DesignPreview() {
       </nav>
 
       {/* ── HERO with cinematic video background ── */}
-      <section className="relative overflow-hidden" style={{ minHeight: "70vh" }}>
+      <section className="relative overflow-hidden" style={{ minHeight: "100vh" }}>
         {/* Video background — same asset as wrenchli.net hero */}
         <video
+          ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover z-0"
           autoPlay
           muted
@@ -118,7 +126,7 @@ export default function DesignPreview() {
         <div className="absolute inset-0 z-[1]" style={{ background: "rgba(0,0,0,0.50)" }} />
 
         {/* Hero content on top of overlay */}
-        <div className="relative z-[2] px-6 py-20 max-w-4xl mx-auto text-center">
+        <div className="relative z-[2] px-6 py-20 max-w-4xl mx-auto text-center flex flex-col items-center justify-center" style={{ minHeight: "calc(100vh - 120px)" }}>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight" style={{ color: "#FFFFFF" }}>
             Vehicle Repair.<br />
             <span style={{ color: "#E07B39" }}>Finally Fixed.</span>
