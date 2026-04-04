@@ -26,6 +26,16 @@ export default function DesignPreview() {
   const [activeStage, setActiveStage] = useState(2);
   const chatRef = useRef<HTMLDivElement>(null);
 
+  // Swap favicon to dark variant on this page only
+  useEffect(() => {
+    const link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
+    const original = link?.href;
+    if (link) link.href = "/favicon-dark.png";
+    return () => {
+      if (link && original) link.href = original;
+    };
+  }, []);
+
   const scrollToChat = () => {
     chatRef.current?.scrollIntoView({ behavior: "smooth" });
   };
