@@ -1,0 +1,132 @@
+import { useState } from "react";
+import VehicleStep from "./steps/VehicleStep";
+import SymptomStep from "./steps/SymptomStep";
+import DiagnosisStep from "./steps/DiagnosisStep";
+import RecommendationStep from "./steps/RecommendationStep";
+
+export type WizardStep = "vehicle" | "symptoms" | "diagnosing" | "recommendation";
+
+export interface VehicleData {
+  year: number;
+  make: string;
+  model: string;
+  mileage: number;
+  trim?: string;
+}
+
+export interface SymptomData {
+  primary_symptom: string;
+  symptom_location?: string;
+  when_it_happens?: string;
+  severity?: "minor" | "moderate" | "urgent" | "do_not_drive";
+  warning_lights?: string[];
+  raw_description?: string;
+}
+
+export interface PossibleCause {
+  name: string;
+  probability: number;
+  estimated_cost_low: number;
+  estimated_cost_high: number;
+  diy_difficulty: "easy" | "moderate" | "professional_only";
+  notes?: string;
+}
+
+export interface DiagnosisResult {
+  diagnosis_id: string;
+  confidence: "low" | "medium" | "high";
+  urgency: "monitor" | "schedule" | "soon" | "immediate";
+  explanation: string;
+  possible_causes: PossibleCause[];
+}
+
+export interface RecommendationResult {
+  recommendation_id: string;
+  action: string;
+  next_steps: string[];
+  questions_to_ask_mechanic: string[];
+  parts_likely_needed: string[];
+}
+
+export default function DiagnosticWizard() {
+  const [step, setStep] = useState<WizardStep>("vehicle");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [vehicle, setVehicle] = useState<VehicleData | null>(null);
+  const [symptoms, setSymptoms] = useState<SymptomData | null>(null);
+  const [diagnosis, setDiagnosis] = useState<DiagnosisResult | null>(null);
+  const [recommendation, setRecommendation] = useState<RecommendationResult | null>(null);
+
+  const stepIndex = ["vehicle", "symptoms", "diagnosing", "recommendation"].indexOf(step);
+
+  return (
+    <div className="rounded-xl overflow-hidden" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
+      {/* Step indicator */}
+      <div className="flex border-b" style={{ borderColor: "#2A2D37" }}>
+        {["Vehicle", "Symptoms", "Diagnosis", "Plan"].map((label, i) => (
+          <div
+            key={label}
+            className="flex-1 text-center py-3 text-xs font-mono transition-colors"
+            style={{
+              background: i <= stepIndex ? "#E07B3915" : "transparent",
+              color: i <= stepIndex ? "#E07B39" : "#4B5563",
+              borderBottom: i === stepIndex ? "2px solid #E07B39" : "2px solid transparent",
+            }}
+          >
+            {i + 1}. {label}
+          </div>
+        ))}
+      </div>
+
+      <div className="p-5">
+        {step === "vehicle" && (
+          <VehicleStep
+            onNext={(v, sid) => {
+              setVehicle(v);
+              setSessionId(sid);
+              setStep("symptoms");
+            }}
+          />
+        )}
+        {step === "symptoms" && vehicle && sessionId && (
+          <SymptomStep
+            vehicle={vehicle}
+            sessionId={sessionId}
+            onNext={(s, d) => {
+              setSymptoms(s);
+              setDiagnosis(d);
+              setStep("diagnosing");
+            }}
+            onBack={() => setStep("vehicle")}
+          />
+        )}
+        {step === "diagnosing" && diagnosis && vehicle && sessionId && (
+          <DiagnosisStep
+            diagnosis={diagnosis}
+            vehicle={vehicle}
+            sessionId={sessionId}
+            onNext={(r) => {
+              setRecommendation(r);
+              setStep("recommendation");
+            }}
+            onBack={() => setStep("symptoms")}
+          />
+        )}
+        {step === "recommendation" && recommendation && diagnosis && vehicle && (
+          <RecommendationStep
+            recommendation={recommendation}
+            diagnosis={diagnosis}
+            vehicle={vehicle}
+            onRestart={() => {
+              setStep("vehicle");
+              setVehicle(null);
+              setSymptoms(null);
+              setDiagnosis(null);
+              setRecommendation(null);
+              setSessionId(null);
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
