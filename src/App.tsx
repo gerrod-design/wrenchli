@@ -144,7 +144,7 @@ function AppLayout() {
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
   const isDesignPreview = location.pathname === "/design-preview";
-  const hideChrome = isAdmin || isDesignPreview;
+  const hideChrome = isAdmin;
 
   useEffect(() => {
     import("@/lib/analytics").then(({ trackPagePerformance }) => {
