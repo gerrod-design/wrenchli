@@ -405,6 +405,7 @@ export default function ChatBot() {
             initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
             className="fixed bottom-[76px] right-4 z-50 flex h-auto w-auto items-center justify-center rounded-2xl bg-primary p-3 text-primary-foreground shadow-lg hover:opacity-90 transition-opacity md:bottom-8 md:right-6 cursor-pointer"
             onClick={handleOpenChat}
+            data-chat-trigger
           >
             <div className="flex flex-col items-center gap-1">
               <MechanicAvatar size={40} />
