@@ -104,6 +104,7 @@ export default function DesignPreview() {
       <section className="relative overflow-hidden" style={{ minHeight: "100vh" }}>
         {/* Video background — same asset as wrenchli.net hero */}
         <video
+          ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover z-0"
           autoPlay
           muted
