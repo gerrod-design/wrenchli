@@ -832,6 +832,63 @@ export type Database = {
           },
         ]
       }
+      integration_sync_log: {
+        Row: {
+          attempted_at: string | null
+          completed_at: string | null
+          direction: string
+          error_message: string | null
+          id: string
+          payload_sent: Json | null
+          response_received: Json | null
+          session_id: string | null
+          shop_integration_id: string
+          sms_record_id: string | null
+          status: string
+        }
+        Insert: {
+          attempted_at?: string | null
+          completed_at?: string | null
+          direction: string
+          error_message?: string | null
+          id?: string
+          payload_sent?: Json | null
+          response_received?: Json | null
+          session_id?: string | null
+          shop_integration_id: string
+          sms_record_id?: string | null
+          status?: string
+        }
+        Update: {
+          attempted_at?: string | null
+          completed_at?: string | null
+          direction?: string
+          error_message?: string | null
+          id?: string
+          payload_sent?: Json | null
+          response_received?: Json | null
+          session_id?: string | null
+          shop_integration_id?: string
+          sms_record_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_sync_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integration_sync_log_shop_integration_id_fkey"
+            columns: ["shop_integration_id"]
+            isOneToOne: false
+            referencedRelation: "shop_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_alerts: {
         Row: {
           created_at: string
@@ -2012,6 +2069,50 @@ export type Database = {
           state?: string | null
         }
         Relationships: []
+      }
+      shop_integrations: {
+        Row: {
+          api_key_encrypted: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          shop_id: string
+          shop_location_id: string | null
+          sms_provider: string
+          webhook_url: string | null
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          shop_id: string
+          shop_location_id?: string | null
+          sms_provider: string
+          webhook_url?: string | null
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          shop_id?: string
+          shop_location_id?: string | null
+          sms_provider?: string
+          webhook_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_integrations_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shop_interest_events: {
         Row: {
