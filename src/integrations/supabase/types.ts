@@ -2133,6 +2133,53 @@ export type Database = {
           },
         ]
       }
+      shop_performance_metrics: {
+        Row: {
+          avg_consumer_satisfaction: number | null
+          computed_at: string | null
+          cost_percentile_by_repair: Json | null
+          cost_percentile_local: number | null
+          id: string
+          period_start: string
+          response_time_avg_hours: number | null
+          shop_id: string
+          symptom_match_rate: number | null
+          verified_repairs_count: number | null
+        }
+        Insert: {
+          avg_consumer_satisfaction?: number | null
+          computed_at?: string | null
+          cost_percentile_by_repair?: Json | null
+          cost_percentile_local?: number | null
+          id?: string
+          period_start: string
+          response_time_avg_hours?: number | null
+          shop_id: string
+          symptom_match_rate?: number | null
+          verified_repairs_count?: number | null
+        }
+        Update: {
+          avg_consumer_satisfaction?: number | null
+          computed_at?: string | null
+          cost_percentile_by_repair?: Json | null
+          cost_percentile_local?: number | null
+          id?: string
+          period_start?: string
+          response_time_avg_hours?: number | null
+          shop_id?: string
+          symptom_match_rate?: number | null
+          verified_repairs_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_performance_metrics_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_recommendations: {
         Row: {
           created_at: string
@@ -2165,6 +2212,66 @@ export type Database = {
           specializations?: string[] | null
         }
         Relationships: []
+      }
+      shop_repair_confirmations: {
+        Row: {
+          actual_labor_rate: number | null
+          actual_parts_cost: number | null
+          actual_total_cost: number | null
+          confirmed_at: string | null
+          confirmed_issue: string
+          created_at: string | null
+          id: string
+          parts_quality: Database["public"]["Enums"]["parts_quality"] | null
+          repair_order_id: string | null
+          session_id: string | null
+          shop_id: string | null
+          technician_notes: string | null
+        }
+        Insert: {
+          actual_labor_rate?: number | null
+          actual_parts_cost?: number | null
+          actual_total_cost?: number | null
+          confirmed_at?: string | null
+          confirmed_issue: string
+          created_at?: string | null
+          id?: string
+          parts_quality?: Database["public"]["Enums"]["parts_quality"] | null
+          repair_order_id?: string | null
+          session_id?: string | null
+          shop_id?: string | null
+          technician_notes?: string | null
+        }
+        Update: {
+          actual_labor_rate?: number | null
+          actual_parts_cost?: number | null
+          actual_total_cost?: number | null
+          confirmed_at?: string | null
+          confirmed_issue?: string
+          created_at?: string | null
+          id?: string
+          parts_quality?: Database["public"]["Enums"]["parts_quality"] | null
+          repair_order_id?: string | null
+          session_id?: string | null
+          shop_id?: string | null
+          technician_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_repair_confirmations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_repair_confirmations_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shop_search_logs: {
         Row: {
@@ -2577,6 +2684,7 @@ export type Database = {
       app_role: "admin" | "moderator" | "user"
       confidence_level: "low" | "medium" | "high"
       diy_difficulty: "easy" | "moderate" | "professional_only"
+      parts_quality: "OEM" | "aftermarket" | "remanufactured" | "mixed"
       problem_fixed_status: "yes" | "no" | "partial"
       session_status:
         | "intake"
@@ -2716,6 +2824,7 @@ export const Constants = {
       app_role: ["admin", "moderator", "user"],
       confidence_level: ["low", "medium", "high"],
       diy_difficulty: ["easy", "moderate", "professional_only"],
+      parts_quality: ["OEM", "aftermarket", "remanufactured", "mixed"],
       problem_fixed_status: ["yes", "no", "partial"],
       session_status: [
         "intake",
