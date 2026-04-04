@@ -29,6 +29,13 @@ const FONT = "'Plus Jakarta Sans', 'DM Sans', sans-serif";
 export default function DesignPreview() {
   const [activeStage, setActiveStage] = useState(2);
   const chatRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.6;
+    }
+  }, []);
 
   useEffect(() => {
     const link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
