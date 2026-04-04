@@ -3,6 +3,8 @@ import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, Arrow
 import { Link } from "react-router-dom";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
+import heroVideo from "@/assets/hero-video.mp4";
+import heroPoster from "@/assets/hero-poster.jpg";
 
 const mockCauses = [
   { name: "Dead Battery", probability: 0.78, costLow: 150, costHigh: 350, difficulty: "easy" },
@@ -98,27 +100,22 @@ export default function DesignPreview() {
         </div>
       </nav>
 
-      {/* ── HERO with dark overlay ── */}
-      <section className="relative overflow-hidden" style={{ background: "#0F1117" }}>
-        {/* Animated gradient background */}
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            background: "linear-gradient(135deg, #0F1117 0%, #1A1D27 25%, #0F1117 50%, #1E293B 75%, #0F1117 100%)",
-            backgroundSize: "400% 400%",
-            animation: "heroGradientShift 12s ease-in-out infinite",
-          }}
-        />
-        {/* Subtle radial glow */}
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            background: "radial-gradient(ellipse at 50% 40%, rgba(224,123,57,0.08) 0%, transparent 60%)",
-            animation: "heroPulseGlow 6s ease-in-out infinite alternate",
-          }}
-        />
-        {/* Semi-transparent dark overlay */}
-        <div className="absolute inset-0 z-[1]" style={{ background: "rgba(0,0,0,0.45)" }} />
+      {/* ── HERO with cinematic video background ── */}
+      <section className="relative overflow-hidden" style={{ minHeight: "70vh" }}>
+        {/* Video background — same asset as wrenchli.net hero */}
+        <video
+          className="absolute inset-0 w-full h-full object-cover z-0"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster={heroPoster}
+          preload="auto"
+        >
+          <source src={heroVideo} type="video/mp4" />
+        </video>
+        {/* Dark overlay for text legibility */}
+        <div className="absolute inset-0 z-[1]" style={{ background: "rgba(0,0,0,0.50)" }} />
 
         {/* Hero content on top of overlay */}
         <div className="relative z-[2] px-6 py-20 max-w-4xl mx-auto text-center">

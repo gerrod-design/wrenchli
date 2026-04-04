@@ -160,7 +160,7 @@ function AppLayout() {
       {!hideChrome && <Footer />}
       {!hideChrome && <MobileBottomBar />}
       {!hideChrome && <BackToTop />}
-      {!hideChrome && <ChatBot />}
+      {!isAdmin && <ChatBot />}
       {!hideChrome && <CookieConsent />}
     </>
   );
