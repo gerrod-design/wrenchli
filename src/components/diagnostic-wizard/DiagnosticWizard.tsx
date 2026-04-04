@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MessageCircle } from "lucide-react";
 import VehicleStep from "./steps/VehicleStep";
 import SymptomStep from "./steps/SymptomStep";
 import DiagnosisStep from "./steps/DiagnosisStep";
