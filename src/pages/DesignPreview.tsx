@@ -151,12 +151,12 @@ export default function DesignPreview() {
       {/* Live Diagnosis + Sample Readout */}
       <section ref={chatRef} className="px-6 pb-20 max-w-5xl mx-auto">
         <div className="grid md:grid-cols-5 gap-6">
-          {/* Left: LIVE Chat Widget */}
-          <div className="md:col-span-2 design-preview-chat-wrapper">
+          {/* Left: LIVE Diagnostic Wizard */}
+          <div className="md:col-span-3">
             <div className="text-xs font-mono mb-4 px-1" style={{ color: "#E07B39" }}>
               LIVE DIAGNOSIS — TRY IT NOW
             </div>
-            <InlineChatWidget />
+            <DiagnosticWizard />
           </div>
 
           {/* Right: Sample Readout (static example of output) */}
