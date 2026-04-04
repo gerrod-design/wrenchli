@@ -59,6 +59,9 @@ import ResetPassword from "./pages/ResetPassword";
 import RepairGuide, { RepairGuidesIndex } from "./pages/RepairGuide";
 import ReferralPackage from "./pages/ReferralPackage";
 import FindNearbyShops from "./pages/FindNearbyShops";
+import AgentDiagnosisFlow from "./pages/AgentDiagnosisFlow";
+import ShopLogin from "./pages/ShopLogin";
+import ShopPortal from "./pages/ShopPortal";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -121,6 +124,9 @@ function AnimatedRoutes() {
           <Route path="/repairs/:slug" element={<RepairGuide />} />
           <Route path="/referral/:token" element={<ReferralPackage />} />
           <Route path="/find-nearby-shops" element={<FindNearbyShops />} />
+          <Route path="/agent-diagnosis" element={<AgentDiagnosisFlow />} />
+          <Route path="/shop-login" element={<ShopLogin />} />
+          <Route path="/shop-portal" element={<ShopPortal />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
