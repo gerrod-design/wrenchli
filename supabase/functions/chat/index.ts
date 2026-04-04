@@ -7,145 +7,125 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 const MAX_MESSAGES = 80;
 const MAX_CONTENT_LENGTH = 8000;
 const MAX_IMAGE_URLS = 5;
-const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3-flash-preview";
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = "claude-sonnet-4-20250514";
 
 const FUNCTIONS_BASE = Deno.env.get("SUPABASE_URL") + "/functions/v1";
 
-// ── Tool definitions ──
+// ── Tool definitions (Anthropic format) ──
 const tools = [
   {
-    type: "function" as const,
-    function: {
-      name: "diagnose_vehicle",
-      description:
-        "Diagnose a vehicle issue using OBD2 codes or symptom descriptions. Returns structured diagnosis with urgency, causes, costs, and DIY feasibility.",
-      parameters: {
-        type: "object",
-        properties: {
-          codes: { type: "string", description: "OBD2 diagnostic trouble codes, e.g. 'P0420 P0171'" },
-          symptom: { type: "string", description: "Plain-language symptom description" },
-          year: { type: "string", description: "Vehicle year" },
-          make: { type: "string", description: "Vehicle make" },
-          model: { type: "string", description: "Vehicle model" },
-        },
-        required: [],
+    name: "diagnose_vehicle",
+    description:
+      "Diagnose a vehicle issue using OBD2 codes or symptom descriptions. Returns structured diagnosis with urgency, causes, costs, and DIY feasibility.",
+    input_schema: {
+      type: "object",
+      properties: {
+        codes: { type: "string", description: "OBD2 diagnostic trouble codes, e.g. 'P0420 P0171'" },
+        symptom: { type: "string", description: "Plain-language symptom description" },
+        year: { type: "string", description: "Vehicle year" },
+        make: { type: "string", description: "Vehicle make" },
+        model: { type: "string", description: "Vehicle model" },
       },
     },
   },
   {
-    type: "function" as const,
-    function: {
-      name: "estimate_repair_cost",
-      description:
-        "Estimate professional repair costs. Returns cost range, parts/labor breakdown, and regional notes.",
-      parameters: {
-        type: "object",
-        properties: {
-          diagnosis_title: { type: "string", description: "The repair/diagnosis title, e.g. 'Faulty Catalytic Converter' or 'Worn Brake Pads'. This field is REQUIRED." },
-          diagnosis_code: { type: "string", description: "DTC code if applicable, e.g. 'P0420'" },
-          vehicle_year: { type: "string", description: "Vehicle year, e.g. '2018'" },
-          vehicle_make: { type: "string", description: "Vehicle make, e.g. 'Ford'" },
-          vehicle_model: { type: "string", description: "Vehicle model, e.g. 'F-150'" },
-          zip_code: { type: "string", description: "Customer ZIP code for regional pricing. REQUIRED." },
-        },
-        required: ["diagnosis_title", "zip_code"],
+    name: "estimate_repair_cost",
+    description:
+      "Estimate professional repair costs. Returns cost range, parts/labor breakdown, and regional notes.",
+    input_schema: {
+      type: "object",
+      properties: {
+        diagnosis_title: { type: "string", description: "The repair/diagnosis title, e.g. 'Faulty Catalytic Converter' or 'Worn Brake Pads'. This field is REQUIRED." },
+        diagnosis_code: { type: "string", description: "DTC code if applicable, e.g. 'P0420'" },
+        vehicle_year: { type: "string", description: "Vehicle year, e.g. '2018'" },
+        vehicle_make: { type: "string", description: "Vehicle make, e.g. 'Ford'" },
+        vehicle_model: { type: "string", description: "Vehicle model, e.g. 'F-150'" },
+        zip_code: { type: "string", description: "Customer ZIP code for regional pricing. REQUIRED." },
       },
+      required: ["diagnosis_title", "zip_code"],
     },
   },
   {
-    type: "function" as const,
-    function: {
-      name: "estimate_vehicle_value",
-      description:
-        "Estimate current fair market value. Returns private-party, trade-in, and dealer retail ranges.",
-      parameters: {
-        type: "object",
-        properties: {
-          year: { type: "number", description: "Vehicle year" },
-          make: { type: "string", description: "Vehicle make" },
-          model: { type: "string", description: "Vehicle model" },
-          trim: { type: "string", description: "Vehicle trim" },
-          mileage: { type: "number", description: "Current mileage" },
-          zipCode: { type: "string", description: "ZIP code" },
-          condition: { type: "string", description: "Condition: excellent, good, average, fair, poor" },
-        },
-        required: ["year", "make", "model", "mileage"],
+    name: "estimate_vehicle_value",
+    description:
+      "Estimate current fair market value. Returns private-party, trade-in, and dealer retail ranges.",
+    input_schema: {
+      type: "object",
+      properties: {
+        year: { type: "number", description: "Vehicle year" },
+        make: { type: "string", description: "Vehicle make" },
+        model: { type: "string", description: "Vehicle model" },
+        trim: { type: "string", description: "Vehicle trim" },
+        mileage: { type: "number", description: "Current mileage" },
+        zipCode: { type: "string", description: "ZIP code" },
+        condition: { type: "string", description: "Condition: excellent, good, average, fair, poor" },
       },
+      required: ["year", "make", "model", "mileage"],
     },
   },
   {
-    type: "function" as const,
-    function: {
-      name: "find_local_shops",
-      description:
-        "Find trusted local auto repair shops near a location.",
-      parameters: {
-        type: "object",
-        properties: {
-          location: { type: "string", description: "ZIP code or city name" },
-          service_type: { type: "string", description: "Service needed, e.g. 'brakes', 'oil change'" },
-          vehicle_make: { type: "string", description: "Vehicle make for specialty matching" },
-        },
-        required: ["location"],
+    name: "find_local_shops",
+    description:
+      "Find trusted local auto repair shops near a location.",
+    input_schema: {
+      type: "object",
+      properties: {
+        location: { type: "string", description: "ZIP code or city name" },
+        service_type: { type: "string", description: "Service needed, e.g. 'brakes', 'oil change'" },
+        vehicle_make: { type: "string", description: "Vehicle make for specialty matching" },
       },
+      required: ["location"],
     },
   },
   {
-    type: "function" as const,
-    function: {
-      name: "diagnose_damage_photo",
-      description:
-        "Analyze vehicle damage from photos. Returns damage type, severity, affected area, repair options with cost estimates, and safety concerns. Use when the user sends photos of vehicle damage.",
-      parameters: {
-        type: "object",
-        properties: {
-          image_urls: {
-            type: "array",
-            items: { type: "string" },
-            description: "Array of image URLs showing vehicle damage",
-          },
-          vehicle_info: { type: "string", description: "Vehicle description, e.g. '2022 Jeep Grand Cherokee'" },
+    name: "diagnose_damage_photo",
+    description:
+      "Analyze vehicle damage from photos. Returns damage type, severity, affected area, repair options with cost estimates, and safety concerns. Use when the user sends photos of vehicle damage.",
+    input_schema: {
+      type: "object",
+      properties: {
+        image_urls: {
+          type: "array",
+          items: { type: "string" },
+          description: "Array of image URLs showing vehicle damage",
         },
-        required: ["image_urls"],
+        vehicle_info: { type: "string", description: "Vehicle description, e.g. '2022 Jeep Grand Cherokee'" },
       },
+      required: ["image_urls"],
     },
   },
   {
-    type: "function" as const,
-    function: {
-      name: "search_repair_videos",
-      description:
-        "Search for vehicle-specific DIY repair tutorial videos on YouTube. Returns optimized search queries with direct YouTube links. Use this when recommending video tutorials for a specific vehicle and repair.",
-      parameters: {
-        type: "object",
-        properties: {
-          repair_title: { type: "string", description: "The repair or maintenance task, e.g. 'Replace Brake Pads'" },
-          diagnosis_code: { type: "string", description: "DTC code if applicable, e.g. 'P0420'" },
-          vehicle_year: { type: "string", description: "Vehicle year, e.g. '2018'" },
-          vehicle_make: { type: "string", description: "Vehicle make, e.g. 'Honda'" },
-          vehicle_model: { type: "string", description: "Vehicle model, e.g. 'Civic'" },
-        },
-        required: ["repair_title"],
+    name: "search_repair_videos",
+    description:
+      "Search for vehicle-specific DIY repair tutorial videos on YouTube. Returns optimized search queries with direct YouTube links.",
+    input_schema: {
+      type: "object",
+      properties: {
+        repair_title: { type: "string", description: "The repair or maintenance task, e.g. 'Replace Brake Pads'" },
+        diagnosis_code: { type: "string", description: "DTC code if applicable, e.g. 'P0420'" },
+        vehicle_year: { type: "string", description: "Vehicle year, e.g. '2018'" },
+        vehicle_make: { type: "string", description: "Vehicle make, e.g. 'Honda'" },
+        vehicle_model: { type: "string", description: "Vehicle model, e.g. 'Civic'" },
       },
+      required: ["repair_title"],
     },
   },
   {
-    type: "function" as const,
-    function: {
-      name: "lookup_diy_tutorial",
-      description:
-        "Search Wrenchli's built-in DIY tutorial library for a matching step-by-step repair guide. Returns tutorial details with a direct link if found. Use this alongside search_repair_videos to offer both written guides and video tutorials.",
-      parameters: {
-        type: "object",
-        properties: {
-          repair_keyword: { type: "string", description: "Keyword(s) describing the repair, e.g. 'brake pads', 'oil change', 'battery'" },
-        },
-        required: ["repair_keyword"],
+    name: "lookup_diy_tutorial",
+    description:
+      "Search Wrenchli's built-in DIY tutorial library for a matching step-by-step repair guide. Returns tutorial details with a direct link if found.",
+    input_schema: {
+      type: "object",
+      properties: {
+        repair_keyword: { type: "string", description: "Keyword(s) describing the repair, e.g. 'brake pads', 'oil change', 'battery'" },
       },
+      required: ["repair_keyword"],
     },
   },
 ];
+
+// ── System Prompt (unchanged from original) ──
 const SYSTEM_PROMPT = `You are Mike — a friendly, knowledgeable vehicle advisor at Wrenchli. You work with a small team of specialists. You genuinely care about helping people with their cars.
 
 **YOUR IDENTITY — CRITICAL:**
@@ -385,7 +365,7 @@ async function executeTool(
     Authorization: `Bearer ${anonKey}`,
   };
 
-  const toolTimeout = 20000; // 20s timeout per tool
+  const toolTimeout = 20000;
 
   try {
     let resp: Response;
@@ -453,7 +433,6 @@ async function executeTool(
         const shopData = await resp.json();
         console.log("find_local_shops returned:", JSON.stringify(shopData?.providers?.map((p: { name: string }) => p.name) || []));
         clearTimeout(timer);
-        // Wrap results with an explicit instruction to prevent hallucination
         return JSON.stringify({
           ...shopData,
           _instruction: "IMPORTANT: Only recommend shops from the 'providers' list above. Do NOT invent, fabricate, or add any shop names that are not in this list."
@@ -470,7 +449,6 @@ async function executeTool(
         break;
 
       case "search_repair_videos": {
-        // Use the youtube-search edge function for real video results
         const vehicle = [rawArgs.vehicle_year || rawArgs.year || "", rawArgs.vehicle_make || rawArgs.make || "", rawArgs.vehicle_model || rawArgs.model || ""].filter(Boolean).join(" ");
         const repairTitle = String(rawArgs.repair_title || rawArgs.diagnosis_title || "vehicle repair");
         const searchQuery = `${vehicle} ${repairTitle} DIY tutorial`.trim();
@@ -495,7 +473,6 @@ async function executeTool(
         } catch (ytErr) {
           console.error("youtube-search tool error, falling back:", ytErr);
         }
-        // Fallback: return a YouTube search link
         clearTimeout(timer);
         return JSON.stringify({
           videos: [{
@@ -523,7 +500,6 @@ async function executeTool(
             .select("slug, title, description, difficulty, estimated_time_minutes, category")
             .eq("is_published", true);
 
-          // Simple keyword matching against title and category
           const matches = (tutorials || []).filter((t: { title: string; category: string }) =>
             t.title.toLowerCase().includes(keyword) ||
             keyword.split(/\s+/).some((w: string) => t.title.toLowerCase().includes(w))
@@ -567,37 +543,32 @@ async function executeTool(
   }
 }
 
-// ── Build multimodal content for AI messages ──
-type ContentPart = { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } };
+// ── Build Anthropic messages ──
+type AnthropicContent =
+  | string
+  | Array<{ type: "text"; text: string } | { type: "image"; source: { type: "url"; url: string } }>;
 
-function buildAiMessages(
+function buildAnthropicMessages(
   messages: Array<{ role: string; content: string; image_urls?: string[] }>,
-  vehicleContext?: { year?: string; make?: string; model?: string; mileage?: number },
-): Array<Record<string, unknown>> {
-  const vehicleContextStr = buildVehicleContext(vehicleContext);
-  const systemContent = SYSTEM_PROMPT + vehicleContextStr;
-
-  const aiMessages: Array<Record<string, unknown>> = [
-    { role: "system", content: systemContent },
-  ];
+): Array<{ role: string; content: AnthropicContent }> {
+  const anthropicMessages: Array<{ role: string; content: AnthropicContent }> = [];
 
   for (const msg of messages) {
     if (msg.role === "user" && msg.image_urls && msg.image_urls.length > 0) {
-      // Multimodal message with text + images
-      const parts: ContentPart[] = [];
+      const parts: Array<{ type: "text"; text: string } | { type: "image"; source: { type: "url"; url: string } }> = [];
       if (msg.content) {
         parts.push({ type: "text", text: msg.content });
       }
       for (const url of msg.image_urls) {
-        parts.push({ type: "image_url", image_url: { url } });
+        parts.push({ type: "image", source: { type: "url", url } });
       }
-      aiMessages.push({ role: "user", content: parts });
+      anthropicMessages.push({ role: "user", content: parts });
     } else {
-      aiMessages.push({ role: msg.role, content: msg.content });
+      anthropicMessages.push({ role: msg.role, content: msg.content });
     }
   }
 
-  return aiMessages;
+  return anthropicMessages;
 }
 
 // ── Validate incoming messages ──
@@ -649,7 +620,6 @@ function validateMessages(
       );
     }
 
-    // Validate image_urls if present
     let validatedImageUrls: string[] | undefined;
     if (Array.isArray(image_urls)) {
       validatedImageUrls = image_urls
@@ -657,7 +627,6 @@ function validateMessages(
         .slice(0, MAX_IMAGE_URLS);
     }
 
-    // Allow empty content if images are present
     if (content.length === 0 && (!validatedImageUrls || validatedImageUrls.length === 0)) {
       return new Response(
         JSON.stringify({ error: "Message must have content or images" }),
@@ -672,6 +641,58 @@ function validateMessages(
     });
   }
   return messages;
+}
+
+// ── Convert Anthropic SSE stream to OpenAI-compatible SSE format ──
+// The frontend streamChat.ts expects OpenAI-style SSE: data: {"choices":[{"delta":{"content":"..."}}]}
+function convertAnthropicStreamToOpenAI(anthropicStream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  let buffer = "";
+
+  return new ReadableStream({
+    async start(controller) {
+      const reader = anthropicStream.getReader();
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          let nl: number;
+          while ((nl = buffer.indexOf("\n")) !== -1) {
+            const line = buffer.slice(0, nl).trim();
+            buffer = buffer.slice(nl + 1);
+
+            if (!line.startsWith("data: ") || line === "data: " ) continue;
+            const json = line.slice(6).trim();
+            if (!json) continue;
+
+            try {
+              const event = JSON.parse(json);
+
+              if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
+                const openAIChunk = JSON.stringify({
+                  choices: [{ delta: { role: "assistant", content: event.delta.text } }],
+                });
+                controller.enqueue(encoder.encode(`data: ${openAIChunk}\n\n`));
+              } else if (event.type === "message_stop") {
+                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+              }
+            } catch {
+              // skip unparseable lines
+            }
+          }
+        }
+        // Ensure [DONE] is sent
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      } catch (err) {
+        console.error("Stream conversion error:", err);
+        controller.error(err);
+      }
+    },
+  });
 }
 
 // ── Main handler ──
@@ -717,62 +738,67 @@ Deno.serve(async (req) => {
     if (validated instanceof Response) return validated;
     const messages = validated;
 
-    // Extract optional vehicle context for personalized advice
     const vehicleContext = (body as Record<string, unknown>).vehicleContext as
       | { year?: string; make?: string; model?: string; mileage?: number }
       | undefined;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
-    const aiMessages = buildAiMessages(messages, vehicleContext);
+    const vehicleContextStr = buildVehicleContext(vehicleContext);
+    const systemContent = SYSTEM_PROMPT + vehicleContextStr;
+    const anthropicMessages = buildAnthropicMessages(messages);
 
     // ── Turn 1: Non-streaming request (may produce tool calls) ──
     const turn1Controller = new AbortController();
-    const turn1Timeout = setTimeout(() => turn1Controller.abort(), 45000); // 45s timeout
+    const turn1Timeout = setTimeout(() => turn1Controller.abort(), 45000);
 
     let turn1Resp: Response;
     try {
-      turn1Resp = await fetch(AI_GATEWAY, {
+      turn1Resp = await fetch(ANTHROPIC_API_URL, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
           "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify({
           model: MODEL,
-          messages: aiMessages,
+          max_tokens: 2048,
+          system: systemContent,
+          messages: anthropicMessages,
           tools,
-          tool_choice: "auto",
-          stream: false,
         }),
         signal: turn1Controller.signal,
       });
     } catch (abortErr) {
       clearTimeout(turn1Timeout);
       console.error("Turn 1 timed out or aborted:", abortErr);
-      // Fall back to a streaming call without tools to avoid timeout
-      const fallbackResp = await fetch(AI_GATEWAY, {
+      // Fallback: streaming without tools
+      const fallbackResp = await fetch(ANTHROPIC_API_URL, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
           "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify({
           model: MODEL,
-          messages: aiMessages,
+          max_tokens: 2048,
+          system: systemContent,
+          messages: anthropicMessages,
           stream: true,
         }),
       });
-      if (!fallbackResp.ok) {
+      if (!fallbackResp.ok || !fallbackResp.body) {
         return new Response(
           JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
           { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
         );
       }
-      return new Response(fallbackResp.body, {
+      return new Response(convertAnthropicStreamToOpenAI(fallbackResp.body), {
         headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
       });
     }
@@ -780,20 +806,14 @@ Deno.serve(async (req) => {
 
     if (!turn1Resp.ok) {
       const status = turn1Resp.status;
+      const t = await turn1Resp.text();
+      console.error("Anthropic API error (turn 1):", status, t);
       if (status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
           { status: 429, headers: { ...securityHeaders, "Content-Type": "application/json" } },
         );
       }
-      if (status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI service temporarily unavailable." }),
-          { status: 402, headers: { ...securityHeaders, "Content-Type": "application/json" } },
-        );
-      }
-      const t = await turn1Resp.text();
-      console.error("AI gateway error (turn 1):", status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
         { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
@@ -811,11 +831,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    const assistantMsg = turn1Data.choices?.[0]?.message;
+    // ── Check for tool use in Anthropic response ──
+    const contentBlocks = turn1Data.content || [];
+    const toolUseBlocks = contentBlocks.filter((b: { type: string }) => b.type === "tool_use");
+    const textBlocks = contentBlocks.filter((b: { type: string }) => b.type === "text");
 
-    // ── No tool calls: return content directly as SSE stream ──
-    if (!assistantMsg?.tool_calls || assistantMsg.tool_calls.length === 0) {
-      const content = assistantMsg?.content || "I'm sorry, I couldn't generate a response. Please try again.";
+    // No tool calls — return text as SSE stream
+    if (toolUseBlocks.length === 0) {
+      const content = textBlocks.map((b: { text: string }) => b.text).join("") ||
+        "I'm sorry, I couldn't generate a response. Please try again.";
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         start(controller) {
@@ -833,62 +857,53 @@ Deno.serve(async (req) => {
     }
 
     // ── Execute tool calls in parallel ──
-    const toolCalls = assistantMsg.tool_calls;
-    console.log("Tool calls:", JSON.stringify(toolCalls.map((tc: { function: { name: string } }) => tc.function.name)));
+    console.log("Tool calls:", JSON.stringify(toolUseBlocks.map((tc: { name: string }) => tc.name)));
 
     const toolResults = await Promise.all(
-      toolCalls.map(async (tc: { id: string; function: { name: string; arguments: string } }) => {
-        let args: Record<string, unknown> = {};
-        try {
-          args = JSON.parse(tc.function.arguments);
-        } catch {
-          args = {};
-        }
-        const result = await executeTool(tc.function.name, args, anonKey);
+      toolUseBlocks.map(async (tc: { id: string; name: string; input: Record<string, unknown> }) => {
+        const result = await executeTool(tc.name, tc.input, anonKey);
         return {
-          role: "tool" as const,
-          tool_call_id: tc.id,
+          type: "tool_result" as const,
+          tool_use_id: tc.id,
           content: result,
         };
       }),
     );
 
     // ── Turn 2: Send tool results, stream final text answer ──
-    const cleanAssistantMsg = {
-      role: "assistant",
-      content: assistantMsg.content || "",
-      tool_calls: assistantMsg.tool_calls,
-    };
-
     const turn2Messages = [
-      ...aiMessages,
-      cleanAssistantMsg,
-      ...toolResults,
+      ...anthropicMessages,
+      { role: "assistant", content: contentBlocks },
+      { role: "user", content: toolResults },
     ];
 
-    const turn2Resp = await fetch(AI_GATEWAY, {
+    const turn2Resp = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
         model: MODEL,
+        max_tokens: 2048,
+        system: systemContent,
         messages: turn2Messages,
         stream: true,
       }),
     });
 
-    if (!turn2Resp.ok) {
+    if (!turn2Resp.ok || !turn2Resp.body) {
       const t = await turn2Resp.text();
-      console.error("AI gateway error (turn 2):", turn2Resp.status, t);
+      console.error("Anthropic API error (turn 2):", turn2Resp.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
         { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    return new Response(turn2Resp.body, {
+    // Convert Anthropic streaming format to OpenAI-compatible format for frontend
+    return new Response(convertAnthropicStreamToOpenAI(turn2Resp.body), {
       headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
