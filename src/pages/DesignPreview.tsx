@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Shield, Zap, Wrench, ChevronRight, AlertTriangle, CheckCircle2, Activity, ArrowLeft } from "lucide-react";
+import { Shield, Zap, Wrench, ChevronRight, AlertTriangle, CheckCircle2, Activity, ArrowLeft, Store, ArrowRight, Users, ClipboardCheck, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 
@@ -54,39 +54,51 @@ export default function DesignPreview() {
             Mobility for All.
           </span>
         </div>
-        <button
-          className="px-5 py-2.5 rounded-lg text-sm font-semibold"
-          style={{ background: "#E07B39", color: "#0F1117" }}
-        >
-          Start Diagnosis
-        </button>
+        <div className="flex items-center gap-4">
+          <a
+            href="#for-shops"
+            className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            style={{ color: "#9CA3AF", border: "1px solid #2A2D37" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "#E07B39";
+              e.currentTarget.style.color = "#F5F5F5";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "#2A2D37";
+              e.currentTarget.style.color = "#9CA3AF";
+            }}
+          >
+            <Store className="h-4 w-4" />
+            For Shops
+          </a>
+          <button
+            className="px-5 py-2.5 rounded-lg text-sm font-semibold"
+            style={{ background: "#E07B39", color: "#0F1117" }}
+          >
+            Start Free Diagnosis
+          </button>
+        </div>
       </nav>
 
       {/* Hero */}
       <section className="px-6 py-20 max-w-4xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono mb-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37", color: "#E07B39" }}>
-          <Activity className="h-3 w-3" />
-          DIAGNOSTIC SYSTEM v2.0
-        </div>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight" style={{ color: "#F5F5F5" }}>
           Vehicle Repair.<br />
           <span style={{ color: "#E07B39" }}>Finally Fixed.</span>
         </h1>
         <p className="mt-6 text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "#9CA3AF" }}>
-          Describe what's wrong. Get a structured diagnosis with confidence scores,
+          <span className="font-semibold" style={{ color: "#F5F5F5" }}>Free, instant AI diagnosis.</span>{" "}
+          Describe what's wrong and get a structured report with confidence scores,
           cost estimates, and exactly what to tell your mechanic.
         </p>
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="px-8 py-3.5 rounded-lg font-semibold text-base flex items-center justify-center gap-2" style={{ background: "#E07B39", color: "#0F1117" }}>
-            Start Diagnosis <ChevronRight className="h-5 w-5" />
-          </button>
-          <button className="px-8 py-3.5 rounded-lg font-semibold text-base" style={{ background: "transparent", border: "1px solid #2A2D37", color: "#9CA3AF" }}>
-            How It Works
+        <div className="mt-10">
+          <button className="px-8 py-3.5 rounded-lg font-semibold text-base flex items-center justify-center gap-2 mx-auto" style={{ background: "#E07B39", color: "#0F1117" }}>
+            Start Free Diagnosis <ChevronRight className="h-5 w-5" />
           </button>
         </div>
         {/* Trust badges */}
         <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm" style={{ color: "#6B7280" }}>
-          {["Free diagnosis", "No account required", "87% accuracy", "2,340+ outcomes tracked"].map(t => (
+          {["Always free", "No account required", "Results in under 60 seconds"].map(t => (
             <span key={t} className="flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5" style={{ color: "#E07B39" }} />
               {t}
@@ -97,7 +109,7 @@ export default function DesignPreview() {
 
       {/* Pipeline stages */}
       <section className="px-6 pb-6 max-w-5xl mx-auto">
-        <div className="flex gap-2 mb-8 justify-center">
+        <div className="flex gap-2 mb-8 justify-center flex-wrap">
           {["Vehicle ID", "Symptom Intake", "Diagnosis", "Recommendation"].map((label, i) => (
             <button
               key={label}
@@ -143,7 +155,7 @@ export default function DesignPreview() {
           <div className="md:col-span-3 rounded-xl p-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
             <div className="flex items-center justify-between mb-6">
               <div className="text-xs font-mono" style={{ color: "#E07B39" }}>DIAGNOSTIC READOUT</div>
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "#E07B39/10", border: "1px solid #E07B39", color: "#E07B39" }}>
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "#E07B3915", border: "1px solid #E07B39", color: "#E07B39" }}>
                 <AlertTriangle className="h-3 w-3" /> SCHEDULE SOON
               </div>
             </div>
@@ -215,7 +227,7 @@ export default function DesignPreview() {
           {[
             { icon: Shield, title: "Transparent Pricing", desc: "See real cost ranges before you visit a shop. No surprises." },
             { icon: Zap, title: "Instant Diagnosis", desc: "AI-powered analysis in seconds, backed by real outcome data." },
-            { icon: Activity, title: "Accuracy Tracked", desc: "We track whether our diagnoses were right. 87% and improving." },
+            { icon: Activity, title: "Accuracy Tracked", desc: "We track whether our diagnoses were right — and publish the results." },
           ].map((v) => (
             <div key={v.title} className="rounded-xl p-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
               <div className="h-10 w-10 rounded-lg flex items-center justify-center mb-4" style={{ background: "#E07B3915" }}>
@@ -228,12 +240,77 @@ export default function DesignPreview() {
         </div>
       </section>
 
-      {/* Accuracy teaser */}
-      <section className="px-6 py-16 max-w-4xl mx-auto text-center">
-        <div className="text-xs font-mono mb-4" style={{ color: "#E07B39" }}>SYSTEM ACCURACY</div>
-        <div className="text-5xl font-bold mb-2" style={{ color: "#F5F5F5" }}>87%</div>
-        <p className="text-sm mb-1" style={{ color: "#9CA3AF" }}>diagnostic accuracy based on 2,340 verified repair outcomes</p>
-        <p className="text-xs" style={{ color: "#6B7280" }}>When we say "high confidence," we're right 94% of the time.</p>
+      {/* ── For Shops Section ── */}
+      <section id="for-shops" className="px-6 py-20" style={{ background: "#0F1117", borderTop: "1px solid #1A1D27" }}>
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37", color: "#E07B39" }}>
+            <Store className="h-3 w-3" />
+            For Repair Shops
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-4" style={{ color: "#F5F5F5" }}>
+            Every customer arrives<br />
+            <span style={{ color: "#E07B39" }}>already knowing what's wrong.</span>
+          </h2>
+          <p className="text-lg max-w-2xl mx-auto leading-relaxed mb-12" style={{ color: "#9CA3AF" }}>
+            Your customers come pre-diagnosed, cost-educated, and ready to approve the work.
+            No more 20-minute intake calls. No more sticker shock at the counter.
+          </p>
+
+          {/* Shop benefits grid */}
+          <div className="grid sm:grid-cols-3 gap-6 text-left">
+            {[
+              {
+                icon: Users,
+                title: "Pre-Qualified Leads",
+                desc: "Customers arrive with a structured diagnosis, vehicle details, and cost expectations. They're not shopping — they're booking.",
+              },
+              {
+                icon: ClipboardCheck,
+                title: "Zero Intake Friction",
+                desc: "The diagnostic report is the intake form. VIN, symptoms, confidence scores — all captured before they walk in.",
+              },
+              {
+                icon: DollarSign,
+                title: "Higher Approval Rates",
+                desc: "Customers who understand the repair approve bigger jobs. Built-in financing means they can afford it, too.",
+              },
+            ].map((b) => (
+              <div key={b.title} className="rounded-xl p-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
+                <div className="h-10 w-10 rounded-lg flex items-center justify-center mb-4" style={{ background: "#E07B3915" }}>
+                  <b.icon className="h-5 w-5" style={{ color: "#E07B39" }} />
+                </div>
+                <h3 className="font-semibold mb-2" style={{ color: "#F5F5F5" }}>{b.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#6B7280" }}>{b.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* What a Wrenchli lead looks like */}
+          <div className="mt-12 rounded-xl p-6 text-left" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
+            <div className="text-xs font-mono mb-4" style={{ color: "#E07B39" }}>WHAT A WRENCHLI LEAD LOOKS LIKE</div>
+            <div className="grid sm:grid-cols-4 gap-4">
+              {[
+                { label: "Vehicle", value: "2019 Honda Civic LX" },
+                { label: "Diagnosis", value: "Dead Battery (78% confidence)" },
+                { label: "Cost Range", value: "$150 – $350" },
+                { label: "Customer Status", value: "Pre-approved financing" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-lg p-3" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
+                  <div className="text-xs mb-1" style={{ color: "#6B7280" }}>{item.label}</div>
+                  <div className="text-sm font-semibold" style={{ color: "#F5F5F5" }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Link
+            to="/for-shops"
+            className="inline-flex items-center gap-2 mt-10 px-8 py-3.5 rounded-lg font-semibold text-base transition-opacity hover:opacity-90"
+            style={{ background: "#E07B39", color: "#0F1117" }}
+          >
+            Learn More for Shops <ArrowRight className="h-5 w-5" />
+          </Link>
+        </div>
       </section>
 
       {/* Footer note */}
