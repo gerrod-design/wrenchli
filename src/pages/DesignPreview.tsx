@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Shield, Zap, Wrench, ChevronRight, AlertTriangle, CheckCircle2, Activity, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
 const mockCauses = [
   { name: "Dead Battery", probability: 0.78, costLow: 150, costHigh: 350, difficulty: "easy" },
@@ -45,9 +46,7 @@ export default function DesignPreview() {
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: "#1A1D27", background: "#0F1117" }}>
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: "#E07B39" }}>
-            <Wrench className="h-5 w-5 text-black" />
-          </div>
+          <img src={wrenchliLogo} alt="Wrenchli" className="h-8 w-8 rounded-lg object-cover" />
           <span className="font-bold text-lg tracking-tight" style={{ color: "#F5F5F5" }}>
             wrenchli
           </span>
