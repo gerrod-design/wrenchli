@@ -65,6 +65,7 @@ import ShopLogin from "./pages/ShopLogin";
 import ShopPortal from "./pages/ShopPortal";
 import DesignPreview from "./pages/DesignPreview";
 import ForShopsPreview from "./pages/ForShopsPreview";
+import ShopOnboardingPreview from "./pages/ShopOnboardingPreview";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
