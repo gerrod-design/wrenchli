@@ -100,6 +100,23 @@ export default function DesignPreview() {
 
       {/* ── HERO with dark overlay ── */}
       <section className="relative overflow-hidden" style={{ background: "#0F1117" }}>
+        {/* Animated gradient background */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            background: "linear-gradient(135deg, #0F1117 0%, #1A1D27 25%, #0F1117 50%, #1E293B 75%, #0F1117 100%)",
+            backgroundSize: "400% 400%",
+            animation: "heroGradientShift 12s ease-in-out infinite",
+          }}
+        />
+        {/* Subtle radial glow */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            background: "radial-gradient(ellipse at 50% 40%, rgba(224,123,57,0.08) 0%, transparent 60%)",
+            animation: "heroPulseGlow 6s ease-in-out infinite alternate",
+          }}
+        />
         {/* Semi-transparent dark overlay */}
         <div className="absolute inset-0 z-[1]" style={{ background: "rgba(0,0,0,0.45)" }} />
 
