@@ -146,6 +146,8 @@ function AppLayout() {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
+  const isDesignPreview = location.pathname === "/design-preview";
+  const hideChrome = isAdmin || isDesignPreview;
 
   useEffect(() => {
     import("@/lib/analytics").then(({ trackPagePerformance }) => {
@@ -156,13 +158,13 @@ function AppLayout() {
   return (
     <>
       <ScrollToTop />
-      {!isAdmin && <Navbar />}
+      {!hideChrome && <Navbar />}
       <AnimatedRoutes />
-      {!isAdmin && <Footer />}
-      {!isAdmin && <MobileBottomBar />}
-      {!isAdmin && <BackToTop />}
-      {!isAdmin && <ChatBot />}
-      {!isAdmin && <CookieConsent />}
+      {!hideChrome && <Footer />}
+      {!hideChrome && <MobileBottomBar />}
+      {!hideChrome && <BackToTop />}
+      {!hideChrome && <ChatBot />}
+      {!hideChrome && <CookieConsent />}
     </>
   );
 }
