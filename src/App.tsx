@@ -60,6 +60,8 @@ import RepairGuide, { RepairGuidesIndex } from "./pages/RepairGuide";
 import ReferralPackage from "./pages/ReferralPackage";
 import FindNearbyShops from "./pages/FindNearbyShops";
 import AgentDiagnosisFlow from "./pages/AgentDiagnosisFlow";
+import ShopLogin from "./pages/ShopLogin";
+import ShopPortal from "./pages/ShopPortal";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
