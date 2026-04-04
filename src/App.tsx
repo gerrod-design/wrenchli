@@ -72,7 +72,7 @@ function AnimatedRoutes() {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
-  const isDesignPreview = location.pathname === "/design-preview";
+  const isDesignPreview = location.pathname === "/design-preview" || location.pathname.startsWith("/design-preview/");
 
   if (isAdmin) {
     return (
