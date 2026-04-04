@@ -45,12 +45,14 @@ export default function DesignPreview() {
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: "#1A1D27", background: "#0F1117" }}>
-        <div className="flex items-center gap-3">
-          <img src={wrenchliLogo} alt="Wrenchli" className="h-8 w-8 rounded-lg object-cover" />
-          <span className="font-bold text-lg tracking-tight" style={{ color: "#F5F5F5" }}>
-            wrenchli
+        <div className="flex flex-col">
+          <span className="flex items-center gap-2 text-xl font-bold tracking-tight" style={{ color: "#F5F5F5" }}>
+            <img src={wrenchliLogo} alt="Wrenchli logo" className="h-8 w-8 object-contain" />
+            Wrenchli
           </span>
-          <span className="text-xs ml-1" style={{ color: "#6B7280" }}>Mobility for All.</span>
+          <span className="ml-10 text-xs font-medium tracking-wide" style={{ color: "#6B7280" }}>
+            Mobility for All.
+          </span>
         </div>
         <button
           className="px-5 py-2.5 rounded-lg text-sm font-semibold"
