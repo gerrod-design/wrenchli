@@ -58,7 +58,7 @@ import DIYTutorialDetail from "./pages/DIYTutorialDetail";
 import ResetPassword from "./pages/ResetPassword";
 import RepairGuide, { RepairGuidesIndex } from "./pages/RepairGuide";
 import ReferralPackage from "./pages/ReferralPackage";
-import FindNearbyShops from "./pages/FindNearbyShops";
+import AgentDiagnosisFlow from "./pages/AgentDiagnosisFlow";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
