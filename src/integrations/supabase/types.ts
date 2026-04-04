@@ -832,6 +832,63 @@ export type Database = {
           },
         ]
       }
+      integration_sync_log: {
+        Row: {
+          attempted_at: string | null
+          completed_at: string | null
+          direction: string
+          error_message: string | null
+          id: string
+          payload_sent: Json | null
+          response_received: Json | null
+          session_id: string | null
+          shop_integration_id: string
+          sms_record_id: string | null
+          status: string
+        }
+        Insert: {
+          attempted_at?: string | null
+          completed_at?: string | null
+          direction: string
+          error_message?: string | null
+          id?: string
+          payload_sent?: Json | null
+          response_received?: Json | null
+          session_id?: string | null
+          shop_integration_id: string
+          sms_record_id?: string | null
+          status?: string
+        }
+        Update: {
+          attempted_at?: string | null
+          completed_at?: string | null
+          direction?: string
+          error_message?: string | null
+          id?: string
+          payload_sent?: Json | null
+          response_received?: Json | null
+          session_id?: string | null
+          shop_integration_id?: string
+          sms_record_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_sync_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integration_sync_log_shop_integration_id_fkey"
+            columns: ["shop_integration_id"]
+            isOneToOne: false
+            referencedRelation: "shop_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_alerts: {
         Row: {
           created_at: string
@@ -2013,6 +2070,50 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_integrations: {
+        Row: {
+          api_key_encrypted: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          shop_id: string
+          shop_location_id: string | null
+          sms_provider: string
+          webhook_url: string | null
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          shop_id: string
+          shop_location_id?: string | null
+          sms_provider: string
+          webhook_url?: string | null
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          shop_id?: string
+          shop_location_id?: string | null
+          sms_provider?: string
+          webhook_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_integrations_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_interest_events: {
         Row: {
           created_at: string
@@ -2133,6 +2234,53 @@ export type Database = {
           },
         ]
       }
+      shop_performance_metrics: {
+        Row: {
+          avg_consumer_satisfaction: number | null
+          computed_at: string | null
+          cost_percentile_by_repair: Json | null
+          cost_percentile_local: number | null
+          id: string
+          period_start: string
+          response_time_avg_hours: number | null
+          shop_id: string
+          symptom_match_rate: number | null
+          verified_repairs_count: number | null
+        }
+        Insert: {
+          avg_consumer_satisfaction?: number | null
+          computed_at?: string | null
+          cost_percentile_by_repair?: Json | null
+          cost_percentile_local?: number | null
+          id?: string
+          period_start: string
+          response_time_avg_hours?: number | null
+          shop_id: string
+          symptom_match_rate?: number | null
+          verified_repairs_count?: number | null
+        }
+        Update: {
+          avg_consumer_satisfaction?: number | null
+          computed_at?: string | null
+          cost_percentile_by_repair?: Json | null
+          cost_percentile_local?: number | null
+          id?: string
+          period_start?: string
+          response_time_avg_hours?: number | null
+          shop_id?: string
+          symptom_match_rate?: number | null
+          verified_repairs_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_performance_metrics_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_recommendations: {
         Row: {
           created_at: string
@@ -2165,6 +2313,66 @@ export type Database = {
           specializations?: string[] | null
         }
         Relationships: []
+      }
+      shop_repair_confirmations: {
+        Row: {
+          actual_labor_rate: number | null
+          actual_parts_cost: number | null
+          actual_total_cost: number | null
+          confirmed_at: string | null
+          confirmed_issue: string
+          created_at: string | null
+          id: string
+          parts_quality: Database["public"]["Enums"]["parts_quality"] | null
+          repair_order_id: string | null
+          session_id: string | null
+          shop_id: string | null
+          technician_notes: string | null
+        }
+        Insert: {
+          actual_labor_rate?: number | null
+          actual_parts_cost?: number | null
+          actual_total_cost?: number | null
+          confirmed_at?: string | null
+          confirmed_issue: string
+          created_at?: string | null
+          id?: string
+          parts_quality?: Database["public"]["Enums"]["parts_quality"] | null
+          repair_order_id?: string | null
+          session_id?: string | null
+          shop_id?: string | null
+          technician_notes?: string | null
+        }
+        Update: {
+          actual_labor_rate?: number | null
+          actual_parts_cost?: number | null
+          actual_total_cost?: number | null
+          confirmed_at?: string | null
+          confirmed_issue?: string
+          created_at?: string | null
+          id?: string
+          parts_quality?: Database["public"]["Enums"]["parts_quality"] | null
+          repair_order_id?: string | null
+          session_id?: string | null
+          shop_id?: string | null
+          technician_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_repair_confirmations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_repair_confirmations_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shop_search_logs: {
         Row: {
@@ -2467,6 +2675,7 @@ export type Database = {
       vehicles: {
         Row: {
           created_at: string | null
+          decoded_specs: Json | null
           id: string
           make: string
           mileage: number | null
@@ -2480,6 +2689,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          decoded_specs?: Json | null
           id?: string
           make: string
           mileage?: number | null
@@ -2493,6 +2703,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          decoded_specs?: Json | null
           id?: string
           make?: string
           mileage?: number | null
@@ -2574,6 +2785,7 @@ export type Database = {
       app_role: "admin" | "moderator" | "user"
       confidence_level: "low" | "medium" | "high"
       diy_difficulty: "easy" | "moderate" | "professional_only"
+      parts_quality: "OEM" | "aftermarket" | "remanufactured" | "mixed"
       problem_fixed_status: "yes" | "no" | "partial"
       session_status:
         | "intake"
@@ -2713,6 +2925,7 @@ export const Constants = {
       app_role: ["admin", "moderator", "user"],
       confidence_level: ["low", "medium", "high"],
       diy_difficulty: ["easy", "moderate", "professional_only"],
+      parts_quality: ["OEM", "aftermarket", "remanufactured", "mixed"],
       problem_fixed_status: ["yes", "no", "partial"],
       session_status: [
         "intake",

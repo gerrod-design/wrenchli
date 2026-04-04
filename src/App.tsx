@@ -64,6 +64,8 @@ import AgentDiagnosisFlow from "./pages/AgentDiagnosisFlow";
 import ShopLogin from "./pages/ShopLogin";
 import ShopPortal from "./pages/ShopPortal";
 import DesignPreview from "./pages/DesignPreview";
+import ForShopsPreview from "./pages/ForShopsPreview";
+import ShopOnboardingPreview from "./pages/ShopOnboardingPreview";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -71,7 +73,7 @@ function AnimatedRoutes() {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
-  const isDesignPreview = location.pathname === "/design-preview";
+  const isDesignPreview = location.pathname === "/design-preview" || location.pathname.startsWith("/design-preview/");
 
   if (isAdmin) {
     return (
@@ -131,6 +133,8 @@ function AnimatedRoutes() {
           <Route path="/shop-login" element={<ShopLogin />} />
           <Route path="/shop-portal" element={<ShopPortal />} />
           <Route path="/design-preview" element={<DesignPreview />} />
+          <Route path="/design-preview/for-shops" element={<ForShopsPreview />} />
+          <Route path="/design-preview/for-shops/onboarding" element={<ShopOnboardingPreview />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
@@ -143,7 +147,7 @@ function AppLayout() {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
-  const isDesignPreview = location.pathname === "/design-preview";
+  const isDesignPreview = location.pathname === "/design-preview" || location.pathname.startsWith("/design-preview/");
   const hideChrome = isAdmin || isDesignPreview;
 
   useEffect(() => {
