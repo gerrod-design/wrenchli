@@ -3,6 +3,8 @@ import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, Arrow
 import { Link } from "react-router-dom";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
+import heroVideo from "@/assets/hero-video.mp4";
+import heroPoster from "@/assets/hero-poster.jpg";
 
 const mockCauses = [
   { name: "Dead Battery", probability: 0.78, costLow: 150, costHigh: 350, difficulty: "easy" },
