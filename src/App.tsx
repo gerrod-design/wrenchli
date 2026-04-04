@@ -171,7 +171,7 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
-                <SitePasswordGateWrapper />
+                <AppLayout />
               </BrowserRouter>
             </VoiceChatProvider>
           </LocationProvider>
