@@ -159,8 +159,9 @@ export default function AgentDiagnosisFlow() {
   return (
     <>
       <SEO
-        title="AI Vehicle Diagnosis | Wrenchli"
+        title="AI Vehicle Diagnosis"
         description="Get a transparent, data-driven AI diagnosis for your vehicle. Full observability on every recommendation."
+        path="/agent-diagnosis"
       />
       <main className="min-h-screen bg-secondary pt-8 pb-20 px-4">
         {/* Progress bar */}
