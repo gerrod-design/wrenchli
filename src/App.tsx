@@ -134,6 +134,7 @@ function AnimatedRoutes() {
           <Route path="/shop-portal" element={<ShopPortal />} />
           <Route path="/design-preview" element={<DesignPreview />} />
           <Route path="/design-preview/for-shops" element={<ForShopsPreview />} />
+          <Route path="/design-preview/for-shops/onboarding" element={<ShopOnboardingPreview />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
