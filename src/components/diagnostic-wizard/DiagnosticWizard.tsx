@@ -128,6 +128,21 @@ export default function DiagnosticWizard() {
           />
         )}
       </div>
+
+      {/* Chat bridge */}
+      <button
+        onClick={() => {
+          const chatTrigger = document.querySelector<HTMLButtonElement>('[data-chat-trigger]');
+          if (chatTrigger) chatTrigger.click();
+        }}
+        className="flex items-center justify-center gap-2 w-full py-3 rounded-b-xl text-sm font-medium transition-colors"
+        style={{ background: "#141720", borderTop: "1px solid #2A2D37", color: "#9CA3AF" }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = "#E07B39"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = "#9CA3AF"; }}
+      >
+        <MessageCircle className="h-4 w-4" />
+        Prefer to talk it through? Chat with our advisor
+      </button>
     </div>
   );
 }
