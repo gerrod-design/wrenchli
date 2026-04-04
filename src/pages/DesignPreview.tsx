@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, ArrowLeft, Store, ArrowRight, Users, ClipboardCheck, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
-import InlineChatWidget from "@/components/InlineChatWidget";
+import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
 
 const mockCauses = [
   { name: "Dead Battery", probability: 0.78, costLow: 150, costHigh: 350, difficulty: "easy" },
