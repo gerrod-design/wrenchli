@@ -25,6 +25,7 @@ const difficultyLabels: Record<string, string> = {
 };
 
 const FONT = "'Plus Jakarta Sans', 'DM Sans', sans-serif";
+const MONO = "'IBM Plex Mono', monospace";
 
 export default function DesignPreview() {
   const [activeStage, setActiveStage] = useState(2);
@@ -66,7 +67,7 @@ export default function DesignPreview() {
 
       {/* Banner */}
       <div className="text-center py-3 text-sm font-medium" style={{ background: "#E07B39", color: "#0F1117" }}>
-        ⚡ DESIGN PREVIEW — Fully functional diagnosis with the new aesthetic
+        ⚡ DESIGN PREVIEW — Fully functional symptom assessment with the new aesthetic
       </div>
 
       {/* Nav */}
@@ -102,14 +103,14 @@ export default function DesignPreview() {
             className="px-5 py-2.5 rounded-lg text-sm font-semibold"
             style={{ background: "#E07B39", color: "#0F1117" }}
           >
-            Start Free Diagnosis
+            Start Free Assessment
           </button>
         </div>
       </nav>
 
       {/* ── HERO with cinematic video background ── */}
       <section className="relative overflow-hidden" style={{ minHeight: "100vh" }}>
-        {/* Video background — same asset as wrenchli.net hero */}
+        {/* Video background */}
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover z-0"
@@ -125,16 +126,16 @@ export default function DesignPreview() {
         {/* Dark overlay for text legibility */}
         <div className="absolute inset-0 z-[1]" style={{ background: "rgba(0,0,0,0.50)" }} />
 
-        {/* Hero content on top of overlay */}
+        {/* Hero content */}
         <div className="relative z-[2] px-6 py-20 max-w-4xl mx-auto text-center flex flex-col items-center justify-center" style={{ minHeight: "calc(100vh - 120px)" }}>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight" style={{ color: "#FFFFFF" }}>
             Vehicle Repair.<br />
             <span style={{ color: "#E07B39" }}>Finally Fixed.</span>
           </h1>
           <p className="mt-6 text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
-            <span className="font-semibold" style={{ color: "#FFFFFF" }}>Free, instant AI diagnosis.</span>{" "}
-            Describe what's wrong and get a structured report with confidence scores,
-            cost estimates, and exactly what to tell your mechanic.
+            <span className="font-semibold" style={{ color: "#FFFFFF" }}>Free, instant symptom assessment.</span>{" "}
+            Describe what's wrong and get a structured report with likelihood scores,
+            cost estimates, and exactly what to ask your shop.
           </p>
           <div className="mt-10">
             <button
@@ -142,7 +143,7 @@ export default function DesignPreview() {
               className="px-8 py-3.5 rounded-lg font-semibold text-base flex items-center justify-center gap-2 mx-auto"
               style={{ background: "#E07B39", color: "#0F1117" }}
             >
-              Start Free Diagnosis <ChevronRight className="h-5 w-5" />
+              Start Free Assessment <ChevronRight className="h-5 w-5" />
             </button>
           </div>
           {/* Trust badges */}
@@ -163,12 +164,13 @@ export default function DesignPreview() {
         {/* Pipeline stages */}
         <section className="px-6 pt-12 pb-6 max-w-5xl mx-auto">
           <div className="flex gap-2 mb-8 justify-center flex-wrap">
-            {["Vehicle ID", "Symptom Intake", "Diagnosis", "Recommendation"].map((label, i) => (
+            {["Vehicle ID", "Symptom Intake", "Assessment", "Recommendation"].map((label, i) => (
               <button
                 key={label}
                 onClick={() => setActiveStage(i)}
-                className="px-4 py-2 rounded-lg text-xs font-mono transition-all"
+                className="px-4 py-2 rounded-lg text-xs transition-all"
                 style={{
+                  fontFamily: MONO,
                   background: activeStage === i ? "#E07B39" : "#FFFFFF",
                   color: activeStage === i ? "#FFFFFF" : "#6B7280",
                   border: `1px solid ${activeStage === i ? "#E07B39" : "#E0DDD8"}`,
@@ -180,21 +182,21 @@ export default function DesignPreview() {
           </div>
         </section>
 
-        {/* Live Diagnosis + Sample Readout */}
+        {/* Live Assessment + Sample Report */}
         <section ref={chatRef} className="px-6 pb-20 max-w-5xl mx-auto">
           <div className="grid md:grid-cols-5 gap-6">
-            {/* Left: LIVE Diagnostic Wizard */}
+            {/* Left: LIVE Assessment Wizard */}
             <div className="md:col-span-3">
-              <div className="text-xs font-mono mb-4 px-1" style={{ color: "#E07B39" }}>
-                LIVE DIAGNOSIS — TRY IT NOW
+              <div className="text-xs mb-4 px-1" style={{ fontFamily: MONO, color: "#E07B39" }}>
+                LIVE ASSESSMENT — TRY IT NOW
               </div>
               <DiagnosticWizard />
             </div>
 
-            {/* Right: Sample Readout */}
+            {/* Right: Sample Repair Likelihood Report */}
             <div className="md:col-span-2 rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
               <div className="flex items-center justify-between mb-6">
-                <div className="text-xs font-mono" style={{ color: "#E07B39" }}>SAMPLE DIAGNOSTIC READOUT</div>
+                <div className="text-xs" style={{ fontFamily: MONO, color: "#E07B39" }}>SAMPLE REPAIR LIKELIHOOD REPORT</div>
                 <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "#FEF3E2", border: "1px solid #E07B39", color: "#E07B39" }}>
                   <AlertTriangle className="h-3 w-3" /> SCHEDULE SOON
                 </div>
@@ -209,7 +211,7 @@ export default function DesignPreview() {
                   <div className="font-semibold text-sm" style={{ color: "#1A1D27" }}>2019 Honda Civic LX</div>
                   <div className="text-xs" style={{ color: "#6B7280" }}>67,200 mi · No VIN provided</div>
                 </div>
-                <div className="ml-auto text-xs font-mono px-2 py-1 rounded" style={{ background: "#DCFCE7", color: "#16A34A" }}>
+                <div className="ml-auto text-xs px-2 py-1 rounded" style={{ fontFamily: MONO, background: "#DCFCE7", color: "#16A34A" }}>
                   HIGH CONFIDENCE
                 </div>
               </div>
@@ -230,7 +232,7 @@ export default function DesignPreview() {
                         style={{ width: `${cause.probability * 100}%`, background: "#E07B39" }}
                       />
                     </div>
-                    <div className="flex justify-between text-xs" style={{ color: "#6B7280" }}>
+                    <div className="flex justify-between text-xs" style={{ fontFamily: MONO, color: "#6B7280" }}>
                       <span>{Math.round(cause.probability * 100)}% likely</span>
                       <span>${cause.costLow}–${cause.costHigh}</span>
                     </div>
@@ -240,7 +242,7 @@ export default function DesignPreview() {
 
               {/* Mechanic questions */}
               <div className="mt-6 rounded-lg p-4" style={{ background: "#F8F8F6", border: "1px solid #E0DDD8" }}>
-                <div className="text-xs font-mono mb-3" style={{ color: "#E07B39" }}>QUESTIONS FOR YOUR MECHANIC</div>
+                <div className="text-xs mb-3" style={{ fontFamily: MONO, color: "#E07B39" }}>QUESTIONS FOR YOUR MECHANIC</div>
                 <ul className="space-y-2 text-sm" style={{ color: "#4B5563" }}>
                   <li className="flex items-start gap-2">
                     <ChevronRight className="h-4 w-4 mt-0.5 shrink-0" style={{ color: "#E07B39" }} />
@@ -265,8 +267,8 @@ export default function DesignPreview() {
           <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
             {[
               { icon: Shield, title: "Transparent Pricing", desc: "See real cost ranges before you visit a shop. No surprises." },
-              { icon: Zap, title: "Instant Diagnosis", desc: "AI-powered analysis in seconds, backed by real outcome data." },
-              { icon: Activity, title: "Accuracy Tracked", desc: "We track whether our diagnoses were right — and publish the results." },
+              { icon: Zap, title: "Instant Assessment", desc: "AI-powered symptom analysis in seconds, backed by real outcome data." },
+              { icon: Activity, title: "Accuracy Tracked", desc: "We track our symptom-to-repair match rate — and publish the results." },
             ].map((v) => (
               <div key={v.title} className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
                 <div className="h-10 w-10 rounded-lg flex items-center justify-center mb-4" style={{ background: "#FEF3E2" }}>
@@ -291,7 +293,7 @@ export default function DesignPreview() {
               <span style={{ color: "#E07B39" }}>already knowing what's wrong.</span>
             </h2>
             <p className="text-lg max-w-2xl mx-auto leading-relaxed mb-12" style={{ color: "#6B7280" }}>
-              Your customers come pre-diagnosed, cost-educated, and ready to approve the work.
+              Your customers come pre-assessed, cost-educated, and ready to approve the work.
               No more 20-minute intake calls. No more sticker shock at the counter.
             </p>
 
@@ -300,12 +302,12 @@ export default function DesignPreview() {
                 {
                   icon: Users,
                   title: "Pre-Qualified Leads",
-                  desc: "Customers arrive with a structured diagnosis, vehicle details, and cost expectations. They're not shopping — they're booking.",
+                  desc: "Customers arrive with a structured assessment, vehicle details, and cost expectations. They're not shopping — they're booking.",
                 },
                 {
                   icon: ClipboardCheck,
                   title: "Zero Intake Friction",
-                  desc: "The diagnostic report is the intake form. VIN, symptoms, confidence scores — all captured before they walk in.",
+                  desc: "The repair likelihood report is the intake form. VIN, symptoms, confidence scores — all captured before they walk in.",
                 },
                 {
                   icon: DollarSign,
@@ -325,11 +327,11 @@ export default function DesignPreview() {
 
             {/* What a Wrenchli lead looks like */}
             <div className="mt-12 rounded-xl p-6 text-left" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
-              <div className="text-xs font-mono mb-4" style={{ color: "#E07B39" }}>WHAT A WRENCHLI LEAD LOOKS LIKE</div>
+              <div className="text-xs mb-4" style={{ fontFamily: MONO, color: "#E07B39" }}>WHAT A WRENCHLI LEAD LOOKS LIKE</div>
               <div className="grid sm:grid-cols-4 gap-4">
                 {[
                   { label: "Vehicle", value: "2019 Honda Civic LX" },
-                  { label: "Diagnosis", value: "Dead Battery (78% confidence)" },
+                  { label: "Assessment", value: "Dead Battery (78% likely)" },
                   { label: "Cost Range", value: "$150 – $350" },
                   { label: "Customer Status", value: "Pre-approved financing" },
                 ].map((item) => (
