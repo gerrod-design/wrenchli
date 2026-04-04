@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      accuracy_metrics: {
+        Row: {
+          accuracy_rate: number
+          close_match_count: number | null
+          computed_at: string | null
+          confidence_calibration: number | null
+          dimension_value: string | null
+          exact_match_count: number | null
+          id: string
+          metric_type: string
+          miss_count: number | null
+          outcomes_count: number
+          partial_match_count: number | null
+          period: string
+          period_start: string
+          top_diagnoses: Json | null
+          trend: string | null
+          worst_diagnoses: Json | null
+        }
+        Insert: {
+          accuracy_rate: number
+          close_match_count?: number | null
+          computed_at?: string | null
+          confidence_calibration?: number | null
+          dimension_value?: string | null
+          exact_match_count?: number | null
+          id?: string
+          metric_type: string
+          miss_count?: number | null
+          outcomes_count: number
+          partial_match_count?: number | null
+          period: string
+          period_start: string
+          top_diagnoses?: Json | null
+          trend?: string | null
+          worst_diagnoses?: Json | null
+        }
+        Update: {
+          accuracy_rate?: number
+          close_match_count?: number | null
+          computed_at?: string | null
+          confidence_calibration?: number | null
+          dimension_value?: string | null
+          exact_match_count?: number | null
+          id?: string
+          metric_type?: string
+          miss_count?: number | null
+          outcomes_count?: number
+          partial_match_count?: number | null
+          period?: string
+          period_start?: string
+          top_diagnoses?: Json | null
+          trend?: string | null
+          worst_diagnoses?: Json | null
+        }
+        Relationships: []
+      }
       ad_click_events: {
         Row: {
           click_type: string
@@ -344,6 +401,47 @@ export type Database = {
         }
         Relationships: []
       }
+      diagnoses: {
+        Row: {
+          confidence: Database["public"]["Enums"]["confidence_level"]
+          created_at: string | null
+          explanation: string
+          id: string
+          model_used: string | null
+          raw_ai_response: Json | null
+          session_id: string | null
+          urgency: Database["public"]["Enums"]["urgency_level"]
+        }
+        Insert: {
+          confidence: Database["public"]["Enums"]["confidence_level"]
+          created_at?: string | null
+          explanation: string
+          id?: string
+          model_used?: string | null
+          raw_ai_response?: Json | null
+          session_id?: string | null
+          urgency: Database["public"]["Enums"]["urgency_level"]
+        }
+        Update: {
+          confidence?: Database["public"]["Enums"]["confidence_level"]
+          created_at?: string | null
+          explanation?: string
+          id?: string
+          model_used?: string | null
+          raw_ai_response?: Json | null
+          session_id?: string | null
+          urgency?: Database["public"]["Enums"]["urgency_level"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnoses_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diagnosis_records: {
         Row: {
           ai_model_used: string | null
@@ -468,6 +566,116 @@ export type Database = {
             columns: ["selected_shop_id"]
             isOneToOne: false
             referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostic_accuracy: {
+        Row: {
+          accuracy_score: number | null
+          actual_diagnosis: string | null
+          computed_at: string | null
+          confidence_was_correct: boolean | null
+          id: string
+          match_explanation: string | null
+          match_label: string | null
+          outcome_report_id: string | null
+          predicted_causes_all: string[]
+          predicted_confidence: Database["public"]["Enums"]["confidence_level"]
+          predicted_top_cause: string
+          predicted_urgency: Database["public"]["Enums"]["urgency_level"]
+          session_id: string | null
+          symptom_category: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+        }
+        Insert: {
+          accuracy_score?: number | null
+          actual_diagnosis?: string | null
+          computed_at?: string | null
+          confidence_was_correct?: boolean | null
+          id?: string
+          match_explanation?: string | null
+          match_label?: string | null
+          outcome_report_id?: string | null
+          predicted_causes_all: string[]
+          predicted_confidence: Database["public"]["Enums"]["confidence_level"]
+          predicted_top_cause: string
+          predicted_urgency: Database["public"]["Enums"]["urgency_level"]
+          session_id?: string | null
+          symptom_category?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+        }
+        Update: {
+          accuracy_score?: number | null
+          actual_diagnosis?: string | null
+          computed_at?: string | null
+          confidence_was_correct?: boolean | null
+          id?: string
+          match_explanation?: string | null
+          match_label?: string | null
+          outcome_report_id?: string | null
+          predicted_causes_all?: string[]
+          predicted_confidence?: Database["public"]["Enums"]["confidence_level"]
+          predicted_top_cause?: string
+          predicted_urgency?: Database["public"]["Enums"]["urgency_level"]
+          session_id?: string | null
+          symptom_category?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_accuracy_outcome_report_id_fkey"
+            columns: ["outcome_report_id"]
+            isOneToOne: false
+            referencedRelation: "outcome_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnostic_accuracy_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostic_sessions: {
+        Row: {
+          anon_session_id: string | null
+          created_at: string | null
+          id: string
+          status: Database["public"]["Enums"]["session_status"] | null
+          updated_at: string | null
+          user_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          anon_session_id?: string | null
+          created_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["session_status"] | null
+          updated_at?: string | null
+          user_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          anon_session_id?: string | null
+          created_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["session_status"] | null
+          updated_at?: string | null
+          user_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_sessions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -822,6 +1030,106 @@ export type Database = {
         }
         Relationships: []
       }
+      outcome_reminders: {
+        Row: {
+          completed_at: string | null
+          id: string
+          opened_at: string | null
+          scheduled_for: string
+          sent_at: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          opened_at?: string | null
+          scheduled_for: string
+          sent_at?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          opened_at?: string | null
+          scheduled_for?: string
+          sent_at?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outcome_reminders_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      outcome_reports: {
+        Row: {
+          actual_cost: number | null
+          actual_diagnosis: string | null
+          diy_notes: string | null
+          id: string
+          no_visit_reason: string | null
+          problem_fixed:
+            | Database["public"]["Enums"]["problem_fixed_status"]
+            | null
+          repair_date: string | null
+          reported_at: string | null
+          session_id: string | null
+          shop_feedback: string | null
+          shop_name: string | null
+          shop_visit: boolean
+          user_id: string | null
+        }
+        Insert: {
+          actual_cost?: number | null
+          actual_diagnosis?: string | null
+          diy_notes?: string | null
+          id?: string
+          no_visit_reason?: string | null
+          problem_fixed?:
+            | Database["public"]["Enums"]["problem_fixed_status"]
+            | null
+          repair_date?: string | null
+          reported_at?: string | null
+          session_id?: string | null
+          shop_feedback?: string | null
+          shop_name?: string | null
+          shop_visit: boolean
+          user_id?: string | null
+        }
+        Update: {
+          actual_cost?: number | null
+          actual_diagnosis?: string | null
+          diy_notes?: string | null
+          id?: string
+          no_visit_reason?: string | null
+          problem_fixed?:
+            | Database["public"]["Enums"]["problem_fixed_status"]
+            | null
+          repair_date?: string | null
+          reported_at?: string | null
+          session_id?: string | null
+          shop_feedback?: string | null
+          shop_name?: string | null
+          shop_visit?: boolean
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outcome_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partnership_metrics: {
         Row: {
           created_at: string
@@ -860,6 +1168,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      possible_causes: {
+        Row: {
+          created_at: string | null
+          diagnosis_id: string | null
+          diy_difficulty: Database["public"]["Enums"]["diy_difficulty"] | null
+          estimated_cost_high: number | null
+          estimated_cost_low: number | null
+          id: string
+          name: string
+          notes: string | null
+          probability: number | null
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          diagnosis_id?: string | null
+          diy_difficulty?: Database["public"]["Enums"]["diy_difficulty"] | null
+          estimated_cost_high?: number | null
+          estimated_cost_low?: number | null
+          id?: string
+          name: string
+          notes?: string | null
+          probability?: number | null
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          diagnosis_id?: string | null
+          diy_difficulty?: Database["public"]["Enums"]["diy_difficulty"] | null
+          estimated_cost_high?: number | null
+          estimated_cost_low?: number | null
+          id?: string
+          name?: string
+          notes?: string | null
+          probability?: number | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "possible_causes_diagnosis_id_fkey"
+            columns: ["diagnosis_id"]
+            isOneToOne: false
+            referencedRelation: "diagnoses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       proactive_insights: {
         Row: {
@@ -1300,6 +1655,60 @@ export type Database = {
           },
         ]
       }
+      repair_history: {
+        Row: {
+          cost_actual: number | null
+          created_at: string | null
+          description: string
+          id: string
+          mileage_at: number | null
+          notes: string | null
+          repair_date: string | null
+          session_id: string | null
+          shop_name: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          cost_actual?: number | null
+          created_at?: string | null
+          description: string
+          id?: string
+          mileage_at?: number | null
+          notes?: string | null
+          repair_date?: string | null
+          session_id?: string | null
+          shop_name?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          cost_actual?: number | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          mileage_at?: number | null
+          notes?: string | null
+          repair_date?: string | null
+          session_id?: string | null
+          shop_name?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_history_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_history_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       repair_outcomes: {
         Row: {
           cost_variance: number | null
@@ -1383,6 +1792,44 @@ export type Database = {
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_recommendations: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          next_steps: string[] | null
+          parts_likely_needed: string[] | null
+          questions_to_ask_mechanic: string[] | null
+          session_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          next_steps?: string[] | null
+          parts_likely_needed?: string[] | null
+          questions_to_ask_mechanic?: string[] | null
+          session_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          next_steps?: string[] | null
+          parts_likely_needed?: string[] | null
+          questions_to_ask_mechanic?: string[] | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_recommendations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "diagnostic_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -1752,6 +2199,50 @@ export type Database = {
         }
         Relationships: []
       }
+      symptom_reports: {
+        Row: {
+          created_at: string | null
+          id: string
+          primary_symptom: string
+          raw_description: string | null
+          session_id: string | null
+          severity: Database["public"]["Enums"]["severity_level"] | null
+          symptom_location: string | null
+          warning_lights: string[] | null
+          when_it_happens: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          primary_symptom: string
+          raw_description?: string | null
+          session_id?: string | null
+          severity?: Database["public"]["Enums"]["severity_level"] | null
+          symptom_location?: string | null
+          warning_lights?: string[] | null
+          when_it_happens?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          primary_symptom?: string
+          raw_description?: string | null
+          session_id?: string | null
+          severity?: Database["public"]["Enums"]["severity_level"] | null
+          symptom_location?: string | null
+          warning_lights?: string[] | null
+          when_it_happens?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "symptom_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -1973,6 +2464,48 @@ export type Database = {
           },
         ]
       }
+      vehicles: {
+        Row: {
+          created_at: string | null
+          id: string
+          make: string
+          mileage: number | null
+          model: string
+          nickname: string | null
+          trim: string | null
+          updated_at: string | null
+          user_id: string | null
+          vin: string | null
+          year: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          make: string
+          mileage?: number | null
+          model: string
+          nickname?: string | null
+          trim?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          vin?: string | null
+          year: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          make?: string
+          mileage?: number | null
+          model?: string
+          nickname?: string | null
+          trim?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          vin?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
       waitlist_signups: {
         Row: {
           created_at: string
@@ -2039,6 +2572,17 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      confidence_level: "low" | "medium" | "high"
+      diy_difficulty: "easy" | "moderate" | "professional_only"
+      problem_fixed_status: "yes" | "no" | "partial"
+      session_status:
+        | "intake"
+        | "diagnosing"
+        | "complete"
+        | "abandoned"
+        | "outcome_reported"
+      severity_level: "minor" | "moderate" | "urgent" | "do_not_drive"
+      urgency_level: "monitor" | "schedule" | "soon" | "immediate"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2167,6 +2711,18 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      confidence_level: ["low", "medium", "high"],
+      diy_difficulty: ["easy", "moderate", "professional_only"],
+      problem_fixed_status: ["yes", "no", "partial"],
+      session_status: [
+        "intake",
+        "diagnosing",
+        "complete",
+        "abandoned",
+        "outcome_reported",
+      ],
+      severity_level: ["minor", "moderate", "urgent", "do_not_drive"],
+      urgency_level: ["monitor", "schedule", "soon", "immediate"],
     },
   },
 } as const
