@@ -834,6 +834,7 @@ export type Database = {
       }
       integration_sync_log: {
         Row: {
+          attempt_number: number | null
           attempted_at: string | null
           completed_at: string | null
           direction: string
@@ -847,6 +848,7 @@ export type Database = {
           status: string
         }
         Insert: {
+          attempt_number?: number | null
           attempted_at?: string | null
           completed_at?: string | null
           direction: string
@@ -860,6 +862,7 @@ export type Database = {
           status?: string
         }
         Update: {
+          attempt_number?: number | null
           attempted_at?: string | null
           completed_at?: string | null
           direction?: string
@@ -2073,35 +2076,47 @@ export type Database = {
       shop_integrations: {
         Row: {
           api_key_encrypted: string | null
+          api_key_iv: string | null
           created_at: string | null
           id: string
           is_active: boolean | null
           last_sync_at: string | null
+          last_sync_status: string | null
           shop_id: string
           shop_location_id: string | null
           sms_provider: string
+          updated_at: string | null
+          webhook_secret: string | null
           webhook_url: string | null
         }
         Insert: {
           api_key_encrypted?: string | null
+          api_key_iv?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
           last_sync_at?: string | null
+          last_sync_status?: string | null
           shop_id: string
           shop_location_id?: string | null
           sms_provider: string
+          updated_at?: string | null
+          webhook_secret?: string | null
           webhook_url?: string | null
         }
         Update: {
           api_key_encrypted?: string | null
+          api_key_iv?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
           last_sync_at?: string | null
+          last_sync_status?: string | null
           shop_id?: string
           shop_location_id?: string | null
           sms_provider?: string
+          updated_at?: string | null
+          webhook_secret?: string | null
           webhook_url?: string | null
         }
         Relationships: [
@@ -2327,6 +2342,7 @@ export type Database = {
           repair_order_id: string | null
           session_id: string | null
           shop_id: string | null
+          shop_integration_id: string | null
           technician_notes: string | null
         }
         Insert: {
@@ -2341,6 +2357,7 @@ export type Database = {
           repair_order_id?: string | null
           session_id?: string | null
           shop_id?: string | null
+          shop_integration_id?: string | null
           technician_notes?: string | null
         }
         Update: {
@@ -2355,6 +2372,7 @@ export type Database = {
           repair_order_id?: string | null
           session_id?: string | null
           shop_id?: string | null
+          shop_integration_id?: string | null
           technician_notes?: string | null
         }
         Relationships: [
@@ -2370,6 +2388,13 @@ export type Database = {
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_repair_confirmations_shop_integration_id_fkey"
+            columns: ["shop_integration_id"]
+            isOneToOne: false
+            referencedRelation: "shop_integrations"
             referencedColumns: ["id"]
           },
         ]
@@ -2404,6 +2429,63 @@ export type Database = {
           state?: string | null
           vehicle_make?: string | null
           zip_code?: string
+        }
+        Relationships: []
+      }
+      shops: {
+        Row: {
+          address_city: string | null
+          address_state: string | null
+          address_street: string | null
+          address_zip: string | null
+          bay_count: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          is_pilot: boolean | null
+          name: string
+          owner_name: string | null
+          owner_user_id: string | null
+          phone: string | null
+          slug: string | null
+          updated_at: string | null
+          verified_status: string | null
+        }
+        Insert: {
+          address_city?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zip?: string | null
+          bay_count?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_pilot?: boolean | null
+          name: string
+          owner_name?: string | null
+          owner_user_id?: string | null
+          phone?: string | null
+          slug?: string | null
+          updated_at?: string | null
+          verified_status?: string | null
+        }
+        Update: {
+          address_city?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zip?: string | null
+          bay_count?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_pilot?: boolean | null
+          name?: string
+          owner_name?: string | null
+          owner_user_id?: string | null
+          phone?: string | null
+          slug?: string | null
+          updated_at?: string | null
+          verified_status?: string | null
         }
         Relationships: []
       }
