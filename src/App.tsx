@@ -63,6 +63,7 @@ import FindNearbyShops from "./pages/FindNearbyShops";
 import AgentDiagnosisFlow from "./pages/AgentDiagnosisFlow";
 import ShopLogin from "./pages/ShopLogin";
 import ShopPortal from "./pages/ShopPortal";
+import DesignPreview from "./pages/DesignPreview";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -70,6 +71,11 @@ function AnimatedRoutes() {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
+  const isDesignPreview = location.pathname === "/design-preview";
+
+  if (isDesignPreview) {
+    return <DesignPreview />;
+  }
 
   if (isAdmin) {
     return (
