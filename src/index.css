@@ -220,3 +220,32 @@
 .animate-subtle-zoom {
   animation: subtleZoom 20s ease-in-out infinite alternate;
 }
+
+/* Design preview: dark-theme overrides for embedded chat widget */
+.design-preview-chat-wrapper {
+  --background: 225 14% 7%;
+  --foreground: 0 0% 88%;
+  --card: 225 14% 12%;
+  --card-foreground: 0 0% 88%;
+  --popover: 225 14% 12%;
+  --popover-foreground: 0 0% 88%;
+  --primary: 24 70% 55%;
+  --primary-foreground: 225 14% 7%;
+  --secondary: 225 14% 15%;
+  --secondary-foreground: 0 0% 88%;
+  --muted: 225 14% 15%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 24 70% 55%;
+  --accent-foreground: 225 14% 7%;
+  --border: 225 10% 18%;
+  --input: 225 10% 18%;
+  --ring: 24 70% 55%;
+}
+
+.design-preview-chat-wrapper h2 {
+  color: hsl(0 0% 96%);
+}
+
+.design-preview-chat-wrapper #quote {
+  margin-top: 0;
+}
