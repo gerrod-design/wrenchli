@@ -344,6 +344,134 @@ export type Database = {
         }
         Relationships: []
       }
+      diagnosis_records: {
+        Row: {
+          ai_model_used: string | null
+          alternative_diagnoses: Json | null
+          booked_at: string | null
+          cost_estimate_high: number | null
+          cost_estimate_low: number | null
+          cost_variance_percent: number | null
+          created_at: string
+          customer_approved: boolean | null
+          customer_approved_at: string | null
+          customer_id: string | null
+          customer_selected_diagnosis: string | null
+          estimated_cost: number | null
+          historical_most_common_diagnosis: string | null
+          historical_similar_symptoms: number | null
+          historical_success_rate: number | null
+          historical_total_cases: number | null
+          id: string
+          market_average_cost: number | null
+          price_approved: boolean | null
+          price_approved_at: string | null
+          primary_confidence: number
+          primary_diagnosis: string
+          rationale: string | null
+          recommended_action: string | null
+          selected_shop_id: string | null
+          session_id: string | null
+          shop_selection_rationale: string | null
+          status: string
+          symptoms: string
+          tracking_number: string | null
+          updated_at: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_trim: string | null
+          vehicle_year: string | null
+          vin: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          ai_model_used?: string | null
+          alternative_diagnoses?: Json | null
+          booked_at?: string | null
+          cost_estimate_high?: number | null
+          cost_estimate_low?: number | null
+          cost_variance_percent?: number | null
+          created_at?: string
+          customer_approved?: boolean | null
+          customer_approved_at?: string | null
+          customer_id?: string | null
+          customer_selected_diagnosis?: string | null
+          estimated_cost?: number | null
+          historical_most_common_diagnosis?: string | null
+          historical_similar_symptoms?: number | null
+          historical_success_rate?: number | null
+          historical_total_cases?: number | null
+          id?: string
+          market_average_cost?: number | null
+          price_approved?: boolean | null
+          price_approved_at?: string | null
+          primary_confidence?: number
+          primary_diagnosis: string
+          rationale?: string | null
+          recommended_action?: string | null
+          selected_shop_id?: string | null
+          session_id?: string | null
+          shop_selection_rationale?: string | null
+          status?: string
+          symptoms: string
+          tracking_number?: string | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_trim?: string | null
+          vehicle_year?: string | null
+          vin?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          ai_model_used?: string | null
+          alternative_diagnoses?: Json | null
+          booked_at?: string | null
+          cost_estimate_high?: number | null
+          cost_estimate_low?: number | null
+          cost_variance_percent?: number | null
+          created_at?: string
+          customer_approved?: boolean | null
+          customer_approved_at?: string | null
+          customer_id?: string | null
+          customer_selected_diagnosis?: string | null
+          estimated_cost?: number | null
+          historical_most_common_diagnosis?: string | null
+          historical_similar_symptoms?: number | null
+          historical_success_rate?: number | null
+          historical_total_cases?: number | null
+          id?: string
+          market_average_cost?: number | null
+          price_approved?: boolean | null
+          price_approved_at?: string | null
+          primary_confidence?: number
+          primary_diagnosis?: string
+          rationale?: string | null
+          recommended_action?: string | null
+          selected_shop_id?: string | null
+          session_id?: string | null
+          shop_selection_rationale?: string | null
+          status?: string
+          symptoms?: string
+          tracking_number?: string | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_trim?: string | null
+          vehicle_year?: string | null
+          vin?: string | null
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnosis_records_selected_shop_id_fkey"
+            columns: ["selected_shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diy_tutorials: {
         Row: {
           category: string
@@ -694,6 +822,45 @@ export type Database = {
         }
         Relationships: []
       }
+      partnership_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          partner_name: string
+          partner_type: string
+          period: string
+          referrals_count: number | null
+          revenue: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          partner_name: string
+          partner_type: string
+          period: string
+          referrals_count?: number | null
+          revenue?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          partner_name?: string
+          partner_type?: string
+          period?: string
+          referrals_count?: number | null
+          revenue?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       proactive_insights: {
         Row: {
           action_items: Json | null
@@ -761,6 +928,71 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quality_alerts: {
+        Row: {
+          action_required: boolean | null
+          action_taken: string | null
+          alert_type: string
+          created_at: string
+          description: string
+          escalated_at: string | null
+          escalated_to: string | null
+          evidence: Json | null
+          id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          shop_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_required?: boolean | null
+          action_taken?: string | null
+          alert_type: string
+          created_at?: string
+          description: string
+          escalated_at?: string | null
+          escalated_to?: string | null
+          evidence?: Json | null
+          id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          shop_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_required?: boolean | null
+          action_taken?: string | null
+          alert_type?: string
+          created_at?: string
+          description?: string
+          escalated_at?: string | null
+          escalated_to?: string | null
+          evidence?: Json | null
+          id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          shop_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quality_alerts_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
             referencedColumns: ["id"]
           },
         ]
@@ -1068,6 +1300,93 @@ export type Database = {
           },
         ]
       }
+      repair_outcomes: {
+        Row: {
+          cost_variance: number | null
+          cost_variance_percent: number | null
+          created_at: string
+          customer_feedback: string | null
+          customer_issues_since_repair: boolean | null
+          customer_reported_at: string | null
+          customer_satisfaction: number | null
+          customer_would_return: boolean | null
+          diagnosis_match: boolean | null
+          diagnosis_record_id: string
+          id: string
+          rework_details: string | null
+          rework_required: boolean | null
+          shop_actual_cost: number | null
+          shop_actual_diagnosis: string | null
+          shop_id: string | null
+          shop_labor_hours: number | null
+          shop_notes: string | null
+          shop_parts_used: Json | null
+          shop_reported_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          cost_variance?: number | null
+          cost_variance_percent?: number | null
+          created_at?: string
+          customer_feedback?: string | null
+          customer_issues_since_repair?: boolean | null
+          customer_reported_at?: string | null
+          customer_satisfaction?: number | null
+          customer_would_return?: boolean | null
+          diagnosis_match?: boolean | null
+          diagnosis_record_id: string
+          id?: string
+          rework_details?: string | null
+          rework_required?: boolean | null
+          shop_actual_cost?: number | null
+          shop_actual_diagnosis?: string | null
+          shop_id?: string | null
+          shop_labor_hours?: number | null
+          shop_notes?: string | null
+          shop_parts_used?: Json | null
+          shop_reported_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cost_variance?: number | null
+          cost_variance_percent?: number | null
+          created_at?: string
+          customer_feedback?: string | null
+          customer_issues_since_repair?: boolean | null
+          customer_reported_at?: string | null
+          customer_satisfaction?: number | null
+          customer_would_return?: boolean | null
+          diagnosis_match?: boolean | null
+          diagnosis_record_id?: string
+          id?: string
+          rework_details?: string | null
+          rework_required?: boolean | null
+          shop_actual_cost?: number | null
+          shop_actual_diagnosis?: string | null
+          shop_id?: string | null
+          shop_labor_hours?: number | null
+          shop_notes?: string | null
+          shop_parts_used?: Json | null
+          shop_reported_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_outcomes_diagnosis_record_id_fkey"
+            columns: ["diagnosis_record_id"]
+            isOneToOne: false
+            referencedRelation: "diagnosis_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_outcomes_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_providers: {
         Row: {
           address: string
@@ -1164,6 +1483,53 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_accounts: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          is_verified: boolean | null
+          owner_name: string | null
+          shop_id: string
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_verified?: boolean | null
+          owner_name?: string | null
+          shop_id: string
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_verified?: boolean | null
+          owner_name?: string | null
+          shop_id?: string
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_accounts_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_applications: {
         Row: {
           city: string | null
@@ -1244,6 +1610,81 @@ export type Database = {
           zip_code?: string | null
         }
         Relationships: []
+      }
+      shop_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          diagnosis_record_id: string
+          estimated_completion: string | null
+          estimated_cost: number | null
+          final_cost: number | null
+          id: string
+          price_approved_by_customer: boolean | null
+          shop_diagnosis_notes: string | null
+          shop_id: string
+          shop_parts_ordered: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          diagnosis_record_id: string
+          estimated_completion?: string | null
+          estimated_cost?: number | null
+          final_cost?: number | null
+          id?: string
+          price_approved_by_customer?: boolean | null
+          shop_diagnosis_notes?: string | null
+          shop_id: string
+          shop_parts_ordered?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          diagnosis_record_id?: string
+          estimated_completion?: string | null
+          estimated_cost?: number | null
+          final_cost?: number | null
+          id?: string
+          price_approved_by_customer?: boolean | null
+          shop_diagnosis_notes?: string | null
+          shop_id?: string
+          shop_parts_ordered?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_jobs_diagnosis_record_id_fkey"
+            columns: ["diagnosis_record_id"]
+            isOneToOne: false
+            referencedRelation: "diagnosis_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_jobs_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shop_recommendations: {
         Row: {
