@@ -118,7 +118,7 @@ export default function DesignPreview() {
         <div className="absolute inset-0 z-[1]" style={{ background: "rgba(0,0,0,0.50)" }} />
 
         {/* Hero content on top of overlay */}
-        <div className="relative z-[2] px-6 py-20 max-w-4xl mx-auto text-center">
+        <div className="relative z-[2] px-6 py-20 max-w-4xl mx-auto text-center flex flex-col items-center justify-center" style={{ minHeight: "calc(100vh - 120px)" }}>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight" style={{ color: "#FFFFFF" }}>
             Vehicle Repair.<br />
             <span style={{ color: "#E07B39" }}>Finally Fixed.</span>

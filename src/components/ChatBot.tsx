@@ -371,7 +371,7 @@ export default function ChatBot() {
   const SUGGESTION_CHIPS = [
     "My check engine light is on",
     "I hear a strange noise",
-    "What's my car worth?",
+    "I need a repair estimate",
     "📸 Show damage photo",
   ];
 
