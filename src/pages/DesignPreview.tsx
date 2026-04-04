@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Shield, Zap, Wrench, ChevronRight, AlertTriangle, CheckCircle2, Activity, ArrowLeft, Store, ArrowRight, Users, ClipboardCheck, DollarSign } from "lucide-react";
+import { useState, useRef } from "react";
+import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, ArrowLeft, Store, ArrowRight, Users, ClipboardCheck, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
+import InlineChatWidget from "@/components/InlineChatWidget";
 
 const mockCauses = [
   { name: "Dead Battery", probability: 0.78, costLow: 150, costHigh: 350, difficulty: "easy" },
@@ -23,6 +24,11 @@ const difficultyLabels: Record<string, string> = {
 
 export default function DesignPreview() {
   const [activeStage, setActiveStage] = useState(2);
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  const scrollToChat = () => {
+    chatRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen" style={{ background: "#0F1117", color: "#E0E0E0", fontFamily: "'DM Sans', sans-serif" }}>
@@ -40,7 +46,7 @@ export default function DesignPreview() {
 
       {/* Banner */}
       <div className="text-center py-3 text-sm font-medium" style={{ background: "#E07B39", color: "#0F1117" }}>
-        ⚡ DESIGN PREVIEW — This is a concept mockup of the new diagnostic-scanner aesthetic
+        ⚡ DESIGN PREVIEW — Fully functional diagnosis with the new aesthetic
       </div>
 
       {/* Nav */}
@@ -72,6 +78,7 @@ export default function DesignPreview() {
             For Shops
           </a>
           <button
+            onClick={scrollToChat}
             className="px-5 py-2.5 rounded-lg text-sm font-semibold"
             style={{ background: "#E07B39", color: "#0F1117" }}
           >
@@ -92,7 +99,11 @@ export default function DesignPreview() {
           cost estimates, and exactly what to tell your mechanic.
         </p>
         <div className="mt-10">
-          <button className="px-8 py-3.5 rounded-lg font-semibold text-base flex items-center justify-center gap-2 mx-auto" style={{ background: "#E07B39", color: "#0F1117" }}>
+          <button
+            onClick={scrollToChat}
+            className="px-8 py-3.5 rounded-lg font-semibold text-base flex items-center justify-center gap-2 mx-auto"
+            style={{ background: "#E07B39", color: "#0F1117" }}
+          >
             Start Free Diagnosis <ChevronRight className="h-5 w-5" />
           </button>
         </div>
@@ -127,34 +138,21 @@ export default function DesignPreview() {
         </div>
       </section>
 
-      {/* Diagnostic readout mockup */}
-      <section className="px-6 pb-20 max-w-5xl mx-auto">
+      {/* Live Diagnosis + Sample Readout */}
+      <section ref={chatRef} className="px-6 pb-20 max-w-5xl mx-auto">
         <div className="grid md:grid-cols-5 gap-6">
-          {/* Left: Intake */}
-          <div className="md:col-span-2 rounded-xl p-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
-            <div className="text-xs font-mono mb-4" style={{ color: "#E07B39" }}>
-              COLLECTING: symptom_location
+          {/* Left: LIVE Chat Widget */}
+          <div className="md:col-span-2 design-preview-chat-wrapper">
+            <div className="text-xs font-mono mb-4 px-1" style={{ color: "#E07B39" }}>
+              LIVE DIAGNOSIS — TRY IT NOW
             </div>
-            <div className="space-y-4">
-              <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
-                <p className="text-sm" style={{ color: "#9CA3AF" }}>Where is the problem coming from?</p>
-              </div>
-              <div className="rounded-lg p-4" style={{ background: "#141720", border: "1px solid #E07B39" }}>
-                <p className="text-sm" style={{ color: "#F5F5F5" }}>Under the hood — clicking noise when I turn the key</p>
-              </div>
-              <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
-                <p className="text-sm" style={{ color: "#9CA3AF" }}>When does this happen?</p>
-              </div>
-              <div className="rounded-lg p-4" style={{ background: "#141720", border: "1px solid #E07B39" }}>
-                <p className="text-sm" style={{ color: "#F5F5F5" }}>Every time I try to start it, especially in the morning</p>
-              </div>
-            </div>
+            <InlineChatWidget />
           </div>
 
-          {/* Right: Readout */}
+          {/* Right: Sample Readout (static example of output) */}
           <div className="md:col-span-3 rounded-xl p-6" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
             <div className="flex items-center justify-between mb-6">
-              <div className="text-xs font-mono" style={{ color: "#E07B39" }}>DIAGNOSTIC READOUT</div>
+              <div className="text-xs font-mono" style={{ color: "#E07B39" }}>SAMPLE DIAGNOSTIC READOUT</div>
               <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "#E07B3915", border: "1px solid #E07B39", color: "#E07B39" }}>
                 <AlertTriangle className="h-3 w-3" /> SCHEDULE SOON
               </div>
@@ -184,7 +182,6 @@ export default function DesignPreview() {
                       {difficultyLabels[cause.difficulty]}
                     </span>
                   </div>
-                  {/* Probability bar */}
                   <div className="h-2 rounded-full overflow-hidden mb-2" style={{ background: "#2A2D37" }}>
                     <div
                       className="h-full rounded-full transition-all"
@@ -256,7 +253,6 @@ export default function DesignPreview() {
             No more 20-minute intake calls. No more sticker shock at the counter.
           </p>
 
-          {/* Shop benefits grid */}
           <div className="grid sm:grid-cols-3 gap-6 text-left">
             {[
               {
