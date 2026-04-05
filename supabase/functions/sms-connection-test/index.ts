@@ -1,4 +1,6 @@
-import { corsHeaders } from "@supabase/supabase-js/cors";
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+
+const corsHeaders = getCorsHeaders(null);
 
 // Tests SMS connection credentials during shop onboarding
 
