@@ -32,7 +32,7 @@ const partsMap: Record<string, PartsInfo> = {
       { name: "Gas Cap (replacement)", estimatedPrice: "$5–$15", required: false, note: "Try tightening or replacing gas cap first — it's the cheapest fix", searchQuery: "gas+cap" },
     ],
     tools: ["OBD2 scanner (or visit auto parts store for free scan)"],
-    proTip: "AutoZone, O'Reilly, and Advance Auto will scan your check engine light for free — no purchase required!",
+    proTip: "O'Reilly and Advance Auto will scan your check engine light for free — no purchase required!",
   },
   "engine overheating": {
     parts: [
