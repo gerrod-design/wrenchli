@@ -28,7 +28,7 @@ const FONT = "'Plus Jakarta Sans', 'DM Sans', sans-serif";
 const MONO = "'IBM Plex Mono', monospace";
 
 export default function DesignPreview() {
-  const [activeStage] = useState(2); // kept for potential future use
+  // Pipeline is now a static visual — no state needed
   const chatRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
