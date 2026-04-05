@@ -268,6 +268,7 @@ export default function Privacy() {
                 <li><strong>Business transfers</strong> — in connection with a merger, acquisition, or sale of all or substantially all of our assets, in which case your data would transfer to the acquiring entity subject to this policy</li>
               </ul>
               <p className="mt-2">We do not sell your personal information. We do not share your personal information with advertisers.</p>
+              <p className="mt-2">Wrenchli uses affiliate links for parts recommendations. When you click an affiliate link and make a purchase, we may receive a commission. This does not affect our recommendations or the price you pay.</p>
             </section>
 
             <section>
