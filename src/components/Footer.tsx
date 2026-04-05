@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Linkedin } from "lucide-react";
-import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
+import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 
 
@@ -47,11 +47,11 @@ export default function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link to="/" className="mb-4 flex items-center gap-2 font-heading text-xl font-bold">
-              <img src={wrenchliLogo} alt="Wrenchli logo" className="h-7 w-7 rounded object-contain" />
+            <Link to="/" className="mb-4 flex items-center gap-2 font-heading text-xl font-bold" style={{ color: "#F5F5F5" }}>
+              <img src={wrenchliLogo} alt="Wrenchli logo" className="h-8 w-8 object-contain" />
               Wrenchli
             </Link>
-            <p className="mb-1 text-sm font-medium tracking-wide text-primary-foreground/80">
+            <p className="mb-1 text-sm font-medium tracking-wide" style={{ color: "#6B7280" }}>
               Mobility for All.
             </p>
             <p className="mb-5 text-xs leading-relaxed text-primary-foreground/50">
