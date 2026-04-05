@@ -157,7 +157,7 @@ export function buildRetailerUrl(
     case "oreilly":
       return `https://www.oreillyauto.com/shop/b/${fullQuery}`;
     case "amazon":
-      return `https://www.amazon.com/s?k=${fullQuery}&tag=wrenchli20-20`;
+      return `https://www.amazon.com/s?k=${fullQuery}&tag=wrenchli-20`;
     case "rockauto":
       return `https://www.rockauto.com/en/catalog/?a=${encodeURIComponent(fullQuery.replace(/\+/g, " "))}`;
     case "advanceauto":
