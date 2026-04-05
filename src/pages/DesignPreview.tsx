@@ -53,22 +53,6 @@ export default function DesignPreview() {
 
   return (
     <div className="min-h-screen" style={{ fontFamily: FONT }}>
-      {/* Back link */}
-      <div className="fixed top-4 left-4 z-50">
-        <Link
-          to="/"
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
-          style={{ background: "#1A1D27", border: "1px solid #2A2D37", color: "#9CA3AF" }}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to current site
-        </Link>
-      </div>
-
-      {/* Banner */}
-      <div className="text-center py-3 text-sm font-medium" style={{ background: "#E07B39", color: "#0F1117" }}>
-        ⚡ DESIGN PREVIEW — Fully functional symptom assessment with the new aesthetic
-      </div>
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: "#1A1D27", background: "#0F1117" }}>
@@ -353,9 +337,9 @@ export default function DesignPreview() {
           </div>
         </section>
 
-        {/* Footer note */}
+        {/* Footer */}
         <div className="text-center py-10 text-xs" style={{ color: "#9CA3AF", borderTop: "1px solid #E0DDD8" }}>
-          This is a design concept preview. Your current site is unchanged.
+          © {new Date().getFullYear()} Wrenchli. All rights reserved.
         </div>
       </div>
     </div>
