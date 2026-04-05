@@ -70,7 +70,7 @@ export default function Footer() {
 
           {/* Link columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
+            <div key={category} className="pt-5 lg:pt-6">
               <h4 className="mb-3 font-heading text-xs font-semibold uppercase tracking-widest whitespace-nowrap" style={{ color: "#E07B39" }}>
                 {category}
               </h4>
