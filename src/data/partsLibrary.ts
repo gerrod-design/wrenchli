@@ -141,7 +141,7 @@ export function getPartsForDiagnosis(diagnosisTitle: string): PartsInfo | undefi
 /**
  * Build a retailer search URL with vehicle context appended.
  */
-export type RetailerId = "autozone" | "oreilly" | "amazon" | "rockauto" | "advanceauto" | "napa";
+export type RetailerId = "oreilly" | "amazon" | "rockauto" | "advanceauto" | "napa";
 
 export function buildRetailerUrl(
   retailer: RetailerId,
@@ -152,8 +152,6 @@ export function buildRetailerUrl(
   const fullQuery = `${searchQuery}+${vehicleQuery}`;
 
   switch (retailer) {
-    case "autozone":
-      return `https://www.autozone.com/searchresult?searchText=${encodeURIComponent(fullQuery.replace(/\+/g, " "))}`;
     case "oreilly":
       return `https://www.oreillyauto.com/shop/b/${fullQuery}`;
     case "amazon":

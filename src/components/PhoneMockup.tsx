@@ -195,7 +195,7 @@ const diyScreens = [
         </div>
         <div className="flex-1 px-3 py-3 space-y-2">
           {[
-            { name: "Ceramic Brake Pads (Front)", price: "$32.99", store: "AutoZone" },
+            { name: "Ceramic Brake Pads (Front)", price: "$32.99", store: "Amazon" },
             { name: "Brake Pad Set (Rear)", price: "$28.49", store: "O'Reilly" },
           ].map((part) => (
             <div key={part.name} className="rounded-lg border border-border bg-card p-2 shadow-sm">

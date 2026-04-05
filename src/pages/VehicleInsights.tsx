@@ -57,7 +57,7 @@ const symptomCategories = [
 const diyItems = ["Cabin air filter", "Wiper blades", "Headlight bulbs", "Battery replacement", "Fluid top-offs", "Tire pressure"];
 const shopItems = ["Brake pads & rotors", "Timing belt", "Transmission repair", "Steering & suspension", "Electrical diagnosis", "AC system"];
 
-const partsPartners = ["AutoZone", "O'Reilly", "Advance Auto Parts", "RockAuto", "Amazon Automotive"];
+const partsPartners = ["Amazon Automotive", "O'Reilly", "Advance Auto Parts", "RockAuto", "NAPA"];
 
 function CyclingPlaceholder() {
   const [idx, setIdx] = useState(0);
