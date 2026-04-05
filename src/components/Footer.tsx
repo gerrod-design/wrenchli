@@ -42,7 +42,7 @@ export default function Footer() {
   const [recommendOpen, setRecommendOpen] = useState(false);
   
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="text-primary-foreground" style={{ backgroundColor: "#0F1117" }}>
       <div className="container-wrenchli py-12 pb-24 md:py-16 md:pb-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
           {/* Brand */}
