@@ -6,8 +6,6 @@ author: "Wrenchli Team"
 tags: ["check engine light", "P0420", "catalytic converter", "diagnostics"]
 ---
 
-# Check Engine Light? Here's What P0420 Really Means
-
 You're driving home from work and it happens — that little amber check engine light blinks on. You pull into a parts store, they scan it, and the code reads **P0420: Catalyst System Efficiency Below Threshold (Bank 1)**.
 
 Now what?
