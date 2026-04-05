@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -132,6 +132,7 @@ function AnimatedRoutes() {
           <Route path="/agent-diagnosis" element={<AgentDiagnosisFlow />} />
           <Route path="/shop-login" element={<ShopLogin />} />
           <Route path="/shop-portal" element={<ShopPortal />} />
+          <Route path="/diagnose" element={<Navigate to="/design-preview" replace />} />
           <Route path="/design-preview" element={<DesignPreview />} />
           <Route path="/design-preview/for-shops" element={<ForShopsPreview />} />
           <Route path="/design-preview/for-shops/onboarding" element={<ShopOnboardingPreview />} />
