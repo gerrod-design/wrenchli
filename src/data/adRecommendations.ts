@@ -8,7 +8,7 @@
  */
 
 // ── Config ──────────────────────────────────────────────────────────────────
-const AFFILIATE_TAG = "wrenchli20-20";
+const AFFILIATE_TAG = "wrenchli-20";
 
 export function buildAmazonLink(asin: string): string {
   return `https://www.amazon.com/dp/${asin}?tag=${AFFILIATE_TAG}`;

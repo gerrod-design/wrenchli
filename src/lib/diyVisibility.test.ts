@@ -2,37 +2,49 @@ import { describe, it, expect } from "vitest";
 import { showDIY } from "./diyVisibility";
 
 describe("showDIY", () => {
-  it("returns true when repair cost is below the default threshold", () => {
-    expect(showDIY(1500)).toBe(true);
+  it("returns true when urgency is monitor and a cause is easy", () => {
+    expect(showDIY("monitor", [{ diy_difficulty: "easy" }])).toBe(true);
   });
 
-  it("returns false when repair cost meets or exceeds the default threshold", () => {
-    expect(showDIY(2000)).toBe(false);
-    expect(showDIY(3000)).toBe(false);
+  it("returns true when urgency is schedule and a cause is moderate", () => {
+    expect(showDIY("schedule", [{ diy_difficulty: "moderate" }])).toBe(true);
   });
 
-  it("uses easy threshold (5000) for easy feasibility", () => {
-    expect(showDIY(4999, "easy")).toBe(true);
-    expect(showDIY(5000, "easy")).toBe(false);
+  it("returns true when at least one cause is DIY-eligible among mixed causes", () => {
+    expect(
+      showDIY("monitor", [
+        { diy_difficulty: "professional_only" },
+        { diy_difficulty: "easy" },
+      ])
+    ).toBe(true);
   });
 
-  it("uses moderate threshold (3000) for moderate feasibility", () => {
-    expect(showDIY(2999, "moderate")).toBe(true);
-    expect(showDIY(3000, "moderate")).toBe(false);
+  it("returns false when urgency is immediate", () => {
+    expect(showDIY("immediate", [{ diy_difficulty: "easy" }])).toBe(false);
   });
 
-  it("uses advanced threshold (1500) for advanced feasibility", () => {
-    expect(showDIY(1499, "advanced")).toBe(true);
-    expect(showDIY(1500, "advanced")).toBe(false);
+  it("returns false when urgency is soon", () => {
+    expect(showDIY("soon", [{ diy_difficulty: "easy" }])).toBe(false);
   });
 
-  it("falls back to default threshold (2000) for unknown feasibility", () => {
-    expect(showDIY(1999, "unknown")).toBe(true);
-    expect(showDIY(2000, "unknown")).toBe(false);
+  it("returns false when all causes are professional_only", () => {
+    expect(
+      showDIY("monitor", [
+        { diy_difficulty: "professional_only" },
+        { diy_difficulty: "professional_only" },
+      ])
+    ).toBe(false);
   });
 
-  it("falls back to default threshold when feasibility is undefined", () => {
-    expect(showDIY(1999, undefined)).toBe(true);
-    expect(showDIY(2000, undefined)).toBe(false);
+  it("returns false when urgency is null", () => {
+    expect(showDIY(null, [{ diy_difficulty: "easy" }])).toBe(false);
+  });
+
+  it("returns false when urgency is undefined", () => {
+    expect(showDIY(undefined, [{ diy_difficulty: "easy" }])).toBe(false);
+  });
+
+  it("returns false when causes array is empty", () => {
+    expect(showDIY("monitor", [])).toBe(false);
   });
 });

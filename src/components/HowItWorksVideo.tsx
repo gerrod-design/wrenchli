@@ -25,7 +25,7 @@ const defaultSteps = [
 
 const diySteps = [
   { step: 3, icon: Tv, title: "Watch a DIY Tutorial", desc: "YouTube video guides matched to your exact year, make, and model — beginner-friendly." },
-  { step: 4, icon: ShoppingCart, title: "Order Parts & Tools", desc: "See exactly what you need with prices from AutoZone, O'Reilly, and Amazon — plus loaner tool tips." },
+  { step: 4, icon: ShoppingCart, title: "Order Parts & Tools", desc: "See exactly what you need with prices from Amazon, O'Reilly, and RockAuto — plus loaner tool tips." },
   { step: 5, icon: CheckCircle, title: "Save & Track in Your Garage", desc: "Log the repair, see your savings vs. shop price, and keep your vehicle history in one place." },
 ];
 

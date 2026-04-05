@@ -194,7 +194,7 @@ export const desktopDiyScreens = [
         <div className="flex-1 px-8 py-5">
           <div className="grid grid-cols-2 gap-3 mb-3">
             {[
-              { name: "Ceramic Brake Pads (Front)", price: "$32.99", store: "AutoZone" },
+              { name: "Ceramic Brake Pads (Front)", price: "$32.99", store: "Amazon" },
               { name: "Brake Pad Set (Rear)", price: "$28.49", store: "O'Reilly" },
             ].map((part) => (
               <div key={part.name} className="rounded-xl border border-border bg-card p-3 shadow-sm">

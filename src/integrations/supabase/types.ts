@@ -75,6 +75,7 @@ export type Database = {
         Row: {
           click_type: string
           created_at: string
+          destination: string | null
           diagnosis_code: string | null
           diagnosis_title: string | null
           id: string
@@ -83,7 +84,9 @@ export type Database = {
           item_id: string | null
           item_price: string | null
           item_title: string | null
+          part_name: string | null
           placement: string | null
+          session_id: string | null
           source: string | null
           vehicle_make: string | null
           vehicle_model: string | null
@@ -92,6 +95,7 @@ export type Database = {
         Insert: {
           click_type: string
           created_at?: string
+          destination?: string | null
           diagnosis_code?: string | null
           diagnosis_title?: string | null
           id?: string
@@ -100,7 +104,9 @@ export type Database = {
           item_id?: string | null
           item_price?: string | null
           item_title?: string | null
+          part_name?: string | null
           placement?: string | null
+          session_id?: string | null
           source?: string | null
           vehicle_make?: string | null
           vehicle_model?: string | null
@@ -109,6 +115,7 @@ export type Database = {
         Update: {
           click_type?: string
           created_at?: string
+          destination?: string | null
           diagnosis_code?: string | null
           diagnosis_title?: string | null
           id?: string
@@ -117,13 +124,23 @@ export type Database = {
           item_id?: string | null
           item_price?: string | null
           item_title?: string | null
+          part_name?: string | null
           placement?: string | null
+          session_id?: string | null
           source?: string | null
           vehicle_make?: string | null
           vehicle_model?: string | null
           vehicle_year?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ad_click_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       analytics_events: {
         Row: {

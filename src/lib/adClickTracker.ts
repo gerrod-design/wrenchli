@@ -14,6 +14,9 @@ interface ClickEvent {
   vehicle_model?: string;
   source?: string;
   placement?: string;
+  session_id?: string;
+  part_name?: string;
+  destination?: string;
 }
 
 export function trackAdClick(event: ClickEvent) {

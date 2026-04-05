@@ -4,6 +4,8 @@ import { Wrench, Clock, DollarSign, ExternalLink } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
 import { buildAmazonSearchLink, type ProductRecommendation } from "@/data/adRecommendations";
 import DIYProductCard from "./DIYProductCard";
+import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+import { getRepairTimeEstimate } from "@/lib/repairTimeEstimate";
 import type { TrackingContext } from "./types";
 
 const DIYProductSection = ({
@@ -12,14 +14,17 @@ const DIYProductSection = ({
   source,
   vehicleInfo,
   trackCtx,
+  diyDifficulty,
 }: {
   products: ProductRecommendation[];
   diyEstimate?: { timeRange: string; totalPartsRange: string };
   source: "local" | "ai";
   vehicleInfo: any;
   trackCtx: TrackingContext;
+  diyDifficulty?: string;
 }) => {
   const vehicleStr = [vehicleInfo?.year, vehicleInfo?.make, vehicleInfo?.model].filter(Boolean).join(" ");
+  const timeEstimate = diyDifficulty ? getRepairTimeEstimate(diyDifficulty) : diyEstimate?.timeRange;
 
   const handleProductClick = (p: ProductRecommendation) =>
     trackAdClick({
@@ -44,6 +49,9 @@ const DIYProductSection = ({
         <div>
           <h3 id="diy-section-heading" className="font-heading text-lg font-bold text-ad-info-heading">DIY Repair Option</h3>
           <p className="text-sm text-ad-info-text">Save money by fixing it yourself with these parts</p>
+          {timeEstimate && (
+            <p className="text-xs text-muted-foreground mt-0.5">Estimated time: {timeEstimate}</p>
+          )}
         </div>
         <Badge className="ml-auto bg-ad-badge-savings text-ad-badge-savings-text border-ad-badge-savings-border" aria-label="Potential savings: 60 to 70 percent">Save 60-70%</Badge>
       </div>
@@ -79,6 +87,7 @@ const DIYProductSection = ({
           </Button>
         </div>
       )}
+      <AffiliateDisclosure />
       {source === "ai" && (
         <p className="mt-2 text-xs text-ad-info-subtle text-center" role="note">
           Recommendations powered by AI — verify fitment for your specific vehicle

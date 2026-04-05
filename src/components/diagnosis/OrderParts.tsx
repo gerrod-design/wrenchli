@@ -2,12 +2,12 @@ import { useState } from "react";
 import { ExternalLink, Wrench, Lightbulb, AlertTriangle, ChevronDown } from "lucide-react";
 import { getPartsForDiagnosis, buildRetailerUrl } from "@/data/partsLibrary";
 import { cn } from "@/lib/utils";
+import AffiliateDisclosure from "@/components/AffiliateDisclosure";
 
 import type { RetailerId } from "@/data/partsLibrary";
 
 const retailers: { id: RetailerId; label: string; bg: string; text: string }[] = [
   { id: "amazon", label: "Amazon", bg: "hsl(30 100% 50%)", text: "hsl(0 0% 10%)" },
-  { id: "autozone", label: "AutoZone", bg: "hsl(0 72% 51%)", text: "white" },
   { id: "oreilly", label: "O'Reilly", bg: "hsl(142 71% 29%)", text: "white" },
   { id: "advanceauto", label: "Advance Auto", bg: "hsl(0 0% 15%)", text: "white" },
   { id: "rockauto", label: "RockAuto", bg: "hsl(210 80% 35%)", text: "white" },
@@ -141,9 +141,7 @@ export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps)
       )}
 
       {/* Affiliate disclosure */}
-      <p className="text-[10px] text-muted-foreground text-center italic">
-        Wrenchli may receive a small referral fee at no additional cost to you.
-      </p>
+      <AffiliateDisclosure />
     </div>
   );
 }

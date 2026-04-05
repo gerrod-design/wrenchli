@@ -51,7 +51,7 @@ function OBD2ScannerRecommendation({ onSwitchToDtc }: { onSwitchToDtc?: () => vo
         <div className="space-y-2">
           <h4 className="font-heading text-sm font-bold">Get a more accurate diagnosis with an OBD2 scanner</h4>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            An OBD2 scanner reads the specific diagnostic code stored in your vehicle's computer, giving you a much more targeted diagnosis. Many auto parts stores (AutoZone, O'Reilly, Advance Auto) will scan your vehicle for free. Or you can purchase a scanner for home use:
+            An OBD2 scanner reads the specific diagnostic code stored in your vehicle's computer, giving you a much more targeted diagnosis. Many auto parts stores (O'Reilly, Advance Auto) will scan your vehicle for free. Or you can purchase a scanner for home use:
           </p>
           <div className="flex flex-wrap gap-2 mt-1">
             {["FIXD", "BlueDriver", "Innova"].map((brand) => (

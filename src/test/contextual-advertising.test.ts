@@ -106,28 +106,28 @@ describe("ContextualAdvertising integration", () => {
     cleanup();
   });
 
-  it("renders DIY section for low-cost easy repairs with products", async () => {
+  it("renders DIY section for monitor urgency with easy cause", async () => {
     hookReturn = {
       data: { products: mockProducts, services: mockServices, source: "local" },
       loading: false,
     };
     const { text, cleanup } = await mount({
-      repairCost: 500,
-      diyFeasibility: "easy",
+      urgency: "monitor",
+      causes: [{ diy_difficulty: "easy" }],
     });
     expect(text()).toContain("DIY Repair Option");
     expect(text()).toContain("Brake Pad Set");
     cleanup();
   });
 
-  it("hides DIY section when cost exceeds threshold", async () => {
+  it("hides DIY section when urgency is immediate", async () => {
     hookReturn = {
       data: { products: mockProducts, services: mockServices, source: "local" },
       loading: false,
     };
     const { text, cleanup } = await mount({
-      repairCost: 6000,
-      diyFeasibility: "easy",
+      urgency: "immediate",
+      causes: [{ diy_difficulty: "easy" }],
     });
     expect(text()).not.toContain("DIY Repair Option");
     cleanup();

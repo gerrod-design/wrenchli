@@ -32,7 +32,7 @@ const partsMap: Record<string, PartsInfo> = {
       { name: "Gas Cap (replacement)", estimatedPrice: "$5–$15", required: false, note: "Try tightening or replacing gas cap first — it's the cheapest fix", searchQuery: "gas+cap" },
     ],
     tools: ["OBD2 scanner (or visit auto parts store for free scan)"],
-    proTip: "AutoZone, O'Reilly, and Advance Auto will scan your check engine light for free — no purchase required!",
+    proTip: "O'Reilly and Advance Auto will scan your check engine light for free — no purchase required!",
   },
   "engine overheating": {
     parts: [
@@ -141,7 +141,7 @@ export function getPartsForDiagnosis(diagnosisTitle: string): PartsInfo | undefi
 /**
  * Build a retailer search URL with vehicle context appended.
  */
-export type RetailerId = "autozone" | "oreilly" | "amazon" | "rockauto" | "advanceauto" | "napa";
+export type RetailerId = "oreilly" | "amazon" | "rockauto" | "advanceauto" | "napa";
 
 export function buildRetailerUrl(
   retailer: RetailerId,
@@ -152,12 +152,10 @@ export function buildRetailerUrl(
   const fullQuery = `${searchQuery}+${vehicleQuery}`;
 
   switch (retailer) {
-    case "autozone":
-      return `https://www.autozone.com/searchresult?searchText=${encodeURIComponent(fullQuery.replace(/\+/g, " "))}`;
     case "oreilly":
       return `https://www.oreillyauto.com/shop/b/${fullQuery}`;
     case "amazon":
-      return `https://www.amazon.com/s?k=${fullQuery}&tag=wrenchli20-20`;
+      return `https://www.amazon.com/s?k=${fullQuery}&tag=wrenchli-20`;
     case "rockauto":
       return `https://www.rockauto.com/en/catalog/?a=${encodeURIComponent(fullQuery.replace(/\+/g, " "))}`;
     case "advanceauto":
