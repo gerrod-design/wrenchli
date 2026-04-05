@@ -10,15 +10,13 @@ const footerLinks = {
     { label: "About Us", to: "/about" },
     { label: "Leadership", to: "/about#leadership" },
     { label: "Investors", to: "/investors" },
-    { label: "Careers", to: "/about", badge: "Coming Soon" },
+    { label: "Careers", to: "/about" },
     { label: "Contact", to: "/contact" },
     { label: "Developers", to: "/developers" },
   ],
   "For Vehicle Owners": [
     { label: "How It Works", to: "/for-car-owners" },
-    { label: "Get a Quote", to: "/#quote" },
     { label: "💬 Recommend a Shop", to: "__recommend__" },
-    { label: "Find a Shop", to: "/#quote", badge: "Coming Soon" },
     { label: "Financing Options", to: "/for-car-owners#financing" },
   ],
   "For Repair Shops": [
@@ -28,8 +26,8 @@ const footerLinks = {
     { label: "Apply Now", to: "/for-shops#apply" },
   ],
   "For Finance Providers": [
-    { label: "Partner With Us", to: "/contact", badge: "Coming Soon" },
-    { label: "Integration", to: "/contact", badge: "Coming Soon" },
+    { label: "Partner With Us", to: "/contact" },
+    { label: "Integration", to: "/contact" },
     { label: "Contact Us", to: "/contact" },
   ],
   Legal: [
@@ -57,7 +55,7 @@ export default function Footer() {
               Mobility for All.
             </p>
             <p className="mb-5 text-xs leading-relaxed text-primary-foreground/50">
-              Fixing the broken vehicle repair experience — coming soon to {userLocation.region}.
+              Fixing the broken vehicle repair experience.
             </p>
             <a
               href="https://linkedin.com/company/wrenchli"

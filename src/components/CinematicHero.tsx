@@ -106,7 +106,7 @@ export default function CinematicHero() {
           className="mt-4 text-base md:text-xl font-semibold text-white max-w-[600px]"
           style={{ textShadow: "0 3px 16px rgba(0,0,0,0.7), 0 1px 6px rgba(0,0,0,0.5)" }}
         >
-          Affordable vehicle repair — coming soon to {userLocation.region}.
+          Affordable vehicle repair — transparent pricing, trusted shops.
         </motion.p>
 
         {/* Trust badges */}
