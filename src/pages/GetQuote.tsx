@@ -471,7 +471,8 @@ export default function GetQuote() {
                       : "repair"
                     : "consider_both"
                 }
-                diyFeasibility={diyFeasibility}
+                urgency={urgency}
+                causes={causes}
                 userZipCode={zipCode.replace(/\D/g, "").slice(0, 5)}
               />
             </SectionReveal>
