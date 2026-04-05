@@ -146,9 +146,12 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
     const rawText = aiData.content?.[0]?.text ?? "";
 
     // ── 4. Parse & validate AI response ───────────────────
+    // Strip markdown code fences if present (Claude sometimes wraps JSON)
+    const cleanedText = rawText.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
+
     let diagnosis: Diagnosis;
     try {
-      diagnosis = JSON.parse(rawText);
+      diagnosis = JSON.parse(cleanedText);
     } catch {
       console.error("Failed to parse AI response:", rawText);
       throw new Error("AI returned invalid JSON");
