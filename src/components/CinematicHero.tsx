@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "@/contexts/LocationContext";
+
 import heroVideo from "@/assets/hero-video.mp4";
 import heroPoster from "@/assets/hero-poster.jpg";
 import heroHome from "@/assets/hero-home.jpg";
@@ -35,7 +35,7 @@ export default function CinematicHero() {
   const prefersReducedMotion = useReducedMotion();
   const isSaveData = useIsSaveData();
   const [isMobile, setIsMobile] = useState(false);
-  const userLocation = useLocation();
+  
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -106,7 +106,7 @@ export default function CinematicHero() {
           className="mt-4 text-base md:text-xl font-semibold text-white max-w-[600px]"
           style={{ textShadow: "0 3px 16px rgba(0,0,0,0.7), 0 1px 6px rgba(0,0,0,0.5)" }}
         >
-          Affordable vehicle repair — coming soon to {userLocation.region}.
+          Affordable vehicle repair — transparent pricing, trusted shops.
         </motion.p>
 
         {/* Trust badges */}

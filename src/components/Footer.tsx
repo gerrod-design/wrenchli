@@ -3,22 +3,20 @@ import { Link } from "react-router-dom";
 import { Linkedin } from "lucide-react";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
-import { useLocation } from "@/contexts/LocationContext";
+
 
 const footerLinks = {
   Company: [
     { label: "About Us", to: "/about" },
     { label: "Leadership", to: "/about#leadership" },
     { label: "Investors", to: "/investors" },
-    { label: "Careers", to: "/about", badge: "Coming Soon" },
+    { label: "Careers", to: "/about" },
     { label: "Contact", to: "/contact" },
     { label: "Developers", to: "/developers" },
   ],
   "For Vehicle Owners": [
     { label: "How It Works", to: "/for-car-owners" },
-    { label: "Get a Quote", to: "/#quote" },
     { label: "💬 Recommend a Shop", to: "__recommend__" },
-    { label: "Find a Shop", to: "/#quote", badge: "Coming Soon" },
     { label: "Financing Options", to: "/for-car-owners#financing" },
   ],
   "For Repair Shops": [
@@ -28,8 +26,8 @@ const footerLinks = {
     { label: "Apply Now", to: "/for-shops#apply" },
   ],
   "For Finance Providers": [
-    { label: "Partner With Us", to: "/contact", badge: "Coming Soon" },
-    { label: "Integration", to: "/contact", badge: "Coming Soon" },
+    { label: "Partner With Us", to: "/contact" },
+    { label: "Integration", to: "/contact" },
     { label: "Contact Us", to: "/contact" },
   ],
   Legal: [
@@ -42,7 +40,7 @@ const footerLinks = {
 
 export default function Footer() {
   const [recommendOpen, setRecommendOpen] = useState(false);
-  const userLocation = useLocation();
+  
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container-wrenchli py-12 pb-24 md:py-16 md:pb-16">
@@ -57,7 +55,7 @@ export default function Footer() {
               Mobility for All.
             </p>
             <p className="mb-5 text-xs leading-relaxed text-primary-foreground/50">
-              Fixing the broken vehicle repair experience — coming soon to {userLocation.region}.
+              Fixing the broken vehicle repair experience.
             </p>
             <a
               href="https://linkedin.com/company/wrenchli"
@@ -110,11 +108,6 @@ export default function Footer() {
                       >
                         {link.label}
                       </Link>
-                    )}
-                    {link.badge && (
-                      <span className="rounded bg-primary-foreground/10 px-1.5 py-0.5 text-[10px] text-primary-foreground/40">
-                        {link.badge}
-                      </span>
                     )}
                   </li>
                 ))}
