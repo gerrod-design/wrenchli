@@ -28,7 +28,7 @@ const FONT = "'Plus Jakarta Sans', 'DM Sans', sans-serif";
 const MONO = "'IBM Plex Mono', monospace";
 
 export default function DesignPreview() {
-  const [activeStage, setActiveStage] = useState(2);
+  const [activeStage] = useState(2); // kept for potential future use
   const chatRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -145,19 +145,24 @@ export default function DesignPreview() {
       {/* ── Everything below hero: warm light background ── */}
       <div style={{ background: "#F8F8F6", color: "#1A1D27" }}>
 
-        {/* Pipeline stages */}
+        {/* Pipeline stages — visual indicator of the assessment flow */}
         <section className="px-6 pt-12 pb-6 max-w-5xl mx-auto">
+          <p className="text-center text-sm mb-4" style={{ color: "#6B7280" }}>
+            Our 4-step assessment flow:
+          </p>
           <div className="flex gap-2 mb-8 justify-center flex-wrap">
             {["Vehicle ID", "Symptom Intake", "Assessment", "Recommendation"].map((label, i) => (
               <button
                 key={label}
-                onClick={() => setActiveStage(i)}
-                className="px-4 py-2 rounded-lg text-xs transition-all"
+                onClick={() => {
+                  chatRef.current?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer"
                 style={{
                   fontFamily: MONO,
-                  background: activeStage === i ? "#E07B39" : "#FFFFFF",
-                  color: activeStage === i ? "#FFFFFF" : "#6B7280",
-                  border: `1px solid ${activeStage === i ? "#E07B39" : "#E0DDD8"}`,
+                  background: i <= 1 ? "#E07B39" : "#FFFFFF",
+                  color: i <= 1 ? "#FFFFFF" : "#6B7280",
+                  border: `1px solid ${i <= 1 ? "#E07B39" : "#E0DDD8"}`,
                 }}
               >
                 {i + 1}. {label}
