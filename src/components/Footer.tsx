@@ -109,11 +109,6 @@ export default function Footer() {
                         {link.label}
                       </Link>
                     )}
-                    {link.badge && (
-                      <span className="rounded bg-primary-foreground/10 px-1.5 py-0.5 text-[10px] text-primary-foreground/40">
-                        {link.badge}
-                      </span>
-                    )}
                   </li>
                 ))}
               </ul>
