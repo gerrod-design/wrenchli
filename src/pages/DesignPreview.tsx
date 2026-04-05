@@ -145,28 +145,35 @@ export default function DesignPreview() {
       {/* ── Everything below hero: warm light background ── */}
       <div style={{ background: "#F8F8F6", color: "#1A1D27" }}>
 
-        {/* Pipeline stages — visual indicator of the assessment flow */}
+        {/* Pipeline stages — static visual showing the assessment flow */}
         <section className="px-6 pt-12 pb-6 max-w-5xl mx-auto">
-          <p className="text-center text-sm mb-4" style={{ color: "#6B7280" }}>
-            Our 4-step assessment flow:
+          <p className="text-center text-sm mb-5" style={{ color: "#6B7280" }}>
+            How it works — 4 simple steps
           </p>
-          <div className="flex gap-2 mb-8 justify-center flex-wrap">
-            {["Vehicle ID", "Symptom Intake", "Assessment", "Recommendation"].map((label, i) => (
-              <button
-                key={label}
-                onClick={() => {
-                  chatRef.current?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="px-4 py-2 rounded-lg text-xs transition-all cursor-pointer"
-                style={{
-                  fontFamily: MONO,
-                  background: i <= 1 ? "#E07B39" : "#FFFFFF",
-                  color: i <= 1 ? "#FFFFFF" : "#6B7280",
-                  border: `1px solid ${i <= 1 ? "#E07B39" : "#E0DDD8"}`,
-                }}
-              >
-                {i + 1}. {label}
-              </button>
+          <div className="flex items-center justify-center gap-0 mb-8 flex-wrap">
+            {["Vehicle", "Symptoms", "Diagnosis", "Plan"].map((label, i) => (
+              <div key={label} className="flex items-center">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
+                    style={{
+                      background: "#E07B39",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span
+                    className="text-xs font-medium"
+                    style={{ fontFamily: MONO, color: "#1A1D27" }}
+                  >
+                    {label}
+                  </span>
+                </div>
+                {i < 3 && (
+                  <ChevronRight className="h-4 w-4 mx-3 shrink-0" style={{ color: "#D1CFC9" }} />
+                )}
+              </div>
             ))}
           </div>
         </section>
