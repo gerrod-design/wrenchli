@@ -1,14 +1,59 @@
-import { CheckCircle2, ChevronRight, RotateCcw, Wrench } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle } from "lucide-react";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
+import { showDIY } from "@/lib/diyVisibility";
+import { getRepairTimeEstimate } from "@/lib/repairTimeEstimate";
+import { buildAmazonSearchLink } from "@/data/adRecommendations";
+import { trackAdClick } from "@/lib/adClickTracker";
+import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+import DIYOutcomePrompt from "./DIYOutcomePrompt";
 
 interface Props {
   recommendation: RecommendationResult;
   diagnosis: DiagnosisResult;
   vehicle: VehicleData;
+  sessionId: string;
   onRestart: () => void;
 }
 
-export default function RecommendationStep({ recommendation, diagnosis, vehicle, onRestart }: Props) {
+export default function RecommendationStep({ recommendation, diagnosis, vehicle, sessionId, onRestart }: Props) {
+  const diyEligible = showDIY(diagnosis.urgency, diagnosis.possible_causes);
+  const topDIYCause = diyEligible
+    ? diagnosis.possible_causes.find(
+        (c) => c.diy_difficulty === "easy" || c.diy_difficulty === "moderate"
+      )
+    : null;
+
+  const vehicleStr = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+  const timeEstimate = topDIYCause ? getRepairTimeEstimate(topDIYCause.diy_difficulty) : null;
+
+  // Check if outcome prompt should show (session older than 3 days)
+  const [showOutcome, setShowOutcome] = useState(false);
+  const [outcomeExists, setOutcomeExists] = useState(true);
+
+  useEffect(() => {
+    // We show the outcome prompt as a demo in design-preview;
+    // in production this would check session.created_at and outcome_reports
+    if (diyEligible && sessionId) {
+      setShowOutcome(true);
+      setOutcomeExists(false);
+    }
+  }, [diyEligible, sessionId]);
+
+  const handlePartsClick = (partName: string, destination: string, url: string) => {
+    trackAdClick({
+      click_type: "diy_parts",
+      item_title: partName,
+      part_name: partName,
+      destination,
+      session_id: sessionId,
+      vehicle_year: String(vehicle.year),
+      vehicle_make: vehicle.make,
+      vehicle_model: vehicle.model,
+    });
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -67,6 +112,89 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
             ))}
           </div>
         </div>
+      )}
+
+      {/* DIY Option Card — only when eligible */}
+      {diyEligible && topDIYCause && (
+        <div className="rounded-lg p-4 space-y-3" style={{ background: "#0F1117", border: "1px solid #22C55E40" }}>
+          <div className="flex items-center gap-2">
+            <Wrench className="h-4 w-4" style={{ color: "#22C55E" }} />
+            <div className="text-xs font-mono" style={{ color: "#22C55E" }}>DIY OPTION</div>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium" style={{ color: "#F5F5F5" }}>{topDIYCause.name}</p>
+            {topDIYCause.notes && (
+              <p className="text-xs mt-1" style={{ color: "#9CA3AF" }}>{topDIYCause.notes}</p>
+            )}
+          </div>
+
+          {/* Difficulty badge + time estimate */}
+          <div className="flex items-center gap-3">
+            <span
+              className="px-2 py-0.5 rounded text-xs font-bold"
+              style={{
+                background: topDIYCause.diy_difficulty === "easy" ? "#22C55E20" : "#F59E0B20",
+                color: topDIYCause.diy_difficulty === "easy" ? "#22C55E" : "#F59E0B",
+                border: `1px solid ${topDIYCause.diy_difficulty === "easy" ? "#22C55E40" : "#F59E0B40"}`,
+              }}
+            >
+              {topDIYCause.diy_difficulty === "easy" ? "Easy" : "Moderate"}
+            </span>
+            {timeEstimate && (
+              <span className="flex items-center gap-1 text-xs" style={{ color: "#9CA3AF" }}>
+                <Clock className="h-3 w-3" />
+                {timeEstimate}
+              </span>
+            )}
+          </div>
+
+          {/* Parts links */}
+          {recommendation.parts_likely_needed.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-mono" style={{ color: "#E07B39" }}>ORDER PARTS</p>
+              {recommendation.parts_likely_needed.map((part, i) => {
+                const amazonUrl = buildAmazonSearchLink(part, vehicleStr);
+                const rockautoUrl = `https://www.rockauto.com/en/catalog/${vehicle.make.toLowerCase()},${vehicle.model.toLowerCase()},${vehicle.year}`;
+                return (
+                  <div key={i} className="flex items-center gap-2 text-xs">
+                    <ShoppingCart className="h-3 w-3 shrink-0" style={{ color: "#E07B39" }} />
+                    <span style={{ color: "#F5F5F5" }}>{part}</span>
+                    <button
+                      onClick={() => handlePartsClick(part, "amazon", amazonUrl)}
+                      className="underline ml-auto"
+                      style={{ color: "#F59E0B" }}
+                    >
+                      Amazon
+                    </button>
+                    <button
+                      onClick={() => handlePartsClick(part, "rockauto", rockautoUrl)}
+                      className="underline"
+                      style={{ color: "#3B82F6" }}
+                    >
+                      RockAuto
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <AffiliateDisclosure />
+
+          {/* Safety disclaimer */}
+          <div className="flex gap-2 pt-2" style={{ borderTop: "1px solid #2A2D3750" }}>
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: "#F59E0B" }} />
+            <p className="text-[11px]" style={{ color: "#6B7280" }}>
+              Wrenchli is not a licensed mechanic. This is informational only. If you are not confident performing this repair, take your vehicle to a qualified shop.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* DIY Outcome Capture */}
+      {diyEligible && showOutcome && !outcomeExists && (
+        <DIYOutcomePrompt sessionId={sessionId} />
       )}
 
       {/* Restart */}
