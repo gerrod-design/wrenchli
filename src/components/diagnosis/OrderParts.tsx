@@ -3,7 +3,6 @@ import { ExternalLink, Wrench, Lightbulb, AlertTriangle, ChevronDown } from "luc
 import { getPartsForDiagnosis, buildRetailerUrl } from "@/data/partsLibrary";
 import { cn } from "@/lib/utils";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
-import { cn } from "@/lib/utils";
 
 import type { RetailerId } from "@/data/partsLibrary";
 
