@@ -73,7 +73,7 @@ function AnimatedRoutes() {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
-  const isDesignPreview = location.pathname === "/design-preview" || location.pathname.startsWith("/design-preview/");
+  const isDesignPreview = location.pathname === "/" || location.pathname.startsWith("/design-preview/");
 
   if (isAdmin) {
     return (
@@ -95,7 +95,7 @@ function AnimatedRoutes() {
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
         <Routes location={location}>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<DesignPreview />} />
           <Route path="/home" element={<Home />} />
           <Route path="/owners" element={<Owners />} />
           <Route path="/shops" element={<Shops />} />
@@ -132,8 +132,8 @@ function AnimatedRoutes() {
           <Route path="/agent-diagnosis" element={<AgentDiagnosisFlow />} />
           <Route path="/shop-login" element={<ShopLogin />} />
           <Route path="/shop-portal" element={<ShopPortal />} />
-          <Route path="/diagnose" element={<Navigate to="/design-preview" replace />} />
-          <Route path="/design-preview" element={<DesignPreview />} />
+          <Route path="/diagnose" element={<Navigate to="/" replace />} />
+          <Route path="/design-preview" element={<Navigate to="/" replace />} />
           <Route path="/design-preview/for-shops" element={<ForShopsPreview />} />
           <Route path="/design-preview/for-shops/onboarding" element={<ShopOnboardingPreview />} />
           <Route path="*" element={<NotFound />} />
@@ -148,7 +148,7 @@ function AppLayout() {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
-  const isDesignPreview = location.pathname === "/design-preview" || location.pathname.startsWith("/design-preview/");
+  const isDesignPreview = location.pathname === "/" || location.pathname.startsWith("/design-preview/");
   const hideChrome = isAdmin || isDesignPreview;
 
   useEffect(() => {
