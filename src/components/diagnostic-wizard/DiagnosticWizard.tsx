@@ -112,11 +112,12 @@ export default function DiagnosticWizard() {
             onBack={() => setStep("symptoms")}
           />
         )}
-        {step === "recommendation" && recommendation && diagnosis && vehicle && (
+        {step === "recommendation" && recommendation && diagnosis && vehicle && sessionId && (
           <RecommendationStep
             recommendation={recommendation}
             diagnosis={diagnosis}
             vehicle={vehicle}
+            sessionId={sessionId}
             onRestart={() => {
               setStep("vehicle");
               setVehicle(null);
