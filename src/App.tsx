@@ -66,6 +66,8 @@ import ShopPortal from "./pages/ShopPortal";
 import DesignPreview from "./pages/DesignPreview";
 import ForShopsPreview from "./pages/ForShopsPreview";
 import ShopOnboardingPreview from "./pages/ShopOnboardingPreview";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -133,6 +135,8 @@ function AnimatedRoutes() {
           <Route path="/shop-login" element={<ShopLogin />} />
           <Route path="/shop-portal" element={<ShopPortal />} />
           <Route path="/for-shops/onboarding" element={<ShopOnboardingPreview />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/diagnose" element={<Navigate to="/" replace />} />
           <Route path="/design-preview" element={<Navigate to="/" replace />} />
           <Route path="/design-preview/for-shops" element={<ForShopsPreview />} />
