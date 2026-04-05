@@ -132,6 +132,7 @@ function AnimatedRoutes() {
           <Route path="/agent-diagnosis" element={<AgentDiagnosisFlow />} />
           <Route path="/shop-login" element={<ShopLogin />} />
           <Route path="/shop-portal" element={<ShopPortal />} />
+          <Route path="/for-shops/onboarding" element={<ShopOnboardingPreview />} />
           <Route path="/diagnose" element={<Navigate to="/" replace />} />
           <Route path="/design-preview" element={<Navigate to="/" replace />} />
           <Route path="/design-preview/for-shops" element={<ForShopsPreview />} />
