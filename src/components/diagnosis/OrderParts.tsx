@@ -2,6 +2,8 @@ import { useState } from "react";
 import { ExternalLink, Wrench, Lightbulb, AlertTriangle, ChevronDown } from "lucide-react";
 import { getPartsForDiagnosis, buildRetailerUrl } from "@/data/partsLibrary";
 import { cn } from "@/lib/utils";
+import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+import { cn } from "@/lib/utils";
 
 import type { RetailerId } from "@/data/partsLibrary";
 
@@ -140,9 +142,7 @@ export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps)
       )}
 
       {/* Affiliate disclosure */}
-      <p className="text-[10px] text-muted-foreground text-center italic">
-        Wrenchli may receive a small referral fee at no additional cost to you.
-      </p>
+      <AffiliateDisclosure />
     </div>
   );
 }
