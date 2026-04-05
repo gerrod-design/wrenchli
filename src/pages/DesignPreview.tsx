@@ -3,6 +3,7 @@ import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, Store
 import { Link } from "react-router-dom";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
+import Footer from "@/components/Footer";
 import heroVideo from "@/assets/hero-video.mp4";
 import heroPoster from "@/assets/hero-poster.jpg";
 
@@ -350,9 +351,7 @@ export default function DesignPreview() {
         </section>
 
         {/* Footer */}
-        <div className="text-center py-10 text-xs" style={{ color: "#9CA3AF", borderTop: "1px solid #E0DDD8" }}>
-          © {new Date().getFullYear()} Wrenchli. All rights reserved.
-        </div>
+        <Footer />
       </div>
     </div>
   );
