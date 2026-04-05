@@ -64,7 +64,7 @@ export default function Footer() {
               className="inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-primary-foreground/10"
               aria-label="LinkedIn"
             >
-              <Linkedin className="h-5 w-5" />
+              <Linkedin className="h-5 w-5" style={{ color: "#E07B39" }} />
             </a>
           </div>
 
