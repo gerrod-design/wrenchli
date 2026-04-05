@@ -23,7 +23,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 //   return <SitePasswordGate><AppLayout /></SitePasswordGate>;
 // }
 import CookieConsent from "@/components/CookieConsent";
-import Index from "./pages/Index";
+// Index page replaced by DesignPreview promotion
 import Home from "./pages/Home";
 import Owners from "./pages/Owners";
 import Shops from "./pages/Shops";
