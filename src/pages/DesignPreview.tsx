@@ -28,7 +28,7 @@ const FONT = "'Plus Jakarta Sans', 'DM Sans', sans-serif";
 const MONO = "'IBM Plex Mono', monospace";
 
 export default function DesignPreview() {
-  const [activeStage, setActiveStage] = useState(2);
+  const [activeStage] = useState(2); // kept for potential future use
   const chatRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
