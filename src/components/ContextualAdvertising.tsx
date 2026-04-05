@@ -22,7 +22,8 @@ const ContextualAdvertising = ({
   vehicleInfo,
   repairCost,
   repairRecommendation,
-  diyFeasibility,
+  urgency,
+  causes = [],
   placement = "full",
   userZipCode,
 }: {
@@ -31,11 +32,13 @@ const ContextualAdvertising = ({
   vehicleInfo: any;
   repairCost: number;
   repairRecommendation: "repair" | "replace" | "consider_both";
-  diyFeasibility?: "easy" | "moderate" | "advanced" | string;
+  urgency?: string | null;
+  causes?: { diy_difficulty?: string | null }[];
   placement?: "full" | "sidebar" | "footer";
   userZipCode?: string;
 }) => {
   const { data, loading } = useProductRecommendations(diagnosis, diagnosisCode, vehicleInfo);
+  const diyEligible = showDIY(urgency ?? null, causes);
 
   // Track section impression when loaded
   useEffect(() => {
@@ -58,7 +61,7 @@ const ContextualAdvertising = ({
     }
     return (
       <div className="space-y-6">
-        {showDIY(repairCost, diyFeasibility) && <DIYSectionSkeleton />}
+        {diyEligible && <DIYSectionSkeleton />}
         {(repairRecommendation === "replace" || repairRecommendation === "consider_both") && (
           <VehicleSectionSkeleton />
         )}
@@ -124,7 +127,7 @@ const ContextualAdvertising = ({
 
   return (
     <div className="space-y-6">
-      {showDIY(repairCost, diyFeasibility) && products.length > 0 && (
+      {diyEligible && products.length > 0 && (
         <DIYProductSection
           products={products}
           diyEstimate={diyEstimate}
