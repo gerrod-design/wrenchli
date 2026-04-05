@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "@/contexts/LocationContext";
+
 import heroVideo from "@/assets/hero-video.mp4";
 import heroPoster from "@/assets/hero-poster.jpg";
 import heroHome from "@/assets/hero-home.jpg";
@@ -35,7 +35,7 @@ export default function CinematicHero() {
   const prefersReducedMotion = useReducedMotion();
   const isSaveData = useIsSaveData();
   const [isMobile, setIsMobile] = useState(false);
-  const userLocation = useLocation();
+  
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
