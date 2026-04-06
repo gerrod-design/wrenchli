@@ -210,7 +210,7 @@ export default function About() {
               This city built the modern automobile. It knows what it means to reinvent an industry. With a community that takes pride in keeping vehicles on the road, Detroit is the perfect proving ground for a platform that's rewriting the rules of auto repair.
             </p>
             <p className="mt-4 text-primary-foreground/60 leading-relaxed">
-              We're launching here first because this is home — and because if Wrenchli can work in Detroit, it can work anywhere.
+              We're launching here first because this is home — and because if Wrenchli can work in Detroit, it can work anywhere. And Columbus is next — because Ohio's vehicle owners and independent shops deserve the same.
             </p>
           </SectionReveal>
         </div>
