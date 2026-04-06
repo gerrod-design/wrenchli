@@ -170,7 +170,7 @@ function AppLayout() {
       {!hideChrome && <Footer />}
       {!hideChrome && <MobileBottomBar />}
       {!hideChrome && <BackToTop />}
-      {!isAdmin && <ChatBot />}
+      {!isAdmin && location.pathname !== "/for-shops" && <ChatBot />}
       {!hideChrome && <CookieConsent />}
     </>
   );
