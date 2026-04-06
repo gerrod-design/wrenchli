@@ -188,9 +188,6 @@ export default function About() {
                       <span><strong className="text-foreground">Managing Director</strong> — led 300+ person organization at a global financial institution</span>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground italic">
-                    MS in Management, Strategy & Leadership — Michigan State University
-                  </p>
                 </div>
               </div>
             </SectionReveal>
