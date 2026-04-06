@@ -168,10 +168,10 @@ export default function About() {
         <div className="container-wrenchli max-w-4xl">
           <SectionReveal>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Leadership</h2>
-            <p className="mt-3 text-center text-muted-foreground md:text-lg">Decades of automotive, finance, and technology experience.</p>
+            <p className="mt-3 text-center text-muted-foreground md:text-lg">30+ years spanning automotive, finance, and technology.</p>
           </SectionReveal>
 
-          <div className="mt-12 grid gap-8 md:grid-cols-2">
+          <div className="mt-12 max-w-lg mx-auto">
             <SectionReveal>
               <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
                 <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -200,35 +200,6 @@ export default function About() {
                   <p className="text-xs text-muted-foreground italic">
                     MS in Management, Strategy & Leadership — Michigan State University
                   </p>
-                </div>
-              </div>
-            </SectionReveal>
-
-            <SectionReveal delay={150}>
-              <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-                <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  <Users className="h-10 w-10" />
-                </div>
-                <h3 className="text-center font-heading text-xl font-bold">Jenine Parchmon</h3>
-                <p className="text-center text-sm font-semibold text-accent mt-1">CTO</p>
-                <div className="mt-4 space-y-3 text-sm text-muted-foreground leading-relaxed">
-                  <p>
-                    20+ years leading enterprise technology, digital transformation, and payment systems across automotive and banking.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <Building className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
-                      <span><strong className="text-foreground">15 years at Comerica Bank</strong> — SVP and Domain CIO driving enterprise technology strategy</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Briefcase className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
-                      <span><strong className="text-foreground">6 years at Volkswagen Group / gedas USA</strong> — automotive technology and systems integration</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Award className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
-                      <span><strong className="text-foreground">Expertise:</strong> Enterprise tech, digital transformation, payment systems, and IT governance</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </SectionReveal>
