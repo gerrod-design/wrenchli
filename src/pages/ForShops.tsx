@@ -1,131 +1,42 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroShops from "@/assets/hero-shops.jpg";
-import { supabase } from "@/integrations/supabase/client";
 import {
-  Store, ArrowRight, TrendingUp, DollarSign, Wrench, Star,
-  CreditCard, BarChart3, Users, CheckCircle, Shield, Calendar,
-  MessageSquare, ClipboardCheck, Eye, Zap, Building
+  ArrowRight, Users, ClipboardCheck, TrendingUp, Plug, CheckCircle,
 } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
-import StatCounter from "@/components/StatCounter";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { toast } from "@/hooks/use-toast";
-import CustomerRecommendationSection from "@/components/recommend/CustomerRecommendationSection";
-import { QRCodeSVG } from "qrcode.react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-const steps = [
-  { step: 1, title: "Join the Network", desc: "Submit your application, verify credentials, and go live in days — not weeks." },
-  { step: 2, title: "Set Your Pricing", desc: "Set competitive rates and manage your availability calendar. You control your business." },
-  { step: 3, title: "Receive Job Requests", desc: "Get full repair details including vehicle info, diagnosis, and customer financing status." },
-  { step: 4, title: "Win the Work", desc: "Submit your best quote and let your reputation, reviews, and ratings speak for you." },
-  { step: 5, title: "Get Paid Fast", desc: "Platform payment processing with direct payout. On financed repairs, the lender pays you directly." },
-];
-
-const benefits = [
-  { icon: TrendingUp, title: "Pre-Qualified Leads", desc: "Customers come to you ready to book. They've already described their issue and are comparing shops — no tire-kickers." },
-  { icon: DollarSign, title: "Bigger Tickets", desc: "Financing helps customers afford the repair they actually need — not just the minimum. Approve more work, grow revenue." },
-  { icon: Wrench, title: "Modern Shop Software", desc: "Digital inspections, scheduling, CRM, and messaging — all in one platform designed for independent shops." },
-  { icon: Star, title: "Build Your Reputation", desc: "Verified reviews tied to real repairs. Build trust with new customers and showcase your best work." },
-  { icon: CreditCard, title: "Guaranteed Payment", desc: "No chasing invoices. Platform payments and lender direct-pay mean you get paid — fast and reliably." },
-  { icon: BarChart3, title: "Business Insights", desc: "See your close rate, average ticket, customer satisfaction, and market positioning. Data to run your shop smarter." },
-];
-
-const platformTabs = [
+const valueCards = [
   {
-    value: "acquisition",
-    label: "Customer Acquisition",
-    features: [
-      { icon: Users, title: "Quote Requests", desc: "Receive repair requests from local vehicle owners with full vehicle and issue details." },
-      { icon: Eye, title: "Local Visibility", desc: "Professional shop profile with your services, hours, photos, and location on the Wrenchli marketplace." },
-      { icon: Star, title: "Verified Reviews", desc: "Real reviews from real customers, tied to completed repairs. No fake or purchased reviews." },
-    ],
+    icon: Users,
+    title: "Pre-Qualified Leads",
+    desc: "Customers arrive with a structured assessment, vehicle details, and cost expectations. They're not shopping — they're booking.",
   },
   {
-    value: "operations",
-    label: "Shop Operations",
-    features: [
-      { icon: Calendar, title: "Online Scheduling", desc: "Customers book available slots directly. Sync with your existing calendar." },
-      { icon: ClipboardCheck, title: "Digital Inspections", desc: "Send photo and video inspection reports to build trust and increase approval rates." },
-      { icon: MessageSquare, title: "Messaging & Job Tracking", desc: "In-platform messaging with customers. Track job status from quote to completion." },
-    ],
+    icon: ClipboardCheck,
+    title: "Zero Intake Friction",
+    desc: "The repair likelihood report is the intake form. VIN, symptoms, confidence scores — all captured before they walk in.",
   },
   {
-    value: "payments",
-    label: "Payments & Financing",
-    features: [
-      { icon: CreditCard, title: "Integrated Payments", desc: "Accept credit cards, debit, and ACH — online and in-shop. Simple, transparent processing." },
-      { icon: Zap, title: "POS Financing", desc: "Offer point-of-sale financing to every customer. Multiple lenders, all credit profiles." },
-      { icon: DollarSign, title: "Direct Payout", desc: "Get paid within days. On financed repairs, the lender pays you directly — no waiting on the customer." },
-    ],
+    icon: TrendingUp,
+    title: "Higher Approval Rates",
+    desc: "Customers who understand their repair approve bigger jobs. Built-in financing means they can afford it too.",
   },
 ];
 
-const faqs = [
-  { q: "How much does Wrenchli cost for shops?", a: "$299/month per location for the full platform — marketplace listing, SaaS tools, payment processing, and customer management. Plus an 8% performance fee on jobs booked through the marketplace." },
-  { q: "What's the 8% fee?", a: "We charge 8% of the job total on repairs booked through the Wrenchli marketplace. This is a performance-based fee — you only pay when you close a job. No upfront costs beyond the monthly subscription." },
-  { q: "How do I get customers through Wrenchli?", a: "Customers search for repairs on Wrenchli and receive quotes from shops in their area. You set your own prices and respond to requests that match your services. Your reviews and ratings help you win work." },
-  { q: "What's included in the $299/month?", a: "Everything: marketplace listing, quote management, online scheduling, digital inspections, customer CRM, messaging, payment processing, business analytics, and a professional shop profile page." },
-  { q: "How does the financing work for my shop?", a: "When a customer chooses financing at checkout, they apply through our lending partners. Once approved, the lender pays you directly for the full repair amount — usually within 2-3 business days." },
-  { q: "Do I have to change my workflow?", a: "Wrenchli is designed to fit into how you already work. Our onboarding team will help you get set up and trained. Most shops are fully operational within a few days." },
-  { q: "How are shops verified?", a: "We verify licensing, insurance, and business history. We also monitor customer satisfaction ratings and review quality continuously. This protects both you and the customers." },
-  { q: "Can I set my own prices?", a: "Absolutely. You set all your own pricing. Wrenchli never dictates what you charge. Customers compare on price, reviews, and availability — so competitive pricing helps, but it's always your call." },
-];
-
-const bayOptions = ["1-3 bays", "4-6 bays", "7-10 bays", "10+ bays"];
+const integrations = ["Tekmetric", "AutoLeap", "Mitchell 1"];
 
 export default function ForShops() {
-  const [form, setForm] = useState({
-    shopName: "", ownerName: "", email: "", phone: "", location: "", bays: "", message: "",
-  });
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.email || !form.shopName) return;
-    setLoading(true);
-    try {
-      const { error } = await supabase.from("shop_applications").insert({
-        shop_name: form.shopName,
-        owner_name: form.ownerName || null,
-        email: form.email,
-        phone: form.phone || null,
-        city: form.location || null,
-        state: null,
-        message: form.message || null,
-      });
-      if (error) throw error;
-      toast({ title: "Application received! 🔧", description: "We'll reach out about partnership opportunities soon." });
-      setForm({ shopName: "", ownerName: "", email: "", phone: "", location: "", bays: "", message: "" });
-    } catch {
-      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="For Repair Shops"
-        description="Grow your shop with pre-qualified leads, modern software, and embedded financing. $299/mo all-in-one platform for independent repair shops."
+        title="For Repair Shops — Wrenchli"
+        description="Every customer arrives pre-assessed, cost-educated, and ready to approve the work. Apply for the free 90-day pilot."
         path="/for-shops"
       />
-      {/* Pilot Banner */}
-      <div className="bg-accent/10 border-b border-accent/20 py-3">
-        <div className="container-wrenchli text-center">
-          <p className="text-sm">
-            <strong>Michigan shops:</strong> Join our pilot program starting March 2026.{' '}
-            <Link to="/pilot" className="text-accent font-semibold hover:underline">
-              Learn more →
-            </Link>
-          </p>
-        </div>
-      </div>
 
       {/* Hero */}
       <section className="relative bg-primary text-primary-foreground section-padding overflow-hidden">
@@ -133,258 +44,99 @@ export default function ForShops() {
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/60" />
         <div className="container-wrenchli text-center relative">
           <SectionReveal>
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-wrenchli-trust-blue/20 px-4 py-1 text-sm font-medium text-wrenchli-trust-blue">
-              <Store className="h-4 w-4" /> For Repair Shops
-            </div>
             <h1 className="mt-6 font-heading text-3xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
-              More Customers. Higher Tickets. Less Hassle.
+              Every customer arrives already knowing what's wrong.
             </h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              Pre-qualified customers who need repairs now. Built-in financing that helps them say yes. Modern tools to run your shop. All for one simple monthly fee.
+              Your customers come pre-assessed, cost-educated, and ready to approve the work. No more 20-minute intake calls. No more sticker shock at the counter.
             </p>
             <Button
+              asChild
               size="lg"
               className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]"
-              onClick={() => document.getElementById("apply")?.scrollIntoView({ behavior: "smooth" })}
             >
-              Apply to Become a Partner Shop <ArrowRight className="ml-2 h-5 w-5" />
+              <Link to="/for-shops/onboarding">
+                Apply for the Free Pilot <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
           </SectionReveal>
         </div>
       </section>
 
-      {/* Impact Stats */}
-      <section className="bg-wrenchli-trust-blue text-white py-16 md:py-20">
-        <div className="container-wrenchli">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <StatCounter end={55} suffix="%" label="Average bay underutilization we help fill" />
-            <div className="text-center">
-              <div className="font-stats text-4xl font-bold text-accent md:text-5xl lg:text-6xl">$299</div>
-              <div className="mt-1 text-sm">/mo</div>
-              <p className="mt-1 text-sm text-white/70">All-in-one shop management software</p>
-            </div>
-            <StatCounter end={8} suffix="%" label="Performance-based fee — pay when you close" />
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
+      {/* Value Cards */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">How It Works</h2>
-            <p className="mt-3 text-center text-muted-foreground md:text-lg">From application to revenue in five steps.</p>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl mb-10">
+              Why shops choose Wrenchli
+            </h2>
           </SectionReveal>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {steps.map((s, i) => (
-              <SectionReveal key={s.step} delay={i * 100} className={i === 4 ? "md:col-span-2 lg:col-span-1 md:max-w-md md:mx-auto lg:max-w-none" : ""}>
-                <div className="flex h-full flex-col rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
-                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-wrenchli-trust-blue text-white font-heading font-bold">
-                    {s.step}
-                  </div>
-                  <h3 className="font-heading text-base font-semibold">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
-                </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {valueCards.map((v, i) => (
+              <SectionReveal key={v.title} delay={i * 100}>
+                <Card className="h-full border border-border hover:shadow-md transition-shadow">
+                  <CardContent className="flex flex-col items-center text-center p-6">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-wrenchli-trust-blue/10">
+                      <v.icon className="h-7 w-7 text-wrenchli-trust-blue" />
+                    </div>
+                    <h3 className="mb-2 font-heading text-lg font-semibold">{v.title}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
+                  </CardContent>
+                </Card>
               </SectionReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Benefits Grid */}
+      {/* Pilot Terms */}
       <section className="section-padding bg-secondary">
-        <div className="container-wrenchli">
+        <div className="container-wrenchli max-w-3xl text-center">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Why Shops Choose Wrenchli</h2>
-          </SectionReveal>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {benefits.map((b, i) => (
-              <SectionReveal key={b.title} delay={i * 80}>
-                <div className="flex items-start gap-4 rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-wrenchli-trust-blue/10">
-                    <b.icon className="h-5 w-5 text-wrenchli-trust-blue" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading text-sm font-semibold">{b.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{b.desc}</p>
-                  </div>
-                </div>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Customer Recommendations Social Proof */}
-      <CustomerRecommendationSection onApply={() => document.getElementById("apply")?.scrollIntoView({ behavior: "smooth" })} />
-
-      {/* Platform Features — 3 Tabs */}
-      <section className="section-padding bg-background">
-        <div className="container-wrenchli max-w-4xl">
-          <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Platform Features</h2>
-            <p className="mt-3 text-center text-muted-foreground md:text-lg">Everything you need to grow your shop — in one platform.</p>
-          </SectionReveal>
-
-          <SectionReveal>
-            <Tabs defaultValue="acquisition" className="mt-10">
-              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto sm:h-12 gap-1 sm:gap-0">
-                {platformTabs.map((tab) => (
-                  <TabsTrigger key={tab.value} value={tab.value} className="text-xs md:text-sm font-semibold h-10 whitespace-nowrap">
-                    {tab.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
-              {platformTabs.map((tab) => (
-                <TabsContent key={tab.value} value={tab.value} className="mt-8">
-                  <div className="grid gap-6 md:grid-cols-3">
-                    {tab.features.map((f) => (
-                      <div key={f.title} className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-wrenchli-trust-blue/10">
-                          <f.icon className="h-5 w-5 text-wrenchli-trust-blue" />
-                        </div>
-                        <h3 className="font-heading text-sm font-semibold">{f.title}</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </SectionReveal>
-        </div>
-      </section>
-
-      {/* Partner Program — Social Proof */}
-      <section className="section-padding bg-secondary">
-        <div className="container-wrenchli text-center">
-          <SectionReveal>
-            <h2 className="font-heading text-2xl font-bold md:text-4xl">What People Are Saying</h2>
-            <p className="mt-3 text-muted-foreground">We're building something people genuinely want.</p>
-          </SectionReveal>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {[
-              { stat: "500+", label: "Survey Respondents" },
-              { stat: "78%", label: "Strong Interest from Consumers" },
-              { stat: "30+", label: "Warm Shop Relationships in MI & OH" },
-            ].map((item, i) => (
-              <SectionReveal key={item.label} delay={i * 120}>
-                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                  <div className="font-stats text-3xl font-bold text-accent md:text-4xl">{item.stat}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{item.label}</p>
-                </div>
-              </SectionReveal>
-            ))}
-          </div>
-          <p className="mt-6 text-xs text-muted-foreground">
-            Real data from our pre-launch research. Testimonials coming when we have real users.
-          </p>
-        </div>
-      </section>
-
-      {/* Partner Program — For Repair Shops CTA */}
-      <section className="section-padding bg-background">
-        <div className="container-wrenchli max-w-2xl mx-auto">
-          <SectionReveal>
-            <div className="rounded-2xl border border-border bg-card p-8 md:p-10 flex flex-col text-center items-center">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-wrenchli-trust-blue/10 px-3 py-1 text-sm font-medium text-wrenchli-trust-blue w-fit">
-                <Store className="h-4 w-4" /> For Repair Shops
-              </div>
-              <h3 className="font-heading text-2xl font-bold md:text-3xl">
-                More Customers. Higher Tickets. Less Hassle.
-              </h3>
-              <p className="mt-3 text-muted-foreground leading-relaxed">
-                Pre-qualified leads, modern software ($299/mo), and embedded financing that increases average ticket size and customer approval rates.
-              </p>
-              <Button
-                className="mt-6 h-12 border-wrenchli-trust-blue bg-wrenchli-trust-blue text-white hover:bg-wrenchli-trust-blue/90 font-semibold w-fit px-8"
-                onClick={() => document.getElementById("apply")?.scrollIntoView({ behavior: "smooth" })}
-              >
-                Apply to Partner <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </SectionReveal>
-        </div>
-      </section>
-
-      {/* Application Form */}
-      <section id="apply" className="section-padding bg-primary text-primary-foreground">
-        <div className="container-wrenchli max-w-lg">
-          <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Apply to Partner</h2>
-            <p className="mt-3 text-center text-primary-foreground/70">We're onboarding shops in Michigan and Ohio now. Fill out the form and we'll be in touch.</p>
-            <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-              <Input placeholder="Shop name *" required value={form.shopName} onChange={(e) => setForm({ ...form, shopName: e.target.value })} className="h-12 text-base bg-card text-foreground" maxLength={200} />
-              <Input placeholder="Your name" value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} className="h-12 text-base bg-card text-foreground" maxLength={100} />
-              <Input type="email" placeholder="Email *" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="h-12 text-base bg-card text-foreground" maxLength={255} />
-              <Input type="tel" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="h-12 text-base bg-card text-foreground" />
-              <Input placeholder="City / Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="h-12 text-base bg-card text-foreground" maxLength={200} />
-              <select
-                value={form.bays}
-                onChange={(e) => setForm({ ...form, bays: e.target.value })}
-                className="flex h-12 w-full rounded-md border border-input bg-card px-3 py-2 text-base text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="">Number of Bays</option>
-                {bayOptions.map((b) => (
-                  <option key={b} value={b}>{b}</option>
-                ))}
-              </select>
-              <textarea
-                placeholder="Anything else you'd like us to know?"
-                value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
-                maxLength={500}
-                rows={3}
-                className="flex w-full rounded-md border border-input bg-card px-3 py-2 text-base text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-              />
-              <Button type="submit" disabled={loading} className="w-full h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-base">
-                {loading ? "Submitting..." : "Request Partnership Info"}
-              </Button>
-            </form>
-          </SectionReveal>
-        </div>
-      </section>
-
-      {/* Partner QR Code */}
-      <section className="section-padding bg-secondary">
-        <div className="container-wrenchli max-w-md text-center">
-          <SectionReveal>
-            <h2 className="font-heading text-2xl font-bold md:text-3xl mb-3">Scan to Learn More</h2>
-            <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
-              Share this QR code with prospective partners for a quick link to Wrenchli.
+            <h2 className="font-heading text-2xl font-bold md:text-4xl mb-4">
+              The pilot is free. No strings attached.
+            </h2>
+            <p className="text-muted-foreground leading-relaxed md:text-lg">
+              No setup fees. No monthly fees. No commission on repairs. The 90-day pilot is completely free. After 90 days, we discuss whether to continue — no automatic rollover, no pressure.
             </p>
-            <div className="inline-flex rounded-2xl bg-white p-5 shadow-lg">
-              <QRCodeSVG
-                value="https://wrenchli.lovable.app/for-shops"
-                size={200}
-                level="H"
-                includeMargin={false}
-                fgColor="hsl(220, 25%, 15%)"
-                bgColor="#ffffff"
-              />
-            </div>
-            <p className="mt-4 text-xs text-muted-foreground">wrenchli.lovable.app/for-shops</p>
+            <Button
+              asChild
+              size="lg"
+              className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg"
+            >
+              <Link to="/for-shops/onboarding">
+                Apply Now <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
           </SectionReveal>
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* SMS Integration */}
       <section className="section-padding bg-background">
-        <div className="container-wrenchli max-w-3xl">
+        <div className="container-wrenchli max-w-3xl text-center">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl mb-8">Frequently Asked Questions</h2>
-          </SectionReveal>
-          <SectionReveal>
-            <Accordion type="single" collapsible className="w-full">
-              {faqs.map((faq, i) => (
-                <AccordionItem value={`faq-${i}`} key={i}>
-                  <AccordionTrigger className="text-left text-sm md:text-base">{faq.q}</AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">{faq.a}</AccordionContent>
-                </AccordionItem>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-wrenchli-trust-blue/10 px-4 py-1 text-sm font-medium text-wrenchli-trust-blue">
+              <Plug className="h-4 w-4" /> Integrations
+            </div>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl mb-4">
+              Works with your existing shop software
+            </h2>
+            <p className="text-muted-foreground leading-relaxed md:text-lg mb-8">
+              Wrenchli integrates directly with Tekmetric, AutoLeap, and Mitchell 1. Customer vehicle and symptom data pre-fills your repair orders before they arrive. CSV export available for all other systems.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {integrations.map((name) => (
+                <Badge
+                  key={name}
+                  variant="secondary"
+                  className="px-5 py-2.5 text-sm font-semibold"
+                >
+                  <CheckCircle className="mr-1.5 h-4 w-4 text-wrenchli-green" />
+                  {name}
+                </Badge>
               ))}
-            </Accordion>
+            </div>
           </SectionReveal>
         </div>
       </section>
