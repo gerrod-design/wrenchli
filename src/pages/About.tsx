@@ -36,7 +36,7 @@ export default function About() {
             <h2 className="font-heading text-2xl font-bold md:text-4xl">Our Story</h2>
             <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                Wrenchli was born from a simple observation: <strong className="text-foreground">vehicle repair is broken for everyone.</strong>
+                Wrenchli was born from a simple observation: <strong className="text-foreground">vehicle repair is harder than it needs to be — for everyone.</strong>
               </p>
               <p>
                 Vehicle owners overpay because they can't compare prices. They accept unnecessary work because they don't know what's really wrong. And they settle for shops they don't trust because they have no better option.
