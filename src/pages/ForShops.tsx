@@ -120,10 +120,10 @@ export default function ForShops() {
               <Plug className="h-4 w-4" /> Integrations
             </div>
             <h2 className="font-heading text-2xl font-bold md:text-4xl mb-4">
-              Works with your existing shop software
+              Built to work with your existing shop software
             </h2>
             <p className="text-muted-foreground leading-relaxed md:text-lg mb-8">
-              Wrenchli integrates directly with Tekmetric, AutoLeap, and Mitchell 1. Customer vehicle and symptom data pre-fills your repair orders before they arrive. CSV export available for all other systems.
+              Wrenchli is designed to integrate with Tekmetric, AutoLeap, and Mitchell 1 — so customer vehicle and symptom data pre-fills your repair orders before they arrive. Integration setup is completed during onboarding. CSV export is available for all other systems.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {integrations.map((name) => (
