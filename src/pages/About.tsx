@@ -177,15 +177,15 @@ export default function About() {
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
                       <Building className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
-                      <span><strong className="text-foreground">10 years at Chrysler Manufacturing</strong> — deep understanding of how vehicles are built</span>
+                      <span><strong className="text-foreground">10 years in automotive manufacturing</strong> — deep understanding of how vehicles are built</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <Briefcase className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
-                      <span><strong className="text-foreground">Auto Finance Leadership</strong> — managed $45B+ portfolios at Chrysler Financial, Bank of America, and Huntington</span>
+                      <span><strong className="text-foreground">Auto Finance Leadership</strong> — managed $45B+ portfolios across automotive and consumer lending institutions</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <Award className="h-4 w-4 shrink-0 mt-0.5 text-wrenchli-trust-blue" />
-                      <span><strong className="text-foreground">MD at JPMorgan Chase</strong> — led 300+ person organization in financial services</span>
+                      <span><strong className="text-foreground">Managing Director</strong> — led 300+ person organization at a global financial institution</span>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground italic">
