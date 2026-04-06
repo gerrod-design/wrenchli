@@ -1,7 +1,7 @@
 import { MapPin, Target, Eye, Users, Building, Award, Briefcase, Wrench, DollarSign, Hammer } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import SEO from "@/components/SEO";
-import heroAbout from "@/assets/hero-about.jpg";
+import heroAbout from "@/assets/hero-about-detroit.jpg";
 
 import MechanicAvatar from "@/components/MechanicAvatar";
 
