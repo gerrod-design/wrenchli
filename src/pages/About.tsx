@@ -207,7 +207,7 @@ export default function About() {
               Detroit isn't just where cars are made — it's where automotive culture <em>lives.</em>
             </p>
             <p className="mt-4 text-primary-foreground/60 leading-relaxed">
-              This city built the modern automobile. It knows what it means to reinvent an industry. With one of the highest concentrations of independent repair shops in the country and a community that takes pride in keeping vehicles on the road, Detroit is the perfect proving ground for a platform that's rewriting the rules of auto repair.
+              This city built the modern automobile. It knows what it means to reinvent an industry. With a community that takes pride in keeping vehicles on the road, Detroit is the perfect proving ground for a platform that's rewriting the rules of auto repair.
             </p>
             <p className="mt-4 text-primary-foreground/60 leading-relaxed">
               We're launching here first because this is home — and because if Wrenchli can work in Detroit, it can work anywhere.
