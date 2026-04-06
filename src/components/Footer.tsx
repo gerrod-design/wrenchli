@@ -50,7 +50,7 @@ export default function Footer() {
               Mobility for All.
             </p>
             <p className="mb-5 text-xs leading-relaxed text-primary-foreground/50">
-              Fixing the broken vehicle repair experience.
+              Fixing the vehicle repair experience — starting in Michigan and Ohio.
             </p>
             <a
               href="https://linkedin.com/company/wrenchli"
