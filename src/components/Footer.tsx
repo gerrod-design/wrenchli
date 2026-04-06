@@ -39,7 +39,7 @@ export default function Footer() {
   return (
     <footer className="text-primary-foreground" style={{ backgroundColor: "#0F1117" }}>
       <div className="container-wrenchli py-12 pb-24 md:py-16 md:pb-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="mb-4 flex items-center gap-2 font-heading text-xl font-bold" style={{ color: "#F5F5F5" }}>
