@@ -25,11 +25,6 @@ const footerLinks = {
     { label: "Shop Software", to: "/for-shops#features" },
     { label: "Apply Now", to: "/for-shops/onboarding" },
   ],
-  "For Finance Providers": [
-    { label: "Partner With Us", to: "/contact" },
-    { label: "Integration", to: "/contact" },
-    { label: "Contact Us", to: "/contact" },
-  ],
   Legal: [
     { label: "Privacy Policy", to: "/privacy" },
     { label: "Terms of Service", to: "/terms" },
