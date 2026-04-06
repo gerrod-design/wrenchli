@@ -41,7 +41,7 @@ export default function BlogPost() {
           <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <CalendarDays className="h-4 w-4" />
-              {new Date(post.date).toLocaleDateString("en-US", {
+              {new Date(post.date + "T00:00:00").toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
