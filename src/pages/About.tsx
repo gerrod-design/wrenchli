@@ -1,13 +1,11 @@
-import { useState } from "react";
-import { MapPin, Target, Eye, Rocket, Users, Building, Award, Briefcase, Play, Wrench, DollarSign, Hammer } from "lucide-react";
+import { MapPin, Target, Eye, Users, Building, Award, Briefcase, Wrench, DollarSign, Hammer } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import SEO from "@/components/SEO";
 import heroAbout from "@/assets/hero-about.jpg";
-import BrandVideoModal from "@/components/BrandVideoModal";
+
 import MechanicAvatar from "@/components/MechanicAvatar";
 
 export default function About() {
-  const [showBrandVideo, setShowBrandVideo] = useState(false);
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -47,24 +45,17 @@ export default function About() {
                 On the other side, independent repair shops — the backbone of the industry — lose customers to dealerships and chains with bigger marketing budgets, even when they do better work at lower prices. They run their businesses on paper tickets and phone calls in an age of instant everything.
               </p>
               <p>
-                We're building the platform that fixes both sides. Transparent pricing and vetted shops for consumers. Pre-qualified customers and modern tools for shops. And embedded financing so cost never stands between a vehicle owner and the repair they need.
+                We built the platform that fixes both sides. Transparent pricing and trusted shops for consumers. Pre-qualified customers and zero intake friction for shops. And repair financing on the way — so cost never stands between a vehicle owner and the repair they need.
               </p>
               <p className="text-foreground font-medium">
                 Based in Michigan — the heart of America's automotive industry — Wrenchli is where technology meets the trades.
               </p>
-              <button
-                onClick={() => setShowBrandVideo(true)}
-                className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent/80 hover:underline transition-colors"
-              >
-                <Play className="h-3.5 w-3.5 fill-current" />
-                Watch Our 30-Second Story
-              </button>
             </div>
           </SectionReveal>
         </div>
       </section>
 
-      <BrandVideoModal isOpen={showBrandVideo} onClose={() => setShowBrandVideo(false)} />
+      
 
       {/* Mission & Vision */}
       <section className="section-padding bg-secondary">
