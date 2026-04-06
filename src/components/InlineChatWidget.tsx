@@ -36,8 +36,6 @@ function detectAgent(content: unknown): AgentType {
   const text = typeof content === "string" ? content : "";
   if (/\[Agent:\s*Sam\]/i.test(text)) return "sam";
   if (/\[Agent:\s*Jess\]/i.test(text)) return "jess";
-  if (/\[Agent:\s*Kai\]/i.test(text)) return "kai";
-  if (/\[Agent:\s*Priya\]/i.test(text)) return "priya";
   return "mike";
 }
 
@@ -235,7 +233,7 @@ export default function InlineChatWidget() {
           }
           // Auto-follow-up when an agent announces a handoff to another specialist
           const finalText = assistantSoFar;
-          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Priya|Sam|Jess|Kai)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll)\s+(?:going to\s+)?(?:bring|connect|hand|let|get)|(?:let|pass(?:ing)?\s+(?:it|this)\s+to)\s+(?:Priya|Sam|Jess|Kai)\b/i.test(finalText);
+          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Sam|Jess)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll)\s+(?:going to\s+)?(?:bring|connect|hand|let|get)|(?:let|pass(?:ing)?\s+(?:it|this)\s+to)\s+(?:Sam|Jess)\b/i.test(finalText);
           if (announcesHandoff) {
             if (canSpeak) {
               waitForSpeechEndRef.current().then(() => {
@@ -367,7 +365,7 @@ export default function InlineChatWidget() {
                 currentAgent = prevAgent;
               } else if (isLastMsg && loading && currentAgent === "mike" && prevAssistant) {
                 const prevText = typeof prevAssistant.content === "string" ? prevAssistant.content : "";
-                const handoffMatch = prevText.match(/\b(Priya|Sam|Jess|Kai)\b/i);
+                const handoffMatch = prevText.match(/\b(Sam|Jess)\b/i);
                 if (handoffMatch) {
                   currentAgent = handoffMatch[1].toLowerCase() as AgentType;
                 }
