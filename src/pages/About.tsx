@@ -42,7 +42,7 @@ export default function About() {
                 Vehicle owners overpay because they can't compare prices. They accept unnecessary work because they don't know what's really wrong. And they settle for shops they don't trust because they have no better option.
               </p>
               <p>
-                On the other side, independent repair shops — the backbone of the industry — lose customers to dealerships and chains with bigger marketing budgets, even when they do better work at lower prices. They run their businesses on paper tickets and phone calls in an age of instant everything.
+                On the other side, independent repair shops — the backbone of the industry — compete for customers in a market where brand recognition and marketing budgets matter as much as quality of work. The best shops in America are running lean, skilled operations. They just don't have the consumer acquisition tools that the big players do.
               </p>
               <p>
                 We built the platform that fixes both sides. Transparent pricing and trusted shops for consumers. Pre-qualified customers and zero intake friction for shops. And repair financing on the way — so cost never stands between a vehicle owner and the repair they need.
