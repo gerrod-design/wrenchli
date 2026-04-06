@@ -116,8 +116,8 @@ export default function About() {
                 color: "bg-amber-500/10 border-amber-500/20",
                 iconColor: "text-amber-500",
                 icon: DollarSign,
-                specialties: ["Repair cost estimates", "Vehicle valuations", "Shop recommendations & financing"],
-                description: "Sam handles the money side — professional repair costs, your car's market value, local shop options, and payment plans to keep repairs affordable.",
+                specialties: ["Repair cost estimates", "Vehicle valuations", "Shop recommendations & fair cost comparisons"],
+                description: "Sam handles the money side — professional repair costs, your car's market value, shop recommendations and fair cost comparisons.",
               },
               {
                 agent: "jess" as const,
