@@ -241,7 +241,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
             )}
 
             <div className="flex justify-center">
-              <DownloadReportButton vehicle={vehicleStr} diagnoses={diagnoses} />
+              <DownloadReportButton vehicle={vehicleStr} diagnoses={diagnoses} symptom={symptom} codes={codes} year={year} make={make} model={model} />
             </div>
 
             <StillNotSure vehicle={vehicleStr} />
