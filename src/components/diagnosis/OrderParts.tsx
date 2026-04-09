@@ -1,17 +1,35 @@
 import { useState } from "react";
-import { ExternalLink, Wrench, Lightbulb, AlertTriangle, ChevronDown } from "lucide-react";
+import { ExternalLink, Wrench, Lightbulb, AlertTriangle, ChevronDown, MapPin } from "lucide-react";
 import { getPartsForDiagnosis, buildRetailerUrl } from "@/data/partsLibrary";
 import { cn } from "@/lib/utils";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
+import { trackAdClick } from "@/lib/adClickTracker";
 
 import type { RetailerId } from "@/data/partsLibrary";
 
-const retailers: { id: RetailerId; label: string; bg: string; text: string }[] = [
-  { id: "amazon", label: "Amazon", bg: "hsl(30 100% 50%)", text: "hsl(0 0% 10%)" },
-  { id: "oreilly", label: "O'Reilly", bg: "hsl(142 71% 29%)", text: "white" },
-  { id: "advanceauto", label: "Advance Auto", bg: "hsl(0 0% 15%)", text: "white" },
-  { id: "rockauto", label: "RockAuto", bg: "hsl(210 80% 35%)", text: "white" },
-  { id: "napa", label: "NAPA", bg: "hsl(45 100% 40%)", text: "hsl(0 0% 10%)" },
+const retailers: { id: RetailerId; label: string; bg: string; text: string; subLabel?: string }[] = [
+  { id: "amazon", label: "Amazon", subLabel: "Order online (2-3 days)", bg: "hsl(30 100% 50%)", text: "hsl(0 0% 10%)" },
+];
+
+const pickupRetailers: { id: string; label: string; subLabel: string; bg: string; text: string; urlBuilder: (query: string) => string; destination: string }[] = [
+  {
+    id: "autozone",
+    label: "AutoZone",
+    subLabel: "Same-day pickup",
+    bg: "hsl(0 72% 45%)",
+    text: "white",
+    urlBuilder: (q) => `https://www.autozone.com/searchresult?searchtext=${encodeURIComponent(q)}`,
+    destination: "autozone",
+  },
+  {
+    id: "oreilly-pickup",
+    label: "O'Reilly",
+    subLabel: "Same-day pickup",
+    bg: "hsl(142 71% 29%)",
+    text: "white",
+    urlBuilder: (q) => `https://www.oreillyauto.com/search?q=${encodeURIComponent(q)}`,
+    destination: "orielly",
+  },
 ];
 
 interface OrderPartsProps {
@@ -71,19 +89,38 @@ export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps)
             )}
 
             {/* Retailer buttons */}
-            <div className="flex flex-wrap gap-1.5">
-              {retailers.map((r) => (
-                <a
-                  key={r.id}
-                  href={buildRetailerUrl(r.id, part.searchQuery, vehicle)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80"
-                  style={{ backgroundColor: r.bg, color: r.text }}
-                >
-                  {r.label} <ExternalLink className="h-2.5 w-2.5" />
-                </a>
-              ))}
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-semibold text-muted-foreground">Get the parts you need:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {retailers.map((r) => (
+                  <a
+                    key={r.id}
+                    href={buildRetailerUrl(r.id, part.searchQuery, vehicle)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80"
+                    style={{ backgroundColor: r.bg, color: r.text }}
+                  >
+                    {r.label} — {r.subLabel} <ExternalLink className="h-2.5 w-2.5" />
+                  </a>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground">Need it today? Pick up locally:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {pickupRetailers.map((r) => (
+                  <a
+                    key={r.id}
+                    href={r.urlBuilder(part.searchQuery + " " + vehicle)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackAdClick({ click_type: "browse_parts", part_name: part.name, destination: r.destination })}
+                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80"
+                    style={{ backgroundColor: r.bg, color: r.text }}
+                  >
+                    <MapPin className="h-2.5 w-2.5" /> {r.label} — {r.subLabel}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         ))}

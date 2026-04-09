@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Wrench, Clock, DollarSign, ExternalLink } from "lucide-react";
+import { Wrench, Clock, DollarSign, ExternalLink, MapPin } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
 import { buildAmazonSearchLink, type ProductRecommendation } from "@/data/adRecommendations";
 import DIYProductCard from "./DIYProductCard";
@@ -74,19 +74,50 @@ const DIYProductSection = ({
               <span aria-label={`Total parts cost: ${diyEstimate.totalPartsRange}`}>Total parts: {diyEstimate.totalPartsRange}</span>
             </span>
           </div>
+        </div>
+      )}
+
+      {/* Parts ordering section */}
+      <div className="mt-4 pt-4 border-t border-ad-info-border space-y-3">
+        <p className="text-xs font-semibold text-ad-info-heading">Get the parts you need:</p>
+        <Button variant="default" size="sm" className="w-full sm:w-auto" asChild>
+          <a
+            href={buildAmazonSearchLink("auto repair parts", vehicleStr)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleBrowseAll}
+            aria-label="Browse all parts on Amazon (opens in new tab)"
+          >
+            <ExternalLink className="h-3 w-3 mr-1" aria-hidden="true" /> Amazon — Order online (2-3 days)
+          </a>
+        </Button>
+
+        <p className="text-xs text-muted-foreground">Need it today? Pick up locally:</p>
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button variant="outline" size="sm" className="border-ad-info-border text-ad-info-text hover:bg-ad-info-bg" asChild>
             <a
-              href={buildAmazonSearchLink("auto repair parts", vehicleStr)}
+              href={`https://www.autozone.com/searchresult?searchtext=${encodeURIComponent(vehicleStr + " auto repair parts")}`}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={handleBrowseAll}
-              aria-label="Browse all parts on Amazon (opens in new tab)"
+              onClick={() => trackAdClick({ ...trackCtx, click_type: "browse_parts", destination: "autozone" })}
+              aria-label="Search AutoZone for same-day pickup (opens in new tab)"
             >
-              <ExternalLink className="h-3 w-3 mr-1" aria-hidden="true" /> Browse All Parts
+              <MapPin className="h-3 w-3 mr-1" aria-hidden="true" /> AutoZone — Same-day pickup
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" className="border-ad-info-border text-ad-info-text hover:bg-ad-info-bg" asChild>
+            <a
+              href={`https://www.oreillyauto.com/search?q=${encodeURIComponent(vehicleStr + " auto repair parts")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackAdClick({ ...trackCtx, click_type: "browse_parts", destination: "orielly" })}
+              aria-label="Search O'Reilly Auto Parts for same-day pickup (opens in new tab)"
+            >
+              <MapPin className="h-3 w-3 mr-1" aria-hidden="true" /> O'Reilly — Same-day pickup
             </a>
           </Button>
         </div>
-      )}
+      </div>
       <AffiliateDisclosure />
       {source === "ai" && (
         <p className="mt-2 text-xs text-ad-info-subtle text-center" role="note">

@@ -4,8 +4,7 @@
  */
 const AffiliateDisclosure = () => (
   <p className="text-xs text-muted-foreground mt-3">
-    Some links on this page are affiliate links. If you purchase through them,
-    Wrenchli may earn a small commission at no additional cost to you.
+    Some links are affiliate links. Wrenchli may earn a small commission if you purchase through them, at no cost to you. This does not affect our recommendations.
   </p>
 );
 
