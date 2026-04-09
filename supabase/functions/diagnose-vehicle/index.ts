@@ -61,6 +61,10 @@ Return ONLY valid JSON matching this exact schema. No explanation, no markdown, 
   "confidence": "low" | "medium" | "high",
   "urgency": "monitor" | "schedule" | "soon" | "immediate",
   "explanation": "Plain English summary in 2-3 sentences. No jargon.",
+  "vehicle_validation": {
+    "is_valid": true | false,
+    "message": "Optional message if vehicle combination seems implausible"
+  },
   "possible_causes": [
     {
       "name": "Cause name",
@@ -74,6 +78,11 @@ Return ONLY valid JSON matching this exact schema. No explanation, no markdown, 
 }
 
 Rules:
+- VEHICLE VALIDATION (CRITICAL): Before diagnosing, verify the year/make/model combination is historically accurate. Check whether that specific model was actually manufactured in that year. Examples of implausible combinations: "2024 Honda S2000" (discontinued in 2009), "2015 Pontiac G6" (Pontiac ceased in 2010), "2020 Toyota Supra" with a trim that didn't exist. If the combination is implausible or you have no record of it:
+  - Set vehicle_validation.is_valid to false
+  - Set vehicle_validation.message to: "We want to make sure we give you accurate information — we don't have records of a [year] [make] [model]. Could you double-check your vehicle details?"
+  - Still attempt a best-effort diagnosis based on the closest known model, but lower confidence to "low"
+  - If the combination is valid, set vehicle_validation.is_valid to true and omit the message field
 - List 2-5 possible causes, ordered by probability descending
 - Probabilities across all causes should sum to roughly 1.0
 - Cost ranges are for parts + labor at an average US shop
