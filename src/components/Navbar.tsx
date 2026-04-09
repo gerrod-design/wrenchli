@@ -121,7 +121,7 @@ export default function Navbar() {
   }, [location.pathname]);
 
   return (
-    <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg">
+    <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
       <div className="container-wrenchli flex h-16 items-center justify-between md:h-[68px]">
         {/* Logo */}
         <Link to="/" className="flex flex-col">

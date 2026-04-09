@@ -30,7 +30,7 @@ export default function MobileBottomBar() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[60px] items-center justify-around border-t border-border bg-background/80 backdrop-blur-md md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[60px] items-center justify-around border-t border-border bg-background/95 backdrop-blur-md md:hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
       {isInsightsPage ? (
         <>
           <Link
