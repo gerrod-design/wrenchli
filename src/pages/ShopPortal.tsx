@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wrench, BarChart3, DollarSign, AlertTriangle, TrendingUp, LogOut } from "lucide-react";
+import { Wrench, BarChart3, DollarSign, AlertTriangle, TrendingUp, LogOut, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ShopJobQueue from "@/components/shop-portal/ShopJobQueue";
 import ShopBenchmarks from "@/components/shop-portal/ShopBenchmarks";
 import ShopRevenue from "@/components/shop-portal/ShopRevenue";
 import ShopQualityAlerts from "@/components/shop-portal/ShopQualityAlerts";
+import AccuracyAuditPanel from "@/components/shop-portal/AccuracyAuditPanel";
 
 export default function ShopPortal() {
   const navigate = useNavigate();
@@ -99,6 +100,11 @@ export default function ShopPortal() {
 
         {/* Dashboard content */}
         <main className="max-w-6xl mx-auto p-4 pt-6">
+          {/* Admin-only accuracy audit panel */}
+          <div className="mb-6">
+            <AccuracyAuditPanel />
+          </div>
+
           <Tabs defaultValue="jobs" className="space-y-6">
             <TabsList className="bg-card border border-border p-1 w-full grid grid-cols-4">
               <TabsTrigger value="jobs" className="text-xs sm:text-sm">
