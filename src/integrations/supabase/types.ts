@@ -1997,59 +1997,53 @@ export type Database = {
       }
       security_alerts: {
         Row: {
-          acknowledged: boolean
-          acknowledged_at: string | null
           check_name: string
-          created_at: string
-          details: Json
+          created_at: string | null
+          details: string
           id: string
+          resolved: boolean | null
+          resolved_at: string | null
           severity: string
-          updated_at: string
         }
         Insert: {
-          acknowledged?: boolean
-          acknowledged_at?: string | null
           check_name: string
-          created_at?: string
-          details?: Json
+          created_at?: string | null
+          details: string
           id?: string
-          severity?: string
-          updated_at?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity: string
         }
         Update: {
-          acknowledged?: boolean
-          acknowledged_at?: string | null
           check_name?: string
-          created_at?: string
-          details?: Json
+          created_at?: string | null
+          details?: string
           id?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
           severity?: string
-          updated_at?: string
         }
         Relationships: []
       }
       security_audit_log: {
         Row: {
           check_name: string
-          checked_at: string
-          created_at: string
-          details: Json
+          checked_at: string | null
+          details: string | null
           id: string
           status: string
         }
         Insert: {
           check_name: string
-          checked_at?: string
-          created_at?: string
-          details?: Json
+          checked_at?: string | null
+          details?: string | null
           id?: string
           status: string
         }
         Update: {
           check_name?: string
-          checked_at?: string
-          created_at?: string
-          details?: Json
+          checked_at?: string | null
+          details?: string | null
           id?: string
           status?: string
         }
@@ -3058,6 +3052,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      resolve_security_alert: { Args: { alert_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
