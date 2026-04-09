@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MessageCircle } from "lucide-react";
 import VehicleStep from "./steps/VehicleStep";
 import SymptomStep from "./steps/SymptomStep";
 import DiagnosisStep from "./steps/DiagnosisStep";
 import RecommendationStep from "./steps/RecommendationStep";
+import { logFunnelEvent, flushPendingFunnelEvents } from "@/lib/funnelTracking";
 
 export type WizardStep = "vehicle" | "symptoms" | "diagnosing" | "recommendation";
 
@@ -58,6 +59,44 @@ export default function DiagnosticWizard() {
   const [recommendation, setRecommendation] = useState<RecommendationResult | null>(null);
 
   const stepIndex = ["vehicle", "symptoms", "diagnosing", "recommendation"].indexOf(step);
+
+  const STEP_MAP: Record<WizardStep, { number: number; name: string }> = {
+    vehicle: { number: 1, name: "vehicle_entry" },
+    symptoms: { number: 2, name: "symptom_entry" },
+    diagnosing: { number: 3, name: "assessment_generating" },
+    recommendation: { number: 5, name: "recommendation_shown" },
+  };
+
+  // Track step changes
+  const prevStep = useRef<WizardStep | null>(null);
+  useEffect(() => {
+    if (prevStep.current === step) return;
+    prevStep.current = step;
+
+    const info = STEP_MAP[step];
+    if (!info) return;
+
+    logFunnelEvent(sessionId, info.number, info.name);
+
+    // When diagnosing starts, also log step 4 when diagnosis arrives
+    // (handled below via diagnosis effect)
+  }, [step, sessionId]);
+
+  // Track step 4 when diagnosis result is set
+  const diagnosisLogged = useRef(false);
+  useEffect(() => {
+    if (diagnosis && !diagnosisLogged.current) {
+      diagnosisLogged.current = true;
+      logFunnelEvent(sessionId, 4, "results_shown");
+    }
+  }, [diagnosis, sessionId]);
+
+  // Flush pending events once sessionId is available
+  useEffect(() => {
+    if (sessionId) {
+      flushPendingFunnelEvents(sessionId);
+    }
+  }, [sessionId]);
 
   return (
     <div className="rounded-xl overflow-hidden" style={{ background: "#1A1D27", border: "1px solid #2A2D37" }}>
