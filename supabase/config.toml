@@ -68,3 +68,6 @@ verify_jwt = false
 
 [functions.security-monitor]
 verify_jwt = false
+
+[functions.compute-funnel-metrics]
+verify_jwt = false

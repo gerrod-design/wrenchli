@@ -888,6 +888,48 @@ export type Database = {
           },
         ]
       }
+      funnel_metrics: {
+        Row: {
+          avg_time_seconds: number | null
+          completed_step: number | null
+          completion_rate: number | null
+          computed_at: string | null
+          desktop_completion_rate: number | null
+          id: string
+          mobile_completion_rate: number | null
+          step_name: string
+          step_number: number
+          total_sessions: number | null
+          week_of: string
+        }
+        Insert: {
+          avg_time_seconds?: number | null
+          completed_step?: number | null
+          completion_rate?: number | null
+          computed_at?: string | null
+          desktop_completion_rate?: number | null
+          id?: string
+          mobile_completion_rate?: number | null
+          step_name: string
+          step_number: number
+          total_sessions?: number | null
+          week_of: string
+        }
+        Update: {
+          avg_time_seconds?: number | null
+          completed_step?: number | null
+          completion_rate?: number | null
+          computed_at?: string | null
+          desktop_completion_rate?: number | null
+          id?: string
+          mobile_completion_rate?: number | null
+          step_name?: string
+          step_number?: number
+          total_sessions?: number | null
+          week_of?: string
+        }
+        Relationships: []
+      }
       integration_sync_log: {
         Row: {
           attempt_number: number | null
@@ -2935,6 +2977,41 @@ export type Database = {
           name?: string | null
         }
         Relationships: []
+      }
+      wizard_funnel_events: {
+        Row: {
+          created_at: string | null
+          device_type: string | null
+          id: string
+          session_id: string | null
+          step_name: string
+          step_number: number
+        }
+        Insert: {
+          created_at?: string | null
+          device_type?: string | null
+          id?: string
+          session_id?: string | null
+          step_name: string
+          step_number: number
+        }
+        Update: {
+          created_at?: string | null
+          device_type?: string | null
+          id?: string
+          session_id?: string | null
+          step_name?: string
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wizard_funnel_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       youtube_search_cache: {
         Row: {
