@@ -336,7 +336,7 @@ export default function InlineChatWidget() {
           })()}
 
           {/* Chat messages area */}
-          <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px" }}>
+          <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}>
             {messages.map((m, i) => {
               // Hide auto-handoff "ok" messages from user
               if (m.role === "user" && /^ok$/i.test(m.content.trim())) {
