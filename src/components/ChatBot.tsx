@@ -421,7 +421,7 @@ export default function ChatBot() {
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed inset-x-0 bottom-[60px] z-[45] flex flex-col overflow-hidden rounded-t-2xl border border-border bg-card shadow-2xl md:inset-x-auto md:bottom-8 md:right-6 md:w-[340px] md:max-w-[calc(100vw-2rem)] md:rounded-2xl"
-            style={{ height: isMobile ? "calc(100dvh - 60px)" : "min(440px, calc(100vh - 10rem))" }}
+            style={{ height: isMobile ? "calc(100dvh - 60px)" : "min(440px, calc(100vh - 10rem))", WebkitTransform: "translate3d(0,0,0)", overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" } as React.CSSProperties}
           >
             {/* Header */}
             <div className="flex items-center justify-between bg-primary px-4 py-3">

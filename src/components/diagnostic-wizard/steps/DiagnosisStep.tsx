@@ -73,18 +73,18 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <div className="text-xs font-mono mb-1" style={{ color: "#E07B39" }}>STEP 3 — DIAGNOSIS</div>
-          <h3 className="text-lg font-semibold" style={{ color: "#F5F5F5" }}>
+          <h3 className="text-lg font-semibold truncate" style={{ color: "#F5F5F5" }}>
             {vehicle.year} {vehicle.make} {vehicle.model}
           </h3>
         </div>
-        <div className="flex gap-2">
-          <span className="text-xs font-mono px-2 py-1 rounded" style={{ background: c.color + "20", color: c.color }}>
+        <div className="flex flex-wrap gap-2 shrink-0">
+          <span className="text-xs font-mono px-2 py-1 rounded whitespace-nowrap" style={{ background: c.color + "20", color: c.color }}>
             {c.label}
           </span>
-          <span className="flex items-center gap-1 text-xs font-mono px-2 py-1 rounded" style={{ background: u.bg, color: u.color }}>
+          <span className="flex items-center gap-1 text-xs font-mono px-2 py-1 rounded whitespace-nowrap" style={{ background: u.bg, color: u.color }}>
             <u.icon className="h-3 w-3" />
             {u.label}
           </span>
