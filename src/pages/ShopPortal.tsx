@@ -11,6 +11,7 @@ import ShopBenchmarks from "@/components/shop-portal/ShopBenchmarks";
 import ShopRevenue from "@/components/shop-portal/ShopRevenue";
 import ShopQualityAlerts from "@/components/shop-portal/ShopQualityAlerts";
 import AccuracyAuditPanel from "@/components/shop-portal/AccuracyAuditPanel";
+import ShopEngagement from "@/components/shop-portal/ShopEngagement";
 
 export default function ShopPortal() {
   const navigate = useNavigate();
@@ -138,6 +139,11 @@ export default function ShopPortal() {
               <ShopQualityAlerts shopId={shopAccount.shop_id} />
             </TabsContent>
           </Tabs>
+
+          {/* Engagement Summary */}
+          <div className="mt-6">
+            <ShopEngagement shopId={shopAccount.shop_id} />
+          </div>
         </main>
       </div>
     </>
