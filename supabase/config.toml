@@ -65,3 +65,6 @@ verify_jwt = false
 
 [functions.audit-assessment-accuracy]
 verify_jwt = false
+
+[functions.security-monitor]
+verify_jwt = false
