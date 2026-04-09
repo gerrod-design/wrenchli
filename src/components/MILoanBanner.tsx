@@ -67,7 +67,7 @@ export default function MILoanBanner() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -80, opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="relative z-[60] bg-gradient-to-r from-primary to-accent text-primary-foreground"
+          className="relative z-0 bg-gradient-to-r from-primary to-accent text-primary-foreground"
         >
           <div className="container-wrenchli flex flex-col items-start gap-3 py-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div className="flex items-center gap-3">

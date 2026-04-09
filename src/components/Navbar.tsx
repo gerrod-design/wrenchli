@@ -121,7 +121,7 @@ export default function Navbar() {
   }, [location.pathname]);
 
   return (
-    <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg">
+    <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
       <div className="container-wrenchli flex h-16 items-center justify-between md:h-[68px]">
         {/* Logo */}
         <Link to="/" className="flex flex-col">
@@ -177,7 +177,7 @@ export default function Navbar() {
 
       {/* Mobile overlay */}
       {open && (
-        <div className="fixed inset-0 top-16 z-40 flex flex-col bg-primary px-6 pt-4 lg:hidden overflow-y-auto pb-24">
+        <div className="fixed inset-0 top-16 z-[55] flex flex-col bg-primary px-6 pt-4 lg:hidden overflow-y-auto pb-24" style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}>
           {navItems.map((item) => (
             <div key={item.to} className="border-b border-primary-foreground/10">
               {item.dropdown ? (
