@@ -2228,6 +2228,50 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_engagement_metrics: {
+        Row: {
+          computed_at: string | null
+          confirmation_rate: number | null
+          flag_reason: string | null
+          flagged: boolean | null
+          id: string
+          outcomes_count: number | null
+          sessions_count: number | null
+          shop_id: string
+          week_of: string
+        }
+        Insert: {
+          computed_at?: string | null
+          confirmation_rate?: number | null
+          flag_reason?: string | null
+          flagged?: boolean | null
+          id?: string
+          outcomes_count?: number | null
+          sessions_count?: number | null
+          shop_id: string
+          week_of: string
+        }
+        Update: {
+          computed_at?: string | null
+          confirmation_rate?: number | null
+          flag_reason?: string | null
+          flagged?: boolean | null
+          id?: string
+          outcomes_count?: number | null
+          sessions_count?: number | null
+          shop_id?: string
+          week_of?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_engagement_metrics_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_integrations: {
         Row: {
           api_key_encrypted: string | null
