@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { Cpu, AlertCircle } from "lucide-react";
 import RecommendShopPrompt from "./recommend/RecommendShopPrompt";
+import DownloadReportButton from "./diagnosis/DownloadReportButton";
 import RecommendShopModal from "./recommend/RecommendShopModal";
 import VehicleScanLoader from "./diagnosis/VehicleScanLoader";
 import { Button } from "@/components/ui/button";
@@ -238,6 +239,10 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
                 Multiple potential causes are listed because symptoms can overlap. A qualified technician can perform a hands-on inspection to pinpoint the exact issue for your vehicle.
               </p>
             )}
+
+            <div className="flex justify-center">
+              <DownloadReportButton vehicle={vehicleStr} diagnoses={diagnoses} />
+            </div>
 
             <StillNotSure vehicle={vehicleStr} />
             <RecommendShopPrompt onOpenModal={() => setRecommendOpen(true)} />
