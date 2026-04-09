@@ -535,6 +535,7 @@ export default function ChatBot() {
                   ref={dropZoneRef}
                   onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}
                   className={`flex-1 overflow-y-auto px-4 py-3 space-y-3 relative transition-colors ${isDragOver ? "bg-accent/10" : ""}`}
+                  style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}
                 >
                   {isDragOver && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-accent/10 border-2 border-dashed border-accent rounded-lg">
