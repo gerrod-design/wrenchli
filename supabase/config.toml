@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.analyze-video-combined]
 verify_jwt = false
+
+[functions.audit-assessment-accuracy]
+verify_jwt = false

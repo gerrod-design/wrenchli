@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      accuracy_alerts: {
+        Row: {
+          accuracy_rate: number
+          alert_date: string
+          category: string
+          category_type: string
+          created_at: string
+          id: string
+          is_resolved: boolean
+          resolved_at: string | null
+          sample_size: number
+          updated_at: string
+        }
+        Insert: {
+          accuracy_rate: number
+          alert_date?: string
+          category: string
+          category_type: string
+          created_at?: string
+          id?: string
+          is_resolved?: boolean
+          resolved_at?: string | null
+          sample_size: number
+          updated_at?: string
+        }
+        Update: {
+          accuracy_rate?: number
+          alert_date?: string
+          category?: string
+          category_type?: string
+          created_at?: string
+          id?: string
+          is_resolved?: boolean
+          resolved_at?: string | null
+          sample_size?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       accuracy_metrics: {
         Row: {
           accuracy_rate: number
