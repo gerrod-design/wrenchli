@@ -177,7 +177,7 @@ export default function Navbar() {
 
       {/* Mobile overlay */}
       {open && (
-        <div className="fixed inset-0 top-16 z-40 flex flex-col bg-primary px-6 pt-4 lg:hidden overflow-y-auto pb-24">
+        <div className="fixed inset-0 top-16 z-[55] flex flex-col bg-primary px-6 pt-4 lg:hidden overflow-y-auto pb-24" style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}>
           {navItems.map((item) => (
             <div key={item.to} className="border-b border-primary-foreground/10">
               {item.dropdown ? (
