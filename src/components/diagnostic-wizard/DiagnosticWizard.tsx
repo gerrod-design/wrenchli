@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, AlertTriangle, ArrowLeft } from "lucide-react";
 import VehicleStep from "./steps/VehicleStep";
 import SymptomStep from "./steps/SymptomStep";
 import DiagnosisStep from "./steps/DiagnosisStep";
@@ -57,6 +57,7 @@ export default function DiagnosticWizard() {
   const [symptoms, setSymptoms] = useState<SymptomData | null>(null);
   const [diagnosis, setDiagnosis] = useState<DiagnosisResult | null>(null);
   const [recommendation, setRecommendation] = useState<RecommendationResult | null>(null);
+  const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
   const stepIndex = ["vehicle", "symptoms", "diagnosing", "recommendation"].indexOf(step);
 
@@ -134,10 +135,36 @@ export default function DiagnosticWizard() {
             onNext={(s, d) => {
               setSymptoms(s);
               setDiagnosis(d);
+              setValidationMessage(null);
               setStep("diagnosing");
+            }}
+            onVehicleInvalid={(msg) => {
+              setValidationMessage(msg);
+              setStep("symptoms");
             }}
             onBack={() => setStep("vehicle")}
           />
+        )}
+        {step === "symptoms" && validationMessage && (
+          <div className="mt-4 rounded-lg p-4 space-y-3" style={{ background: "#F59E0B10", border: "1px solid #F59E0B40" }}>
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "#F59E0B" }} />
+              <p className="text-sm leading-relaxed" style={{ color: "#F5F5F5" }}>
+                {validationMessage}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setValidationMessage(null);
+                setStep("vehicle");
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              style={{ background: "#E07B39", color: "#0F1117" }}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Edit Vehicle Details
+            </button>
+          </div>
         )}
         {step === "diagnosing" && diagnosis && vehicle && sessionId && (
           <DiagnosisStep
