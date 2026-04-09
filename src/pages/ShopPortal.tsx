@@ -12,6 +12,7 @@ import ShopRevenue from "@/components/shop-portal/ShopRevenue";
 import ShopQualityAlerts from "@/components/shop-portal/ShopQualityAlerts";
 import AccuracyAuditPanel from "@/components/shop-portal/AccuracyAuditPanel";
 import ShopEngagement from "@/components/shop-portal/ShopEngagement";
+import SecurityStatusPanel from "@/components/shop-portal/SecurityStatusPanel";
 
 export default function ShopPortal() {
   const navigate = useNavigate();
@@ -101,9 +102,10 @@ export default function ShopPortal() {
 
         {/* Dashboard content */}
         <main className="max-w-6xl mx-auto p-4 pt-6">
-          {/* Admin-only accuracy audit panel */}
-          <div className="mb-6">
+          {/* Admin-only panels */}
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <AccuracyAuditPanel />
+            <SecurityStatusPanel />
           </div>
 
           <Tabs defaultValue="jobs" className="space-y-6">
