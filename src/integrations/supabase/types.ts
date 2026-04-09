@@ -25,6 +25,7 @@ export type Database = {
           is_resolved: boolean
           resolved_at: string | null
           sample_size: number
+          threshold: number | null
           updated_at: string
         }
         Insert: {
@@ -37,6 +38,7 @@ export type Database = {
           is_resolved?: boolean
           resolved_at?: string | null
           sample_size: number
+          threshold?: number | null
           updated_at?: string
         }
         Update: {
@@ -49,6 +51,7 @@ export type Database = {
           is_resolved?: boolean
           resolved_at?: string | null
           sample_size?: number
+          threshold?: number | null
           updated_at?: string
         }
         Relationships: []
