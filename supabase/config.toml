@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.compute-funnel-metrics]
 verify_jwt = false
+
+[functions.shop-engagement-monitor]
+verify_jwt = false
