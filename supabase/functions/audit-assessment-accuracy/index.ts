@@ -1,21 +1,13 @@
 // supabase/functions/audit-assessment-accuracy/index.ts
-// ============================================================
-// WRENCHLI — Edge Function: Audit Assessment Accuracy
-// Nightly scheduled function (2am EST) that computes accuracy
-// breakdowns by symptom_category, vehicle_make, and urgency_level
-// from the last 30 days of verified outcomes.
-// ============================================================
+// Nightly accuracy audit: computes breakdowns by symptom_category,
+// vehicle_make, and urgency_level. Deduplicates alerts and enforces
+// sample_size >= 5 before triggering.
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { corsHeaders, handleCorsOptions, getCorsHeaders } from "../_shared/cors.ts";
 
 const ACCURACY_THRESHOLD = 0.60;
+const MIN_SAMPLE = 5;
 
 interface AccuracyRow {
   accuracy_score: number | null;
@@ -41,7 +33,6 @@ interface CategoryMetrics {
 function computeCategoryMetrics(
   rows: AccuracyRow[],
   keyFn: (r: AccuracyRow) => string | null,
-  minSample = 3
 ): CategoryMetrics[] {
   const groups = new Map<string, AccuracyRow[]>();
   for (const row of rows) {
@@ -55,11 +46,10 @@ function computeCategoryMetrics(
   const results: CategoryMetrics[] = [];
   for (const [category, catRows] of groups.entries()) {
     const scored = catRows.filter((r) => r.accuracy_score !== null);
-    if (scored.length < minSample) continue;
+    if (scored.length < MIN_SAMPLE) continue;
 
     const avgAccuracy =
-      scored.reduce((sum, r) => sum + (r.accuracy_score ?? 0), 0) /
-      scored.length;
+      scored.reduce((sum, r) => sum + (r.accuracy_score ?? 0), 0) / scored.length;
 
     results.push({
       category,
@@ -75,15 +65,17 @@ function computeCategoryMetrics(
   return results.sort((a, b) => b.sample_size - a.sample_size);
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const optResp = handleCorsOptions(req);
+  if (optResp) return optResp;
+
+  const origin = req.headers.get("Origin");
+  const headers = { ...getCorsHeaders(origin), "Content-Type": "application/json" };
 
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
     const now = new Date();
@@ -94,7 +86,7 @@ serve(async (req) => {
     const { data: rows, error } = await supabase
       .from("diagnostic_accuracy")
       .select(
-        "accuracy_score, match_label, predicted_confidence, predicted_urgency, confidence_was_correct, vehicle_make, symptom_category, predicted_top_cause"
+        "accuracy_score, match_label, predicted_confidence, predicted_urgency, confidence_was_correct, vehicle_make, symptom_category, predicted_top_cause",
       )
       .gte("computed_at", thirtyDaysAgo.toISOString())
       .neq("match_label", "unverified");
@@ -103,132 +95,108 @@ serve(async (req) => {
     if (!rows || rows.length === 0) {
       return new Response(
         JSON.stringify({ success: true, message: "No verified outcomes in last 30 days", rows_written: 0 }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { headers },
       );
     }
 
     const today = now.toISOString().split("T")[0];
     const upsertRows: Record<string, unknown>[] = [];
-    const alertRows: Record<string, unknown>[] = [];
+    const pendingAlerts: { category: string; category_type: string; accuracy_rate: number; sample_size: number }[] = [];
 
-    // ── By Symptom Category ──────────────────────────────
-    const bySymptom = computeCategoryMetrics(rows, (r) => r.symptom_category);
-    for (const m of bySymptom) {
-      upsertRows.push({
-        metric_type: "category_breakdown",
-        period: "monthly",
-        period_start: today,
-        dimension_value: `symptom:${m.category}`,
-        accuracy_rate: m.accuracy_rate,
-        outcomes_count: m.sample_size,
-        exact_match_count: m.exact_count,
-        close_match_count: m.close_count,
-        partial_match_count: m.partial_count,
-        miss_count: m.miss_count,
-        computed_at: now.toISOString(),
-      });
-      if (m.accuracy_rate < ACCURACY_THRESHOLD) {
-        alertRows.push({
-          category: m.category,
-          category_type: "symptom_category",
+    // Helper to push metrics + collect potential alerts
+    function processBreakdown(
+      metrics: CategoryMetrics[],
+      dimPrefix: string,
+      categoryType: string,
+    ) {
+      for (const m of metrics) {
+        upsertRows.push({
+          metric_type: "category_breakdown",
+          period: "monthly",
+          period_start: today,
+          dimension_value: `${dimPrefix}:${m.category}`,
           accuracy_rate: m.accuracy_rate,
-          sample_size: m.sample_size,
-          alert_date: today,
+          outcomes_count: m.sample_size,
+          exact_match_count: m.exact_count,
+          close_match_count: m.close_count,
+          partial_match_count: m.partial_count,
+          miss_count: m.miss_count,
+          computed_at: now.toISOString(),
         });
+        if (m.accuracy_rate < ACCURACY_THRESHOLD && m.sample_size >= MIN_SAMPLE) {
+          pendingAlerts.push({
+            category: m.category,
+            category_type: categoryType,
+            accuracy_rate: m.accuracy_rate,
+            sample_size: m.sample_size,
+          });
+        }
       }
     }
 
-    // ── By Vehicle Make ──────────────────────────────────
-    const byMake = computeCategoryMetrics(rows, (r) => r.vehicle_make);
-    for (const m of byMake) {
-      upsertRows.push({
-        metric_type: "category_breakdown",
-        period: "monthly",
-        period_start: today,
-        dimension_value: `make:${m.category}`,
-        accuracy_rate: m.accuracy_rate,
-        outcomes_count: m.sample_size,
-        exact_match_count: m.exact_count,
-        close_match_count: m.close_count,
-        partial_match_count: m.partial_count,
-        miss_count: m.miss_count,
-        computed_at: now.toISOString(),
-      });
-      if (m.accuracy_rate < ACCURACY_THRESHOLD) {
-        alertRows.push({
-          category: m.category,
-          category_type: "vehicle_make",
-          accuracy_rate: m.accuracy_rate,
-          sample_size: m.sample_size,
-          alert_date: today,
-        });
-      }
-    }
+    processBreakdown(computeCategoryMetrics(rows, (r) => r.symptom_category), "symptom", "symptom_category");
+    processBreakdown(computeCategoryMetrics(rows, (r) => r.vehicle_make), "make", "vehicle_make");
+    processBreakdown(computeCategoryMetrics(rows, (r) => r.predicted_urgency), "urgency", "urgency_level");
 
-    // ── By Urgency Level ─────────────────────────────────
-    const byUrgency = computeCategoryMetrics(rows, (r) => r.predicted_urgency);
-    for (const m of byUrgency) {
-      upsertRows.push({
-        metric_type: "category_breakdown",
-        period: "monthly",
-        period_start: today,
-        dimension_value: `urgency:${m.category}`,
-        accuracy_rate: m.accuracy_rate,
-        outcomes_count: m.sample_size,
-        exact_match_count: m.exact_count,
-        close_match_count: m.close_count,
-        partial_match_count: m.partial_count,
-        miss_count: m.miss_count,
-        computed_at: now.toISOString(),
-      });
-      if (m.accuracy_rate < ACCURACY_THRESHOLD) {
-        alertRows.push({
-          category: m.category,
-          category_type: "urgency_level",
-          accuracy_rate: m.accuracy_rate,
-          sample_size: m.sample_size,
-          alert_date: today,
-        });
-      }
-    }
-
-    // ── Upsert metrics ───────────────────────────────────
+    // Upsert metrics
     if (upsertRows.length > 0) {
       const { error: upsertError } = await supabase
         .from("accuracy_metrics")
-        .upsert(upsertRows, {
-          onConflict: "metric_type,period,period_start,dimension_value",
-        });
+        .upsert(upsertRows, { onConflict: "metric_type,period,period_start,dimension_value" });
       if (upsertError) throw upsertError;
     }
 
-    // ── Insert accuracy alerts ───────────────────────────
-    if (alertRows.length > 0) {
-      const { error: alertError } = await supabase
+    // Deduplicate alerts — only insert if no unresolved alert exists for same category+type
+    let alertsCreated = 0;
+    if (pendingAlerts.length > 0) {
+      const { data: existing } = await supabase
         .from("accuracy_alerts")
-        .insert(alertRows);
-      if (alertError) throw alertError;
+        .select("category, category_type")
+        .eq("is_resolved", false);
+
+      const existingSet = new Set(
+        (existing ?? []).map((e: any) => `${e.category_type}::${e.category}`),
+      );
+
+      const newAlerts = pendingAlerts
+        .filter((a) => !existingSet.has(`${a.category_type}::${a.category}`))
+        .map((a) => ({
+          category: a.category,
+          category_type: a.category_type,
+          accuracy_rate: a.accuracy_rate,
+          sample_size: a.sample_size,
+          threshold: ACCURACY_THRESHOLD * 100,
+          alert_date: today,
+        }));
+
+      if (newAlerts.length > 0) {
+        const { error: alertError } = await supabase
+          .from("accuracy_alerts")
+          .insert(newAlerts);
+        if (alertError) throw alertError;
+        alertsCreated = newAlerts.length;
+      }
     }
 
     return new Response(
       JSON.stringify({
         success: true,
         metrics_written: upsertRows.length,
-        alerts_generated: alertRows.length,
+        alerts_generated: alertsCreated,
         total_outcomes_analyzed: rows.length,
         breakdown: {
-          symptom_categories: bySymptom.length,
-          vehicle_makes: byMake.length,
-          urgency_levels: byUrgency.length,
+          symptom_categories: computeCategoryMetrics(rows, (r) => r.symptom_category).length,
+          vehicle_makes: computeCategoryMetrics(rows, (r) => r.vehicle_make).length,
+          urgency_levels: computeCategoryMetrics(rows, (r) => r.predicted_urgency).length,
         },
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers },
     );
   } catch (error) {
     console.error("audit-assessment-accuracy error:", error);
     return new Response(
       JSON.stringify({ error: error.message ?? "Unexpected error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers },
     );
   }
 });
