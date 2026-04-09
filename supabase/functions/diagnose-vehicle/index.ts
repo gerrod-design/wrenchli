@@ -55,16 +55,29 @@ interface Diagnosis {
 const SYSTEM_PROMPT = `You are a senior automotive diagnostic expert. 
 Given a vehicle and symptom report, return a structured diagnosis.
 
-Return ONLY valid JSON matching this exact schema. No explanation, no markdown, no preamble:
+CRITICAL — VEHICLE VALIDATION (must be done FIRST):
+Before ANY diagnosis, verify the year/make/model combination is historically accurate.
+Check whether that specific model was actually manufactured in that year.
 
+Examples of INVALID combinations:
+- 2012 Ford Bronco (Bronco was made 1966-1996 and 2021-present, NOT 1997-2020)
+- 2024 Honda S2000 (discontinued in 2009)
+- 2015 Pontiac G6 (Pontiac ceased operations in 2010)
+- Any year before the brand was founded
+- Any model year beyond ${new Date().getFullYear() + 1}
+
+If the year/make/model combination is implausible or was never manufactured:
+Return ONLY this JSON — do NOT include possible_causes or run a diagnosis:
+{
+  "vehicle_invalid": true,
+  "validation_message": "We want to make sure we give you the most accurate assessment. We don't have records of a [year] [make] [model] in our database. Could you double-check your vehicle details? If your vehicle details are correct, please try a similar year or trim level."
+}
+
+If the vehicle IS valid, return ONLY valid JSON matching this exact schema:
 {
   "confidence": "low" | "medium" | "high",
   "urgency": "monitor" | "schedule" | "soon" | "immediate",
   "explanation": "Plain English summary in 2-3 sentences. No jargon.",
-  "vehicle_validation": {
-    "is_valid": true | false,
-    "message": "Optional message if vehicle combination seems implausible"
-  },
   "possible_causes": [
     {
       "name": "Cause name",
@@ -78,11 +91,6 @@ Return ONLY valid JSON matching this exact schema. No explanation, no markdown, 
 }
 
 Rules:
-- VEHICLE VALIDATION (CRITICAL): Before diagnosing, verify the year/make/model combination is historically accurate. Check whether that specific model was actually manufactured in that year. Examples of implausible combinations: "2024 Honda S2000" (discontinued in 2009), "2015 Pontiac G6" (Pontiac ceased in 2010), "2020 Toyota Supra" with a trim that didn't exist. If the combination is implausible or you have no record of it:
-  - Set vehicle_validation.is_valid to false
-  - Set vehicle_validation.message to: "We want to make sure we give you accurate information — we don't have records of a [year] [make] [model]. Could you double-check your vehicle details?"
-  - Still attempt a best-effort diagnosis based on the closest known model, but lower confidence to "low"
-  - If the combination is valid, set vehicle_validation.is_valid to true and omit the message field
 - List 2-5 possible causes, ordered by probability descending
 - Probabilities across all causes should sum to roughly 1.0
 - Cost ranges are for parts + labor at an average US shop
@@ -158,14 +166,27 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
     // Strip markdown code fences if present (Claude sometimes wraps JSON)
     const cleanedText = rawText.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
 
-    let diagnosis: Diagnosis;
+    let parsed: any;
     try {
-      diagnosis = JSON.parse(cleanedText);
+      parsed = JSON.parse(cleanedText);
     } catch {
       console.error("Failed to parse AI response:", rawText);
       throw new Error("AI returned invalid JSON");
     }
 
+    // ── 4b. Check for vehicle validation rejection ────────
+    if (parsed.vehicle_invalid === true) {
+      return new Response(
+        JSON.stringify({
+          vehicle_invalid: true,
+          validation_message: parsed.validation_message || `We don't have records of a ${vehicle.year} ${vehicle.make} ${vehicle.model}. Could you double-check your vehicle details?`,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── 4c. Validate diagnosis fields ─────────────────────
+    const diagnosis: Diagnosis = parsed;
     if (!diagnosis.confidence || !diagnosis.urgency || !diagnosis.explanation) {
       throw new Error("AI response missing required fields");
     }

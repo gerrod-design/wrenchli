@@ -7,6 +7,7 @@ interface Props {
   vehicle: VehicleData;
   sessionId: string;
   onNext: (symptoms: SymptomData, diagnosis: DiagnosisResult) => void;
+  onVehicleInvalid: (message: string) => void;
   onBack: () => void;
 }
 
@@ -17,7 +18,7 @@ const SEVERITY_OPTIONS = [
   { value: "do_not_drive", label: "Don't Drive", desc: "Unsafe to drive" },
 ] as const;
 
-export default function SymptomStep({ vehicle, sessionId, onNext, onBack }: Props) {
+export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInvalid, onBack }: Props) {
   const [description, setDescription] = useState("");
   const [severity, setSeverity] = useState<SymptomData["severity"]>();
   const [loading, setLoading] = useState(false);
@@ -46,6 +47,12 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onBack }: Prop
 
       if (fnErr) throw fnErr;
       if (data?.error) throw new Error(data.error);
+
+      // Check for vehicle validation rejection
+      if (data?.vehicle_invalid) {
+        onVehicleInvalid(data.validation_message || `We don't have records of a ${vehicle.year} ${vehicle.make} ${vehicle.model}. Could you double-check your vehicle details?`);
+        return;
+      }
 
       onNext(symptomData, data as DiagnosisResult);
     } catch (e: any) {
