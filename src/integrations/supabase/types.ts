@@ -1950,6 +1950,66 @@ export type Database = {
           },
         ]
       }
+      security_alerts: {
+        Row: {
+          acknowledged: boolean
+          acknowledged_at: string | null
+          check_name: string
+          created_at: string
+          details: Json
+          id: string
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          check_name: string
+          created_at?: string
+          details?: Json
+          id?: string
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          check_name?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      security_audit_log: {
+        Row: {
+          check_name: string
+          checked_at: string
+          created_at: string
+          details: Json
+          id: string
+          status: string
+        }
+        Insert: {
+          check_name: string
+          checked_at?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          status: string
+        }
+        Update: {
+          check_name?: string
+          checked_at?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       service_providers: {
         Row: {
           address: string
