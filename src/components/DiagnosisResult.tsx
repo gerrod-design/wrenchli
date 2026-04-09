@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef, lazy, Suspense } from "react";
 import { Cpu, AlertCircle } from "lucide-react";
 import RecommendShopPrompt from "./recommend/RecommendShopPrompt";
 import DownloadReportButton from "./diagnosis/DownloadReportButton";
@@ -16,6 +16,8 @@ import { getDtcEntry } from "@/data/dtcCodes";
 import { getToolsForDiagnosis } from "@/data/toolsLibrary";
 import type { Diagnosis, DiagnosisResultProps } from "./diagnosis/types";
 import { useGarage } from "@/hooks/useGarage";
+
+const PwaInstallPrompt = lazy(() => import("./PwaInstallPrompt"));
 
 const DIAGNOSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/diagnose`;
 
@@ -243,6 +245,10 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
             <div className="flex justify-center">
               <DownloadReportButton vehicle={vehicleStr} diagnoses={diagnoses} symptom={symptom} codes={codes} year={year} make={make} model={model} />
             </div>
+
+            <Suspense fallback={null}>
+              <PwaInstallPrompt />
+            </Suspense>
 
             <StillNotSure vehicle={vehicleStr} />
             <RecommendShopPrompt onOpenModal={() => setRecommendOpen(true)} />
