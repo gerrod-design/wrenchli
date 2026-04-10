@@ -790,6 +790,22 @@ export default function Garage() {
         onClose={() => setEditingVehicle(null)}
         onUpdated={fetchVehicles}
       />
+      <AuthGateModal
+        open={showAuthGate}
+        onClose={() => setShowAuthGate(false)}
+        onAuthenticated={handleAuthSuccess}
+      />
+      <ProUpgradeModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        onSuccess={handleUpgradeSuccess}
+      />
+      <ManageSubscriptionModal
+        open={showManageSub}
+        onClose={() => setShowManageSub(false)}
+        subscription={subscription}
+        onUpdated={refetchPro}
+      />
     </main>
   );
 }
