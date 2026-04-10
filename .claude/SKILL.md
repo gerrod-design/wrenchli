@@ -84,7 +84,118 @@ If risk level is high, stop and ask for explicit confirmation before
 proceeding. If critical path impact is yes, always require manual
 confirmation before deploying to production regardless of risk level.
 
-Wrenchli Brand Guideline Skill
+Codebase Memory
+
+This section is the persistent memory of every architectural decision,
+file location, known issue, and deliberate choice made in the Wrenchli
+codebase. Read this before writing any code. Update this section whenever
+a new architectural decision is made.
+
+Deliberate Decisions — Never Reverse Without Explicit Instruction
+
+AutoZone was deliberately removed from all parts recommendations and the
+chat system prompt. Do not add it back under any circumstances.
+
+Amazon affiliate tag is wrenchli-20 (with hyphen). Never use wrenchli20-20
+(without hyphen) — this is a known revenue leak that was fixed.
+
+All Edge Functions use _shared/cors.ts for CORS handling. Never import
+CORS from supabase-js directly.
+
+Claude API responses wrap JSON in markdown code fences (```json). Always
+strip these fences before parsing. Never assume the response is clean JSON.
+
+The AI model is claude-sonnet-4-20250514 exclusively. Never substitute
+another model without explicit instruction.
+
+DIY options are only shown when urgency is 'monitor' or 'schedule' AND
+difficulty is 'easy' or 'moderate'. Never show DIY for 'immediate' or
+'soon' urgency.
+
+'Pro Only' was renamed to 'Shop Required' globally across all components.
+Do not revert this.
+
+'Always free' was changed to 'Assessment always free' in the homepage
+trust bar. Do not revert this.
+
+The /diagnose route redirects to /. Never recreate /diagnose as a
+standalone page.
+
+verify_jwt = false is set in config.toml for the two new Edge Functions
+(create-pro-subscription and stripe-webhook). This is intentional.
+
+Current Database Tables — All Have RLS Enabled
+
+Core: diagnostic_sessions, vehicles, possible_causes, outcome_reports
+Shop: shop_integrations, integration_sync_log, shop_engagement_metrics
+Consumer: user_vehicles, recall_alerts, pro_subscriptions
+Tracking: ad_click_events, wizard_funnel_events, funnel_metrics
+Agents: accuracy_metrics, accuracy_alerts, security_audit_log,
+security_alerts
+
+Edge Functions — Currently Deployed
+
+diagnose-vehicle, get-recommendations, compute-accuracy-metrics
+check-recalls, create-pro-subscription, stripe-webhook
+shop-engagement-monitor, audit-assessment-accuracy, security-monitor
+compute-funnel-metrics, sms-export-csv, sms-tekmetric-prefill
+
+External Integrations — Status
+
+Stripe: Sandbox active. Price ID price_1TKaxDGgIpvcscSeDceeWkFo. Live
+activation pending EIN submission.
+Tekmetric: API application submitted April 5 2026. Approval expected
+April 19-26. Do not mark as live.
+NHTSA vPIC API: Active. Used for VIN decode and recall lookup. No API
+key required.
+AutoZone: Removed. Replaced with same-day pickup search URL only. No
+affiliate tag yet.
+O'Reilly: Added as same-day pickup search URL only. No affiliate tag yet.
+Amazon: Active. Affiliate tag wrenchli-20. All links must include
+&tag=wrenchli-20.
+
+Known Removed Features — Do Not Rebuild
+
+Kai (Finance AI advisor): Removed from chat routing. Financing does not
+exist yet.
+Priya (Prevention Coach): Removed from chat routing.
+Jenine Parchmon leadership card: Removed from About page.
+Finance Providers footer column: Removed from footer.
+$299/month shop pricing: Removed from /for-shops page.
+'March 2026 pilot program' banner: Removed from /for-shops page.
+
+Current Routes
+
+/ homepage
+/for-shops shop partner landing
+/for-shops/onboarding 4-step wizard
+/shop/dashboard authenticated shop dashboard
+/garage vehicle garage (requires account)
+/blog blog listing
+/blog/[slug] individual articles
+/about about page
+/about.html static crawler page
+/privacy privacy policy
+/warranty-guide manufacturer warranty reference
+/admin/login admin auth
+/shop-login shop auth
+
+Pro Subscription
+
+Price: $2.99/month recurring
+Free tier limits: 2 saved vehicles
+Pro tier: unlimited vehicles, recall alerts, assessment history, PDF export
+Coming soon (do not build yet): AI vehicle health insights, priority
+processing
+
+Stripe Keys In Use
+
+Publishable key stored in frontend as VITE_STRIPE_PUBLISHABLE_KEY
+Secret key stored in Supabase secrets as STRIPE_SECRET_KEY
+Webhook secret stored in Supabase secrets as STRIPE_WEBHOOK_SECRET
+Price ID stored in Supabase secrets as STRIPE_PRO_PRICE_ID
+
+
 Place this file in your Lovable project at: .claude/SKILL.md
 Lovable reads this at the start of every session.
 ============================================================
