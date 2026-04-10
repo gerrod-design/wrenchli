@@ -99,6 +99,14 @@ run the following verification before closing the task:
 If any of these fail, roll back the RLS change and report the failure
 before proceeding.
 
+Security Scan Rule: After every deployment — any time code is published
+to production — automatically open the Lovable security panel and run
+an updated security scan before marking the task complete. If the scan
+returns any errors, stop all work and fix the errors before proceeding
+to the next task. If the scan returns warnings, flag them and ask for
+confirmation before proceeding. Never close a deployment task with an
+outdated or unreviewed security scan.
+
 Codebase Memory
 
 This section is the persistent memory of every architectural decision,
