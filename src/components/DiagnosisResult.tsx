@@ -249,6 +249,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
 
             <StillNotSure vehicle={vehicleStr} />
             <RecommendShopPrompt onOpenModal={() => setRecommendOpen(true)} />
+            <SaveToGaragePrompt year={year} make={make} model={model} />
           </div>
         )}
 
