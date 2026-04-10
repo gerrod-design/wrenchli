@@ -261,22 +261,34 @@ export default function Navbar() {
           ))}
 
           {/* My Garage in mobile menu */}
-          <div className="border-b border-primary-foreground/10">
-            <Link
-              to="/garage"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2 py-4 text-lg font-medium text-primary-foreground/80"
-            >
-              <Car className="h-5 w-5" />
-              My Garage
-              {vehicles.length > 0 && (
-                <span className="text-sm text-primary-foreground/50">
-                  ({vehicles.length} vehicle{vehicles.length !== 1 ? "s" : ""} saved)
-                </span>
-              )}
-              {vehicles.length > 0 && <GarageBadge />}
-            </Link>
-          </div>
+          {user && (
+            <div className="border-b border-primary-foreground/10">
+              <Link
+                to="/garage"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 py-4 text-lg font-medium text-primary-foreground/80"
+              >
+                <Car className="h-5 w-5" />
+                My Garage
+                {unreadRecalls > 0 && (
+                  <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-bold text-white">
+                    {unreadRecalls}
+                  </span>
+                )}
+              </Link>
+            </div>
+          )}
+          {user && isPro && (
+            <div className="border-b border-primary-foreground/10">
+              <button
+                onClick={() => { setOpen(false); setManageSubOpen(true); }}
+                className="flex items-center gap-2 py-4 text-lg font-medium text-primary-foreground/80 w-full text-left"
+              >
+                <Settings className="h-5 w-5" />
+                Manage Subscription
+              </button>
+            </div>
+          )}
 
           {/* Trust items */}
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-primary-foreground/50">
