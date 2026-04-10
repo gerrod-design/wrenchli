@@ -163,6 +163,30 @@ export default function Navbar() {
 
         {/* Desktop CTAs - right */}
         <div className="hidden items-center gap-3 lg:flex">
+          {user && (
+            <Link
+              to="/garage"
+              className={`relative flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-accent ${
+                location.pathname === "/garage" ? "text-accent" : "text-primary-foreground/80"
+              }`}
+            >
+              <Car className="h-4 w-4" />
+              My Garage
+              {unreadRecalls > 0 && (
+                <span className="absolute -top-1.5 -right-3 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-white">
+                  {unreadRecalls}
+                </span>
+              )}
+            </Link>
+          )}
+          {user && isPro && (
+            <button
+              onClick={() => setManageSubOpen(true)}
+              className="text-sm font-medium text-primary-foreground/80 transition-colors hover:text-accent flex items-center gap-1"
+            >
+              <Settings className="h-3.5 w-3.5" />
+            </button>
+          )}
           <NotificationBell />
           <GarageDropdown />
           <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
