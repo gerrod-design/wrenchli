@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Car, Plus, MoreHorizontal, Trash2, Edit2, AlertTriangle,
-  Search, Crown, Shield, Check, Lock, Eye, EyeOff, Gauge,
+  Search, Crown, Shield, Check, Lock, Eye, EyeOff, Gauge, Settings,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import ProUpgradeModal from "@/components/ProUpgradeModal";
+import AuthGateModal from "@/components/AuthGateModal";
+import ManageSubscriptionModal from "@/components/ManageSubscriptionModal";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -552,15 +555,20 @@ export default function Garage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { vehicles, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
-  const { isPro, loading: proLoading } = useProSubscription();
+  const { isPro, loading: proLoading, subscription, refetch: refetchPro } = useProSubscription();
 
   const vehicleIds = useMemo(() => vehicles.map((v) => v.id), [vehicles]);
   const { recalls, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
 
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<CloudVehicle | null>(null);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
+  const [showManageSub, setShowManageSub] = useState(false);
 
   const isLoading = vehiclesLoading || proLoading;
+
+  const isLapsed = !!subscription && (subscription.status === "canceled" || subscription.status === "past_due");
 
   // Group unread recalls by vehicle
   const unreadRecallsByVehicle = useMemo(() => {
@@ -590,7 +598,7 @@ export default function Garage() {
       toast("Free tier limit reached. Upgrade to Pro for unlimited vehicles.", {
         action: {
           label: "Upgrade",
-          onClick: () => navigate("/garage#upgrade"),
+          onClick: () => handleUpgradeClick(),
         },
       });
       return;
@@ -599,9 +607,21 @@ export default function Garage() {
   };
 
   const handleUpgradeClick = () => {
-    // Part D will implement Stripe checkout — for now scroll to comparison
-    const el = document.getElementById("pro-comparison");
-    el?.scrollIntoView({ behavior: "smooth" });
+    if (!user) {
+      setShowAuthGate(true);
+    } else {
+      setShowUpgrade(true);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthGate(false);
+    // Small delay for auth state to propagate
+    setTimeout(() => setShowUpgrade(true), 500);
+  };
+
+  const handleUpgradeSuccess = () => {
+    refetchPro();
   };
 
   if (!user) {
@@ -641,17 +661,45 @@ export default function Garage() {
                 </Badge>
               )}
             </div>
-            {!isPro && (
+            <div className="flex items-center gap-2">
+              {isPro && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs"
+                  onClick={() => setShowManageSub(true)}
+                >
+                  <Settings className="h-3 w-3 mr-1.5" /> Manage
+                </Button>
+              )}
+              {!isPro && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs border-accent text-accent hover:bg-accent/10"
+                  onClick={handleUpgradeClick}
+                >
+                  <Crown className="h-3 w-3 mr-1.5" /> Upgrade to Pro — $2.99/mo
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Lapsed subscription banner */}
+          {isLapsed && (
+            <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <p className="text-sm text-muted-foreground">
+                Your Wrenchli Pro subscription has ended. Upgrade again to restore unlimited access.
+              </p>
               <Button
                 size="sm"
-                variant="outline"
-                className="h-8 text-xs border-accent text-accent hover:bg-accent/10"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 shrink-0"
                 onClick={handleUpgradeClick}
               >
-                <Crown className="h-3 w-3 mr-1.5" /> Upgrade to Pro — $2.99/mo
+                Reactivate
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           {isLoading ? (
             <div className="space-y-3">
@@ -741,6 +789,22 @@ export default function Garage() {
         vehicle={editingVehicle}
         onClose={() => setEditingVehicle(null)}
         onUpdated={fetchVehicles}
+      />
+      <AuthGateModal
+        open={showAuthGate}
+        onClose={() => setShowAuthGate(false)}
+        onAuthenticated={handleAuthSuccess}
+      />
+      <ProUpgradeModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        onSuccess={handleUpgradeSuccess}
+      />
+      <ManageSubscriptionModal
+        open={showManageSub}
+        onClose={() => setShowManageSub(false)}
+        subscription={subscription}
+        onUpdated={refetchPro}
       />
     </main>
   );
