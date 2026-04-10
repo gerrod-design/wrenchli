@@ -84,6 +84,21 @@ If risk level is high, stop and ask for explicit confirmation before
 proceeding. If critical path impact is yes, always require manual
 confirmation before deploying to production regardless of risk level.
 
+RLS Change Rule: Any prompt that modifies RLS policies on
+diagnostic_sessions, possible_causes, vehicles, user_vehicles, or any
+table touched by the assessment flow must be immediately followed by a
+guest flow verification test. Never apply RLS hardening without
+confirming the anonymous assessment flow still works end to end —
+Vehicle → Symptoms → Assessment → Plan, no login required.
+
+RLS Regression Test Rule: After any RLS policy change, automatically
+run the following verification before closing the task:
+(1) anonymous user can complete a full assessment without logging in,
+(2) anonymous user can read back their own session results,
+(3) authenticated users cannot read other users' data.
+If any of these fail, roll back the RLS change and report the failure
+before proceeding.
+
 Codebase Memory
 
 This section is the persistent memory of every architectural decision,
