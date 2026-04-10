@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { Cpu, AlertCircle } from "lucide-react";
+import { Cpu, AlertCircle, Car } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import RecommendShopPrompt from "./recommend/RecommendShopPrompt";
 import DownloadReportButton from "./diagnosis/DownloadReportButton";
 import RecommendShopModal from "./recommend/RecommendShopModal";
