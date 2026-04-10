@@ -699,7 +699,7 @@ export default function Garage() {
                 Reactivate
               </Button>
             </div>
-          )
+          )}
 
           {isLoading ? (
             <div className="space-y-3">
