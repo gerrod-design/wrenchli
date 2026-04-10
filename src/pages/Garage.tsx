@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Car, Plus, MoreHorizontal, Trash2, Edit2, AlertTriangle,
   Search, Crown, Shield, Check, Lock, Eye, EyeOff, Gauge, Settings,
@@ -51,22 +51,35 @@ function AddVehicleDialog({
   open,
   onClose,
   onAdded,
+  initialYear = "",
+  initialMake = "",
+  initialModel = "",
 }: {
   open: boolean;
   onClose: () => void;
   onAdded: () => void;
+  initialYear?: string;
+  initialMake?: string;
+  initialModel?: string;
 }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [vin, setVin] = useState("");
   const [vinDecoding, setVinDecoding] = useState(false);
   const [vinError, setVinError] = useState("");
-  const [year, setYear] = useState("");
-  const [make, setMake] = useState("");
-  const [model, setModel] = useState("");
+  const [year, setYear] = useState(initialYear);
+  const [make, setMake] = useState(initialMake);
+  const [model, setModel] = useState(initialModel);
   const [trim, setTrim] = useState("");
   const [mileage, setMileage] = useState("");
   const [nickname, setNickname] = useState("");
+
+  // Update when initial values change (from URL params)
+  useEffect(() => {
+    if (initialYear) setYear(initialYear);
+    if (initialMake) setMake(initialMake);
+    if (initialModel) setModel(initialModel);
+  }, [initialYear, initialMake, initialModel]);
 
   const reset = () => {
     setVin(""); setVinError(""); setVinDecoding(false);
@@ -554,17 +567,30 @@ function EditVehicleDialog({
 export default function Garage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { vehicles, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
   const { isPro, loading: proLoading, subscription, refetch: refetchPro } = useProSubscription();
 
   const vehicleIds = useMemo(() => vehicles.map((v) => v.id), [vehicles]);
   const { recalls, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
 
+  // Pre-fill from URL params (from assessment save-to-garage)
+  const prefillYear = searchParams.get("addYear") || "";
+  const prefillMake = searchParams.get("addMake") || "";
+  const prefillModel = searchParams.get("addModel") || "";
+
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<CloudVehicle | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [showManageSub, setShowManageSub] = useState(false);
+
+  // Auto-open add dialog if URL has prefill params
+  useEffect(() => {
+    if (prefillYear && prefillMake && prefillModel && user) {
+      setShowAddVehicle(true);
+    }
+  }, [prefillYear, prefillMake, prefillModel, user]);
 
   const isLoading = vehiclesLoading || proLoading;
 
@@ -782,8 +808,20 @@ export default function Garage() {
       {/* Dialogs */}
       <AddVehicleDialog
         open={showAddVehicle}
-        onClose={() => setShowAddVehicle(false)}
+        onClose={() => {
+          setShowAddVehicle(false);
+          // Clear URL prefill params
+          if (searchParams.has("addYear")) {
+            searchParams.delete("addYear");
+            searchParams.delete("addMake");
+            searchParams.delete("addModel");
+            setSearchParams(searchParams, { replace: true });
+          }
+        }}
         onAdded={fetchVehicles}
+        initialYear={prefillYear}
+        initialMake={prefillMake}
+        initialModel={prefillModel}
       />
       <EditVehicleDialog
         vehicle={editingVehicle}

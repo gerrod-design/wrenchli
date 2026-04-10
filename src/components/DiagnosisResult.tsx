@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { Cpu, AlertCircle } from "lucide-react";
+import { Cpu, AlertCircle, Car } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import RecommendShopPrompt from "./recommend/RecommendShopPrompt";
 import DownloadReportButton from "./diagnosis/DownloadReportButton";
 import RecommendShopModal from "./recommend/RecommendShopModal";
@@ -16,8 +17,49 @@ import { getDtcEntry } from "@/data/dtcCodes";
 import { getToolsForDiagnosis } from "@/data/toolsLibrary";
 import type { Diagnosis, DiagnosisResultProps } from "./diagnosis/types";
 import { useGarage } from "@/hooks/useGarage";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCloudVehicles } from "@/hooks/useCloudVehicles";
 
 const DIAGNOSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/diagnose`;
+
+function SaveToGaragePrompt({ year, make, model }: { year?: string; make?: string; model?: string }) {
+  const { user } = useAuth();
+  const { vehicles } = useCloudVehicles();
+  const navigate = useNavigate();
+
+  if (!year || !make || !model) return null;
+
+  const alreadySaved = vehicles.some(
+    (v) => String(v.year) === year && v.make.toLowerCase() === make.toLowerCase() && v.model.toLowerCase() === model.toLowerCase()
+  );
+  if (alreadySaved) return null;
+
+  const handleClick = () => {
+    if (!user) {
+      navigate("/admin/login");
+      return;
+    }
+    navigate(`/garage?addYear=${encodeURIComponent(year)}&addMake=${encodeURIComponent(make)}&addModel=${encodeURIComponent(model)}`);
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-muted/30 p-5 text-center space-y-3">
+      <div className="flex items-center justify-center gap-2 text-muted-foreground">
+        <Car className="h-5 w-5" />
+        <p className="text-sm">
+          Save this vehicle to your garage for recall alerts and assessment history.
+        </p>
+      </div>
+      <Button
+        onClick={handleClick}
+        className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+      >
+        <Car className="mr-2 h-4 w-4" />
+        Save to My Garage
+      </Button>
+    </div>
+  );
+}
 
 export default function DiagnosisResult({ codes, symptom, year, make, model, onSwitchToDtc }: DiagnosisResultProps) {
   const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
@@ -246,6 +288,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
 
             <StillNotSure vehicle={vehicleStr} />
             <RecommendShopPrompt onOpenModal={() => setRecommendOpen(true)} />
+            <SaveToGaragePrompt year={year} make={make} model={model} />
           </div>
         )}
 
