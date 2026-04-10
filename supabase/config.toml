@@ -83,3 +83,9 @@ verify_jwt = false
 
 [functions.cancel-pro-subscription]
 verify_jwt = false
+
+[functions.drain-webhook-queue]
+verify_jwt = false
+
+[functions.trigger-n8n-workflow]
+verify_jwt = false
