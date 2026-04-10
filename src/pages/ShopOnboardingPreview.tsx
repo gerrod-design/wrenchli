@@ -72,12 +72,28 @@ export default function ShopOnboardingPreview() {
 
   const handleComplete = async () => {
     try {
-      await supabase.from("contact_submissions").insert({
+      const { data: contactData } = await supabase.from("contact_submissions").insert({
         name: profile.ownerName,
         email: profile.email,
         phone: profile.phone,
         message: `Shop Onboarding — Shop: ${profile.shopName}, Address: ${profile.address}, ${profile.city}, ${profile.state} ${profile.zip}, Bays: ${profile.bays}, SMS: ${smsProvider}`,
+      }).select("id").single();
+
+      await supabase.from("webhook_queue" as any).insert({
+        event_type: "shop_onboarded",
+        payload: {
+          shop_name: profile.shopName,
+          owner_name: profile.ownerName,
+          email: profile.email,
+          phone: profile.phone,
+          address: `${profile.address}, ${profile.city}, ${profile.state} ${profile.zip}`,
+          bays: profile.bays,
+          sms_provider: smsProvider,
+          contact_submission_id: contactData?.id ?? null,
+          created_at: new Date().toISOString(),
+        },
       });
+
       setStep(4);
     } catch {
       toast({ title: "Error submitting", description: "Please try again.", variant: "destructive" });
