@@ -22,7 +22,7 @@ const difficultyColors: Record<string, string> = {
 const difficultyLabels: Record<string, string> = {
   easy: "DIY Friendly",
   moderate: "Intermediate",
-  professional_only: "Pro Only",
+  professional_only: "Shop Required",
 };
 
 const FONT = "'Plus Jakarta Sans', 'DM Sans', sans-serif";

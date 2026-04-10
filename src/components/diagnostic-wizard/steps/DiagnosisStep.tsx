@@ -32,7 +32,7 @@ const difficultyColors: Record<string, string> = {
 const difficultyLabels: Record<string, string> = {
   easy: "DIY Friendly",
   moderate: "Intermediate",
-  professional_only: "Pro Only",
+  professional_only: "Shop Required",
 };
 
 export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, onBack }: Props) {
