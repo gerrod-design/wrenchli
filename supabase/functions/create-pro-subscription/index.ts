@@ -82,6 +82,9 @@ Deno.serve(async (req) => {
     const clientSecret = paymentIntent?.client_secret;
 
     const status = subscription.status === "active" ? "active" : "trialing";
+    const periodEnd = subscription.current_period_end
+      ? new Date(subscription.current_period_end * 1000).toISOString()
+      : null;
 
     // Upsert subscription record
     const { error: upsertError } = await supabase
@@ -92,7 +95,7 @@ Deno.serve(async (req) => {
           stripe_customer_id: customerId,
           stripe_subscription_id: subscription.id,
           status,
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          current_period_end: periodEnd,
         },
         { onConflict: "user_id" }
       );
