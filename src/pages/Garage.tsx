@@ -186,6 +186,9 @@ function AddVehicleDialog({
               </Button>
             </div>
             <p className="text-[10px] text-muted-foreground">{vin.length}/17 characters</p>
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+              Optional. Your VIN helps us auto-fill your vehicle details and check for open safety recalls. It is stored securely, never sold, and can be deleted at any time.
+            </p>
             {vinError && <p className="text-xs text-destructive">{vinError}</p>}
           </div>
 
