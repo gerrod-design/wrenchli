@@ -55,6 +55,9 @@ function AddVehicleDialog({
 }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [vin, setVin] = useState("");
+  const [vinDecoding, setVinDecoding] = useState(false);
+  const [vinError, setVinError] = useState("");
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -63,8 +66,45 @@ function AddVehicleDialog({
   const [nickname, setNickname] = useState("");
 
   const reset = () => {
+    setVin(""); setVinError(""); setVinDecoding(false);
     setYear(""); setMake(""); setModel(""); setTrim("");
     setMileage(""); setNickname("");
+  };
+
+  const handleVinChange = (raw: string) => {
+    const sanitized = raw.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/gi, "").slice(0, 17);
+    setVin(sanitized);
+    setVinError("");
+  };
+
+  const handleVinDecode = async () => {
+    if (vin.length !== 17) return;
+    setVinDecoding(true);
+    setVinError("");
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const resp = await fetch(`${supabaseUrl}/functions/v1/decode-vin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: supabaseKey },
+        body: JSON.stringify({ vin }),
+      });
+      if (!resp.ok) throw new Error("API error");
+      const data = await resp.json();
+      const result = data.Results?.[0];
+      if (!result || (!result.Make && !result.ErrorCode?.includes?.("0"))) {
+        setVinError("We couldn't decode that VIN. Please fill in your vehicle details manually.");
+        return;
+      }
+      if (result.ModelYear) setYear(String(result.ModelYear));
+      if (result.Make) setMake(result.Make);
+      if (result.Model) setModel(result.Model);
+      if (result.Trim) setTrim(result.Trim);
+    } catch {
+      setVinError("We couldn't decode that VIN. Please fill in your vehicle details manually.");
+    } finally {
+      setVinDecoding(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -115,11 +155,40 @@ function AddVehicleDialog({
             Add a Vehicle
           </DialogTitle>
           <DialogDescription>
-            Add your vehicle to get recall alerts and track your assessment history.
+            Enter your VIN to auto-fill, or fill in the details manually.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3">
+          {/* VIN input */}
+          <div className="space-y-1">
+            <Label className="text-xs">VIN (optional)</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="e.g. 4T1B11HK5KU123456"
+                value={vin}
+                onChange={(e) => handleVinChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); handleVinDecode(); }
+                }}
+                className="font-mono uppercase flex-1"
+                maxLength={17}
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={handleVinDecode}
+                disabled={vin.length !== 17 || vinDecoding}
+                className="shrink-0"
+              >
+                {vinDecoding ? "Decoding VIN…" : "Decode"}
+              </Button>
+            </div>
+            <p className="text-[10px] text-muted-foreground">{vin.length}/17 characters</p>
+            {vinError && <p className="text-xs text-destructive">{vinError}</p>}
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="text-xs">Year *</Label>
@@ -134,14 +203,7 @@ function AddVehicleDialog({
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Make *</Label>
-              <Select value={make} onValueChange={setMake}>
-                <SelectTrigger><SelectValue placeholder="Make" /></SelectTrigger>
-                <SelectContent>
-                  {POPULAR_MAKES.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input placeholder="e.g. Toyota" value={make} onChange={(e) => setMake(e.target.value)} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
