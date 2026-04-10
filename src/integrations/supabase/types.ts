@@ -1377,6 +1377,39 @@ export type Database = {
           },
         ]
       }
+      pro_subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       proactive_insights: {
         Row: {
           action_items: Json | null
@@ -1606,6 +1639,7 @@ export type Database = {
           email_sent: boolean
           id: string
           is_read: boolean
+          nhtsa_id: string | null
           priority: string
           remedy: string | null
           summary: string
@@ -1619,6 +1653,7 @@ export type Database = {
           email_sent?: boolean
           id?: string
           is_read?: boolean
+          nhtsa_id?: string | null
           priority?: string
           remedy?: string | null
           summary: string
@@ -1632,6 +1667,7 @@ export type Database = {
           email_sent?: boolean
           id?: string
           is_read?: boolean
+          nhtsa_id?: string | null
           priority?: string
           remedy?: string | null
           summary?: string
@@ -2763,11 +2799,13 @@ export type Database = {
           fuel_type: string | null
           id: string
           is_active: boolean | null
+          is_primary: boolean | null
           last_mileage_update: string | null
           location_zip: string | null
           make: string
           model: string
           nickname: string | null
+          photo_url: string | null
           purchase_date: string | null
           purchase_mileage: number | null
           purchase_price: number | null
@@ -2791,11 +2829,13 @@ export type Database = {
           fuel_type?: string | null
           id?: string
           is_active?: boolean | null
+          is_primary?: boolean | null
           last_mileage_update?: string | null
           location_zip?: string | null
           make: string
           model: string
           nickname?: string | null
+          photo_url?: string | null
           purchase_date?: string | null
           purchase_mileage?: number | null
           purchase_price?: number | null
@@ -2819,11 +2859,13 @@ export type Database = {
           fuel_type?: string | null
           id?: string
           is_active?: boolean | null
+          is_primary?: boolean | null
           last_mileage_update?: string | null
           location_zip?: string | null
           make?: string
           model?: string
           nickname?: string | null
+          photo_url?: string | null
           purchase_date?: string | null
           purchase_mileage?: number | null
           purchase_price?: number | null
