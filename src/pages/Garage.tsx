@@ -808,8 +808,20 @@ export default function Garage() {
       {/* Dialogs */}
       <AddVehicleDialog
         open={showAddVehicle}
-        onClose={() => setShowAddVehicle(false)}
+        onClose={() => {
+          setShowAddVehicle(false);
+          // Clear URL prefill params
+          if (searchParams.has("addYear")) {
+            searchParams.delete("addYear");
+            searchParams.delete("addMake");
+            searchParams.delete("addModel");
+            setSearchParams(searchParams, { replace: true });
+          }
+        }}
         onAdded={fetchVehicles}
+        initialYear={prefillYear}
+        initialMake={prefillMake}
+        initialModel={prefillModel}
       />
       <EditVehicleDialog
         vehicle={editingVehicle}
