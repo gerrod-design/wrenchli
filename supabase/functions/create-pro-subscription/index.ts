@@ -104,6 +104,18 @@ Deno.serve(async (req) => {
       console.error("[create-pro-subscription] DB upsert error:", upsertError);
     }
 
+    // Queue N8N webhook for new active subscription
+    if (status === "active") {
+      await supabase.from("webhook_queue").insert({
+        event_type: "pro_subscriber_new",
+        payload: {
+          user_id,
+          stripe_subscription_id: subscription.id,
+          created_at: new Date().toISOString(),
+        },
+      });
+    }
+
     return new Response(
       JSON.stringify({ client_secret: clientSecret, subscription_id: subscription.id }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

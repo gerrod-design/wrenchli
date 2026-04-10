@@ -75,6 +75,18 @@ Deno.serve(async (req) => {
         console.warn("[check-recalls] upsert error:", error);
       } else if (data && data.length > 0) {
         newRecalls++;
+        // Queue N8N webhook for new recall
+        await supabase.from("webhook_queue").insert({
+          event_type: "recall_found",
+          payload: {
+            recall_id: data[0].id,
+            vehicle_id: user_vehicle_id,
+            component: recall.Component || "Unknown Component",
+            summary: recall.Summary || "No details available.",
+            consequence: recall.Consequence || "",
+            remedy: recall.Remedy || "Contact your dealer.",
+          },
+        });
       }
     }
 

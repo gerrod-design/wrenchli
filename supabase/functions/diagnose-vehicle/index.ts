@@ -237,7 +237,20 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
       .update({ status: "diagnosing" })
       .eq("id", session_id);
 
-    // ── 6. Return result ───────────────────────────────────
+    // ── 6. Queue N8N webhook ──────────────────────────────
+    await supabase.from("webhook_queue").insert({
+      event_type: "assessment_complete",
+      payload: {
+        session_id,
+        vehicle_id: vehicle ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : null,
+        diagnosis_id: diagnosisRecord.id,
+        confidence: diagnosis.confidence,
+        urgency: diagnosis.urgency,
+        created_at: diagnosisRecord.created_at,
+      },
+    });
+
+    // ── 7. Return result ───────────────────────────────────
     return new Response(
       JSON.stringify({
         diagnosis_id: diagnosisRecord.id,
