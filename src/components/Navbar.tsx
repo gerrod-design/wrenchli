@@ -312,6 +312,12 @@ export default function Navbar() {
         </div>
       )}
       <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
+      <ManageSubscriptionModal
+        open={manageSubOpen}
+        onClose={() => setManageSubOpen(false)}
+        subscription={subscription}
+        onUpdated={() => {}}
+      />
     </nav>
   );
 }
