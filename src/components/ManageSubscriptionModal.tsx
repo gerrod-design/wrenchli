@@ -29,15 +29,10 @@ export default function ManageSubscriptionModal({ open, onClose, subscription, o
     if (!subscription?.stripe_subscription_id) return;
     setCancelling(true);
     try {
-      const { data, error } = await supabase.functions.invoke("customer-portal", {
-        body: { action: "cancel", subscription_id: subscription.stripe_subscription_id },
+      const { error } = await supabase.functions.invoke("cancel-pro-subscription", {
+        body: { subscription_id: subscription.stripe_subscription_id },
       });
       if (error) throw error;
-      // Update local status
-      await supabase
-        .from("pro_subscriptions")
-        .update({ status: "canceled" })
-        .eq("id", subscription.id);
       toast.success(`Your Pro access continues until ${periodEnd}. After that your garage will return to the free tier.`);
       setShowConfirm(false);
       onClose();
@@ -52,7 +47,7 @@ export default function ManageSubscriptionModal({ open, onClose, subscription, o
   const isActive = subscription?.status === "active" || subscription?.status === "trialing";
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={open} onOpenChange={(o) => { if (!o) { setShowConfirm(false); onClose(); } }}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -100,21 +95,10 @@ export default function ManageSubscriptionModal({ open, onClose, subscription, o
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 text-xs"
-                  onClick={() => setShowConfirm(false)}
-                >
+                <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => setShowConfirm(false)}>
                   Keep Pro
                 </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  className="flex-1 text-xs"
-                  onClick={handleCancel}
-                  disabled={cancelling}
-                >
+                <Button size="sm" variant="destructive" className="flex-1 text-xs" onClick={handleCancel} disabled={cancelling}>
                   {cancelling ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
                   Confirm Cancel
                 </Button>
