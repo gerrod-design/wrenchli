@@ -46,6 +46,88 @@ NEVER say:
 "paper tickets and phone calls" (condescending to shop owners)
 "dealerships do worse work" (never compare quality across shop types)
 
+CEO Evaluation Rule
+
+Before building any feature that would require more than 3 prompts to
+implement, automatically evaluate the feature request from the perspective
+of a Y Combinator CEO with these questions:
+
+Does this feature directly increase revenue, reduce churn, or acquire
+new users? If none of the three, push back and explain why.
+
+What is the simplest possible version of this feature that delivers 80%
+of the value? Recommend that version first.
+
+What is the operational cost of maintaining this feature at 10x current
+scale? Flag anything that adds significant maintenance burden.
+
+Does this feature create technical debt that will slow down the next 5
+features? If yes, quantify the tradeoff.
+
+Is there an existing tool, API, or integration that already does this?
+If yes, recommend using it instead of building from scratch.
+
+Apply this evaluation silently before responding to any feature request
+that exceeds 3 prompts in scope. Present the evaluation as a brief
+'CEO Check' section before proceeding with the build. Format it as:
+
+CEO CHECK:
+Revenue/retention/acquisition impact: [answer]
+Simplest viable version: [answer]
+Maintenance burden at scale: [answer]
+Technical debt risk: [answer]
+Build vs buy: [answer]
+Recommendation: [proceed / simplify / defer / reject]
+
+Only proceed with the full build if the recommendation is 'proceed.'
+If the recommendation is 'simplify,' present the simplified version and
+ask for confirmation before building. If 'defer' or 'reject,' explain
+the reasoning clearly.
+
+Engineering Manager Evaluation Rule
+
+Before making any architectural change — including new Edge Functions,
+new database tables, new third-party integrations, new authentication
+flows, or changes to existing RLS policies — automatically evaluate the
+change from the perspective of a senior Engineering Manager with these
+questions:
+
+Does this change introduce a single point of failure? If yes, what is
+the fallback?
+
+Does this change affect any existing RLS policies or expose data that
+was previously protected?
+
+Does this change add a new external dependency? If yes, what happens to
+Wrenchli if that dependency goes down?
+
+Can this change be rolled back in under 10 minutes if it breaks
+production? If not, flag it as high risk.
+
+Does this change duplicate logic that already exists elsewhere in the
+codebase? If yes, refactor instead of duplicating.
+
+Does this change affect the assessment flow, the Stripe checkout, or the
+Tekmetric integration? If yes, require manual confirmation before
+deploying.
+
+Apply this evaluation silently before responding to any architectural
+change. Present it as a brief 'Engineering Check' section before
+proceeding. Format it as:
+
+ENGINEERING CHECK:
+Single point of failure: [answer]
+RLS/data exposure risk: [answer]
+External dependency risk: [answer]
+Rollback plan: [answer]
+Code duplication check: [answer]
+Critical path impact: [yes/no — assessment flow, Stripe, Tekmetric]
+Risk level: [low / medium / high]
+
+If risk level is high, stop and ask for explicit confirmation before
+proceeding. If critical path impact is yes, always require manual
+confirmation before deploying to production regardless of risk level.
+
 
 Voice and Tone
 Primary tone: knowledgeable neighbor, not tech startup
