@@ -199,6 +199,14 @@ Never claim accuracy rates without real data behind them.
 Current accuracy: being computed from outcome_reports — do not
 publish a specific percentage until accuracy_metrics confirms it.
 
+Layout Enforcement Rules
+Never use symmetrical three-column grid layouts for marketing sections.
+Every page section must have one visually dominant element.
+Never center-align body text on desktop viewports.
+Avoid equal-weight card grids — use asymmetric layouts that create
+visual hierarchy.
+All interactive elements must have a minimum 44px touch target on mobile.
+
 Legal and Compliance
 Disclaimer required on all assessment results:
 "Wrenchli is not a licensed mechanic. This is an informational
