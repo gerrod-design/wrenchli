@@ -62,10 +62,7 @@ export default function ReferralPackage() {
     (async () => {
       try {
         const { data: pkg, error: err } = await supabase
-          .from("referral_packages" as any)
-          .select("*")
-          .eq("token", token)
-          .single();
+          .rpc("get_referral_package_by_token", { p_token: token });
 
         if (err || !pkg) {
           setError("This referral link is invalid or has expired.");
@@ -82,11 +79,8 @@ export default function ReferralPackage() {
 
         setData(p);
 
-        // Increment view count
-        await supabase
-          .from("referral_packages" as any)
-          .update({ view_count: (p.view_count || 0) + 1 } as any)
-          .eq("id", p.id);
+        // Increment view count via secure RPC
+        await supabase.rpc("increment_referral_view", { p_token: token });
       } catch {
         setError("Failed to load referral package.");
       } finally {
@@ -233,10 +227,7 @@ export default function ReferralPackage() {
       doc.save(`wrenchli-referral-${data.token.slice(0, 8)}.pdf`);
 
       // Track download
-      await supabase
-        .from("referral_packages" as any)
-        .update({ pdf_download_count: (data.pdf_download_count || 0) + 1 } as any)
-        .eq("id", data.id);
+      await supabase.rpc("increment_referral_download", { p_token: data.token });
 
       toast.success("PDF downloaded!");
     } catch (e) {
