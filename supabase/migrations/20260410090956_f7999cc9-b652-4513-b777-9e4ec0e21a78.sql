@@ -1,0 +1,1 @@
+ALTER TABLE public.pro_subscriptions ADD CONSTRAINT pro_subscriptions_user_id_unique UNIQUE (user_id);
