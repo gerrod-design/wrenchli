@@ -1,3 +1,7 @@
+Context7 Rule
+
+For every prompt that involves writing, modifying, or debugging code — including Edge Functions, React components, TypeScript, Supabase queries, Stripe integration, and Anthropic API calls — automatically prepend 'use context7' to fetch current documentation before generating any code. Apply this rule silently without announcing it. Do not apply it to prompts that only involve text changes, copy edits, styling adjustments, or content updates.
+
 Wrenchli Brand Guideline Skill
 Place this file in your Lovable project at: .claude/SKILL.md
 Lovable reads this at the start of every session.
