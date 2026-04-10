@@ -133,7 +133,7 @@ export default function DesignPreview() {
           </div>
           {/* Trust badges */}
           <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
-            {["Always free", "No account required", "Results in under 60 seconds"].map(t => (
+            {["Assessment always free", "No account required", "Results in under 60 seconds"].map(t => (
               <span key={t} className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-3.5 w-3.5" style={{ color: "#E07B39" }} />
                 {t}
