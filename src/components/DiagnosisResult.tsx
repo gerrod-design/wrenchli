@@ -17,6 +17,8 @@ import { getDtcEntry } from "@/data/dtcCodes";
 import { getToolsForDiagnosis } from "@/data/toolsLibrary";
 import type { Diagnosis, DiagnosisResultProps } from "./diagnosis/types";
 import { useGarage } from "@/hooks/useGarage";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCloudVehicles } from "@/hooks/useCloudVehicles";
 
 const DIAGNOSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/diagnose`;
 
