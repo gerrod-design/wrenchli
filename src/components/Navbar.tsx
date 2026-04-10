@@ -116,8 +116,12 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [recommendOpen, setRecommendOpen] = useState(false);
+  const [manageSubOpen, setManageSubOpen] = useState(false);
   const location = useLocation();
   const { vehicles } = useGarage();
+  const { user } = useAuth();
+  const unreadRecalls = useUnreadRecallCount();
+  const { subscription, isPro } = useProSubscription();
 
   useEffect(() => {
     setOpen(false);
