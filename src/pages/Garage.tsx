@@ -555,15 +555,20 @@ export default function Garage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { vehicles, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
-  const { isPro, loading: proLoading } = useProSubscription();
+  const { isPro, loading: proLoading, subscription, refetch: refetchPro } = useProSubscription();
 
   const vehicleIds = useMemo(() => vehicles.map((v) => v.id), [vehicles]);
   const { recalls, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
 
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<CloudVehicle | null>(null);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
+  const [showManageSub, setShowManageSub] = useState(false);
 
   const isLoading = vehiclesLoading || proLoading;
+
+  const isLapsed = !!subscription && (subscription.status === "canceled" || subscription.status === "past_due");
 
   // Group unread recalls by vehicle
   const unreadRecallsByVehicle = useMemo(() => {
@@ -593,7 +598,7 @@ export default function Garage() {
       toast("Free tier limit reached. Upgrade to Pro for unlimited vehicles.", {
         action: {
           label: "Upgrade",
-          onClick: () => navigate("/garage#upgrade"),
+          onClick: () => handleUpgradeClick(),
         },
       });
       return;
@@ -602,9 +607,21 @@ export default function Garage() {
   };
 
   const handleUpgradeClick = () => {
-    // Part D will implement Stripe checkout — for now scroll to comparison
-    const el = document.getElementById("pro-comparison");
-    el?.scrollIntoView({ behavior: "smooth" });
+    if (!user) {
+      setShowAuthGate(true);
+    } else {
+      setShowUpgrade(true);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthGate(false);
+    // Small delay for auth state to propagate
+    setTimeout(() => setShowUpgrade(true), 500);
+  };
+
+  const handleUpgradeSuccess = () => {
+    refetchPro();
   };
 
   if (!user) {
