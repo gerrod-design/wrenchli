@@ -296,6 +296,7 @@ export type Database = {
           name: string
           owner_email: string | null
           rate_limit_per_minute: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -306,6 +307,7 @@ export type Database = {
           name: string
           owner_email?: string | null
           rate_limit_per_minute?: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -316,6 +318,7 @@ export type Database = {
           name?: string
           owner_email?: string | null
           rate_limit_per_minute?: number
+          user_id?: string | null
         }
         Relationships: []
       }
