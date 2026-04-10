@@ -51,22 +51,35 @@ function AddVehicleDialog({
   open,
   onClose,
   onAdded,
+  initialYear = "",
+  initialMake = "",
+  initialModel = "",
 }: {
   open: boolean;
   onClose: () => void;
   onAdded: () => void;
+  initialYear?: string;
+  initialMake?: string;
+  initialModel?: string;
 }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [vin, setVin] = useState("");
   const [vinDecoding, setVinDecoding] = useState(false);
   const [vinError, setVinError] = useState("");
-  const [year, setYear] = useState("");
-  const [make, setMake] = useState("");
-  const [model, setModel] = useState("");
+  const [year, setYear] = useState(initialYear);
+  const [make, setMake] = useState(initialMake);
+  const [model, setModel] = useState(initialModel);
   const [trim, setTrim] = useState("");
   const [mileage, setMileage] = useState("");
   const [nickname, setNickname] = useState("");
+
+  // Update when initial values change (from URL params)
+  useEffect(() => {
+    if (initialYear) setYear(initialYear);
+    if (initialMake) setMake(initialMake);
+    if (initialModel) setModel(initialModel);
+  }, [initialYear, initialMake, initialModel]);
 
   const reset = () => {
     setVin(""); setVinError(""); setVinDecoding(false);
