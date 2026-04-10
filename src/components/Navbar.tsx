@@ -1,13 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Car } from "lucide-react";
+import { Menu, X, ChevronDown, Car, Crown, Settings } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import { Button } from "@/components/ui/button";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 import GarageDropdown from "@/components/garage/GarageDropdown";
 import GarageBadge from "@/components/vehicle/GarageBadge";
 import { useGarage } from "@/hooks/useGarage";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUnreadRecallCount } from "@/hooks/useUnreadRecallCount";
+import { useProSubscription } from "@/hooks/useProSubscription";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
+import ManageSubscriptionModal from "@/components/ManageSubscriptionModal";
 
 interface DropdownItem {
   label: string;
