@@ -3164,6 +3164,10 @@ export type Database = {
       cleanup_edge_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_youtube_cache: { Args: never; Returns: undefined }
+      get_referral_package_by_token: {
+        Args: { p_token: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -3171,6 +3175,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_referral_download: {
+        Args: { p_token: string }
+        Returns: undefined
+      }
+      increment_referral_view: { Args: { p_token: string }; Returns: undefined }
       resolve_security_alert: { Args: { alert_id: string }; Returns: undefined }
     }
     Enums: {
