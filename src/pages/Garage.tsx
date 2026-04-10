@@ -567,17 +567,30 @@ function EditVehicleDialog({
 export default function Garage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { vehicles, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
   const { isPro, loading: proLoading, subscription, refetch: refetchPro } = useProSubscription();
 
   const vehicleIds = useMemo(() => vehicles.map((v) => v.id), [vehicles]);
   const { recalls, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
 
+  // Pre-fill from URL params (from assessment save-to-garage)
+  const prefillYear = searchParams.get("addYear") || "";
+  const prefillMake = searchParams.get("addMake") || "";
+  const prefillModel = searchParams.get("addModel") || "";
+
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<CloudVehicle | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [showManageSub, setShowManageSub] = useState(false);
+
+  // Auto-open add dialog if URL has prefill params
+  useEffect(() => {
+    if (prefillYear && prefillMake && prefillModel && user) {
+      setShowAddVehicle(true);
+    }
+  }, [prefillYear, prefillMake, prefillModel, user]);
 
   const isLoading = vehiclesLoading || proLoading;
 
