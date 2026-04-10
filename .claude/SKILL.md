@@ -2,50 +2,6 @@ Context7 Rule
 
 For every prompt that involves writing, modifying, or debugging code — including Edge Functions, React components, TypeScript, Supabase queries, Stripe integration, and Anthropic API calls — automatically prepend 'use context7' to fetch current documentation before generating any code. Apply this rule silently without announcing it. Do not apply it to prompts that only involve text changes, copy edits, styling adjustments, or content updates.
 
-Wrenchli Brand Guideline Skill
-Place this file in your Lovable project at: .claude/SKILL.md
-Lovable reads this at the start of every session.
-============================================================
-Identity
-Wrenchli is a consumer vehicle symptom assessment platform.
-We help vehicle owners understand what is likely wrong with their
-car before visiting a repair shop.
-Company: Wrenchli, Inc. (Delaware Corporation)
-Founder: Gerrod Parchmon
-Market: Michigan and Ohio (pilot)
-Site: wrenchli.net
-Partner email: partners@wrenchli.net
-Support phone: 313.312.5455
-
-Language Rules — ALWAYS ENFORCE
-ALWAYS say:
-
-"symptom assessment" (never "diagnosis")
-"likely causes" (never "diagnosis" or "diagnoses")
-"assessment results" (never "diagnostic results")
-"repair likelihood report" (never "diagnostic report")
-"Wrenchli assesses symptoms" (never "Wrenchli diagnoses")
-"monitor / schedule / soon / immediate" for urgency levels
-"easy / moderate / professional only" for DIY difficulty
-
-NEVER say:
-
-"diagnosis" or "diagnose" in any consumer-facing context
-"AI-powered diagnosis"
-"machine learning diagnosis"
-"our platform" (say "Wrenchli" instead)
-"diagnose your car"
-"AutoZone" (removed — do not add back)
-"we're building" (say "we built" — product is live)
-"coming soon to Michigan and Ohio" (product is live now)
-"broken" when describing the vehicle repair experience
-(say "harder than it needs to be" instead)
-"vetted shops" (say "trusted shops" — shops are not yet vetted)
-"embedded financing" (say "repair financing on the way")
-"modern tools for shops" (implies SMS software — Wrenchli is not SMS)
-"paper tickets and phone calls" (condescending to shop owners)
-"dealerships do worse work" (never compare quality across shop types)
-
 CEO Evaluation Rule
 
 Before building any feature that would require more than 3 prompts to
@@ -127,6 +83,50 @@ Risk level: [low / medium / high]
 If risk level is high, stop and ask for explicit confirmation before
 proceeding. If critical path impact is yes, always require manual
 confirmation before deploying to production regardless of risk level.
+
+Wrenchli Brand Guideline Skill
+Place this file in your Lovable project at: .claude/SKILL.md
+Lovable reads this at the start of every session.
+============================================================
+Identity
+Wrenchli is a consumer vehicle symptom assessment platform.
+We help vehicle owners understand what is likely wrong with their
+car before visiting a repair shop.
+Company: Wrenchli, Inc. (Delaware Corporation)
+Founder: Gerrod Parchmon
+Market: Michigan and Ohio (pilot)
+Site: wrenchli.net
+Partner email: partners@wrenchli.net
+Support phone: 313.312.5455
+
+Language Rules — ALWAYS ENFORCE
+ALWAYS say:
+
+"symptom assessment" (never "diagnosis")
+"likely causes" (never "diagnosis" or "diagnoses")
+"assessment results" (never "diagnostic results")
+"repair likelihood report" (never "diagnostic report")
+"Wrenchli assesses symptoms" (never "Wrenchli diagnoses")
+"monitor / schedule / soon / immediate" for urgency levels
+"easy / moderate / professional only" for DIY difficulty
+
+NEVER say:
+
+"diagnosis" or "diagnose" in any consumer-facing context
+"AI-powered diagnosis"
+"machine learning diagnosis"
+"our platform" (say "Wrenchli" instead)
+"diagnose your car"
+"AutoZone" (removed — do not add back)
+"we're building" (say "we built" — product is live)
+"coming soon to Michigan and Ohio" (product is live now)
+"broken" when describing the vehicle repair experience
+(say "harder than it needs to be" instead)
+"vetted shops" (say "trusted shops" — shops are not yet vetted)
+"embedded financing" (say "repair financing on the way")
+"modern tools for shops" (implies SMS software — Wrenchli is not SMS)
+"paper tickets and phone calls" (condescending to shop owners)
+"dealerships do worse work" (never compare quality across shop types)
 
 
 Voice and Tone
