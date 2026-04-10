@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Car, Plus, MoreHorizontal, Trash2, Edit2, AlertTriangle,
-  Search, Crown, Shield, Check, Lock, Eye, EyeOff, Gauge,
+  Search, Crown, Shield, Check, Lock, Eye, EyeOff, Gauge, Settings,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import ProUpgradeModal from "@/components/ProUpgradeModal";
+import AuthGateModal from "@/components/AuthGateModal";
+import ManageSubscriptionModal from "@/components/ManageSubscriptionModal";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
