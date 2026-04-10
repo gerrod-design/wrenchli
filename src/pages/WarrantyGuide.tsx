@@ -257,14 +257,14 @@ export default function WarrantyGuide() {
       />
 
       {/* Hero */}
-      <section className="section-padding" style={{ backgroundColor: "#0F1117" }}>
+      <section className="section-padding" style={{ backgroundColor: "#F8F8F6" }}>
         <div className="container-wrenchli max-w-4xl text-center">
           <SectionReveal>
-            <h1 className="font-heading text-3xl md:text-5xl font-extrabold text-white leading-tight">
+            <h1 className="font-heading text-3xl md:text-5xl font-extrabold leading-tight" style={{ color: "#1A1A1A" }}>
               Car Manufacturer Warranty Guide —{" "}
               <span style={{ color: "#E07B39" }}>What's Covered</span> and for How Long
             </h1>
-            <p className="mt-5 text-base md:text-lg text-white/70 leading-relaxed max-w-3xl mx-auto">
+            <p className="mt-5 text-base md:text-lg leading-relaxed max-w-3xl mx-auto" style={{ color: "#1A1A1A", opacity: 0.7 }}>
               Understanding your vehicle's factory warranty can save you thousands of dollars in repair costs. This guide shows coverage terms for major manufacturers sold in the US. Always verify current terms with your dealer as manufacturers update warranty programs periodically.
             </p>
           </SectionReveal>
