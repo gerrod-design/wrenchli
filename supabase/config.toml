@@ -89,3 +89,6 @@ verify_jwt = false
 
 [functions.trigger-n8n-workflow]
 verify_jwt = false
+
+[functions.morning-briefing]
+verify_jwt = false
