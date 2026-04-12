@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import InteractiveVehicleCard from "@/components/garage/InteractiveVehicleCard";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
@@ -267,98 +268,7 @@ function AddVehicleDialog({
   );
 }
 
-// ─── Vehicle Card ───────────────────────────────────────────────
-function VehicleCard({
-  vehicle,
-  unreadRecalls,
-  onDelete,
-  onEdit,
-}: {
-  vehicle: CloudVehicle;
-  unreadRecalls: number;
-  onDelete: (id: string) => void;
-  onEdit: (v: CloudVehicle) => void;
-}) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  const displayName = vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-  const subtitle = vehicle.nickname
-    ? `${vehicle.year} ${vehicle.make} ${vehicle.model}${vehicle.trim ? ` ${vehicle.trim}` : ""}`
-    : vehicle.trim || "";
-
-  return (
-    <div className="rounded-xl border border-border bg-white p-4 space-y-3">
-      <div className="flex items-start justify-between">
-        <div className="min-w-0 flex-1">
-          <h3 className="font-heading text-sm font-bold truncate">{displayName}</h3>
-          {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
-          <div className="flex items-center gap-3 mt-1">
-            {vehicle.current_mileage && (
-              <span className="text-xs text-muted-foreground font-mono">
-                <Gauge className="h-3 w-3 inline mr-1" />
-                {vehicle.current_mileage.toLocaleString()} mi
-              </span>
-            )}
-            {unreadRecalls > 0 && (
-              <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4 gap-0.5">
-                <AlertTriangle className="h-2.5 w-2.5" />
-                {unreadRecalls} recall{unreadRecalls !== 1 ? "s" : ""}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        {/* Three-dot menu */}
-        <div className="relative shrink-0">
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-1 text-muted-foreground hover:text-foreground rounded"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-          {menuOpen && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg border border-border bg-white shadow-lg py-1">
-              <button
-                onClick={() => { onEdit(vehicle); setMenuOpen(false); }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-xs hover:bg-muted transition-colors"
-              >
-                <Edit2 className="h-3 w-3" /> Edit Vehicle
-              </button>
-              <button
-                onClick={() => { onDelete(vehicle.id); setMenuOpen(false); }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
-              >
-                <Trash2 className="h-3 w-3" /> Delete Vehicle
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Button
-          size="sm"
-          className="h-8 text-xs bg-accent text-accent-foreground hover:bg-accent/90"
-          onClick={() =>
-            navigate(`/?year=${vehicle.year}&make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}`)
-          }
-        >
-          <Search className="mr-1 h-3 w-3" /> Run Assessment
-        </Button>
-        <Button
-          asChild
-          size="sm"
-          variant="outline"
-          className="h-8 text-xs"
-        >
-          <Link to={`/vehicle-insights?year=${vehicle.year}&make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}`}>
-            View Assessments
-          </Link>
-        </Button>
-      </div>
-    </div>
-  );
-}
+// VehicleCard is now InteractiveVehicleCard (imported above)
 
 // ─── Recall Alert Card ──────────────────────────────────────────
 function RecallAlertCard({
@@ -752,7 +662,7 @@ export default function Garage() {
             <div className="space-y-4">
               {/* Vehicle cards */}
               {vehicles.map((v) => (
-                <VehicleCard
+                <InteractiveVehicleCard
                   key={v.id}
                   vehicle={v}
                   unreadRecalls={unreadByVehicle(v.id)}
