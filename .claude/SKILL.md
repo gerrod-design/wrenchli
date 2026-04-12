@@ -436,3 +436,37 @@ Privacy policy live at: wrenchli.net/privacy
 Terms of service: live on site
 Affiliate disclosure in footer: "Wrenchli participates in
 affiliate programs including Amazon Associates."
+
+Consumer-Facing Text Assertion Checklist
+
+Before publishing ANY consumer-facing text change, validate every
+assertion below. If any assertion fails, flag it and DO NOT proceed.
+
+1. No "diagnosis" or "diagnose" — scan the entire change for the
+   words "diagnosis", "diagnose", "diagnoses", "diagnosed", or
+   "diagnosing" in any consumer-facing string. Fail if found.
+
+2. No sentence over 25 words in marketing copy — count words in
+   every sentence of marketing copy (headlines, CTAs, hero text,
+   landing pages, blog excerpts, UI labels). Fail if any single
+   sentence exceeds 25 words. Code comments and internal docs are
+   exempt.
+
+3. Every CTA uses an action verb — every call-to-action button or
+   link must begin with an action verb (e.g. "Get", "Start", "Run",
+   "Apply", "Save", "See", "Try", "Find"). Fail if a CTA begins
+   with a noun, adjective, or passive construction.
+
+4. Urgency levels use exact words only — the only permitted urgency
+   labels are: immediate, soon, schedule, monitor. Fail if any
+   other word is used as an urgency level (e.g. "critical", "low",
+   "high", "warning", "urgent").
+
+5. DIY difficulty uses exact words only — the only permitted
+   difficulty labels are: easy, moderate, Shop Required. Fail if
+   any other label is used (e.g. "hard", "advanced", "beginner",
+   "professional only", "pro only", "expert").
+
+Enforcement: Apply this checklist silently on every consumer-facing
+text change. Present failures as a numbered list with the failing
+text quoted. Do not publish until all five assertions pass.
