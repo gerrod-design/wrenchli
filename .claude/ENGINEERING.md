@@ -67,6 +67,12 @@ run the following audit before marking the task complete:
 Flag violations before publishing. This audit is required before any
 consumer-facing visual change is marked complete.
 
+**Audit Separation Rule:** When running a security scan or copy audit,
+report all findings first and wait for explicit confirmation before
+making any fixes. Never fix and audit in the same step. The audit
+result must be reviewed and approved before any remediation prompt
+is submitted.
+
 **Security Scan Rule:** After every deployment, run an updated security
 scan. Errors → stop and fix. Warnings → flag and ask confirmation.
 
