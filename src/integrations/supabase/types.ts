@@ -3161,7 +3161,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      shops_public: {
+        Row: {
+          address_city: string | null
+          address_state: string | null
+          address_street: string | null
+          address_zip: string | null
+          bay_count: string | null
+          created_at: string | null
+          id: string | null
+          is_pilot: boolean | null
+          name: string | null
+          owner_name: string | null
+          slug: string | null
+          updated_at: string | null
+          verified_status: string | null
+        }
+        Insert: {
+          address_city?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zip?: string | null
+          bay_count?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_pilot?: boolean | null
+          name?: string | null
+          owner_name?: string | null
+          slug?: string | null
+          updated_at?: string | null
+          verified_status?: string | null
+        }
+        Update: {
+          address_city?: string | null
+          address_state?: string | null
+          address_street?: string | null
+          address_zip?: string | null
+          bay_count?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_pilot?: boolean | null
+          name?: string | null
+          owner_name?: string | null
+          slug?: string | null
+          updated_at?: string | null
+          verified_status?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_edge_rate_limits: { Args: never; Returns: undefined }
