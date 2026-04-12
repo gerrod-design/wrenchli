@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { CloudVehicle } from "@/hooks/useCloudVehicles";
-import VehicleSilhouette from "@/components/vehicle/VehicleSilhouette";
+import { useVehiclePhoto } from "@/hooks/useVehiclePhoto";
 import { cn } from "@/lib/utils";
 
 // ─── Body type detection ────────────────────────────────────────
