@@ -53,6 +53,20 @@ Assessment → Plan, no login required.
 
 If any fail, roll back and report before proceeding.
 
+**UI/UX Audit Rule:** After any visual component change affecting
+consumer-facing pages (homepage, assessment flow, garage, /for-shops),
+run the following audit before marking the task complete:
+
+1. Mobile rendering at 375px width — no layout breaks
+2. Contrast ratios on all text against backgrounds — minimum 4.5:1
+   for body text
+3. All interactive elements have minimum 44px touch targets
+4. Loading states exist on all form submissions and API calls
+5. No text overflows its container on mobile
+
+Flag violations before publishing. This audit is required before any
+consumer-facing visual change is marked complete.
+
 **Security Scan Rule:** After every deployment, run an updated security
 scan. Errors → stop and fix. Warnings → flag and ask confirmation.
 
