@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Camera, Upload, X, Loader2, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +19,12 @@ export default function PhotoUploader({
   disabled = false,
 }: PhotoUploaderProps) {
   const [uploading, setUploading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
 
   const handleUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -47,7 +52,8 @@ export default function PhotoUploader({
         }
 
         const ext = file.name.split(".").pop() || "jpg";
-        const path = `${crypto.randomUUID()}.${ext}`;
+        const folder = userId || "anonymous";
+        const path = `${folder}/${crypto.randomUUID()}.${ext}`;
 
         const { error } = await supabase.storage
           .from("damage-photos")
