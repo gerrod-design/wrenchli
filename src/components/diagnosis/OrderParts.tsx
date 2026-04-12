@@ -13,15 +13,6 @@ const retailers: { id: RetailerId; label: string; bg: string; text: string; subL
 
 const pickupRetailers: { id: string; label: string; subLabel: string; bg: string; text: string; urlBuilder: (query: string) => string; destination: string }[] = [
   {
-    id: "autozone",
-    label: "AutoZone",
-    subLabel: "Same-day pickup",
-    bg: "hsl(0 72% 45%)",
-    text: "white",
-    urlBuilder: (q) => `https://www.autozone.com/searchresult?searchtext=${encodeURIComponent(q)}`,
-    destination: "autozone",
-  },
-  {
     id: "oreilly-pickup",
     label: "O'Reilly",
     subLabel: "Same-day pickup",
