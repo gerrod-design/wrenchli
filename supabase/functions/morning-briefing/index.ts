@@ -148,9 +148,22 @@ Deno.serve(async (req) => {
 
     const body = lines.join("\n");
 
-    // Send via Resend
-    const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    // Send via Resend (direct API — same pattern as send-alert-email)
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Wrenchli <onboarding@resend.dev>",
+        to: ["gerrod@wrenchli.net"],
+        subject: `Morning Briefing — ${dateStr}`,
+        text: body,
+      }),
+    });
+    const sendResult = await res.json();
+    if (!res.ok) throw new Error(`Resend error [${res.status}]: ${JSON.stringify(sendResult)}`);
 
     let sendResult;
     if (lovableApiKey) {
