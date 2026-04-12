@@ -144,8 +144,9 @@ export default function ChatBot() {
     const path = `chat-${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("damage-photos").upload(path, file, { contentType: file.type });
     if (error) { console.error("Upload error:", error); toast.error("Failed to upload photo."); return null; }
-    const { data: urlData } = supabase.storage.from("damage-photos").getPublicUrl(path);
-    return urlData.publicUrl;
+    const { data: urlData, error: signErr } = await supabase.storage.from("damage-photos").createSignedUrl(path, 3600);
+    if (signErr || !urlData?.signedUrl) { console.error("Signed URL error:", signErr); toast.error("Failed to get photo URL."); return null; }
+    return urlData.signedUrl;
   };
 
   const handleFileUpload = async (files: FileList | null) => {
