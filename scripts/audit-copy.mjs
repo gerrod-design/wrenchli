@@ -146,33 +146,31 @@ function scan() {
     const lines = content.split("\n");
     const texts = extractConsumerText(content, ext);
 
-    // 1. Banned words
+    // 1. Banned words — only scan extracted consumer-facing text, not code
     for (const rule of BANNED_WORDS) {
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        // Skip code lines: imports, comments, declarations, type annotations, prop access, variable usage
-        // We only want to flag consumer-facing strings and JSX text, not code identifiers
-        const trimmed = line.trimStart();
-        if (/^(import |\/\/|\/\*|\*|export (type|interface|function|default function|const )|type |interface |return |if |else |switch |case |try |catch |async |await |throw )/.test(trimmed)) continue;
-        // Skip lines that are clearly code: assignments, function calls, prop passing, destructuring
-        if (/^\w+\s*[=({]|^\.\w|^\}|^\]|^\)/.test(trimmed)) continue;
-        // Skip lines referencing diagnosis/diagnose as identifiers (camelCase, dot access, destructuring, etc.)
-        if (/diagnos\w*[.([\]_A-Z]|[.=({]\s*diagnos|diagnos\w*\s*[=,}\])|diagnos\w*\s*&&|diagnos\w*\s*\|\||diagnos\w*\s*\?[^"']|set[A-Z]\w*diagnos|:\s*Diagnos|<Diagnos|\bdiagnos\w*\b\s*:/i.test(line) && !/["'`>].*diagnos/i.test(line)) continue;
-        const matches = [...line.matchAll(rule.pattern)];
-        for (const match of matches) {
-          if (rule.contextCheck && rule.label.includes("broken")) {
-            if (BROKEN_OK_CONTEXT.test(line)) continue;
+      if (ext === ".md") {
+        // For markdown, scan full lines (they're all consumer-facing)
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (/^---/.test(line.trim())) continue; // skip frontmatter delimiters
+          const matches = [...line.matchAll(rule.pattern)];
+          for (const match of matches) {
+            if (rule.contextCheck && rule.label.includes("broken") && BROKEN_OK_CONTEXT.test(line)) continue;
+            findings.push({ severity: "error", category: "Banned word", file: rel, line: i + 1, text: `"${match[0]}"`, fix: rule.fix });
           }
-          findings.push({
-            severity: "error",
-            category: "Banned word",
-            file: rel,
-            line: i + 1,
-            text: `"${match[0]}"`,
-            fix: rule.fix,
-          });
+        }
+      } else {
+        // For TSX/TS: only scan the extracted consumer text fragments
+        for (const text of texts) {
+          const matches = [...text.matchAll(rule.pattern)];
+          for (const match of matches) {
+            if (rule.contextCheck && rule.label.includes("broken") && BROKEN_OK_CONTEXT.test(text)) continue;
+            const lineNum = lines.findIndex((l) => l.includes(text.slice(0, 30))) + 1;
+            findings.push({ severity: "error", category: "Banned word", file: rel, line: lineNum || "?", text: `"${match[0]}"`, fix: rule.fix });
+          }
         }
       }
+    }
     }
 
     // 2. Sentence length (marketing copy only — skip code lines)
