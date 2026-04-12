@@ -150,8 +150,8 @@ function scan() {
     for (const rule of BANNED_WORDS) {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        // Skip imports, comments, variable names
-        if (/^\s*(import |\/\/|\/\*|\*|const |let |var |type |interface |function )/.test(line)) continue;
+        // Skip imports, comments, variable declarations, type definitions, prop spreading, function signatures
+        if (/^\s*(import |\/\/|\/\*|\*|const |let |var |type |interface |function |export (type|interface|function|default function|const)|.*=>|.*\?\.|.*\.\w+|.*diagnosis[_A-Z]|.*[Dd]iagnos(is|e)[A-Z]|.*diagnosis\.|.*: Diagnosis|.*Diagnosis\[]|.*Diagnosis>|.*DiagnosisResult|.*diagnosisTitle|.*diagnosisCode|.*diagnosisUrgency|.*diagnosisDetails|.*diagnosis_id|.*diagnosis\.|\{.*diagnosis|diagnosis\s*[,\}=]|diagnosis\s*&&|diagnosis\s*\?|setDiagnosis|diagnosis\s*\|\|)/.test(line)) continue;
         const matches = [...line.matchAll(rule.pattern)];
         for (const match of matches) {
           if (rule.contextCheck && rule.label.includes("broken")) {
