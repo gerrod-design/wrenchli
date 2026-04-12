@@ -11,7 +11,6 @@
 
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
 import ShopList from "@/components/shops/ShopList";
