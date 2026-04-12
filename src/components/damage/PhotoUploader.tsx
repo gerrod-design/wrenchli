@@ -65,11 +65,18 @@ export default function PhotoUploader({
           continue;
         }
 
-        const { data: urlData } = supabase.storage
+        // Bucket is private — use a signed URL (1 hour expiry)
+        const { data: urlData, error: signErr } = await supabase.storage
           .from("damage-photos")
-          .getPublicUrl(path);
+          .createSignedUrl(path, 3600);
 
-        uploaded.push(urlData.publicUrl);
+        if (signErr || !urlData?.signedUrl) {
+          console.error("Signed URL error:", signErr);
+          toast.error(`Failed to get URL for ${file.name}`);
+          continue;
+        }
+
+        uploaded.push(urlData.signedUrl);
       }
 
       if (uploaded.length > 0) {

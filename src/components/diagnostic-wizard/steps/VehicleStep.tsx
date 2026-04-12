@@ -83,23 +83,23 @@ export default function VehicleStep({ onNext }: Props) {
     try {
       const anonSessionId = getAnonSessionId();
 
-      // Create vehicle record
-      const { data: vehicleRec, error: vErr } = await supabase
+      // Pre-generate IDs so we don't need SELECT policies for anon users
+      const vehicleId = crypto.randomUUID();
+      const sessionId = crypto.randomUUID();
+
+      // Create vehicle record (no .select() — anon has no SELECT policy)
+      const { error: vErr } = await supabase
         .from("vehicles")
-        .insert({ year: y, make: make.trim(), model: model.trim(), mileage: m, anon_session_id: anonSessionId } as any)
-        .select()
-        .single();
+        .insert({ id: vehicleId, year: y, make: make.trim(), model: model.trim(), mileage: m, anon_session_id: anonSessionId } as any);
       if (vErr) throw vErr;
 
       // Create diagnostic session
-      const { data: session, error: sErr } = await supabase
+      const { error: sErr } = await supabase
         .from("diagnostic_sessions")
-        .insert({ vehicle_id: vehicleRec.id, status: "intake", anon_session_id: anonSessionId })
-        .select()
-        .single();
+        .insert({ id: sessionId, vehicle_id: vehicleId, status: "intake", anon_session_id: anonSessionId });
       if (sErr) throw sErr;
 
-      onNext({ year: y, make: make.trim(), model: model.trim(), mileage: m }, session.id);
+      onNext({ year: y, make: make.trim(), model: model.trim(), mileage: m }, sessionId);
     } catch (e: any) {
       setError(e.message || "Failed to create session");
     } finally {
