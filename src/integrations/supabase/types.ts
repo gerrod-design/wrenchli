@@ -3000,6 +3000,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          anon_session_id: string | null
           created_at: string | null
           decoded_specs: Json | null
           id: string
@@ -3014,6 +3015,7 @@ export type Database = {
           year: number
         }
         Insert: {
+          anon_session_id?: string | null
           created_at?: string | null
           decoded_specs?: Json | null
           id?: string
@@ -3028,6 +3030,7 @@ export type Database = {
           year: number
         }
         Update: {
+          anon_session_id?: string | null
           created_at?: string | null
           decoded_specs?: Json | null
           id?: string
