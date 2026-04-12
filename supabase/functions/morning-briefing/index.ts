@@ -15,7 +15,6 @@ Deno.serve(async (req) => {
     if (!resendApiKey) throw new Error("RESEND_API_KEY not configured");
 
     const supabase = createClient(supabaseUrl, serviceRoleKey);
-
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
     // 1. New diagnostic sessions
@@ -72,53 +71,53 @@ Deno.serve(async (req) => {
     });
 
     const lines: string[] = [];
-    lines.push(`WRENCHLI MORNING BRIEFING`);
-    lines.push(`${dateStr}`);
-    lines.push(`Covering the last 24 hours`);
-    lines.push(`${"─".repeat(40)}`);
-    lines.push(``);
+    lines.push("WRENCHLI MORNING BRIEFING");
+    lines.push(dateStr);
+    lines.push("Covering the last 24 hours");
+    lines.push("─".repeat(40));
+    lines.push("");
 
     // Sessions
-    lines.push(`ASSESSMENTS`);
+    lines.push("ASSESSMENTS");
     lines.push(`  New sessions: ${sessionCount ?? 0}`);
-    lines.push(``);
+    lines.push("");
 
     // Shop onboarded
-    lines.push(`SHOP ONBOARDING`);
+    lines.push("SHOP ONBOARDING");
     if (shopEvents && shopEvents.length > 0) {
       for (const ev of shopEvents) {
         const p = ev.payload as Record<string, unknown>;
         lines.push(`  ✓ ${p?.shop_name || "Unknown shop"} — ${p?.city || ""}, ${p?.state || ""}`);
       }
     } else {
-      lines.push(`  No new shops onboarded.`);
+      lines.push("  No new shops onboarded.");
     }
-    lines.push(``);
+    lines.push("");
 
     // Accuracy alerts
-    lines.push(`ACCURACY ALERTS`);
+    lines.push("ACCURACY ALERTS");
     if (accuracyAlerts && accuracyAlerts.length > 0) {
       for (const a of accuracyAlerts) {
         lines.push(`  ⚠ ${a.category} — ${a.accuracy_rate}% accuracy (n=${a.sample_size})`);
       }
     } else {
-      lines.push(`  No accuracy alerts. All clear.`);
+      lines.push("  No accuracy alerts. All clear.");
     }
-    lines.push(``);
+    lines.push("");
 
     // Security alerts
-    lines.push(`SECURITY ALERTS`);
+    lines.push("SECURITY ALERTS");
     if (securityAlerts && securityAlerts.length > 0) {
       for (const s of securityAlerts) {
-        lines.push(`  🔒 [${s.severity?.toUpperCase()}] ${s.alert_type}: ${s.description}`);
+        lines.push(`  🔒 [${(s.severity || "").toUpperCase()}] ${s.alert_type}: ${s.description}`);
       }
     } else {
-      lines.push(`  No security alerts. All clear.`);
+      lines.push("  No security alerts. All clear.");
     }
-    lines.push(``);
+    lines.push("");
 
     // Recall events
-    lines.push(`RECALL ALERTS`);
+    lines.push("RECALL ALERTS");
     if (recallEvents && recallEvents.length > 0) {
       lines.push(`  ${recallEvents.length} new recall(s) discovered.`);
       for (const r of recallEvents.slice(0, 5)) {
@@ -129,27 +128,27 @@ Deno.serve(async (req) => {
         lines.push(`  ... and ${recallEvents.length - 5} more.`);
       }
     } else {
-      lines.push(`  No new recalls found.`);
+      lines.push("  No new recalls found.");
     }
-    lines.push(``);
+    lines.push("");
 
     // Pro subscriptions
-    lines.push(`PRO SUBSCRIPTIONS`);
+    lines.push("PRO SUBSCRIPTIONS");
     if (newSubs && newSubs.length > 0) {
       lines.push(`  ${newSubs.length} new subscription(s).`);
     } else {
-      lines.push(`  No new subscriptions.`);
+      lines.push("  No new subscriptions.");
     }
-    lines.push(``);
+    lines.push("");
 
-    lines.push(`${"─".repeat(40)}`);
-    lines.push(`Wrenchli, Inc. · Detroit, MI`);
-    lines.push(`https://wrenchli.net`);
+    lines.push("─".repeat(40));
+    lines.push("Wrenchli, Inc. · Detroit, MI");
+    lines.push("https://wrenchli.net");
 
     const body = lines.join("\n");
 
-    // Send via Resend (direct API — same pattern as send-alert-email)
-    const res = await fetch("https://api.resend.com/emails", {
+    // Send via Resend (direct API)
+    const emailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${resendApiKey}`,
@@ -162,42 +161,8 @@ Deno.serve(async (req) => {
         text: body,
       }),
     });
-    const sendResult = await res.json();
-    if (!res.ok) throw new Error(`Resend error [${res.status}]: ${JSON.stringify(sendResult)}`);
-
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${lovableApiKey}`,
-          "X-Connection-Api-Key": resendApiKey,
-        },
-        body: JSON.stringify({
-          from: "Wrenchli <onboarding@resend.dev>",
-          to: ["gerrod@wrenchli.net"],
-          subject: `Morning Briefing — ${dateStr}`,
-          text: body,
-        }),
-      });
-      sendResult = await res.json();
-      if (!res.ok) throw new Error(`Resend error [${res.status}]: ${JSON.stringify(sendResult)}`);
-    } else {
-      // Direct Resend fallback
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Wrenchli <onboarding@resend.dev>",
-          to: ["gerrod@wrenchli.net"],
-          subject: `Morning Briefing — ${dateStr}`,
-          text: body,
-        }),
-      });
-      sendResult = await res.json();
-      if (!res.ok) throw new Error(`Resend error [${res.status}]: ${JSON.stringify(sendResult)}`);
-    }
+    const sendResult = await emailRes.json();
+    if (!emailRes.ok) throw new Error(`Resend error [${emailRes.status}]: ${JSON.stringify(sendResult)}`);
 
     console.log("[morning-briefing] Sent successfully:", sendResult);
 
