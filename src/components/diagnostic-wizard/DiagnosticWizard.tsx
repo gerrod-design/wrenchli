@@ -103,7 +103,7 @@ export default function DiagnosticWizard() {
     <div className="relative rounded-xl overflow-hidden" style={{ background: "#1A1D27", border: "1px solid #2A2D37", WebkitTransform: "translate3d(0,0,0)" }}>
       {/* Step indicator */}
       <div className="flex border-b" style={{ borderColor: "#2A2D37" }}>
-        {["Vehicle", "Symptoms", "Diagnosis", "Plan"].map((label, i) => (
+        {["Vehicle", "Symptoms", "Assessment", "Plan"].map((label, i) => (
           <div
             key={label}
             className="flex-1 text-center py-3 text-xs font-mono transition-colors"
