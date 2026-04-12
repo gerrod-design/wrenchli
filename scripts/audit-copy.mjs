@@ -150,8 +150,14 @@ function scan() {
     for (const rule of BANNED_WORDS) {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        // Skip imports, comments, variable declarations, type definitions, prop spreading, function signatures
-        if (/^\s*(import |\/\/|\/\*|\*|const |let |var |type |interface |function |export (type|interface|function|default function|const)|.*=>|.*\?\.|.*\.\w+|.*diagnosis[_A-Z]|.*[Dd]iagnos(is|e)[A-Z]|.*diagnosis\.|.*: Diagnosis|.*Diagnosis\[]|.*Diagnosis>|.*DiagnosisResult|.*diagnosisTitle|.*diagnosisCode|.*diagnosisUrgency|.*diagnosisDetails|.*diagnosis_id|.*diagnosis\.|\{.*diagnosis|diagnosis\s*[,\}=]|diagnosis\s*&&|diagnosis\s*\?|setDiagnosis|diagnosis\s*\|\|)/.test(line)) continue;
+        // Skip code lines: imports, comments, declarations, type annotations, prop access, variable usage
+        // We only want to flag consumer-facing strings and JSX text, not code identifiers
+        const trimmed = line.trimStart();
+        if (/^(import |\/\/|\/\*|\*|export (type|interface|function|default function|const )|type |interface |return |if |else |switch |case |try |catch |async |await |throw )/.test(trimmed)) continue;
+        // Skip lines that are clearly code: assignments, function calls, prop passing, destructuring
+        if (/^\w+\s*[=({]|^\.\w|^\}|^\]|^\)/.test(trimmed)) continue;
+        // Skip lines referencing diagnosis/diagnose as identifiers (camelCase, dot access, destructuring, etc.)
+        if (/diagnos\w*[.([\]_A-Z]|[.=({]\s*diagnos|diagnos\w*\s*[=,}\])|diagnos\w*\s*&&|diagnos\w*\s*\|\||diagnos\w*\s*\?[^"']|set[A-Z]\w*diagnos|:\s*Diagnos|<Diagnos|\bdiagnos\w*\b\s*:/i.test(line) && !/["'`>].*diagnos/i.test(line)) continue;
         const matches = [...line.matchAll(rule.pattern)];
         for (const match of matches) {
           if (rule.contextCheck && rule.label.includes("broken")) {
