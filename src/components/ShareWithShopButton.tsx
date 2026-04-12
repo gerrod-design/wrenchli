@@ -39,9 +39,17 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
   const handleShare = async () => {
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please sign in to share with a shop.");
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("referral_packages" as any)
         .insert({
+          user_id: user.id,
           diagnosis_title: props.diagnosisTitle,
           diagnosis_code: props.diagnosisCode || null,
           diagnosis_urgency: props.diagnosisUrgency || null,
