@@ -618,10 +618,10 @@ export default function Garage() {
             <div className="flex items-center gap-3 mb-6">
               <Car className="h-6 w-6 text-accent" />
               <h1 className="font-heading text-2xl font-bold md:text-3xl">My Garage</h1>
-              <Badge className="bg-muted text-muted-foreground text-[10px] px-2 py-0.5">Demo</Badge>
+              
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {DEMO_VEHICLES.map((v) => (
                 <InteractiveVehicleCard
                   key={v.id}
