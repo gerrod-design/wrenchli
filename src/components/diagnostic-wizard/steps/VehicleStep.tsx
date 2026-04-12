@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Loader2, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { VehicleData } from "../DiagnosticWizard";
+import { getAnonSessionId } from "@/lib/anonSession";
 
 interface Props {
   onNext: (vehicle: VehicleData, sessionId: string) => void;
@@ -80,10 +81,12 @@ export default function VehicleStep({ onNext }: Props) {
     setError("");
 
     try {
+      const anonSessionId = getAnonSessionId();
+
       // Create vehicle record
       const { data: vehicleRec, error: vErr } = await supabase
         .from("vehicles")
-        .insert({ year: y, make: make.trim(), model: model.trim(), mileage: m })
+        .insert({ year: y, make: make.trim(), model: model.trim(), mileage: m, anon_session_id: anonSessionId } as any)
         .select()
         .single();
       if (vErr) throw vErr;
@@ -91,7 +94,7 @@ export default function VehicleStep({ onNext }: Props) {
       // Create diagnostic session
       const { data: session, error: sErr } = await supabase
         .from("diagnostic_sessions")
-        .insert({ vehicle_id: vehicleRec.id, status: "intake" })
+        .insert({ vehicle_id: vehicleRec.id, status: "intake", anon_session_id: anonSessionId })
         .select()
         .single();
       if (sErr) throw sErr;
