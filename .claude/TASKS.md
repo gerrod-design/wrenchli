@@ -5,7 +5,7 @@
 ## Critical
 
 - [ ] **Find EIN and activate Stripe live mode** — Stripe sandbox is active (price ID `price_1TKaxDGgIpvcscSeDceeWkFo`). Live mode blocked until EIN is registered. Status: *waiting on EIN*
-- [ ] **Fix symptom_reports and repair_recommendations cross-session RLS policies** — Current policies may allow data leakage across anonymous sessions. Must verify guest flow after fix. Status: *not started*
+- [x] **Fix symptom_reports and repair_recommendations cross-session RLS policies** — Fixed April 12 2026. Dropped overly permissive ALL policies. Anon restricted to INSERT-only; authenticated scoped to own sessions. Guest reads handled by edge functions (service role). Status: *complete*
 
 ## This Week
 
