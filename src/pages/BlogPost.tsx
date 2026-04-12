@@ -69,6 +69,9 @@ export default function BlogPost() {
             </div>
           )}
 
+          {/* Explainer Graphic */}
+          {slug && <SymptomExplainer slug={slug} />}
+
           {/* Body */}
           <div className="prose prose-neutral mt-8 max-w-none prose-headings:font-heading prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-a:text-accent hover:prose-a:underline">
             <ReactMarkdown>{post.content}</ReactMarkdown>
