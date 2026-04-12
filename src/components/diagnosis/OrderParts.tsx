@@ -45,7 +45,7 @@ export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps)
     return (
       <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
         <p className="text-sm text-muted-foreground">
-          Parts data isn't available for this specific diagnosis yet. Try searching directly:
+          Parts data isn't available for this specific issue yet. Try searching directly:
         </p>
         <a
           href={buildRetailerUrl("amazon", diagnosisTitle.replace(/\s+/g, "+"), vehicle)}
