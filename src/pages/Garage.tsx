@@ -560,20 +560,87 @@ export default function Garage() {
     refetchPro();
   };
 
+  // ─── DEMO MODE: preview card without auth (remove later) ────
+  const DEMO_VEHICLES: CloudVehicle[] = [
+    {
+      id: "demo-1",
+      user_id: "demo",
+      year: 2021,
+      make: "Ford",
+      model: "F-150",
+      trim: "XLT",
+      nickname: "Big Blue",
+      current_mileage: 47200,
+      is_active: true,
+      is_primary: true,
+      photo_url: null,
+      created_at: "2025-01-15T00:00:00Z",
+      updated_at: "2025-12-01T00:00:00Z",
+    },
+    {
+      id: "demo-2",
+      user_id: "demo",
+      year: 2019,
+      make: "Toyota",
+      model: "Camry",
+      trim: "SE",
+      nickname: null,
+      current_mileage: 82300,
+      is_active: true,
+      is_primary: false,
+      photo_url: null,
+      created_at: "2024-06-10T00:00:00Z",
+      updated_at: "2024-09-20T00:00:00Z", // stale mileage (90+ days)
+    },
+    {
+      id: "demo-3",
+      user_id: "demo",
+      year: 2023,
+      make: "Honda",
+      model: "CR-V",
+      trim: "EX-L",
+      nickname: "Family Hauler",
+      current_mileage: 12400,
+      is_active: true,
+      is_primary: false,
+      photo_url: null,
+      created_at: "2025-03-01T00:00:00Z",
+      updated_at: new Date().toISOString(),
+    },
+  ];
+
   if (!user) {
     return (
       <main className="pb-[60px] md:pb-0">
         <SEO title="My Garage — Wrenchli" description="Save your vehicles, get recall alerts, and track assessment history." path="/garage" />
         <section className="section-padding" style={{ backgroundColor: "#F8F8F6" }}>
-          <div className="container-wrenchli max-w-2xl text-center py-20">
-            <Car className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
-            <h1 className="font-heading text-2xl font-bold mb-2">My Garage</h1>
-            <p className="text-sm text-muted-foreground mb-6">
-              Sign in to save your vehicles, get recall alerts, and track your assessment history.
-            </p>
-            <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link to="/admin/login">Sign In</Link>
-            </Button>
+          <div className="container-wrenchli max-w-2xl">
+            <div className="flex items-center gap-3 mb-6">
+              <Car className="h-6 w-6 text-accent" />
+              <h1 className="font-heading text-2xl font-bold md:text-3xl">My Garage</h1>
+              <Badge className="bg-muted text-muted-foreground text-[10px] px-2 py-0.5">Demo</Badge>
+            </div>
+
+            <div className="space-y-4">
+              {DEMO_VEHICLES.map((v) => (
+                <InteractiveVehicleCard
+                  key={v.id}
+                  vehicle={v}
+                  unreadRecalls={v.id === "demo-1" ? 2 : 0}
+                  onDelete={() => {}}
+                  onEdit={() => {}}
+                />
+              ))}
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground mb-3">
+                Sign in to save your vehicles, get recall alerts, and track your assessment history.
+              </p>
+              <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+                <Link to="/admin/login">Sign In</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>
