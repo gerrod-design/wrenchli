@@ -661,7 +661,7 @@ export default function Garage() {
             <div className="space-y-4">
               {/* Vehicle cards */}
               {vehicles.map((v) => (
-                <VehicleCard
+                <InteractiveVehicleCard
                   key={v.id}
                   vehicle={v}
                   unreadRecalls={unreadByVehicle(v.id)}
