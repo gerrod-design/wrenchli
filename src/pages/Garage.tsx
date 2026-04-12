@@ -621,7 +621,7 @@ export default function Garage() {
               
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {DEMO_VEHICLES.map((v) => (
                 <InteractiveVehicleCard
                   key={v.id}
