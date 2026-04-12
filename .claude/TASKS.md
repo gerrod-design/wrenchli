@@ -5,7 +5,7 @@
 ## Critical
 
 - [ ] **Find EIN and activate Stripe live mode** — Stripe sandbox is active (price ID `price_1TKaxDGgIpvcscSeDceeWkFo`). Live mode blocked until EIN is registered. Status: *waiting on EIN*
-- [x] **Fix symptom_reports and repair_recommendations cross-session RLS policies** — Fixed April 12 2026. Dropped overly permissive ALL policies. Anon restricted to INSERT-only; authenticated scoped to own sessions. Guest reads handled by edge functions (service role). Status: *complete*
+- [x] **Fix symptom_reports and repair_recommendations cross-session RLS policies** — Fixed April 12 2026. Status: *complete*
 
 ## This Week
 
@@ -18,3 +18,10 @@
 
 - [ ] **Build N8N Workflow 5 — Weekly Agent Digest** — Automated weekly summary of agent activity and accuracy metrics. Status: *not started*
 - [ ] **Apply to CJ Affiliate for AutoZone and O'Reilly** — Affiliate program applications for parts revenue. Note: AutoZone removed from product; affiliate would be link-only if approved. Status: *not started*
+
+## Completed — April 12 2026 (Tonight)
+
+- [x] **Garage vehicle card redesign** — Replaced basic list-item cards with premium dashboard-style cards inspired by Rivian/BMW ConnectedDrive. Full-width hero, corner health ring, stats bar with IBM Plex Mono, recall badge, stacked CTAs, hover lift animation. Status: *complete*
+- [x] **Unsplash integration for garage vehicle photos** — Created `unsplash-search` edge function and `useVehiclePhoto` hook. Replaces SVG silhouettes with real vehicle photography via Unsplash API. Dark gradient overlay for text readability. Fallback to clean dark card if no photo found. Query optimized to `{make} {model} car exterior` (year excluded for better results). Status: *complete*
+- [x] **Demo mode for garage** — Added temporary demo vehicles (F-150, Camry, CR-V) to garage page so cards can be previewed without authentication. Status: *complete*
+- [x] **UI/UX Audit Rule added to ENGINEERING.md** — 5-point checklist (mobile 375px, contrast 4.5:1, 44px touch targets, loading states, no text overflow) required before any consumer-facing visual change is marked complete. Status: *complete*

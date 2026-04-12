@@ -50,9 +50,27 @@ easy · moderate · Shop Required
 - $299/month shop pricing — removed from /for-shops
 - "March 2026 pilot program" banner — removed from /for-shops
 
+## Garage & Vehicle Card Preferences
+
+- Garage cards use premium dashboard aesthetic (Rivian/BMW ConnectedDrive style)
+- Vehicle photos sourced from Unsplash API via `unsplash-search` edge function
+- Unsplash query format: `{make} {model} car exterior` — exclude year (pollutes results)
+- UNSPLASH_ACCESS_KEY stored as Supabase secret
+- Fallback when no photo: clean dark card with vehicle name only — no icons, no illustrations, no placeholders
+- Dark gradient overlay: transparent at top → #0F1117 at bottom for text readability
+- Typography: Plus Jakarta Sans for labels, IBM Plex Mono for stats/numbers
+- Stats bar shows: mileage, age, last assessment — separated by thin vertical dividers
+- Stale mileage (90+ days) renders in orange with pulse animation
+- Health ring: compact 48px in top-right corner, tooltip on hover (no inline text)
+- Recall badge: orange pill ("X Open Recalls") overlaid top-left of hero
+- Hover: 4px upward shift + shadow increase
+- Demo vehicles exist on garage page for preview without auth (temporary)
+
 ## Session-Learned Corrections
 
 <!-- Add new corrections below as they are discovered in sessions -->
 <!-- Format: - YYYY-MM-DD: Description of correction -->
 
 - 2026-04-12: Initial memory file seeded from SKILL.md and past session corrections
+- 2026-04-12: Unsplash search queries should exclude vehicle year — returns unrelated photos. Use `{make} {model} car exterior` instead.
+- 2026-04-12: UI/UX Audit Rule added to ENGINEERING.md — 5-point mandatory checklist for all consumer-facing visual changes.
