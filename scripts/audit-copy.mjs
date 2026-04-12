@@ -171,7 +171,6 @@ function scan() {
         }
       }
     }
-    }
 
     // 2. Sentence length (marketing copy only — skip code lines)
     for (const text of texts) {
