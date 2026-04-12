@@ -107,6 +107,7 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
   const [menuOpen, setMenuOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
+  const { url: photoUrl, loading: photoLoading } = useVehiclePhoto(vehicle.year, vehicle.make, vehicle.model);
 
   const displayName = vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const subtitle = vehicle.nickname
