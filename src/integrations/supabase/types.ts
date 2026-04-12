@@ -1772,6 +1772,7 @@ export type Database = {
           photo_urls: string[] | null
           quote_request_id: string | null
           token: string
+          user_id: string | null
           vehicle_make: string | null
           vehicle_model: string | null
           vehicle_trim: string | null
@@ -1804,6 +1805,7 @@ export type Database = {
           photo_urls?: string[] | null
           quote_request_id?: string | null
           token?: string
+          user_id?: string | null
           vehicle_make?: string | null
           vehicle_model?: string | null
           vehicle_trim?: string | null
@@ -1836,6 +1838,7 @@ export type Database = {
           photo_urls?: string[] | null
           quote_request_id?: string | null
           token?: string
+          user_id?: string | null
           vehicle_make?: string | null
           vehicle_model?: string | null
           vehicle_trim?: string | null
