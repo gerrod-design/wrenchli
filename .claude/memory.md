@@ -1,5 +1,7 @@
 # Wrenchli — Learned Preferences & Corrections
 
+> Related files: [SKILL.md](SKILL.md) · [ENGINEERING.md](ENGINEERING.md) · [MARKETING.md](MARKETING.md)
+
 Read this file at the start of every session. Update it whenever
 a new correction or preference is established during a conversation.
 
