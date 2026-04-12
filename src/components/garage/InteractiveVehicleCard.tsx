@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { CloudVehicle } from "@/hooks/useCloudVehicles";
-import VehicleSilhouette from "@/components/vehicle/VehicleSilhouette";
+import { useVehiclePhoto } from "@/hooks/useVehiclePhoto";
 import { cn } from "@/lib/utils";
 
 // ─── Body type detection ────────────────────────────────────────
@@ -107,6 +107,7 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
   const [menuOpen, setMenuOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
+  const { url: photoUrl, loading: photoLoading } = useVehiclePhoto(vehicle.year, vehicle.make, vehicle.model);
 
   const displayName = vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const subtitle = vehicle.nickname
@@ -188,26 +189,40 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
           </div>
         )}
 
-        {/* Vehicle silhouette — large, centered */}
-        <div
-          className={cn(
-            "relative mx-auto w-full max-w-[320px] transition-transform duration-500 ease-out",
-            hovered ? "-translate-y-1" : ""
-          )}
-        >
-          <VehicleSilhouette
-            bodyType={bodyType}
-            color="#E07B39"
-            className="w-full h-auto aspect-[380/120]"
-          />
-          {/* Road shadow */}
+        {/* Vehicle photo hero or fallback */}
+        {photoUrl ? (
           <div
-            className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[85%] h-3 rounded-[50%] opacity-40"
-            style={{
-              background: "radial-gradient(ellipse at center, rgba(224,123,57,0.25) 0%, transparent 70%)",
-            }}
-          />
-        </div>
+            className={cn(
+              "relative w-full h-48 transition-transform duration-500 ease-out",
+              hovered ? "-translate-y-1" : ""
+            )}
+          >
+            <img
+              src={photoUrl}
+              alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            {/* Dark gradient overlay for text readability */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: "linear-gradient(to bottom, transparent 30%, #0F1117 100%)",
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "relative w-full h-32 flex items-center justify-center transition-transform duration-500 ease-out",
+              hovered ? "-translate-y-1" : ""
+            )}
+          >
+            {photoLoading && (
+              <div className="w-8 h-8 border-2 border-white/10 border-t-accent rounded-full animate-spin" />
+            )}
+          </div>
+        )}
 
         {/* Vehicle name — hero text */}
         <div className="mt-5 text-center">
