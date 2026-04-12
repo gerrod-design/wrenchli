@@ -24,7 +24,7 @@ const angleLabel: Record<string, string> = {
 function buildSearchVariations(title: string, vehicle: string) {
   const actionMap: Record<string, string> = {
     "worn brake pads": "replace brake pads",
-    "check engine light": "diagnose check engine light",
+    "check engine light": "troubleshoot check engine light",
     "engine overheating": "fix engine overheating",
     "vehicle vibration": "fix car vibration",
     "battery": "replace car battery",
@@ -33,7 +33,7 @@ function buildSearchVariations(title: string, vehicle: string) {
     "transmission": "fix transmission",
     "hvac": "fix car AC",
     "air conditioning": "fix car AC",
-    "noise": "diagnose car noise",
+    "noise": "troubleshoot car noise",
   };
 
   const lowerTitle = title.toLowerCase();

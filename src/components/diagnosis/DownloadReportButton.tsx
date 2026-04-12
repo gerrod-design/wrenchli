@@ -221,7 +221,7 @@ function buildPrintContent(props: DownloadReportProps) {
 
   <div class="disclaimer">
     <strong>Disclaimer:</strong> This is an informational assessment only. Wrenchli is not a licensed mechanic. 
-    Please consult a qualified technician for professional diagnosis and repair. This report does not constitute 
+    Please consult a qualified technician for professional inspection and repair. This report does not constitute 
     professional automotive advice and should not be used as the sole basis for repair decisions.
   </div>
 

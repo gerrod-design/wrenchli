@@ -204,7 +204,7 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
         style={{ background: "#0F1117", border: "1px solid #2A2D37", color: "#9CA3AF" }}
       >
         <RotateCcw className="h-4 w-4" />
-        Start New Diagnosis
+        Start New Assessment
       </button>
     </div>
   );

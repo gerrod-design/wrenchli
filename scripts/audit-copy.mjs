@@ -98,17 +98,34 @@ function extractConsumerText(content, ext) {
     const body = content.replace(/^---[\s\S]*?---/, "");
     return body.split("\n").map((l) => l.trim()).filter(Boolean);
   }
-  // For TSX: extract string contents and JSX text nodes
+  // For TSX: extract JSX text nodes and display strings only
   const strings = [];
-  // Double-quoted strings
-  for (const m of content.matchAll(/"([^"]{4,})"/g)) strings.push(m[1]);
-  // Single-quoted strings
-  for (const m of content.matchAll(/'([^']{4,})'/g)) strings.push(m[1]);
-  // Template literals
-  for (const m of content.matchAll(/`([^`]{4,})`/g)) strings.push(m[1]);
-  // JSX text nodes (lines between > and <)
+
+  // JSX text nodes (text between > and <, excluding expressions in {})
   for (const m of content.matchAll(/>\s*([^<>{}\n]{4,})\s*</g)) strings.push(m[1]);
-  return strings;
+
+  // Quoted strings that look like display text (not URLs, CSS, code identifiers)
+  // Only grab strings in contexts like: title="...", label: "...", placeholder="...", aria-label="..."
+  // Or standalone strings that look like sentences (contain spaces and start with uppercase or common patterns)
+  const lines = content.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trimStart();
+    // Skip pure code lines
+    if (/^(import |export |const |let |var |type |interface |function |return |if |else |switch |case |try |catch |async |await |throw |\/\/|\/\*|\*)/.test(trimmed)) continue;
+
+    // Extract attribute values that are display text
+    for (const m of line.matchAll(/(?:title|label|placeholder|alt|aria-label|desc|description|subtitle|text|heading|message|tip|note|disclaimer|content)\s*[=:]\s*"([^"]{4,})"/gi)) {
+      strings.push(m[1]);
+    }
+    // Extract strings in JSX expressions that look like messages: {"Some text here"}
+    // But NOT code-like strings (URLs, class names, identifiers)
+    for (const m of line.matchAll(/\{"([^"]{8,})"\}/g)) {
+      if (/^[a-z_/]/.test(m[1]) || /[=&?#{}()[\]]/.test(m[1])) continue; // skip URLs/code
+      strings.push(m[1]);
+    }
+  }
+
+  return [...new Set(strings)];
 }
 
 function countWords(sentence) {
@@ -146,25 +163,28 @@ function scan() {
     const lines = content.split("\n");
     const texts = extractConsumerText(content, ext);
 
-    // 1. Banned words
+    // 1. Banned words — only scan extracted consumer-facing text, not code
     for (const rule of BANNED_WORDS) {
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        // Skip imports, comments, variable names
-        if (/^\s*(import |\/\/|\/\*|\*|const |let |var |type |interface |function )/.test(line)) continue;
-        const matches = [...line.matchAll(rule.pattern)];
-        for (const match of matches) {
-          if (rule.contextCheck && rule.label.includes("broken")) {
-            if (BROKEN_OK_CONTEXT.test(line)) continue;
+      if (ext === ".md") {
+        // For markdown, scan full lines (they're all consumer-facing)
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (/^---/.test(line.trim())) continue; // skip frontmatter delimiters
+          const matches = [...line.matchAll(rule.pattern)];
+          for (const match of matches) {
+            if (rule.contextCheck && rule.label.includes("broken") && BROKEN_OK_CONTEXT.test(line)) continue;
+            findings.push({ severity: "error", category: "Banned word", file: rel, line: i + 1, text: `"${match[0]}"`, fix: rule.fix });
           }
-          findings.push({
-            severity: "error",
-            category: "Banned word",
-            file: rel,
-            line: i + 1,
-            text: `"${match[0]}"`,
-            fix: rule.fix,
-          });
+        }
+      } else {
+        // For TSX/TS: only scan the extracted consumer text fragments
+        for (const text of texts) {
+          const matches = [...text.matchAll(rule.pattern)];
+          for (const match of matches) {
+            if (rule.contextCheck && rule.label.includes("broken") && BROKEN_OK_CONTEXT.test(text)) continue;
+            const lineNum = lines.findIndex((l) => l.includes(text.slice(0, 30))) + 1;
+            findings.push({ severity: "error", category: "Banned word", file: rel, line: lineNum || "?", text: `"${match[0]}"`, fix: rule.fix });
+          }
         }
       }
     }

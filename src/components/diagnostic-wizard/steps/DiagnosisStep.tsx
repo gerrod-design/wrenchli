@@ -75,7 +75,7 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
     <div className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <div className="text-xs font-mono mb-1" style={{ color: "#E07B39" }}>STEP 3 — DIAGNOSIS</div>
+          <div className="text-xs font-mono mb-1" style={{ color: "#E07B39" }}>STEP 3 — ASSESSMENT</div>
           <h3 className="text-lg font-semibold truncate" style={{ color: "#F5F5F5" }}>
             {vehicle.year} {vehicle.make} {vehicle.model}
           </h3>

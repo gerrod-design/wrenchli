@@ -381,7 +381,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
           <ul className="space-y-2 text-sm mb-4 flex-1">
             <li className="flex items-center gap-2">
               <CheckCircle className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(204 64% 44%)" }} />
-              <span>Quotes from vetted local shops</span>
+              <span>Quotes from trusted local shops</span>
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(204 64% 44%)" }} />

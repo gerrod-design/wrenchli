@@ -13,15 +13,6 @@ const retailers: { id: RetailerId; label: string; bg: string; text: string; subL
 
 const pickupRetailers: { id: string; label: string; subLabel: string; bg: string; text: string; urlBuilder: (query: string) => string; destination: string }[] = [
   {
-    id: "autozone",
-    label: "AutoZone",
-    subLabel: "Same-day pickup",
-    bg: "hsl(0 72% 45%)",
-    text: "white",
-    urlBuilder: (q) => `https://www.autozone.com/searchresult?searchtext=${encodeURIComponent(q)}`,
-    destination: "autozone",
-  },
-  {
     id: "oreilly-pickup",
     label: "O'Reilly",
     subLabel: "Same-day pickup",
@@ -45,7 +36,7 @@ export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps)
     return (
       <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
         <p className="text-sm text-muted-foreground">
-          Parts data isn't available for this specific diagnosis yet. Try searching directly:
+          Parts data isn't available for this specific issue yet. Try searching directly:
         </p>
         <a
           href={buildRetailerUrl("amazon", diagnosisTitle.replace(/\s+/g, "+"), vehicle)}

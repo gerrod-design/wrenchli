@@ -56,7 +56,7 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
 
       onNext(symptomData, data as DiagnosisResult);
     } catch (e: any) {
-      setError(e.message || "Diagnosis failed. Please try again.");
+      setError(e.message || "Assessment failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -124,7 +124,7 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
               Analyzing...
             </>
           ) : (
-            <>Get Diagnosis <ArrowRight className="h-4 w-4" /></>
+            <>Get Assessment <ArrowRight className="h-4 w-4" /></>
           )}
         </button>
       </div>

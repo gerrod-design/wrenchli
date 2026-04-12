@@ -49,9 +49,9 @@ function OBD2ScannerRecommendation({ onSwitchToDtc }: { onSwitchToDtc?: () => vo
       <div className="flex items-start gap-3">
         <Plug className="h-5 w-5 shrink-0 mt-0.5 text-wrenchli-teal" />
         <div className="space-y-2">
-          <h4 className="font-heading text-sm font-bold">Get a more accurate diagnosis with an OBD2 scanner</h4>
+          <h4 className="font-heading text-sm font-bold">Get a more accurate assessment with an OBD2 scanner</h4>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            An OBD2 scanner reads the specific diagnostic code stored in your vehicle's computer, giving you a much more targeted diagnosis. Many auto parts stores (O'Reilly, Advance Auto) will scan your vehicle for free. Or you can purchase a scanner for home use:
+            An OBD2 scanner reads the specific trouble code stored in your vehicle's computer, giving you a much more targeted assessment. Many auto parts stores (O'Reilly, Advance Auto) will scan your vehicle for free. Or you can purchase a scanner for home use:
           </p>
           <div className="flex flex-wrap gap-2 mt-1">
             {["FIXD", "BlueDriver", "Innova"].map((brand) => (
@@ -120,18 +120,18 @@ export function NoMatchFallback({ vehicle }: NoMatchFallbackProps) {
         <div className="space-y-1">
           <h4 className="text-sm font-semibold">Option 1: Scan with an OBD2 Reader</h4>
           <p className="text-sm text-muted-foreground">
-            If you have an OBD2 scanner, plug it in and enter the diagnostic code above for a more specific diagnosis.
+            If you have an OBD2 scanner, plug it in and enter the trouble code above for a more specific assessment.
           </p>
         </div>
 
         <div className="space-y-2">
           <h4 className="text-sm font-semibold">Option 2: Get a Professional Inspection</h4>
           <p className="text-sm text-muted-foreground">
-            Get quotes from trusted local shops who can perform a hands-on diagnostic inspection.
+            Get quotes from trusted local shops who can perform a hands-on inspection.
           </p>
           <Button className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-            <Link to={`/get-quote?type=diagnostic&vehicle=${encodeURIComponent(vehicle)}`}>
-              Get a Professional Diagnostic Quote <ArrowRight className="ml-2 h-4 w-4" />
+            <Link to={`/get-quote?type=inspection&vehicle=${encodeURIComponent(vehicle)}`}>
+              Get a Professional Inspection Quote <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>

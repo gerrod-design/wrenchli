@@ -12,15 +12,15 @@ export default function StillNotSure({ vehicle }: StillNotSureProps) {
       <Wrench className="mx-auto h-8 w-8 text-accent mb-3" />
       <h3 className="font-heading text-lg font-bold">Still not sure what's wrong?</h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
-        That's completely okay — vehicle problems can be tricky to diagnose without seeing it in person. Get quotes from trusted local shops who can perform a full diagnostic inspection.
+        That's completely okay — vehicle problems can be tricky to pinpoint without seeing it in person. Get quotes from trusted local shops who can perform a full hands-on inspection.
       </p>
       <Button
         size="lg"
         className="mt-5 bg-accent text-accent-foreground hover:bg-accent/90 font-bold"
         asChild
       >
-        <Link to={`/get-quote?type=diagnostic&vehicle=${encodeURIComponent(vehicle)}`}>
-          Get a Professional Diagnostic Quote <ArrowRight className="ml-2 h-4 w-4" />
+        <Link to={`/get-quote?type=inspection&vehicle=${encodeURIComponent(vehicle)}`}>
+          Get a Professional Inspection Quote <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       </Button>
     </div>
