@@ -209,3 +209,10 @@ Verified Score components:
 - Finance Providers footer column — removed from footer
 - $299/month shop pricing — removed from /for-shops
 - "March 2026 pilot program" banner — removed from /for-shops
+
+## End-of-Session Documentation Rule
+
+**End of Session Rule:** At the end of any session involving N8N,
+Stripe, Tekmetric, or any external integration, update the
+corresponding setup document in the project files to reflect current
+status. Never close a session with an outdated status document.
