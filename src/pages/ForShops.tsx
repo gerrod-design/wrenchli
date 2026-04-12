@@ -89,6 +89,20 @@ export default function ForShops() {
         </div>
       </section>
 
+      {/* Not Another Platform */}
+      <section className="section-padding bg-background border-t border-border">
+        <div className="container-wrenchli max-w-3xl text-center">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl mb-4">
+              We do one thing. We do it well.
+            </h2>
+            <p className="text-muted-foreground leading-relaxed md:text-lg">
+              Wrenchli doesn't replace your shop management software, your invoicing, or your scheduling — and we don't charge $300 a month to try. We do one thing: make sure your next customer walks in already knowing what's wrong, what it costs, and ready to say yes. The 90-day pilot is free, with no fees, no commission, and no strings.
+            </p>
+          </SectionReveal>
+        </div>
+      </section>
+
       {/* Pilot Terms */}
       <section className="section-padding bg-secondary">
         <div className="container-wrenchli max-w-3xl text-center">
