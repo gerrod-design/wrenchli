@@ -98,17 +98,34 @@ function extractConsumerText(content, ext) {
     const body = content.replace(/^---[\s\S]*?---/, "");
     return body.split("\n").map((l) => l.trim()).filter(Boolean);
   }
-  // For TSX: extract string contents and JSX text nodes
+  // For TSX: extract JSX text nodes and display strings only
   const strings = [];
-  // Double-quoted strings
-  for (const m of content.matchAll(/"([^"]{4,})"/g)) strings.push(m[1]);
-  // Single-quoted strings
-  for (const m of content.matchAll(/'([^']{4,})'/g)) strings.push(m[1]);
-  // Template literals
-  for (const m of content.matchAll(/`([^`]{4,})`/g)) strings.push(m[1]);
-  // JSX text nodes (lines between > and <)
+
+  // JSX text nodes (text between > and <, excluding expressions in {})
   for (const m of content.matchAll(/>\s*([^<>{}\n]{4,})\s*</g)) strings.push(m[1]);
-  return strings;
+
+  // Quoted strings that look like display text (not URLs, CSS, code identifiers)
+  // Only grab strings in contexts like: title="...", label: "...", placeholder="...", aria-label="..."
+  // Or standalone strings that look like sentences (contain spaces and start with uppercase or common patterns)
+  const lines = content.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trimStart();
+    // Skip pure code lines
+    if (/^(import |export |const |let |var |type |interface |function |return |if |else |switch |case |try |catch |async |await |throw |\/\/|\/\*|\*)/.test(trimmed)) continue;
+
+    // Extract attribute values that are display text
+    for (const m of line.matchAll(/(?:title|label|placeholder|alt|aria-label|desc|description|subtitle|text|heading|message|tip|note|disclaimer|content)\s*[=:]\s*"([^"]{4,})"/gi)) {
+      strings.push(m[1]);
+    }
+    // Extract strings in JSX expressions that look like messages: {"Some text here"}
+    // But NOT code-like strings (URLs, class names, identifiers)
+    for (const m of line.matchAll(/\{"([^"]{8,})"\}/g)) {
+      if (/^[a-z_/]/.test(m[1]) || /[=&?#{}()[\]]/.test(m[1])) continue; // skip URLs/code
+      strings.push(m[1]);
+    }
+  }
+
+  return [...new Set(strings)];
 }
 
 function countWords(sentence) {
