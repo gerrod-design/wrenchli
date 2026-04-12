@@ -4,6 +4,7 @@ import { getPostBySlug } from "@/lib/blog";
 import ReactMarkdown from "react-markdown";
 import { CalendarDays, Clock, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SymptomExplainer from "@/components/blog/SymptomExplainer";
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
