@@ -279,7 +279,7 @@ describe("Assessment Flow — Invalid VIN", () => {
     renderWizard();
 
     const vinInput = screen.getByPlaceholderText("VIN (optional)");
-    fireEvent.change(vinInput, { target: { value: "INVALIDVIN12345XX" } });
+    fireEvent.change(vinInput, { target: { value: "1HGBH41JXMN109186" } });
 
     await waitFor(() => {
       expect(
