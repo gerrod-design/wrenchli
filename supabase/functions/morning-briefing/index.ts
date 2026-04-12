@@ -165,10 +165,6 @@ Deno.serve(async (req) => {
     const sendResult = await res.json();
     if (!res.ok) throw new Error(`Resend error [${res.status}]: ${JSON.stringify(sendResult)}`);
 
-    let sendResult;
-    if (lovableApiKey) {
-      // Use connector gateway
-      const res = await fetch(`${GATEWAY_URL}/emails`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
