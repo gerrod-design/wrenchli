@@ -4,6 +4,7 @@ import { getPostBySlug } from "@/lib/blog";
 import ReactMarkdown from "react-markdown";
 import { CalendarDays, Clock, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SymptomExplainer from "@/components/blog/SymptomExplainer";
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
@@ -67,6 +68,9 @@ export default function BlogPost() {
               ))}
             </div>
           )}
+
+          {/* Explainer Graphic */}
+          {slug && <SymptomExplainer slug={slug} />}
 
           {/* Body */}
           <div className="prose prose-neutral mt-8 max-w-none prose-headings:font-heading prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-a:text-accent hover:prose-a:underline">
