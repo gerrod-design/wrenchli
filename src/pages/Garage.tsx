@@ -531,12 +531,7 @@ export default function Garage() {
       return;
     }
     if (!isPro && vehicles.length >= FREE_VEHICLE_LIMIT) {
-      toast("Free tier limit reached. Upgrade to Pro for unlimited vehicles.", {
-        action: {
-          label: "Upgrade",
-          onClick: () => handleUpgradeClick(),
-        },
-      });
+      setShowUpgrade(true);
       return;
     }
     setShowAddVehicle(true);
