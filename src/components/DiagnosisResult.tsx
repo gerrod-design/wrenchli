@@ -34,9 +34,11 @@ function SaveToGaragePrompt({ year, make, model }: { year?: string; make?: strin
   );
   if (alreadySaved) return null;
 
+  const [showAuthGate, setShowAuthGate] = useState(false);
+
   const handleClick = () => {
     if (!user) {
-      navigate("/admin/login");
+      setShowAuthGate(true);
       return;
     }
     navigate(`/garage?addYear=${encodeURIComponent(year)}&addMake=${encodeURIComponent(make)}&addModel=${encodeURIComponent(model)}`);

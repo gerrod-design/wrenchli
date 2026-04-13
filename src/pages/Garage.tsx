@@ -632,8 +632,8 @@ export default function Garage() {
               <p className="text-sm text-muted-foreground mb-3">
                 Sign in to save your vehicles, get recall alerts, and track your assessment history.
               </p>
-              <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link to="/admin/login">Sign In</Link>
+              <Button onClick={() => setShowAuthGate(true)} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                Sign In
               </Button>
             </div>
           </div>
