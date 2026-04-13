@@ -19,6 +19,7 @@ import type { Diagnosis, DiagnosisResultProps } from "./diagnosis/types";
 import { useGarage } from "@/hooks/useGarage";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCloudVehicles } from "@/hooks/useCloudVehicles";
+import AuthGateModal from "@/components/AuthGateModal";
 
 const DIAGNOSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/diagnose`;
 
@@ -26,6 +27,7 @@ function SaveToGaragePrompt({ year, make, model }: { year?: string; make?: strin
   const { user } = useAuth();
   const { vehicles } = useCloudVehicles();
   const navigate = useNavigate();
+  const [showAuthGate, setShowAuthGate] = useState(false);
 
   if (!year || !make || !model) return null;
 
@@ -36,28 +38,38 @@ function SaveToGaragePrompt({ year, make, model }: { year?: string; make?: strin
 
   const handleClick = () => {
     if (!user) {
-      navigate("/admin/login");
+      setShowAuthGate(true);
       return;
     }
     navigate(`/garage?addYear=${encodeURIComponent(year)}&addMake=${encodeURIComponent(make)}&addModel=${encodeURIComponent(model)}`);
   };
 
   return (
-    <div className="rounded-xl border border-border bg-muted/30 p-5 text-center space-y-3">
-      <div className="flex items-center justify-center gap-2 text-muted-foreground">
-        <Car className="h-5 w-5" />
-        <p className="text-sm">
-          Save this vehicle to your garage for recall alerts and assessment history.
-        </p>
+    <>
+      <div className="rounded-xl border border-border bg-muted/30 p-5 text-center space-y-3">
+        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <Car className="h-5 w-5" />
+          <p className="text-sm">
+            Save this vehicle to your garage for recall alerts and assessment history.
+          </p>
+        </div>
+        <Button
+          onClick={handleClick}
+          className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+        >
+          <Car className="mr-2 h-4 w-4" />
+          Save to My Garage
+        </Button>
       </div>
-      <Button
-        onClick={handleClick}
-        className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
-      >
-        <Car className="mr-2 h-4 w-4" />
-        Save to My Garage
-      </Button>
-    </div>
+      <AuthGateModal
+        open={showAuthGate}
+        onClose={() => setShowAuthGate(false)}
+        onAuthenticated={() => {
+          setShowAuthGate(false);
+          navigate(`/garage?addYear=${encodeURIComponent(year!)}&addMake=${encodeURIComponent(make!)}&addModel=${encodeURIComponent(model!)}`);
+        }}
+      />
+    </>
   );
 }
 
