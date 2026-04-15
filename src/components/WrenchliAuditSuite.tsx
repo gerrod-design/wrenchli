@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/audit-wrenchli-site`;
 
 const AGENTS = [
@@ -26,14 +26,14 @@ const IMPACT_CONFIG = {
 };
 
 export default function WrenchliAuditSuite() {
-  const [agentStates, setAgentStates] = useState({});
-  const [pages, setPages] = useState([]);
+  const [agentStates, setAgentStates] = useState<Record<string, any>>({});
+  const [pages, setPages] = useState<any[]>([]);
   const [running, setRunning] = useState(false);
-  const [activeAgent, setActiveAgent] = useState(null);
-  const [error, setError] = useState(null);
-  const [lastRun, setLastRun] = useState(null);
+  const [activeAgent, setActiveAgent] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [lastRun, setLastRun] = useState<string | null>(null);
 
-  const updateAgent = useCallback((id, update) => {
+  const updateAgent = useCallback((id: string, update: any) => {
     setAgentStates(prev => ({ ...prev, [id]: { ...(prev[id] || {}), ...update } }));
   }, []);
 
@@ -51,7 +51,7 @@ export default function WrenchliAuditSuite() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
         },
         body: JSON.stringify({}),
       });
@@ -70,7 +70,7 @@ export default function WrenchliAuditSuite() {
           updateAgent(agent.id, { status: "error", result: null, error: agent.error });
         }
       });
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
       AGENTS.forEach(a => updateAgent(a.id, { status: "idle" }));
     } finally {
