@@ -8,6 +8,7 @@ import { trackAdClick } from "@/lib/adClickTracker";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
 import DIYOutcomePrompt from "./DIYOutcomePrompt";
 import SaveAssessmentPrompt from "@/components/diagnosis/SaveAssessmentPrompt";
+import RecallEmailCapture from "@/components/diagnosis/RecallEmailCapture";
 
 interface Props {
   recommendation: RecommendationResult;
@@ -235,6 +236,14 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
       {diyEligible && showOutcome && !outcomeExists && (
         <DIYOutcomePrompt sessionId={sessionId} />
       )}
+
+      {/* Recall Email Capture — delayed prompt for guests */}
+      <RecallEmailCapture
+        vehicleYear={vehicle.year}
+        vehicleMake={vehicle.make}
+        vehicleModel={vehicle.model}
+        sessionId={sessionId}
+      />
 
       {/* Deferred Account Creation */}
       <SaveAssessmentPrompt />
