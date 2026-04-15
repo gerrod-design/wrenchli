@@ -16,7 +16,7 @@ const prerenderRoutes: {
     path: "/",
     title: "Free Vehicle Symptom Assessment | Wrenchli — Michigan & Ohio",
     description:
-      "Describe what's wrong with your car and get a structured report with likely causes, cost ranges, and questions to ask your shop. Free. No account required.",
+      "Describe your car symptom in plain English — get a free instant assessment of likely causes and repair costs. Serving Michigan and Ohio drivers.",
     content: `
       <h1>Vehicle Repair Finally Fixed</h1>
       <p>Affordable vehicle repair — transparent pricing, trusted shops.</p>
@@ -34,7 +34,7 @@ const prerenderRoutes: {
     path: "/for-shops",
     title: "Free Pilot Program for Independent Repair Shops | Wrenchli",
     description:
-      "Join Wrenchli's free 90-day pilot. Your customers arrive pre-assessed — vehicle details, likely causes, and fair cost range before they walk in. No fees, no commission.",
+      "Get pre-assessed leads with symptom details, likely causes, and fair cost ranges before customers walk in. Free 90-day pilot, no fees, no commission.",
     content: `
       <h1>Customers Arrive Pre-Assessed</h1>
       <p>Vehicle details, likely causes, and a fair cost range — before they walk in. Free 90-day pilot for independent shops.</p>
@@ -55,7 +55,7 @@ const prerenderRoutes: {
     path: "/about",
     title: "About Wrenchli | Built to Fix Vehicle Repair in Michigan",
     description:
-      "Wrenchli helps vehicle owners understand what is likely wrong before paying for a repair. Built in Michigan by Gerrod Parchmon.",
+      "Wrenchli helps vehicle owners understand what is likely wrong with their car before paying for a repair. Built in Michigan by Gerrod Parchmon.",
     content: `
       <h1>About Wrenchli</h1>
       <p>Wrenchli helps vehicle owners understand what is likely wrong before paying for a repair. Built in Michigan by Gerrod Parchmon.</p>
@@ -65,7 +65,7 @@ const prerenderRoutes: {
     path: "/privacy",
     title: "Privacy Policy | Wrenchli",
     description:
-      "How Wrenchli collects, uses, and protects your vehicle and assessment data.",
+      "How Wrenchli collects, uses, and protects your vehicle and assessment data. Your data is never sold.",
     content: `
       <h1>Privacy Policy</h1>
       <p>How Wrenchli collects, uses, and protects your vehicle and assessment data.</p>
