@@ -809,6 +809,7 @@ export default function ChatBot() {
                       }}
                     />
                     <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Sound</span>
+                    <span className="text-[11px] text-muted-foreground italic">Powered by Google AI</span>
                   </span>
                   <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
                     className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Scan VIN">

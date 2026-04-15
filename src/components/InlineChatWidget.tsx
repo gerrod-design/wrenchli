@@ -601,6 +601,7 @@ export default function InlineChatWidget() {
                 />
               </span>
               <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Sound</span>
+              <span className="text-[11px] text-muted-foreground italic">Powered by Google AI</span>
             </div>
           </div>
 
