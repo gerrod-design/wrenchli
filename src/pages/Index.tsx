@@ -7,6 +7,7 @@ import SectionReveal from "@/components/SectionReveal";
 import InlineChatWidget from "@/components/InlineChatWidget";
 import CinematicHero from "@/components/CinematicHero";
 import HowItWorksVideo from "@/components/HowItWorksVideo";
+import VinRecallCheck from "@/components/VinRecallCheck";
 
 import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
@@ -41,6 +42,9 @@ export default function Index() {
 
       {/* Cinematic Hero */}
       <CinematicHero />
+
+      {/* VIN Recall Check — high-trust, zero-friction entry point */}
+      <VinRecallCheck />
 
       <HowItWorksVideo />
 
