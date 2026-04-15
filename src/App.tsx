@@ -29,6 +29,7 @@ import Owners from "./pages/Owners";
 import Shops from "./pages/Shops";
 import ForCarOwners from "./pages/ForCarOwners";
 import ForShops from "./pages/ForShops";
+import ForDealers from "./pages/ForDealers";
 import VehicleInsights from "./pages/VehicleInsights";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
