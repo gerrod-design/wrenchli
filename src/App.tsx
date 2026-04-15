@@ -39,6 +39,7 @@ import Investors from "./pages/Investors";
 import GetQuote from "./pages/GetQuote";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminAudit from "./pages/AdminAudit";
 import NotificationSettings from "./pages/NotificationSettings";
 import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
@@ -83,6 +84,7 @@ function AnimatedRoutes() {
       <Routes location={location}>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/audit" element={<ProtectedRoute><AdminAudit /></ProtectedRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     );
