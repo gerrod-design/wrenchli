@@ -1,4 +1,41 @@
 {
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|Twitterbot|facebookexternalhit|LinkedInBot|Slackbot|WhatsApp|iMessage).*" }],
+      "destination": "/prerender/index.html"
+    },
+    {
+      "source": "/for-shops",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|Twitterbot|facebookexternalhit|LinkedInBot|Slackbot|WhatsApp|iMessage).*" }],
+      "destination": "/prerender/for-shops.html"
+    },
+    {
+      "source": "/for-dealers",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|Twitterbot|facebookexternalhit|LinkedInBot|Slackbot|WhatsApp|iMessage).*" }],
+      "destination": "/prerender/for-dealers.html"
+    },
+    {
+      "source": "/blog",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|Twitterbot|facebookexternalhit|LinkedInBot|Slackbot|WhatsApp|iMessage).*" }],
+      "destination": "/prerender/blog.html"
+    },
+    {
+      "source": "/about",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|Twitterbot|facebookexternalhit|LinkedInBot|Slackbot|WhatsApp|iMessage).*" }],
+      "destination": "/prerender/about.html"
+    },
+    {
+      "source": "/privacy",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|Twitterbot|facebookexternalhit|LinkedInBot|Slackbot|WhatsApp|iMessage).*" }],
+      "destination": "/prerender/privacy.html"
+    },
+    {
+      "source": "/warranty-guide",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|Twitterbot|facebookexternalhit|LinkedInBot|Slackbot|WhatsApp|iMessage).*" }],
+      "destination": "/prerender/warranty-guide.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
