@@ -60,6 +60,25 @@ const prerenderRoutes: {
     `,
   },
   {
+    path: "/for-dealers",
+    title: "Wrenchli for Auto Dealers | Free Service Department Partner Program — Michigan & Ohio",
+    description:
+      "Help your service advisors prepare for every trade-in, service visit, and CPO inspection. Pre-assessed customers, Tekmetric integration, and a free 90-day pilot for Michigan and Ohio dealerships.",
+    content: `
+      <h1>Your Service Department, One Step Ahead</h1>
+      <p>Customers who ran a Wrenchli assessment before their visit arrive knowing what's wrong — cutting intake time and increasing RO approval rates.</p>
+      <h2>Faster Trade-In Appraisals</h2>
+      <p>Run a rapid symptom assessment on any trade-in vehicle before setting ACV. Enter the VIN, describe what you observe, and get a probable cause list and cost range in under 60 seconds.</p>
+      <h2>Service Department Integration</h2>
+      <p>Wrenchli integrates directly with Tekmetric. Pre-visit assessment data drops into a new or existing RO — no double entry for your service advisors.</p>
+      <h2>Multi-Location Support</h2>
+      <p>Managing more than one rooftop? Wrenchli supports dealer groups with consolidated reporting across locations. One account, all your stores.</p>
+      <h2>Free 90-day pilot. No strings attached.</h2>
+      <p>No fees, no commission, no auto-billing.</p>
+      <a href="/for-shops/onboarding">Apply for the Dealer Pilot Program</a>
+    `,
+  },
+  {
     path: "/blog",
     title: "Vehicle Repair Guides & Symptom Articles | Wrenchli",
     description:

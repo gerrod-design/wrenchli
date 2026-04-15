@@ -43,6 +43,7 @@ const navItems: NavItem[] = [
     to: "/for-shops",
     dropdown: [
       { label: "Partner Program", to: "/for-shops" },
+      { label: "For Dealers", to: "/for-dealers" },
       { label: "How It Works", to: "/for-shops#how-it-works" },
       { label: "Shop Software", to: "/for-shops#features" },
       { label: "💬 Recommend a Shop", to: "__recommend__" },

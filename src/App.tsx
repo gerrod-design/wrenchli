@@ -29,6 +29,7 @@ import Owners from "./pages/Owners";
 import Shops from "./pages/Shops";
 import ForCarOwners from "./pages/ForCarOwners";
 import ForShops from "./pages/ForShops";
+import ForDealers from "./pages/ForDealers";
 import VehicleInsights from "./pages/VehicleInsights";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
@@ -107,6 +108,7 @@ function AnimatedRoutes() {
           <Route path="/shops" element={<Shops />} />
           <Route path="/for-car-owners" element={<ForCarOwners />} />
           <Route path="/for-shops" element={<ForShops />} />
+          <Route path="/for-dealers" element={<ForDealers />} />
           <Route path="/vehicle-insights" element={<VehicleInsights />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />
