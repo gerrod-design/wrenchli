@@ -32,8 +32,8 @@ export default function Index() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Wrenchli — Vehicle Repair, Finally Fixed"
-        description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to. Launching in Michigan and Ohio."
+        title="Free Vehicle Symptom Assessment | Wrenchli — Michigan & Ohio"
+        description="Describe what's wrong with your car and get a structured report with likely causes, cost ranges, and questions to ask your shop. Free. No account required."
         path="/"
       />
       <HomeJsonLd />

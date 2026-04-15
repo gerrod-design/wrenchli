@@ -607,7 +607,7 @@ export default function Garage() {
   if (!user) {
     return (
       <main className="pb-[60px] md:pb-0">
-        <SEO title="My Garage — Wrenchli" description="Save your vehicles, get recall alerts, and track assessment history." path="/garage" />
+        <SEO title="My Vehicle Garage | Wrenchli" description="Save your vehicles, track assessments, and get safety recall alerts. Free for up to 2 vehicles. Pro unlocks unlimited vehicles for $2.99/month." path="/garage" />
         <section className="section-padding" style={{ backgroundColor: "#F8F8F6" }}>
           <div className="container-wrenchli max-w-2xl">
             <div className="flex items-center gap-3 mb-6">
@@ -644,7 +644,7 @@ export default function Garage() {
 
   return (
     <main className="pb-[60px] md:pb-0">
-      <SEO title="My Garage — Wrenchli" description="Save your vehicles, get recall alerts, and track assessment history." path="/garage" />
+      <SEO title="My Vehicle Garage | Wrenchli" description="Save your vehicles, track assessments, and get safety recall alerts. Free for up to 2 vehicles. Pro unlocks unlimited vehicles for $2.99/month." path="/garage" />
 
       <section className="section-padding" style={{ backgroundColor: "#F8F8F6" }}>
         <div className="container-wrenchli max-w-2xl">
