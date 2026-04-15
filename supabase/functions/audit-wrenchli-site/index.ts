@@ -60,7 +60,7 @@ function extractMeta(html: string): string {
 async function fetchPage(page: { name: string; url: string }) {
   try {
     const res = await fetch(page.url, {
-      headers: { "User-Agent": "Wrenchli-Audit-Agent/1.0" },
+      headers: { "User-Agent": "Googlebot/2.1 (+http://www.google.com/bot.html)" },
       signal: AbortSignal.timeout(10000),
     });
     const html = await res.text();
