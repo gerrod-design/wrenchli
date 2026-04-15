@@ -3,6 +3,9 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+
 serve(async (req) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -30,21 +33,23 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const vehicleContext = vehicle_info ? `The vehicle is a ${vehicle_info}.` : "The vehicle make/model is unknown.";
-    const imageContent = image_urls.map((url: string) => ({ type: "image_url" as const, image_url: { url } }));
+    const imageContent = image_urls.map((url: string) => ({ type: "image", source: { type: "url", url } }));
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert automotive damage assessment specialist. Analyze vehicle damage photos and provide a structured diagnosis.
+        model: MODEL,
+        max_tokens: 1500,
+        system: `You are an expert automotive damage assessment specialist. Analyze vehicle damage photos and provide a structured diagnosis.
 
 Always respond with valid JSON in this exact format:
 {
@@ -69,7 +74,7 @@ Always respond with valid JSON in this exact format:
 }
 
 Be specific and helpful. Provide realistic cost estimates in USD. If you cannot identify damage or the image is unclear, say so honestly.`,
-          },
+        messages: [
           {
             role: "user",
             content: [
@@ -95,12 +100,12 @@ Be specific and helpful. Provide realistic cost estimates in USD. If you cannot 
         );
       }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("Anthropic API error:", response.status, errorText);
       throw new Error(`AI analysis failed: ${response.status}`);
     }
 
     const aiResult = await response.json();
-    const content = aiResult.choices?.[0]?.message?.content || "";
+    const content = aiResult.content?.[0]?.text || "";
 
     let diagnosis;
     try {

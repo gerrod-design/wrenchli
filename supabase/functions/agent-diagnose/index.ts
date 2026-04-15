@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -18,8 +21,8 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const vehicleStr = [year, make, model, trim].filter(Boolean).join(" ");
 
@@ -39,7 +42,7 @@ serve(async (req) => {
         const matchCount = outcomes.filter((o: any) => o.diagnosis_match === true).length;
         historicalData.successRate = historicalData.totalCases > 0 
           ? Math.round((matchCount / historicalData.totalCases) * 100) 
-          : 88; // default
+          : 88;
       }
     } catch { /* non-critical, proceed with defaults */ }
 
@@ -55,75 +58,60 @@ CRITICAL RULES:
 - Cross-reference with common issues for the specific make/model/year
 
 Vehicle: ${vehicleStr || "Not specified"}
-Historical network data: ${historicalData.totalCases} total repair cases tracked, ${historicalData.successRate}% diagnostic accuracy rate.
+Historical network data: ${historicalData.totalCases} total repair cases tracked, ${historicalData.successRate}% diagnostic accuracy rate.`;
 
-Respond in this exact JSON format:
-{
-  "primaryDiagnosis": "string - the most likely issue",
-  "primaryConfidence": number (0-100),
-  "rationale": "string - 2-3 sentences explaining WHY this is the primary diagnosis, citing specific evidence",
-  "alternativeDiagnoses": [
-    {"diagnosis": "string", "probability": number (0-100), "rationale": "string"}
-  ],
-  "costEstimate": {"min": number, "max": number, "breakdown": "string describing parts vs labor"},
-  "recommendedAction": "string - what the customer should do next",
-  "urgency": "low" | "medium" | "high",
-  "confidenceWarning": "string | null - only if primary confidence < 70%"
-}`;
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: MODEL,
+        max_tokens: 1500,
+        system: systemPrompt,
         messages: [
-          { role: "system", content: systemPrompt },
           { role: "user", content: `My ${vehicleStr} is experiencing: ${symptoms}${zip_code ? `. Located in ZIP: ${zip_code}` : ""}` },
         ],
         tools: [{
-          type: "function",
-          function: {
-            name: "provide_diagnosis",
-            description: "Provide a structured vehicle diagnosis with confidence scores",
-            parameters: {
-              type: "object",
-              properties: {
-                primaryDiagnosis: { type: "string" },
-                primaryConfidence: { type: "number" },
-                rationale: { type: "string" },
-                alternativeDiagnoses: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      diagnosis: { type: "string" },
-                      probability: { type: "number" },
-                      rationale: { type: "string" },
-                    },
-                    required: ["diagnosis", "probability", "rationale"],
-                  },
-                },
-                costEstimate: {
+          name: "provide_diagnosis",
+          description: "Provide a structured vehicle diagnosis with confidence scores",
+          input_schema: {
+            type: "object",
+            properties: {
+              primaryDiagnosis: { type: "string" },
+              primaryConfidence: { type: "number" },
+              rationale: { type: "string" },
+              alternativeDiagnoses: {
+                type: "array",
+                items: {
                   type: "object",
                   properties: {
-                    min: { type: "number" },
-                    max: { type: "number" },
-                    breakdown: { type: "string" },
+                    diagnosis: { type: "string" },
+                    probability: { type: "number" },
+                    rationale: { type: "string" },
                   },
-                  required: ["min", "max", "breakdown"],
+                  required: ["diagnosis", "probability", "rationale"],
                 },
-                recommendedAction: { type: "string" },
-                urgency: { type: "string", enum: ["low", "medium", "high"] },
-                confidenceWarning: { type: "string" },
               },
-              required: ["primaryDiagnosis", "primaryConfidence", "rationale", "alternativeDiagnoses", "costEstimate", "recommendedAction", "urgency"],
+              costEstimate: {
+                type: "object",
+                properties: {
+                  min: { type: "number" },
+                  max: { type: "number" },
+                  breakdown: { type: "string" },
+                },
+                required: ["min", "max", "breakdown"],
+              },
+              recommendedAction: { type: "string" },
+              urgency: { type: "string", enum: ["low", "medium", "high"] },
+              confidenceWarning: { type: "string" },
             },
+            required: ["primaryDiagnosis", "primaryConfidence", "rationale", "alternativeDiagnoses", "costEstimate", "recommendedAction", "urgency"],
           },
         }],
-        tool_choice: { type: "function", function: { name: "provide_diagnosis" } },
+        tool_choice: { type: "tool", name: "provide_diagnosis" },
       }),
     });
 
@@ -139,15 +127,15 @@ Respond in this exact JSON format:
         });
       }
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      throw new Error("AI gateway error");
+      console.error("Anthropic API error:", response.status, t);
+      throw new Error("Anthropic API error");
     }
 
     const aiData = await response.json();
-    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("No tool call in response");
+    const toolUse = aiData.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_diagnosis");
+    if (!toolUse) throw new Error("No tool call in response");
 
-    const diagnosis = JSON.parse(toolCall.function.arguments);
+    const diagnosis = toolUse.input;
 
     // Store in diagnosis_records
     let trackingNumber: string | null = null;
@@ -177,7 +165,7 @@ Respond in this exact JSON format:
           cost_estimate_low: diagnosis.costEstimate.min,
           cost_estimate_high: diagnosis.costEstimate.max,
           recommended_action: diagnosis.recommendedAction,
-          ai_model_used: "google/gemini-3-flash-preview",
+          ai_model_used: MODEL,
           historical_total_cases: historicalData.totalCases,
           historical_success_rate: historicalData.successRate,
           tracking_number: trackingNumber,

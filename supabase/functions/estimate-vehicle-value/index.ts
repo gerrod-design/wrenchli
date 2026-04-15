@@ -2,6 +2,9 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+
 interface ValueRequest {
   year: number;
   make: string;
@@ -66,31 +69,31 @@ Respond ONLY with a valid JSON object (no markdown, no explanation) with these e
 
 Be accurate and realistic. Consider current used car market conditions, supply/demand, vehicle reliability reputation, and any special factors (e.g., PHEV tax credits, discontinued models, high demand trims).`;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
       return new Response(
         JSON.stringify({ success: false, error: "AI service not configured" }),
         { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const aiResp = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.3,
+        model: MODEL,
         max_tokens: 500,
+        messages: [{ role: "user", content: prompt }],
       }),
     });
 
     if (!aiResp.ok) {
       const errText = await aiResp.text();
-      console.error("AI gateway error:", aiResp.status, errText);
+      console.error("Anthropic API error:", aiResp.status, errText);
       return new Response(
         JSON.stringify({ success: false, error: "Valuation service temporarily unavailable" }),
         { status: 502, headers: { ...securityHeaders, "Content-Type": "application/json" } }
@@ -98,7 +101,7 @@ Be accurate and realistic. Consider current used car market conditions, supply/d
     }
 
     const aiData = await aiResp.json();
-    const rawContent = aiData.choices?.[0]?.message?.content ?? "";
+    const rawContent = aiData.content?.[0]?.text ?? "";
     const jsonStr = rawContent.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
     let valuation;

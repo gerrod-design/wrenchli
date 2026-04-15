@@ -3,6 +3,9 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+
 serve(async (req) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -11,7 +14,6 @@ serve(async (req) => {
   const optionsResp = handleCorsOptions(req);
   if (optionsResp) return optionsResp;
 
-  // Rate limiting
   const rateLimitId = getRateLimitIdentifier(req);
   const rateResult = await checkRateLimit(rateLimitId, RATE_LIMITS.STANDARD);
   if (!rateResult.allowed) {
@@ -63,68 +65,57 @@ serve(async (req) => {
       userPrompt = `Diagnose this car problem for a ${vehicleStr || "vehicle"}: "${safeSymptom}"`;
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            {
-              role: "system",
-              content: `You are Wrenchli's expert automotive diagnostics AI. Given a DTC code or symptom description, return one or more structured diagnoses using the provide_diagnoses tool. Each diagnosis should be specific to the vehicle when provided. Be honest about when a professional is needed. Provide realistic cost ranges. If the input could indicate multiple issues, return multiple diagnoses (up to 3).`,
-            },
-            { role: "user", content: userPrompt },
-          ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "provide_diagnoses",
-                description: "Return structured vehicle diagnosis results",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    diagnoses: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          title: { type: "string", description: "Short diagnosis title, e.g. 'Worn Brake Pads'" },
-                          code: { type: "string", description: "The DTC code if applicable, e.g. 'P0420'. Empty string if from symptom." },
-                          urgency: { type: "string", enum: ["low", "medium", "high"], description: "Urgency level" },
-                          whats_happening: { type: "string", description: "2-3 sentence plain-language explanation. No jargon. Written for someone who knows nothing about cars." },
-                          common_causes: {
-                            type: "array",
-                            items: { type: "string" },
-                            description: "2-4 most common causes"
-                          },
-                          diy_feasibility: { type: "string", enum: ["easy", "moderate", "advanced"], description: "DIY difficulty rating" },
-                          diy_cost: { type: "string", description: "DIY parts-only cost range, e.g. '$25–$60'" },
-                          shop_cost: { type: "string", description: "Professional repair cost range, e.g. '$150–$350'" },
-                        },
-                        required: ["title", "code", "urgency", "whats_happening", "common_causes", "diy_feasibility", "diy_cost", "shop_cost"],
-                        additionalProperties: false,
+    const response = await fetch(ANTHROPIC_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1500,
+        system: `You are Wrenchli's expert automotive diagnostics AI. Given a DTC code or symptom description, return one or more structured diagnoses using the provide_diagnoses tool. Each diagnosis should be specific to the vehicle when provided. Be honest about when a professional is needed. Provide realistic cost ranges. If the input could indicate multiple issues, return multiple diagnoses (up to 3).`,
+        messages: [{ role: "user", content: userPrompt }],
+        tools: [
+          {
+            name: "provide_diagnoses",
+            description: "Return structured vehicle diagnosis results",
+            input_schema: {
+              type: "object",
+              properties: {
+                diagnoses: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      title: { type: "string", description: "Short diagnosis title, e.g. 'Worn Brake Pads'" },
+                      code: { type: "string", description: "The DTC code if applicable, e.g. 'P0420'. Empty string if from symptom." },
+                      urgency: { type: "string", enum: ["low", "medium", "high"], description: "Urgency level" },
+                      whats_happening: { type: "string", description: "2-3 sentence plain-language explanation. No jargon. Written for someone who knows nothing about cars." },
+                      common_causes: {
+                        type: "array",
+                        items: { type: "string" },
+                        description: "2-4 most common causes"
                       },
+                      diy_feasibility: { type: "string", enum: ["easy", "moderate", "advanced"], description: "DIY difficulty rating" },
+                      diy_cost: { type: "string", description: "DIY parts-only cost range, e.g. '$25–$60'" },
+                      shop_cost: { type: "string", description: "Professional repair cost range, e.g. '$150–$350'" },
                     },
+                    required: ["title", "code", "urgency", "whats_happening", "common_causes", "diy_feasibility", "diy_cost", "shop_cost"],
                   },
-                  required: ["diagnoses"],
-                  additionalProperties: false,
                 },
               },
+              required: ["diagnoses"],
             },
-          ],
-          tool_choice: { type: "function", function: { name: "provide_diagnoses" } },
-        }),
-      }
-    );
+          },
+        ],
+        tool_choice: { type: "tool", name: "provide_diagnoses" },
+      }),
+    });
 
     if (!response.ok) {
       if (response.status === 429) {
@@ -140,7 +131,7 @@ serve(async (req) => {
         );
       }
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
+      console.error("Anthropic API error:", response.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
         { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
@@ -148,16 +139,15 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall || toolCall.function.name !== "provide_diagnoses") {
+    const toolUse = data.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_diagnoses");
+    if (!toolUse) {
       return new Response(
         JSON.stringify({ error: "Unexpected AI response format" }),
         { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const diagnoses = JSON.parse(toolCall.function.arguments);
-    return new Response(JSON.stringify(diagnoses), {
+    return new Response(JSON.stringify(toolUse.input), {
       headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
