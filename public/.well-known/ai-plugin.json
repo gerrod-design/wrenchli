@@ -11,9 +11,9 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://wrenchli.lovable.app/.well-known/openapi.yaml"
+    "url": "https://wrenchli.net/.well-known/openapi.yaml"
   },
-  "logo_url": "https://wrenchli.lovable.app/favicon.ico",
+  "logo_url": "https://wrenchli.net/favicon.ico",
   "contact_email": "support@wrenchli.net",
-  "legal_info_url": "https://wrenchli.lovable.app/about"
+  "legal_info_url": "https://wrenchli.net/about"
 }
