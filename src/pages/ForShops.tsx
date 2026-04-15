@@ -147,6 +147,9 @@ export default function ForShops() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Not Another Platform */}
       <section className="section-padding bg-background border-t border-border">
         <div className="container-wrenchli max-w-3xl text-center">
           <SectionReveal>
