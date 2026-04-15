@@ -1,48 +1,69 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
+import { isValidEmail } from "../_shared/validation.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_REDIRECT_DOMAINS = [
+  "wrenchli.net",
+  "www.wrenchli.net",
+  "wrenchli.lovable.app",
+];
+
+const DEFAULT_RESET_URL = "https://wrenchli.net/reset-password";
+
+function isAllowedRedirect(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return false;
+    return ALLOWED_REDIRECT_DOMAINS.includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+  const corsResp = handleCorsOptions(req);
+  if (corsResp) return corsResp;
+
+  const origin = req.headers.get("Origin");
+  const cors = getCorsHeaders(origin);
 
   try {
-    const { email, redirectTo } = await req.json();
-
-    if (!email) {
-      return new Response(JSON.stringify({ error: "Email is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Rate limit by IP
+    const identifier = getRateLimitIdentifier(req);
+    const rl = await checkRateLimit(identifier, RATE_LIMITS.STRICT, "send-password-reset");
+    if (!rl.allowed) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+        status: 429,
+        headers: { ...cors, "Content-Type": "application/json", ...getRateLimitHeaders(RATE_LIMITS.STRICT.maxRequests, rl.remaining, rl.resetTime) },
       });
     }
+
+    const { email, redirectTo } = await req.json();
+
+    if (!email || !isValidEmail(String(email))) {
+      return new Response(JSON.stringify({ error: "A valid email is required" }), {
+        status: 400,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+
+    // Strict redirect URL allowlist — ignore any value not on our domains
+    const safeRedirectTo =
+      typeof redirectTo === "string" && isAllowedRedirect(redirectTo.trim())
+        ? redirectTo.trim()
+        : DEFAULT_RESET_URL;
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const defaultResetUrl = "https://wrenchli.net/reset-password";
-    let safeRedirectTo = typeof redirectTo === "string" && redirectTo.trim().length > 0
-      ? redirectTo
-      : defaultResetUrl;
-
-    // Preview links can 404 outside the active preview session; force published URL instead.
-    if (
-      safeRedirectTo.includes("lovableproject.com") ||
-      safeRedirectTo.includes("id-preview--")
-    ) {
-      safeRedirectTo = defaultResetUrl;
-    }
-
     // Generate the password reset link using the admin API
     const { data, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: "recovery",
-      email,
+      email: String(email).trim(),
       options: { redirectTo: safeRedirectTo },
     });
 
@@ -50,22 +71,21 @@ serve(async (req) => {
       console.error("Generate link error:", linkError);
       // Don't reveal whether the email exists
       return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
-    // Build a direct link to the app with token_hash, bypassing Supabase's redirect
-    // which can 404 if the redirect URL isn't in the allowed list
+    // Build a direct link to the app with token_hash
     const hashedToken = data.properties.hashed_token;
     const resetLink = `${safeRedirectTo}?token_hash=${hashedToken}&type=recovery`;
 
-    // Send email via Resend with the link as plain text URL
+    // Send email via Resend
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) {
       console.error("RESEND_API_KEY not set");
       return new Response(JSON.stringify({ error: "Email service not configured" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
@@ -77,7 +97,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: "Wrenchli <onboarding@resend.dev>",
-        to: [email],
+        to: [String(email).trim()],
         subject: "Reset Your Wrenchli Password",
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f4f6f8; padding: 40px 16px;">
@@ -121,18 +141,18 @@ serve(async (req) => {
       console.error("Resend error:", errBody);
       return new Response(JSON.stringify({ error: "Failed to send email" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...cors, "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("Unexpected error:", err);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...cors, "Content-Type": "application/json" },
     });
   }
 });
