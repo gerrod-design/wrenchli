@@ -92,3 +92,6 @@ verify_jwt = false
 
 [functions.morning-briefing]
 verify_jwt = false
+
+[functions.audit-wrenchli-site]
+verify_jwt = false
