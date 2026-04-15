@@ -53,6 +53,10 @@ const prerenderRoutes: {
       <h2>No surprises after 90 days</h2>
       <p>When your 90-day pilot ends, nothing happens automatically. We schedule a call to review your results. There is no auto-billing, no contract renewal, and no pressure.</p>
       <p>If you decide to leave at any time: your shop listing is removed within 48 hours. No customer data is retained under your shop profile after you leave.</p>
+      <h2>Founding partner shops in Metro Detroit</h2>
+      <p><strong>Curt's Service</strong> — Oak Park, MI — Founding pilot partner, Tekmetric user</p>
+      <p><strong>McInerney Auto Center</strong> — Troy, MI (multiple locations) — Founding pilot partner, Tekmetric user</p>
+      <p>Founding partner spots are limited to the first 50 shops in Michigan and Ohio. Founding partners receive priority placement in consumer results during the pilot period.</p>
     `,
   },
   {
