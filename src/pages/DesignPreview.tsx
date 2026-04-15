@@ -4,8 +4,7 @@ import { Link } from "react-router-dom";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
 import Footer from "@/components/Footer";
-import heroVideo from "@/assets/hero-video.mp4";
-import heroPoster from "@/assets/hero-poster.jpg";
+import heroShop from "@/assets/hero-shop.jpg";
 
 const mockCauses = [
   { name: "Dead Battery", probability: 0.78, costLow: 150, costHigh: 350, difficulty: "easy" },

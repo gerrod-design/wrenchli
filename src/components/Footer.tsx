@@ -18,7 +18,7 @@ const footerLinks = {
     { label: "How It Works", to: "/for-car-owners" },
     { label: "Warranty Guide", to: "/warranty-guide" },
     { label: "💬 Recommend a Shop", to: "__recommend__" },
-    { label: "Financing Options", to: "/for-car-owners#financing" },
+    
   ],
   "For Repair Shops": [
     { label: "Partner Program", to: "/for-shops" },
