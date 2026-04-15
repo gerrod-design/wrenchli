@@ -77,28 +77,31 @@ const AudioRecordButton = memo(function AudioRecordButton({
   // Show recorded clip preview
   if (audioBlob && !isRecording) {
     return (
-      <div className="flex items-center gap-1.5">
-        <div className="flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/5 px-2 py-1">
-          <span className="text-[10px] font-medium text-primary">{recordingDuration}s clip</span>
+      <div className="flex flex-col items-center gap-1">
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/5 px-2 py-1">
+            <span className="text-[10px] font-medium text-primary">{recordingDuration}s clip</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleSendAudio}
+            disabled={analyzing}
+            className="flex h-8 items-center gap-1 rounded-lg bg-primary text-primary-foreground px-2.5 text-xs font-medium disabled:opacity-50"
+            aria-label="Send audio for analysis"
+          >
+            {analyzing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "🔊 Analyze"}
+          </button>
+          <button
+            type="button"
+            onClick={clearRecording}
+            disabled={analyzing}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40"
+            aria-label="Discard recording"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleSendAudio}
-          disabled={analyzing}
-          className="flex h-8 items-center gap-1 rounded-lg bg-primary text-primary-foreground px-2.5 text-xs font-medium disabled:opacity-50"
-          aria-label="Send audio for analysis"
-        >
-          {analyzing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "🔊 Analyze"}
-        </button>
-        <button
-          type="button"
-          onClick={clearRecording}
-          disabled={analyzing}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40"
-          aria-label="Discard recording"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
+        <span className="text-[11px] text-muted-foreground italic">Audio and video analysis powered by Google AI.</span>
       </div>
     );
   }
