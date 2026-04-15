@@ -251,9 +251,15 @@ export default function Privacy() {
                       <td className="py-2 pr-4">Usage analytics</td>
                       <td className="py-2">Anonymized browsing data</td>
                     </tr>
+                    <tr>
+                      <td className="py-2 pr-4">Google AI</td>
+                      <td className="py-2 pr-4">Audio and video analysis</td>
+                      <td className="py-2">Audio recordings and video uploads submitted through vehicle sound and video analysis features</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
+              <p className="mt-4">Audio and video submitted through our vehicle sound and video analysis features are processed by Google AI. This data is subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google's privacy policy</a>.</p>
               <p className="mt-4">Wrenchli does not sell your personal information to any third party.</p>
             </section>
 
