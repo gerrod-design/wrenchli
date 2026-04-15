@@ -13,6 +13,7 @@ import { getPreliminaryCostRange } from "@/data/preliminaryCostRanges";
 import VehicleContextBar from "./diagnosis/VehicleContextBar";
 import DiagnosisCard from "./diagnosis/DiagnosisCard";
 import StillNotSure from "./diagnosis/StillNotSure";
+import ShopShareConsent from "./diagnosis/ShopShareConsent";
 import SymptomMatchResults, { NoMatchFallback } from "./diagnosis/SymptomMatchResults";
 import { matchSymptoms } from "@/data/symptomLibrary";
 import { getDtcEntry } from "@/data/dtcCodes";
