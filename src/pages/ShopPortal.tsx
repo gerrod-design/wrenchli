@@ -13,6 +13,7 @@ import ShopQualityAlerts from "@/components/shop-portal/ShopQualityAlerts";
 import AccuracyAuditPanel from "@/components/shop-portal/AccuracyAuditPanel";
 import ShopEngagement from "@/components/shop-portal/ShopEngagement";
 import SecurityStatusPanel from "@/components/shop-portal/SecurityStatusPanel";
+import ShopGettingStarted from "@/components/shop-portal/ShopGettingStarted";
 
 export default function ShopPortal() {
   const navigate = useNavigate();
