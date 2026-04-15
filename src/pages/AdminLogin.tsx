@@ -47,7 +47,7 @@ export default function AdminLogin() {
               email,
               redirectTo:
                 window.location.hostname.includes("lovableproject.com") || window.location.hostname.includes("id-preview--")
-                  ? "https://wrenchli.lovable.app/reset-password"
+                  ? "https://wrenchli.net/reset-password"
                   : `${window.location.origin}/reset-password`,
             }),
           }

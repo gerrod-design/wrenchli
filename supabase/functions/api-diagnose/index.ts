@@ -113,7 +113,7 @@ serve(async (req) => {
     }
 
     const diagnosis = analyzeSymptoms(symptoms, vehicle);
-    const baseUrl = "https://wrenchli.lovable.app";
+    const baseUrl = "https://wrenchli.net";
 
     const response = {
       diagnosis: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate },

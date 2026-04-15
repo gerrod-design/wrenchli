@@ -1,4 +1,4 @@
-export const BASE_URL = "https://wrenchli.lovable.app";
+export const BASE_URL = "https://wrenchli.net";
 
 export interface ServiceProvider {
   id: string;

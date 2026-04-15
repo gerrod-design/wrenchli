@@ -137,7 +137,7 @@ serve(async (req) => {
     const valuation = estimateValue(vehicle.make, vehicle.model, vehicle.year, vehicle.mileage);
     const tradeVsRepair = repair_cost && repair_cost > 0 ? analyzeRepairVsReplace(valuation.current_value, repair_cost, vehicle.year, vehicle.mileage, vehicle.make) : undefined;
 
-    const baseUrl = "https://wrenchli.lovable.app";
+    const baseUrl = "https://wrenchli.net";
     const response = {
       current_value: valuation.current_value, confidence: valuation.confidence, value_breakdown: valuation.breakdown,
       market_analysis: { trend: valuation.market_trend, optimal_sell_window: valuation.optimal_sell_window, trade_vs_repair: tradeVsRepair },
