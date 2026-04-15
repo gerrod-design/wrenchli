@@ -179,6 +179,12 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
 
             {symptomMatches.length > 0 && (
               <div className="space-y-6 mb-8">
+                <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 mb-2">
+                  <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-blue-600" />
+                  <p className="text-sm leading-relaxed text-blue-900">
+                    This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.
+                  </p>
+                </div>
                 <DisclaimerBanner />
                 <VehicleContextBar vehicleStr={vehicleStr} onChangeVehicle={handleChangeVehicle} />
                 <SymptomMatchResults matches={symptomMatches} vehicle={vehicleStr} onSwitchToDtc={onSwitchToDtc} />
@@ -279,6 +285,12 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
               </>
             )}
 
+            <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 mb-2">
+              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-blue-600" />
+              <p className="text-sm leading-relaxed text-blue-900">
+                This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.
+              </p>
+            </div>
             <DisclaimerBanner />
             <VehicleContextBar vehicleStr={vehicleStr} onChangeVehicle={handleChangeVehicle} />
 

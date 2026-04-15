@@ -126,15 +126,20 @@ export default function CinematicHero() {
         {/* CTA Buttons */}
         <motion.div
           {...fadeUp(1.6, 10)}
-          className="mt-8 flex flex-col gap-3 sm:flex-row"
+          className="mt-8 flex flex-col items-center gap-3"
         >
-          <Button
-            asChild
-            size="lg"
-            className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base md:text-lg transition-transform hover:scale-[1.02] shadow-[0_4px_15px_hsl(var(--accent)/0.4)]"
-          >
-            <Link to="/#quote">Get Your Free Diagnosis</Link>
-          </Button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button
+              asChild
+              size="lg"
+              className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base md:text-lg transition-transform hover:scale-[1.02] shadow-[0_4px_15px_hsl(var(--accent)/0.4)]"
+            >
+              <Link to="/#quote">Get Your Free Diagnosis</Link>
+            </Button>
+          </div>
+          <p className="text-sm text-white/60 max-w-md text-center leading-relaxed">
+            This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.
+          </p>
         </motion.div>
 
 
