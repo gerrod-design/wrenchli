@@ -4,8 +4,8 @@ export default function Privacy() {
   return (
     <>
       <SEO
-        title="Privacy Policy"
-        description="Learn how Wrenchli collects, uses, and protects your personal information. Your privacy matters to us."
+        title="Privacy Policy | Wrenchli"
+        description="How Wrenchli collects, uses, and protects your vehicle and assessment data."
         path="/privacy"
       />
       <main className="min-h-screen bg-background py-16 md:py-24">

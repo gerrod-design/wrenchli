@@ -247,8 +247,8 @@ export default function WarrantyGuide() {
   return (
     <main className="pb-[60px] md:pb-0" style={{ backgroundColor: "#F8F8F6" }}>
       <SEO
-        title="Car Warranty Guide 2026 — Manufacturer Coverage by Brand | Wrenchli"
-        description="Compare factory warranty coverage for all major car brands. See bumper-to-bumper, powertrain, and corrosion terms side by side. Free reference guide for US vehicle owners."
+        title="Manufacturer Warranty Guide | Wrenchli"
+        description="Understand what your vehicle manufacturer warranty covers before you pay for a repair out of pocket."
         path="/warranty-guide"
       />
       <script

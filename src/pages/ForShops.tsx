@@ -33,8 +33,8 @@ export default function ForShops() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="For Repair Shops — Wrenchli"
-        description="Every customer arrives pre-assessed, cost-educated, and ready to approve the work. Apply for the free 90-day pilot."
+        title="Free Pilot Program for Independent Repair Shops | Wrenchli"
+        description="Join Wrenchli's free 90-day pilot. Your customers arrive pre-assessed — vehicle details, likely causes, and fair cost range before they walk in. No fees, no commission."
         path="/for-shops"
       />
 
