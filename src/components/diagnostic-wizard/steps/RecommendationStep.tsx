@@ -223,6 +223,14 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
         </div>
       )}
 
+      {/* Shop Transparency */}
+      <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
+        <h4 className="text-xs font-mono mb-2" style={{ color: "#E07B39" }}>HOW WE CHOOSE PARTNER SHOPS</h4>
+        <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>
+          Shops don't pay to appear in your results. Every partner shop earns a Verified Score based on three things: how often their repairs matched our assessment, how their pricing compares to the local market, and ratings from real customers. Higher scores appear first.
+        </p>
+      </div>
+
       {/* DIY Outcome Capture */}
       {diyEligible && showOutcome && !outcomeExists && (
         <DIYOutcomePrompt sessionId={sessionId} />
