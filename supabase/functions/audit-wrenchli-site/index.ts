@@ -235,10 +235,11 @@ async function callAgent(agent: typeof AGENTS[0], pageContent: string) {
   }
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getCorsHeaders(origin);
+  const optionsResp = handleCorsOptions(req);
+  if (optionsResp) return optionsResp;
 
   try {
     const { agentIds } = await req.json().catch(() => ({}));
