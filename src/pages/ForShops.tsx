@@ -213,10 +213,13 @@ export default function ForShops() {
             <p className="text-muted-foreground leading-relaxed md:text-lg">
               No setup fees. No monthly fees. No commission on repairs. The 90-day pilot is completely free. After 90 days, we discuss whether to continue — no automatic rollover, no pressure.
             </p>
+            <p className="text-xs text-muted-foreground mt-6 mb-2 leading-relaxed max-w-xl mx-auto">
+              Shop partners are disclosed to consumers at the time of recommendation.
+            </p>
             <Button
               asChild
               size="lg"
-              className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg"
+              className="mt-6 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg"
             >
               <Link to="/for-shops/onboarding">
                 Apply Now <ArrowRight className="ml-2 h-5 w-5" />

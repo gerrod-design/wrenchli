@@ -76,6 +76,11 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
 
   return (
     <div className="space-y-4">
+      {/* FTC Material Connection Disclosure */}
+      <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
+        Wrenchli has a business relationship with the shops shown below. Partner shops have agreed to Wrenchli's transparency standards. This does not affect the content of your symptom assessment.
+      </p>
+      
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 className="font-heading text-xl font-semibold">
           {filteredShops.length} {filteredShops.length === 1 ? "Result" : "Results"} Found
