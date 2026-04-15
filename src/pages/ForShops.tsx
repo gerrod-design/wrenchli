@@ -89,6 +89,66 @@ export default function ForShops() {
         </div>
       </section>
 
+      {/* How It Works — step-by-step flow */}
+      <section id="how-it-works" className="section-padding bg-secondary">
+        <div className="container-wrenchli max-w-3xl">
+          <SectionReveal>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl mb-12">
+              What happens when a customer chooses your shop
+            </h2>
+          </SectionReveal>
+
+          <div className="space-y-8">
+            {[
+              {
+                num: 1,
+                title: "Customer describes their symptoms",
+                body: "A vehicle owner in Metro Detroit describes their car problem on Wrenchli. They enter their vehicle details and symptoms in plain English.",
+              },
+              {
+                num: 2,
+                title: "Your shop appears in their results",
+                body: "If your shop is in our partner network and near their location, your shop appears in their assessment results with your Verified Score.",
+              },
+              {
+                num: 3,
+                title: "You receive an alert",
+                body: "You get a notification — via dashboard, email, or directly in Tekmetric, AutoLeap, or Mitchell 1 — with the customer's vehicle details, symptoms, top 3 likely causes, and a fair cost range.",
+              },
+              {
+                num: 4,
+                title: "The customer arrives prepared",
+                body: "The customer walks in knowing what to ask. No 20-minute intake conversation. No sticker shock. You can focus on the repair.",
+              },
+              {
+                num: 5,
+                title: "Confirm the outcome",
+                body: "After the repair, confirm what you found in your dashboard. This updates your Verified Score and increases how often Wrenchli recommends your shop to new customers.",
+              },
+            ].map((step, i) => (
+              <SectionReveal key={step.num} delay={i * 80}>
+                <div className="flex gap-5">
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-heading text-lg font-bold text-accent-foreground"
+                    style={{ backgroundColor: "#E07B39" }}
+                  >
+                    {step.num}
+                  </div>
+                  <div>
+                    <h3 className="font-heading text-lg font-semibold text-foreground">
+                      {step.title}
+                    </h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                      {step.body}
+                    </p>
+                  </div>
+                </div>
+              </SectionReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Not Another Platform */}
       <section className="section-padding bg-background border-t border-border">
         <div className="container-wrenchli max-w-3xl text-center">

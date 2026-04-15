@@ -38,6 +38,14 @@ const prerenderRoutes: {
     content: `
       <h1>Customers Arrive Pre-Assessed</h1>
       <p>Vehicle details, likely causes, and a fair cost range — before they walk in. Free 90-day pilot for independent shops.</p>
+      <h2>What happens when a customer chooses your shop</h2>
+      <ol>
+        <li><strong>Customer describes their symptoms</strong> — A vehicle owner in Metro Detroit describes their car problem on Wrenchli.</li>
+        <li><strong>Your shop appears in their results</strong> — If your shop is in our partner network and near their location, your shop appears with your Verified Score.</li>
+        <li><strong>You receive an alert</strong> — You get a notification with the customer's vehicle details, symptoms, top 3 likely causes, and a fair cost range.</li>
+        <li><strong>The customer arrives prepared</strong> — No 20-minute intake conversation. No sticker shock. You can focus on the repair.</li>
+        <li><strong>Confirm the outcome</strong> — This updates your Verified Score and increases how often Wrenchli recommends your shop.</li>
+      </ol>
       <a href="/pilot">Join the Free Pilot</a>
     `,
   },
