@@ -3,6 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+
 async function hashApiKey(key: string): Promise<string> {
   const encoded = new TextEncoder().encode(key);
   const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
@@ -80,38 +83,37 @@ serve(async (req) => {
 
     const vehicleStr = [safeYear, safeMake, safeModel, safeTrim].filter(Boolean).join(" ");
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const userPrompt = `Estimate professional repair costs for the following:\n\nVehicle: ${vehicleStr || "Unknown vehicle"}\nDiagnosis: ${safeTitle}${safeCode ? ` (Code: ${safeCode})` : ""}\nDIY Feasibility: ${safeDiy || "unknown"}\nUrgency: ${safeUrgency || "unknown"}\nCustomer ZIP Code: ${zipClean}\n\nProvide a realistic cost estimate for this repair in the metro area around ZIP code ${zipClean}. Consider labor rates, parts costs, and regional pricing variations.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: "You are Wrenchli's automotive repair cost estimator. Provide transparent, realistic repair cost estimates based on diagnosis, vehicle, and ZIP code region. Include parts, labor, and regional pricing. Always provide a range." },
-          { role: "user", content: userPrompt },
-        ],
+        model: MODEL,
+        max_tokens: 1024,
+        system: "You are Wrenchli's automotive repair cost estimator. Provide transparent, realistic repair cost estimates based on diagnosis, vehicle, and ZIP code region. Include parts, labor, and regional pricing. Always provide a range.",
+        messages: [{ role: "user", content: userPrompt }],
         tools: [{
-          type: "function",
-          function: {
-            name: "provide_cost_estimate",
-            description: "Return a structured cost estimate for a vehicle repair",
-            parameters: {
-              type: "object",
-              properties: {
-                metro_area: { type: "string" }, cost_low: { type: "number" }, cost_high: { type: "number" },
-                parts_estimate: { type: "string" }, labor_estimate: { type: "string" }, labor_hours: { type: "string" },
-                regional_notes: { type: "string" }, what_to_expect: { type: "string" }, warranty_note: { type: "string" },
-              },
-              required: ["metro_area", "cost_low", "cost_high", "parts_estimate", "labor_estimate", "labor_hours", "regional_notes", "what_to_expect", "warranty_note"],
-              additionalProperties: false,
+          name: "provide_cost_estimate",
+          description: "Return a structured cost estimate for a vehicle repair",
+          input_schema: {
+            type: "object",
+            properties: {
+              metro_area: { type: "string" }, cost_low: { type: "number" }, cost_high: { type: "number" },
+              parts_estimate: { type: "string" }, labor_estimate: { type: "string" }, labor_hours: { type: "string" },
+              regional_notes: { type: "string" }, what_to_expect: { type: "string" }, warranty_note: { type: "string" },
             },
+            required: ["metro_area", "cost_low", "cost_high", "parts_estimate", "labor_estimate", "labor_hours", "regional_notes", "what_to_expect", "warranty_note"],
           },
         }],
-        tool_choice: { type: "function", function: { name: "provide_cost_estimate" } },
+        tool_choice: { type: "tool", name: "provide_cost_estimate" },
       }),
     });
 
@@ -119,18 +121,17 @@ serve(async (req) => {
       if (response.status === 429) return new Response(JSON.stringify({ error: "AI rate limit exceeded. Try again shortly." }), { status: 429, headers: { ...securityHeaders, "Content-Type": "application/json" } });
       if (response.status === 402) return new Response(JSON.stringify({ error: "AI service temporarily unavailable." }), { status: 402, headers: { ...securityHeaders, "Content-Type": "application/json" } });
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
+      console.error("Anthropic API error:", response.status, t);
       return new Response(JSON.stringify({ error: "AI service error" }), { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } });
     }
 
     const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall || toolCall.function.name !== "provide_cost_estimate") {
+    const toolUse = data.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_cost_estimate");
+    if (!toolUse) {
       return new Response(JSON.stringify({ error: "Unexpected AI response format" }), { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } });
     }
 
-    const estimate = JSON.parse(toolCall.function.arguments);
-    return new Response(JSON.stringify(estimate), { headers: { ...securityHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify(toolUse.input), { headers: { ...securityHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("api-estimate-repair error:", e);
     return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } });

@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -12,8 +15,8 @@ serve(async (req) => {
   try {
     const { diagnosis_title, diagnosis_code, vehicle_year, vehicle_make, vehicle_model, diy_cost, shop_cost } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY not configured");
 
     const vehicleStr = [vehicle_year, vehicle_make, vehicle_model].filter(Boolean).join(" ");
 
@@ -31,53 +34,48 @@ Analyze this repair scenario and provide:
 3. An estimated DIY success rate percentage (realistic, based on difficulty) and the approximate number of steps.
 4. A one-line motivational message for the DIYer (e.g., "Most owners complete this in under 2 hours").`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
+        model: MODEL,
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }],
         tools: [
           {
-            type: "function",
-            function: {
-              name: "provide_repair_intel",
-              description: "Return structured repair intelligence data",
-              parameters: {
-                type: "object",
-                properties: {
-                  youtube_queries: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        query: { type: "string", description: "Optimized YouTube search query" },
-                        label: { type: "string", description: "Short human-readable label for the query" },
-                        angle: { type: "string", enum: ["model_specific", "technique", "troubleshooting"] },
-                      },
-                      required: ["query", "label", "angle"],
-                      additionalProperties: false,
+            name: "provide_repair_intel",
+            description: "Return structured repair intelligence data",
+            input_schema: {
+              type: "object",
+              properties: {
+                youtube_queries: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      query: { type: "string", description: "Optimized YouTube search query" },
+                      label: { type: "string", description: "Short human-readable label for the query" },
+                      angle: { type: "string", enum: ["model_specific", "technique", "troubleshooting"] },
                     },
+                    required: ["query", "label", "angle"],
                   },
-                  is_common_issue: { type: "boolean", description: "Whether this is a known common issue for this vehicle" },
-                  common_issue_reason: { type: "string", description: "Why this is a common issue, or empty if not" },
-                  diy_success_rate: { type: "number", description: "Estimated success rate for DIY repair (0-100)" },
-                  estimated_steps: { type: "number", description: "Approximate number of steps to complete the repair" },
-                  confidence_message: { type: "string", description: "One-line motivational message for the DIYer" },
                 },
-                required: ["youtube_queries", "is_common_issue", "common_issue_reason", "diy_success_rate", "estimated_steps", "confidence_message"],
-                additionalProperties: false,
+                is_common_issue: { type: "boolean", description: "Whether this is a known common issue for this vehicle" },
+                common_issue_reason: { type: "string", description: "Why this is a common issue, or empty if not" },
+                diy_success_rate: { type: "number", description: "Estimated success rate for DIY repair (0-100)" },
+                estimated_steps: { type: "number", description: "Approximate number of steps to complete the repair" },
+                confidence_message: { type: "string", description: "One-line motivational message for the DIYer" },
               },
+              required: ["youtube_queries", "is_common_issue", "common_issue_reason", "diy_success_rate", "estimated_steps", "confidence_message"],
             },
           },
         ],
-        tool_choice: { type: "function", function: { name: "provide_repair_intel" } },
+        tool_choice: { type: "tool", name: "provide_repair_intel" },
       }),
     });
 
@@ -95,17 +93,15 @@ Analyze this repair scenario and provide:
         });
       }
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      throw new Error("AI gateway error");
+      console.error("Anthropic API error:", response.status, t);
+      throw new Error("Anthropic API error");
     }
 
     const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("No tool call in response");
+    const toolUse = data.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_repair_intel");
+    if (!toolUse) throw new Error("No tool call in response");
 
-    const intel = JSON.parse(toolCall.function.arguments);
-
-    return new Response(JSON.stringify(intel), {
+    return new Response(JSON.stringify(toolUse.input), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

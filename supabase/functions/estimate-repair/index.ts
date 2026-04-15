@@ -4,6 +4,9 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+
 serve(async (req) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -12,7 +15,6 @@ serve(async (req) => {
   const optionsResp = handleCorsOptions(req);
   if (optionsResp) return optionsResp;
 
-  // Rate limiting
   const rateLimitId = getRateLimitIdentifier(req);
   const rateResult = await checkRateLimit(rateLimitId, RATE_LIMITS.STANDARD);
   if (!rateResult.allowed) {
@@ -74,8 +76,8 @@ serve(async (req) => {
 
     const vehicleStr = [safeYear, safeMake, safeModel, safeTrim].filter(Boolean).join(" ");
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const userPrompt = `Estimate professional repair costs for the following:
 
@@ -87,52 +89,42 @@ Customer ZIP Code: ${zipClean}
 
 Provide a realistic cost estimate for this repair in the metro area around ZIP code ${zipClean}. Consider labor rates, parts costs, and regional pricing variations. Be honest and transparent — this estimate will be shared with both the customer and the repair shop.`;
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            {
-              role: "system",
-              content: `You are Wrenchli's automotive repair cost estimator. You provide transparent, realistic repair cost estimates based on the diagnosis, vehicle, and customer's geographic area (ZIP code). Your estimates should reflect real-world pricing including parts and labor for that region. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate.`,
-            },
-            { role: "user", content: userPrompt },
-          ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "provide_cost_estimate",
-                description: "Return a structured cost estimate for a vehicle repair",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    metro_area: { type: "string", description: "The metro area name based on the ZIP code" },
-                    cost_low: { type: "number", description: "Low end of the estimated cost range in dollars" },
-                    cost_high: { type: "number", description: "High end of the estimated cost range in dollars" },
-                    parts_estimate: { type: "string", description: "Estimated parts cost range" },
-                    labor_estimate: { type: "string", description: "Estimated labor cost range" },
-                    labor_hours: { type: "string", description: "Estimated labor hours" },
-                    regional_notes: { type: "string", description: "Regional pricing notes" },
-                    what_to_expect: { type: "string", description: "Brief description of the repair for the customer" },
-                    warranty_note: { type: "string", description: "Typical warranty information" },
-                  },
-                  required: ["metro_area", "cost_low", "cost_high", "parts_estimate", "labor_estimate", "labor_hours", "regional_notes", "what_to_expect", "warranty_note"],
-                  additionalProperties: false,
-                },
+    const response = await fetch(ANTHROPIC_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1024,
+        system: `You are Wrenchli's automotive repair cost estimator. You provide transparent, realistic repair cost estimates based on the diagnosis, vehicle, and customer's geographic area (ZIP code). Your estimates should reflect real-world pricing including parts and labor for that region. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate.`,
+        messages: [{ role: "user", content: userPrompt }],
+        tools: [
+          {
+            name: "provide_cost_estimate",
+            description: "Return a structured cost estimate for a vehicle repair",
+            input_schema: {
+              type: "object",
+              properties: {
+                metro_area: { type: "string", description: "The metro area name based on the ZIP code" },
+                cost_low: { type: "number", description: "Low end of the estimated cost range in dollars" },
+                cost_high: { type: "number", description: "High end of the estimated cost range in dollars" },
+                parts_estimate: { type: "string", description: "Estimated parts cost range" },
+                labor_estimate: { type: "string", description: "Estimated labor cost range" },
+                labor_hours: { type: "string", description: "Estimated labor hours" },
+                regional_notes: { type: "string", description: "Regional pricing notes" },
+                what_to_expect: { type: "string", description: "Brief description of the repair for the customer" },
+                warranty_note: { type: "string", description: "Typical warranty information" },
               },
+              required: ["metro_area", "cost_low", "cost_high", "parts_estimate", "labor_estimate", "labor_hours", "regional_notes", "what_to_expect", "warranty_note"],
             },
-          ],
-          tool_choice: { type: "function", function: { name: "provide_cost_estimate" } },
-        }),
-      }
-    );
+          },
+        ],
+        tool_choice: { type: "tool", name: "provide_cost_estimate" },
+      }),
+    });
 
     if (!response.ok) {
       if (response.status === 429) {
@@ -148,7 +140,7 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
         );
       }
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
+      console.error("Anthropic API error:", response.status, t);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
         { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
@@ -156,15 +148,15 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
     }
 
     const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall || toolCall.function.name !== "provide_cost_estimate") {
+    const toolUse = data.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_cost_estimate");
+    if (!toolUse) {
       return new Response(
         JSON.stringify({ error: "Unexpected AI response format" }),
         { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const estimate = JSON.parse(toolCall.function.arguments);
+    const estimate = toolUse.input;
 
     // Log request (fire and forget)
     supabase.from("api_request_logs").insert({

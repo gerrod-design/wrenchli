@@ -3,6 +3,9 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+
 serve(async (req) => {
   const origin = req.headers.get("origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -27,8 +30,8 @@ serve(async (req) => {
       replacement_price, replacement_url, zip_code,
     } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const replacementDesc = [replacement_year, replacement_make, replacement_model].filter(Boolean).join(" ");
 
@@ -55,53 +58,52 @@ Estimate the following for EACH option over 3 years:
 
 Use the tool "compare_tco" to return structured results. Be realistic with estimates based on the ZIP code region. If the replacement vehicle details are vague, make reasonable assumptions and note them. All dollar amounts should be numbers (not strings).`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: MODEL,
+        max_tokens: 1500,
         messages: [{ role: "user", content: prompt }],
         tools: [
           {
-            type: "function",
-            function: {
-              name: "compare_tco",
-              description: "Return a structured TCO comparison between repairing and replacing a vehicle.",
-              parameters: {
-                type: "object",
-                properties: {
-                  repair_option: {
-                    type: "object",
-                    properties: {
-                      upfront_cost: { type: "number" }, monthly_payment: { type: "number" },
-                      annual_insurance: { type: "number" }, annual_depreciation: { type: "number" },
-                      maintenance_3yr: { type: "number" }, total_3yr: { type: "number" },
-                    },
-                    required: ["upfront_cost", "monthly_payment", "annual_insurance", "annual_depreciation", "maintenance_3yr", "total_3yr"],
-                    additionalProperties: false,
+            name: "compare_tco",
+            description: "Return a structured TCO comparison between repairing and replacing a vehicle.",
+            input_schema: {
+              type: "object",
+              properties: {
+                repair_option: {
+                  type: "object",
+                  properties: {
+                    upfront_cost: { type: "number" }, monthly_payment: { type: "number" },
+                    annual_insurance: { type: "number" }, annual_depreciation: { type: "number" },
+                    maintenance_3yr: { type: "number" }, total_3yr: { type: "number" },
                   },
-                  replace_option: {
-                    type: "object",
-                    properties: {
-                      upfront_cost: { type: "number" }, monthly_payment: { type: "number" },
-                      annual_insurance: { type: "number" }, annual_depreciation: { type: "number" },
-                      maintenance_3yr: { type: "number" }, total_3yr: { type: "number" },
-                    },
-                    required: ["upfront_cost", "monthly_payment", "annual_insurance", "annual_depreciation", "maintenance_3yr", "total_3yr"],
-                    additionalProperties: false,
-                  },
-                  recommendation: { type: "string", description: "A 2-3 sentence plain-English recommendation." },
-                  assumptions: { type: "array", items: { type: "string" }, description: "Key assumptions made in the estimate." },
-                  savings_amount: { type: "number", description: "How much cheaper the better option is over 3 years." },
-                  better_option: { type: "string", enum: ["repair", "replace"], description: "Which option is cheaper over 3 years." },
+                  required: ["upfront_cost", "monthly_payment", "annual_insurance", "annual_depreciation", "maintenance_3yr", "total_3yr"],
                 },
-                required: ["repair_option", "replace_option", "recommendation", "assumptions", "savings_amount", "better_option"],
-                additionalProperties: false,
+                replace_option: {
+                  type: "object",
+                  properties: {
+                    upfront_cost: { type: "number" }, monthly_payment: { type: "number" },
+                    annual_insurance: { type: "number" }, annual_depreciation: { type: "number" },
+                    maintenance_3yr: { type: "number" }, total_3yr: { type: "number" },
+                  },
+                  required: ["upfront_cost", "monthly_payment", "annual_insurance", "annual_depreciation", "maintenance_3yr", "total_3yr"],
+                },
+                recommendation: { type: "string", description: "A 2-3 sentence plain-English recommendation." },
+                assumptions: { type: "array", items: { type: "string" }, description: "Key assumptions made in the estimate." },
+                savings_amount: { type: "number", description: "How much cheaper the better option is over 3 years." },
+                better_option: { type: "string", enum: ["repair", "replace"], description: "Which option is cheaper over 3 years." },
               },
+              required: ["repair_option", "replace_option", "recommendation", "assumptions", "savings_amount", "better_option"],
             },
           },
         ],
-        tool_choice: { type: "function", function: { name: "compare_tco" } },
+        tool_choice: { type: "tool", name: "compare_tco" },
       }),
     });
 
@@ -117,16 +119,15 @@ Use the tool "compare_tco" to return structured results. Be realistic with estim
         });
       }
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
+      console.error("Anthropic API error:", response.status, t);
       throw new Error("AI comparison failed");
     }
 
     const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("No structured response from AI");
+    const toolUse = data.content?.find((block: any) => block.type === "tool_use" && block.name === "compare_tco");
+    if (!toolUse) throw new Error("No structured response from AI");
 
-    const result = JSON.parse(toolCall.function.arguments);
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify(toolUse.input), {
       headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
