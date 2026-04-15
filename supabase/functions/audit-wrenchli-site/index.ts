@@ -255,7 +255,7 @@ async function callAgent(agent: typeof AGENTS[0], pageContent: string) {
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 3000,
+      max_tokens: 6000,
       system: agent.systemPrompt,
       messages: [{
         role: "user",
