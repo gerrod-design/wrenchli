@@ -1,41 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import heroVideo from "@/assets/hero-video.mp4";
-import heroPoster from "@/assets/hero-poster.jpg";
-import heroHome from "@/assets/hero-home.jpg";
-
-function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return reduced;
-}
-
-function useIsSaveData() {
-  const [save, setSave] = useState(false);
-  useEffect(() => {
-    const conn = (navigator as any).connection;
-    if (conn?.saveData) setSave(true);
-    else if (conn?.effectiveType === "2g" || conn?.effectiveType === "slow-2g") setSave(true);
-  }, []);
-  return save;
-}
+import heroShop from "@/assets/hero-shop.jpg";
 
 export default function CinematicHero() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const prefersReducedMotion = useReducedMotion();
-  const isSaveData = useIsSaveData();
   const [isMobile, setIsMobile] = useState(false);
-  
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -43,8 +15,6 @@ export default function CinematicHero() {
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
-
-  const showVideo = !prefersReducedMotion && !isSaveData && !isMobile;
 
   const handleScrollDown = () => {
     document.getElementById("quote")?.scrollIntoView({ behavior: "smooth" });
@@ -58,37 +28,17 @@ export default function CinematicHero() {
 
   return (
     <section className="relative w-full overflow-hidden hero-height">
-      {/* Background Video (desktop only) */}
-      {showVideo && (
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover z-0"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={heroPoster}
-          preload="auto"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
-      )}
-
-      {/* Mobile fallback: poster image with subtle zoom */}
-      {!showVideo && (
-        <div
-          className="absolute inset-0 z-0 bg-cover bg-center animate-subtle-zoom"
-          style={{ backgroundImage: `url(${isMobile ? heroHome : heroPoster})` }}
-        />
-      )}
+      {/* Single on-brand hero image */}
+      <div
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${heroShop})` }}
+      />
 
       {/* Gradient overlay */}
       <div className="absolute inset-0 z-[1] hero-overlay" />
 
       {/* Content */}
       <div className="relative z-[2] flex flex-col items-center justify-center h-full px-6 text-center max-w-[900px] mx-auto">
-        {/* WRENCHLI wordmark */}
-
         {/* Headline */}
         <motion.h1
           {...fadeUp(0.8)}
@@ -142,7 +92,6 @@ export default function CinematicHero() {
           </p>
         </motion.div>
 
-
         {/* Scroll indicator */}
         <motion.button
           initial={{ opacity: 0 }}
@@ -155,7 +104,6 @@ export default function CinematicHero() {
           <ChevronDown className="h-8 w-8 animate-bounce" />
         </motion.button>
       </div>
-
     </section>
   );
 }
