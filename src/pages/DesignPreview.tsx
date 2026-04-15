@@ -30,13 +30,6 @@ const MONO = "'IBM Plex Mono', monospace";
 export default function DesignPreview() {
   // Pipeline is now a static visual — no state needed
   const chatRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.6;
-    }
-  }, []);
 
   useEffect(() => {
     const link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
@@ -94,19 +87,11 @@ export default function DesignPreview() {
 
       {/* ── HERO with cinematic video background ── */}
       <section className="relative overflow-hidden" style={{ minHeight: "100vh" }}>
-        {/* Video background */}
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover z-0"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={heroPoster}
-          preload="auto"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
+        {/* Static hero image */}
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroShop})` }}
+        />
         {/* Dark overlay for text legibility */}
         <div className="absolute inset-0 z-[1]" style={{ background: "rgba(0,0,0,0.50)" }} />
 
@@ -329,7 +314,7 @@ export default function DesignPreview() {
                   { label: "Vehicle", value: "2019 Honda Civic LX" },
                   { label: "Assessment", value: "Dead Battery (78% likely)" },
                   { label: "Cost Range", value: "$150 – $350" },
-                  { label: "Customer Status", value: "Pre-approved financing" },
+                  { label: "Customer Status", value: "Assessment complete" },
                 ].map((item) => (
                   <div key={item.label} className="rounded-lg p-3" style={{ background: "#F8F8F6", border: "1px solid #E0DDD8" }}>
                     <div className="text-xs mb-1" style={{ color: "#6B7280" }}>{item.label}</div>
