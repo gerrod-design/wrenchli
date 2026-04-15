@@ -8,7 +8,7 @@ const MAX_MESSAGES = 80;
 const MAX_CONTENT_LENGTH = 8000;
 const MAX_IMAGE_URLS = 5;
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "claude-sonnet-4-6";
 
 const FUNCTIONS_BASE = Deno.env.get("SUPABASE_URL") + "/functions/v1";
 
