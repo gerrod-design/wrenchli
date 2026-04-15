@@ -70,6 +70,7 @@ import ShopOnboardingPreview from "./pages/ShopOnboardingPreview";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import WarrantyGuide from "./pages/WarrantyGuide";
+import Subprocessors from "./pages/Subprocessors";
 const queryClient = new QueryClient();
 
 function AnimatedRoutes() {
@@ -141,6 +142,7 @@ function AnimatedRoutes() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/warranty-guide" element={<WarrantyGuide />} />
+          <Route path="/subprocessors" element={<Subprocessors />} />
           <Route path="/diagnose" element={<Navigate to="/" replace />} />
           <Route path="/design-preview" element={<Navigate to="/" replace />} />
           <Route path="/design-preview/for-shops" element={<ForShopsPreview />} />

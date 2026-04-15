@@ -28,6 +28,7 @@ const footerLinks = {
   ],
   Legal: [
     { label: "Privacy Policy", to: "/privacy" },
+    { label: "Subprocessors", to: "/subprocessors" },
     { label: "Terms of Service", to: "/terms" },
     { label: "Accessibility", to: "/accessibility" },
     { label: "🍪 Manage Cookies", to: "__cookies__" },

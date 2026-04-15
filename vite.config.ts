@@ -81,6 +81,27 @@ const prerenderRoutes: {
       <p>Understand what your vehicle manufacturer warranty covers before you pay for a repair out of pocket.</p>
     `,
   },
+  {
+    path: "/subprocessors",
+    title: "Subprocessors | Wrenchli",
+    description:
+      "List of third-party services that process Wrenchli user data, including data handling details and compliance certifications.",
+    content: `
+      <h1>Subprocessors</h1>
+      <p>Wrenchli uses the following third-party services to operate our platform. Each service processes user data under a data processing agreement.</p>
+      <table>
+        <tr><th>Service</th><th>Purpose</th><th>Data Sent</th><th>Notes</th></tr>
+        <tr><td>Anthropic PBC</td><td>AI symptom assessment generation</td><td>Symptom description, vehicle year/make/model</td><td>No training use</td></tr>
+        <tr><td>Supabase Inc.</td><td>Database and authentication</td><td>All user account and session data</td><td>SOC 2 Type II certified</td></tr>
+        <tr><td>Vercel Inc.</td><td>Hosting and CDN</td><td>Request logs</td><td>No personal data stored beyond standard logs</td></tr>
+        <tr><td>Google AI (Gemini)</td><td>Audio and video analysis features only</td><td>Audio/video recordings submitted for analysis</td><td>Subject to Google AI terms</td></tr>
+        <tr><td>Stripe Inc.</td><td>Payment processing (Pro subscriptions)</td><td>Payment card data</td><td>PCI DSS compliant, Wrenchli never stores card data</td></tr>
+        <tr><td>NHTSA</td><td>Vehicle recall lookup</td><td>VIN</td><td>US government public API, no data retained</td></tr>
+      </table>
+      <p>Last updated: April 2026</p>
+      <p>Questions about data processing? Email privacy@wrenchli.net</p>
+    `,
+  },
 ];
 
 /**
