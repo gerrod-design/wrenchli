@@ -163,6 +163,46 @@ export default function ForShops() {
         </div>
       </section>
 
+      {/* Founding Partners — social proof */}
+      <section className="section-padding bg-background">
+        <div className="container-wrenchli max-w-3xl">
+          <SectionReveal>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl mb-10">
+              Founding partner shops in Metro Detroit
+            </h2>
+          </SectionReveal>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {[
+              { name: "Curt's Service", location: "Oak Park, MI", note: "Founding pilot partner — Tekmetric user" },
+              { name: "McInerney Auto Center", location: "Troy, MI (multiple locations)", note: "Founding pilot partner — Tekmetric user" },
+            ].map((shop, i) => (
+              <SectionReveal key={shop.name} delay={i * 100}>
+                <Card className="h-full border border-border hover:shadow-md transition-shadow">
+                  <CardContent className="p-6 space-y-3">
+                    <Badge
+                      className="text-xs font-semibold px-3 py-1 border"
+                      style={{ backgroundColor: "rgba(224,123,57,0.1)", color: "#E07B39", borderColor: "rgba(224,123,57,0.3)" }}
+                    >
+                      Founding Partner
+                    </Badge>
+                    <h3 className="font-heading text-lg font-bold text-foreground">{shop.name}</h3>
+                    <p className="text-sm text-muted-foreground">{shop.location}</p>
+                    <p className="text-sm text-muted-foreground italic">{shop.note}</p>
+                  </CardContent>
+                </Card>
+              </SectionReveal>
+            ))}
+          </div>
+
+          <SectionReveal delay={250}>
+            <p className="mt-8 text-center text-sm text-muted-foreground leading-relaxed max-w-xl mx-auto">
+              Founding partner spots are limited to the first 50 shops in Michigan and Ohio. Founding partners receive priority placement in consumer results during the pilot period.
+            </p>
+          </SectionReveal>
+        </div>
+      </section>
+
       {/* Pilot Terms */}
       <section className="section-padding bg-secondary">
         <div className="container-wrenchli max-w-3xl text-center">
