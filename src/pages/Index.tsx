@@ -34,7 +34,7 @@ export default function Index() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Free Vehicle Symptom Assessment | Wrenchli — Michigan & Ohio"
-        description="Describe what's wrong with your car and get a structured report with likely causes, cost ranges, and questions to ask your shop. Free. No account required."
+        description="Describe your car symptom in plain English — get a free instant assessment of likely causes and repair costs. Serving Michigan and Ohio drivers."
         path="/"
       />
       <HomeJsonLd />
