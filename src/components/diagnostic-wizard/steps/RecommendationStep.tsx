@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle } from "lucide-react";
+import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle, MapPin } from "lucide-react";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
 import { showDIY } from "@/lib/diyVisibility";
 import { getRepairTimeEstimate } from "@/lib/repairTimeEstimate";
@@ -97,6 +97,36 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Book This Repair CTA — urgency-gated */}
+      {(diagnosis.urgency === "immediate" || diagnosis.urgency === "soon") && (
+        <div className="rounded-lg p-4 space-y-3" style={{ background: "#E07B3910", border: "1px solid #E07B39" }}>
+          <h4 className="text-sm font-heading font-bold" style={{ color: "#F5F5F5" }}>
+            Ready to get this fixed?
+          </h4>
+          <p className="text-xs leading-relaxed" style={{ color: "#9CA3AF" }}>
+            Connect with a Wrenchli partner shop in Metro Detroit. They'll receive your assessment before you arrive.
+          </p>
+          <a
+            href="/find-shops"
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90"
+            style={{ background: "#E07B39", color: "#0F1117" }}
+          >
+            <MapPin className="h-4 w-4" />
+            Find a Partner Shop Near Me
+          </a>
+        </div>
+      )}
+      {diagnosis.urgency === "schedule" && (
+        <div className="rounded-lg p-3" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
+          <p className="text-xs leading-relaxed" style={{ color: "#9CA3AF" }}>
+            When you're ready, a partner shop can see your assessment before you arrive.{" "}
+            <a href="/find-shops" className="underline font-medium" style={{ color: "#E07B39" }}>
+              Find a Shop
+            </a>
+          </p>
         </div>
       )}
 
