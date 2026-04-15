@@ -1,6 +1,6 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
-const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const AI_GATEWAY = "https://api.anthropic.com/v1/messages";
 
 const SYSTEM_PROMPT = `You are Mike, a master automotive diagnostician at Wrenchli. You've just listened to an audio recording of a car noise that a customer recorded.
 
