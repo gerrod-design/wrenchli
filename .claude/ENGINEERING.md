@@ -78,7 +78,7 @@ scan. Errors → stop and fix. Warnings → flag and ask confirmation.
 
 ## Technical Stack — Never Change Without Instruction
 
-- AI model: claude-sonnet-4-20250514 ONLY
+- AI model: claude-sonnet-4-6 ONLY
 - Database: Supabase PostgreSQL
 - Edge Functions: Deno runtime
 - Frontend: React + TypeScript + Vite
