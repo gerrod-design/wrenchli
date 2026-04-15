@@ -709,6 +709,8 @@ export type Database = {
           anon_session_id: string | null
           created_at: string | null
           id: string
+          shop_share_consent: boolean
+          shop_share_consented_at: string | null
           status: Database["public"]["Enums"]["session_status"] | null
           updated_at: string | null
           user_id: string | null
@@ -718,6 +720,8 @@ export type Database = {
           anon_session_id?: string | null
           created_at?: string | null
           id?: string
+          shop_share_consent?: boolean
+          shop_share_consented_at?: string | null
           status?: Database["public"]["Enums"]["session_status"] | null
           updated_at?: string | null
           user_id?: string | null
@@ -727,6 +731,8 @@ export type Database = {
           anon_session_id?: string | null
           created_at?: string | null
           id?: string
+          shop_share_consent?: boolean
+          shop_share_consented_at?: string | null
           status?: Database["public"]["Enums"]["session_status"] | null
           updated_at?: string | null
           user_id?: string | null

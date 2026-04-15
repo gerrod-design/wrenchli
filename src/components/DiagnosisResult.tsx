@@ -13,6 +13,7 @@ import { getPreliminaryCostRange } from "@/data/preliminaryCostRanges";
 import VehicleContextBar from "./diagnosis/VehicleContextBar";
 import DiagnosisCard from "./diagnosis/DiagnosisCard";
 import StillNotSure from "./diagnosis/StillNotSure";
+import ShopShareConsent from "./diagnosis/ShopShareConsent";
 import SymptomMatchResults, { NoMatchFallback } from "./diagnosis/SymptomMatchResults";
 import { matchSymptoms } from "@/data/symptomLibrary";
 import { getDtcEntry } from "@/data/dtcCodes";
@@ -81,6 +82,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
   const [hasRun, setHasRun] = useState(false);
   const [error, setError] = useState("");
   const [recommendOpen, setRecommendOpen] = useState(false);
+  const [shopShareConsent, setShopShareConsent] = useState(false);
 
   const vehicleStr = [year, make, model].filter(Boolean).join(" ");
   const { findVehicle, addDiagnosticEntry } = useGarage();
@@ -316,8 +318,18 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
               <DownloadReportButton vehicle={vehicleStr} diagnoses={diagnoses} symptom={symptom} codes={codes} year={year} make={make} model={model} />
             </div>
 
-            <StillNotSure vehicle={vehicleStr} />
-            <RecommendShopPrompt onOpenModal={() => setRecommendOpen(true)} />
+            <ShopShareConsent
+              consented={shopShareConsent}
+              onConsentChange={setShopShareConsent}
+            />
+
+            {shopShareConsent && (
+              <>
+                <StillNotSure vehicle={vehicleStr} />
+                <RecommendShopPrompt onOpenModal={() => setRecommendOpen(true)} />
+              </>
+            )}
+
             <SaveToGaragePrompt year={year} make={make} model={model} />
           </div>
         )}
