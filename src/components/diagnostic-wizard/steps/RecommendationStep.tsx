@@ -7,6 +7,7 @@ import { buildAmazonSearchLink } from "@/data/adRecommendations";
 import { trackAdClick } from "@/lib/adClickTracker";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
 import DIYOutcomePrompt from "./DIYOutcomePrompt";
+import SaveAssessmentPrompt from "@/components/diagnosis/SaveAssessmentPrompt";
 
 interface Props {
   recommendation: RecommendationResult;
@@ -196,6 +197,9 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
       {diyEligible && showOutcome && !outcomeExists && (
         <DIYOutcomePrompt sessionId={sessionId} />
       )}
+
+      {/* Deferred Account Creation */}
+      <SaveAssessmentPrompt />
 
       {/* Restart */}
       <button
