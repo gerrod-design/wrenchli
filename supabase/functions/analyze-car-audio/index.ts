@@ -1,6 +1,7 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
-const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const WHISPER_URL = "https://api.openai.com/v1/audio/transcriptions";
+const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 
 const SYSTEM_PROMPT = `You are Mike, a master automotive diagnostician at Wrenchli. You've just listened to an audio recording of a car noise that a customer recorded. The audio has been transcribed for you below.
 
@@ -31,74 +32,82 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      return new Response(JSON.stringify({ error: "AI service not configured" }), {
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      return new Response(JSON.stringify({ error: "Whisper transcription service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Convert audio to base64 for Gemini (which supports inline audio)
-    const audioBytes = await audioFile.arrayBuffer();
-    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBytes)));
-
-    // Determine mime type
-    const mimeType = audioFile.type || "audio/webm";
-
-    const userContent: any[] = [
-      {
-        type: "input_audio",
-        input_audio: {
-          data: base64Audio,
-          format: mimeType.includes("wav") ? "wav" : "mp3",
-        },
-      },
-      {
-        type: "text",
-        text: `The customer recorded this audio clip of a noise their car is making.${
-          vehicleContext ? ` Vehicle: ${vehicleContext}.` : ""
-        } Please listen and analyze what you hear. Describe the sound and provide your diagnosis.`,
-      },
-    ];
-
-    const response = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userContent },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("AI gateway error:", response.status, errText);
-
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited. Please try again in a moment." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI service credits exhausted." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      return new Response(JSON.stringify({ error: "Failed to analyze audio" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    const ANTHROPIC_MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-20250514";
+    if (!ANTHROPIC_API_KEY) {
+      return new Response(JSON.stringify({ error: "Assessment service not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const result = await response.json();
-    const analysis = result.choices?.[0]?.message?.content || "I couldn't make out a clear noise from that recording. Could you try recording again, a bit closer to where the sound is coming from?";
+    // Step 1: Transcribe with OpenAI Whisper
+    const whisperForm = new FormData();
+    whisperForm.append("file", audioFile, audioFile.name || "car-noise.webm");
+    whisperForm.append("model", "whisper-1");
+    whisperForm.append("prompt", "Car engine noise, vehicle sound recording, mechanical noise diagnosis");
+
+    const whisperResp = await fetch(WHISPER_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+      body: whisperForm,
+    });
+
+    if (!whisperResp.ok) {
+      const errText = await whisperResp.text();
+      console.error("Whisper error:", whisperResp.status, errText);
+      return new Response(JSON.stringify({ error: "Failed to transcribe audio" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const whisperResult = await whisperResp.json();
+    const transcript = whisperResult.text || "";
+
+    console.log("Whisper transcript length:", transcript.length);
+
+    // Step 2: Send transcript to Claude for assessment
+    const userMessage = `Here is a transcription of a car noise recording the customer submitted:\n\n"${transcript}"\n\n${
+      vehicleContext ? `Vehicle: ${vehicleContext}.\n\n` : ""
+    }Based on this transcription, analyze the sound and provide your diagnosis.`;
+
+    const claudeResp = await fetch(ANTHROPIC_URL, {
+      method: "POST",
+      headers: {
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: ANTHROPIC_MODEL,
+        max_tokens: 512,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: userMessage }],
+      }),
+    });
+
+    if (!claudeResp.ok) {
+      const errText = await claudeResp.text();
+      console.error("Anthropic error:", claudeResp.status, errText);
+      return new Response(JSON.stringify({ error: "Failed to analyze audio" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const claudeResult = await claudeResp.json();
+    const analysis =
+      claudeResult.content?.[0]?.text ||
+      "I couldn't make out a clear noise from that recording. Could you try recording again, a bit closer to where the sound is coming from?";
 
     return new Response(JSON.stringify({ analysis }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -106,7 +115,8 @@ Deno.serve(async (req: Request) => {
   } catch (err) {
     console.error("analyze-car-audio error:", err);
     return new Response(JSON.stringify({ error: "Internal error processing audio" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
