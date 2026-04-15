@@ -47,6 +47,12 @@ const prerenderRoutes: {
         <li><strong>Confirm the outcome</strong> — This updates your Verified Score and increases how often Wrenchli recommends your shop.</li>
       </ol>
       <a href="/pilot">Join the Free Pilot</a>
+      <h2>Your Verified Score is yours to earn</h2>
+      <p>Your Verified Score is calculated from three things: how often our assessment matched what you actually found, how your pricing compares to the local market average, and ratings from customers who visited through Wrenchli.</p>
+      <p>We require a minimum of 5 confirmed outcomes before displaying a score publicly.</p>
+      <h2>No surprises after 90 days</h2>
+      <p>When your 90-day pilot ends, nothing happens automatically. We schedule a call to review your results. There is no auto-billing, no contract renewal, and no pressure.</p>
+      <p>If you decide to leave at any time: your shop listing is removed within 48 hours. No customer data is retained under your shop profile after you leave.</p>
     `,
   },
   {

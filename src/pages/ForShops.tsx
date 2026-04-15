@@ -214,6 +214,44 @@ export default function ForShops() {
           </SectionReveal>
         </div>
       </section>
+
+      {/* Verified Score */}
+      <section className="section-padding bg-secondary">
+        <div className="container-wrenchli max-w-3xl text-center">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl mb-4">
+              Your Verified Score is yours to earn
+            </h2>
+            <div className="text-muted-foreground leading-relaxed md:text-lg text-left space-y-4">
+              <p>
+                Your Verified Score is calculated from three things: how often our assessment matched what you actually found (symptom-to-repair accuracy), how your pricing compares to the local market average, and ratings from customers who visited through Wrenchli.
+              </p>
+              <p>
+                We require a minimum of 5 confirmed outcomes before displaying a score publicly. If a customer declined the recommended repair, that outcome is flagged — not counted against you. You can see your full score history and flag any outcome you believe was recorded incorrectly.
+              </p>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
+
+      {/* After the Pilot */}
+      <section className="section-padding bg-background border-t border-border">
+        <div className="container-wrenchli max-w-3xl text-center">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl mb-4">
+              No surprises after 90 days
+            </h2>
+            <div className="text-muted-foreground leading-relaxed md:text-lg text-left space-y-4">
+              <p>
+                When your 90-day pilot ends, nothing happens automatically. We schedule a call to review your results and discuss whether continuing makes sense for your shop. There is no auto-billing, no contract renewal, and no pressure.
+              </p>
+              <p>
+                If you decide to leave at any time: your shop listing is removed within 48 hours. No customer data collected through our platform is retained under your shop profile after you leave.
+              </p>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
     </main>
   );
 }
