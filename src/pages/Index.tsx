@@ -7,6 +7,7 @@ import SectionReveal from "@/components/SectionReveal";
 import InlineChatWidget from "@/components/InlineChatWidget";
 import CinematicHero from "@/components/CinematicHero";
 import HowItWorksVideo from "@/components/HowItWorksVideo";
+import VinRecallCheck from "@/components/VinRecallCheck";
 
 import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
