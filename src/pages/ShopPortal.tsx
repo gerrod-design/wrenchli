@@ -125,6 +125,18 @@ export default function ShopPortal() {
 
         {/* Dashboard content */}
         <main className="max-w-6xl mx-auto p-4 pt-6">
+          {/* Getting Started Checklist — pilot period only */}
+          {isPilotPeriod && (
+            <div className="mb-6">
+              <ShopGettingStarted
+                shopProfile={shopProfile}
+                hasIntegration={hasIntegration}
+                qrShareCount={0}
+                confirmedOutcomes={confirmedOutcomes}
+              />
+            </div>
+          )}
+
           {/* Admin-only panels */}
           <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <AccuracyAuditPanel />
