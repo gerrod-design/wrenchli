@@ -108,6 +108,7 @@ function AnimatedRoutes() {
           <Route path="/shops" element={<Shops />} />
           <Route path="/for-car-owners" element={<ForCarOwners />} />
           <Route path="/for-shops" element={<ForShops />} />
+          <Route path="/for-dealers" element={<ForDealers />} />
           <Route path="/vehicle-insights" element={<VehicleInsights />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<FAQ />} />
