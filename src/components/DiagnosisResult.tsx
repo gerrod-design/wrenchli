@@ -8,6 +8,8 @@ import VehicleScanLoader from "./diagnosis/VehicleScanLoader";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DisclaimerBanner from "./diagnosis/DisclaimerBanner";
+import PreliminaryCostCard from "./diagnosis/PreliminaryCostCard";
+import { getPreliminaryCostRange } from "@/data/preliminaryCostRanges";
 import VehicleContextBar from "./diagnosis/VehicleContextBar";
 import DiagnosisCard from "./diagnosis/DiagnosisCard";
 import StillNotSure from "./diagnosis/StillNotSure";
@@ -254,6 +256,10 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
               color={garageVehicle?.color}
               codes={codes}
             />
+            {(() => {
+              const range = getPreliminaryCostRange(symptom || codes || "");
+              return range ? <PreliminaryCostCard range={range} /> : null;
+            })()}
           </div>
         )}
 
