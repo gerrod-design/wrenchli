@@ -13,17 +13,48 @@ const PAGES = [
   { name: "Warranty Guide", url: "https://wrenchli.net/warranty-guide" },
 ];
 
-function extractText(html: string, maxChars = 4000): string {
-  return html
+function extractMeta(html: string): string {
+  const parts: string[] = [];
+
+  // Title
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  if (titleMatch) parts.push(`Title: ${titleMatch[1].trim()}`);
+
+  // Meta description
+  const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i)
+    || html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i);
+  if (descMatch) parts.push(`Description: ${descMatch[1].trim()}`);
+
+  // Meta keywords
+  const kwMatch = html.match(/<meta[^>]*name=["']keywords["'][^>]*content=["']([^"']+)["']/i)
+    || html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']keywords["']/i);
+  if (kwMatch) parts.push(`Keywords: ${kwMatch[1].trim()}`);
+
+  // All OG tags
+  const ogRegex = /<meta[^>]*property=["'](og:[^"']+)["'][^>]*content=["']([^"']+)["'][^>]*>/gi;
+  let ogMatch;
+  while ((ogMatch = ogRegex.exec(html)) !== null) {
+    parts.push(`${ogMatch[1]}: ${ogMatch[2].trim()}`);
+  }
+  // Also match reversed attribute order
+  const ogRegex2 = /<meta[^>]*content=["']([^"']+)["'][^>]*property=["'](og:[^"']+)["'][^>]*>/gi;
+  while ((ogMatch = ogRegex2.exec(html)) !== null) {
+    parts.push(`${ogMatch[2]}: ${ogMatch[1].trim()}`);
+  }
+
+  // Visible text outside script/style/div (headings, paragraphs, spans, li, etc.)
+  const textOnly = html
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
-    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, "")
+    .replace(/<div[^>]*>[\s\S]*?<\/div>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
     .replace(/&nbsp;/g, " ").replace(/&quot;/g, '"').replace(/&#39;/g, "'")
-    .replace(/\s+/g, " ").trim()
-    .substring(0, maxChars);
+    .replace(/\s+/g, " ").trim();
+
+  if (textOnly.length > 10) parts.push(`Page text: ${textOnly.substring(0, 2000)}`);
+
+  return parts.join("\n");
 }
 
 async function fetchPage(page: { name: string; url: string }) {
@@ -33,7 +64,16 @@ async function fetchPage(page: { name: string; url: string }) {
       signal: AbortSignal.timeout(10000),
     });
     const html = await res.text();
-    return { ...page, content: extractText(html), status: res.status, error: null };
+    console.log(`[fetchPage] ${page.name} — raw HTML length: ${html.length}`);
+
+    let content = extractMeta(html);
+
+    if (content.length < 200) {
+      console.warn(`[fetchPage] ${page.name} — extracted content only ${content.length} chars, using raw HTML fallback`);
+      content = `[FALLBACK: meta extraction returned <200 chars — raw HTML below]\n${html.substring(0, 2000)}`;
+    }
+
+    return { ...page, content, status: res.status, error: null };
   } catch (err) {
     return { ...page, content: "", status: 0, error: String(err) };
   }
@@ -215,7 +255,7 @@ async function callAgent(agent: typeof AGENTS[0], pageContent: string) {
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 1500,
+      max_tokens: 3000,
       system: agent.systemPrompt,
       messages: [{
         role: "user",
