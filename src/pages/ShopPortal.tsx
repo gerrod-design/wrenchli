@@ -20,6 +20,9 @@ export default function ShopPortal() {
   const [shopAccount, setShopAccount] = useState<any>(null);
   const [shopProfile, setShopProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPilotPeriod, setIsPilotPeriod] = useState(false);
+  const [hasIntegration, setHasIntegration] = useState(false);
+  const [confirmedOutcomes, setConfirmedOutcomes] = useState(0);
 
   useEffect(() => {
     checkAuth();
@@ -32,7 +35,6 @@ export default function ShopPortal() {
       return;
     }
 
-    // Get shop account
     const { data: account } = await supabase
       .from("shop_accounts")
       .select("*, service_providers(*)")
@@ -42,6 +44,26 @@ export default function ShopPortal() {
     if (account) {
       setShopAccount(account);
       setShopProfile(account.service_providers);
+
+      // Check if within 90-day pilot period
+      const createdAt = new Date(account.created_at);
+      const daysSinceCreation = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+      setIsPilotPeriod(daysSinceCreation <= 90);
+
+      // Check for SMS integration
+      const { count: integrationCount } = await supabase
+        .from("shop_integrations")
+        .select("id", { count: "exact", head: true })
+        .eq("shop_id", account.shop_id);
+      setHasIntegration((integrationCount ?? 0) > 0);
+
+      // Count confirmed outcomes
+      const { count: outcomeCount } = await supabase
+        .from("diagnosis_records")
+        .select("id", { count: "exact", head: true })
+        .eq("selected_shop_id", account.shop_id)
+        .eq("status", "completed");
+      setConfirmedOutcomes(outcomeCount ?? 0);
     }
     setIsLoading(false);
   };
