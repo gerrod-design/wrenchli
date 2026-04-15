@@ -1692,6 +1692,36 @@ export type Database = {
           },
         ]
       }
+      recall_email_captures: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          session_id: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          session_id?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          session_id?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: string | null
+        }
+        Relationships: []
+      }
       referral_events: {
         Row: {
           created_at: string
