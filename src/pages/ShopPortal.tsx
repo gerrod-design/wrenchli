@@ -13,12 +13,16 @@ import ShopQualityAlerts from "@/components/shop-portal/ShopQualityAlerts";
 import AccuracyAuditPanel from "@/components/shop-portal/AccuracyAuditPanel";
 import ShopEngagement from "@/components/shop-portal/ShopEngagement";
 import SecurityStatusPanel from "@/components/shop-portal/SecurityStatusPanel";
+import ShopGettingStarted from "@/components/shop-portal/ShopGettingStarted";
 
 export default function ShopPortal() {
   const navigate = useNavigate();
   const [shopAccount, setShopAccount] = useState<any>(null);
   const [shopProfile, setShopProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPilotPeriod, setIsPilotPeriod] = useState(false);
+  const [hasIntegration, setHasIntegration] = useState(false);
+  const [confirmedOutcomes, setConfirmedOutcomes] = useState(0);
 
   useEffect(() => {
     checkAuth();
@@ -31,7 +35,6 @@ export default function ShopPortal() {
       return;
     }
 
-    // Get shop account
     const { data: account } = await supabase
       .from("shop_accounts")
       .select("*, service_providers(*)")
@@ -41,6 +44,26 @@ export default function ShopPortal() {
     if (account) {
       setShopAccount(account);
       setShopProfile(account.service_providers);
+
+      // Check if within 90-day pilot period
+      const createdAt = new Date(account.created_at);
+      const daysSinceCreation = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+      setIsPilotPeriod(daysSinceCreation <= 90);
+
+      // Check for SMS integration
+      const { count: integrationCount } = await supabase
+        .from("shop_integrations")
+        .select("id", { count: "exact", head: true })
+        .eq("shop_id", account.shop_id);
+      setHasIntegration((integrationCount ?? 0) > 0);
+
+      // Count confirmed outcomes
+      const { count: outcomeCount } = await supabase
+        .from("diagnosis_records")
+        .select("id", { count: "exact", head: true })
+        .eq("selected_shop_id", account.shop_id)
+        .eq("status", "completed");
+      setConfirmedOutcomes(outcomeCount ?? 0);
     }
     setIsLoading(false);
   };
@@ -102,6 +125,18 @@ export default function ShopPortal() {
 
         {/* Dashboard content */}
         <main className="max-w-6xl mx-auto p-4 pt-6">
+          {/* Getting Started Checklist — pilot period only */}
+          {isPilotPeriod && (
+            <div className="mb-6">
+              <ShopGettingStarted
+                shopProfile={shopProfile}
+                hasIntegration={hasIntegration}
+                qrShareCount={0}
+                confirmedOutcomes={confirmedOutcomes}
+              />
+            </div>
+          )}
+
           {/* Admin-only panels */}
           <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <AccuracyAuditPanel />

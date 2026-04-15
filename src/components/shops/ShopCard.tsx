@@ -25,6 +25,7 @@ export interface Shop {
   is_dealer?: boolean;
   dealer_brands?: string[];
   is_partnered?: boolean;
+  pilot_status?: "new_partner" | "pilot_partner" | null;
 }
 
 interface ShopCardProps {
@@ -125,13 +126,29 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h3 className="font-heading text-lg font-semibold text-card-foreground group-hover:text-accent transition-colors">
               {shop.name}
             </h3>
             {shop.wrenchli_verified && isPartnered && !isDealer && (
               <span title="Wrenchli Verified">
                 <Shield className="h-4 w-4 text-wrenchli-teal flex-shrink-0" />
+              </span>
+            )}
+            {shop.pilot_status === "pilot_partner" && (
+              <span
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                style={{ background: "#E07B3920", color: "#E07B39", border: "1px solid #E07B3940" }}
+              >
+                Pilot Partner
+              </span>
+            )}
+            {shop.pilot_status === "new_partner" && (
+              <span
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                style={{ background: "#E07B3910", color: "#E07B39", border: "1px solid #E07B3930" }}
+              >
+                New Partner
               </span>
             )}
           </div>
