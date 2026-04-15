@@ -23,7 +23,6 @@ const footerLinks = {
   "For Repair Shops": [
     { label: "Partner Program", to: "/for-shops" },
     { label: "How It Works", to: "/for-shops#how-it-works" },
-    { label: "Shop Software", to: "/for-shops#features" },
     { label: "Apply Now", to: "/for-shops/onboarding" },
   ],
   Legal: [
