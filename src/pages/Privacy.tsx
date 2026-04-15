@@ -382,7 +382,26 @@ export default function Privacy() {
             </section>
 
             <section>
-              <h2 className="font-heading text-xl font-semibold text-foreground">15. Contact Us</h2>
+              <h2 className="font-heading text-xl font-semibold text-foreground">15. Your Privacy Rights</h2>
+              <p>Michigan and Ohio residents have the following rights regarding their personal data:</p>
+              <ul className="list-disc pl-6 space-y-2 mt-2">
+                <li><strong>Right to access:</strong> Request a copy of the vehicle and symptom data we have collected about you.</li>
+                <li><strong>Right to delete:</strong> Request deletion of your vehicle details, symptom descriptions, and assessment history at any time.</li>
+                <li><strong>Right to correct:</strong> Request correction of any inaccurate information in your profile.</li>
+                <li><strong>Right to opt out:</strong> Opt out of your assessment data being shared with partner shops at any time.</li>
+              </ul>
+              <p className="mt-2">
+                To exercise any of these rights, email{" "}
+                <a href="mailto:privacy@wrenchli.net" className="text-accent hover:underline font-medium">privacy@wrenchli.net</a>.
+                We will respond within 45 days.
+              </p>
+              <p className="mt-2">
+                We do not sell your personal information, including your VIN, symptom descriptions, or assessment history, to any third party.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="font-heading text-xl font-semibold text-foreground">16. Contact Us</h2>
               <p>For questions, concerns, or to exercise your privacy rights:</p>
               <p className="mt-2">
                 <strong>Wrenchli, Inc.</strong><br />
