@@ -8,7 +8,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-const stripePromise = loadStripe("pk_test_51T1QqsGgIpvcscSeR1qGlKdIfTomSNBZoZqKhM0Ou6vji7JFyxAX8wNPmxEjACaerUJY1BhoQWxKRsvvFyzHyo2L00IchfYaT2");
+// Lazy-load Stripe only when the modal opens to avoid blank-screen crashes
+let stripePromise: ReturnType<typeof loadStripe> | null = null;
+function getStripe() {
+  if (!stripePromise) {
+    stripePromise = loadStripe("pk_test_51T1QqsGgIpvcscSeR1qGlKdIfTomSNBZoZqKhM0Ou6vji7JFyxAX8wNPmxEjACaerUJY1BhoQWxKRsvvFyzHyo2L00IchfYaT2").catch((err) => {
+      console.warn("[Stripe] Failed to load Stripe.js:", err);
+      stripePromise = null; // allow retry
+      return null;
+    });
+  }
+  return stripePromise;
+}
 
 function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
   const stripe = useStripe();
@@ -158,7 +169,7 @@ export default function ProUpgradeModal({ open, onClose, onSuccess }: Props) {
 
           {clientSecret && !loading && (
             <Elements
-              stripe={stripePromise}
+              stripe={getStripe()}
               options={{
                 clientSecret,
                 appearance: {
