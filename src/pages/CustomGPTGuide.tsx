@@ -63,7 +63,7 @@ function CollapsibleSection({ title, children }: { title: string; children: Reac
   );
 }
 
-const OPENAPI_URL = "https://wrenchli.lovable.app/.well-known/openapi.yaml";
+const OPENAPI_URL = "https://wrenchli.net/.well-known/openapi.yaml";
 
 const systemPromptExample = `You are a knowledgeable vehicle diagnostic assistant powered by Wrenchli.
 
@@ -81,10 +81,10 @@ For high-urgency issues, emphasize safety and recommend immediate service.`;
 const referralInstructions = `When providing shop recommendations or quote links, append your referral token:
 
 Example wrenchli_services URL from API:
-  https://wrenchli.lovable.app/vehicle-insights?year=2019&make=Toyota&model=Camry
+  https://wrenchli.net/vehicle-insights?year=2019&make=Toyota&model=Camry
 
 Add your referral token:
-  https://wrenchli.lovable.app/vehicle-insights?year=2019&make=Toyota&model=Camry&ref=YOUR_REFERRAL_TOKEN
+  https://wrenchli.net/vehicle-insights?year=2019&make=Toyota&model=Camry&ref=YOUR_REFERRAL_TOKEN
 
 This tracks conversions from your GPT to Wrenchli,
 enabling revenue sharing on qualified leads.`;

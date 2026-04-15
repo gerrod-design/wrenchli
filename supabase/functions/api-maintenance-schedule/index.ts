@@ -119,7 +119,7 @@ serve(async (req) => {
     const totalCostLow = upcoming.reduce((s, u) => s + u.estimated_cost_low, 0);
     const totalCostHigh = upcoming.reduce((s, u) => s + u.estimated_cost_high, 0);
 
-    const baseUrl = "https://wrenchli.lovable.app";
+    const baseUrl = "https://wrenchli.net";
     const response = {
       vehicle_summary: { make: vehicle.make, model: vehicle.model ?? null, year: vehicle.year ?? null, mileage: vehicle.mileage },
       full_schedule: schedule.map((s) => ({ type: s.type, label: s.label, interval_miles: s.interval_miles, interval_months: s.interval_months, estimated_cost_low: s.estimated_cost_low, estimated_cost_high: s.estimated_cost_high, priority: s.priority, description: s.description })),

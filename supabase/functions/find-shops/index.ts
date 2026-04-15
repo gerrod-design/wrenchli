@@ -289,7 +289,7 @@ serve(async (req) => {
       response_time: p.response_time,
       availability: p.availability,
       wrenchli_verified: p.wrenchli_verified,
-      quote_url: p.quote_url || `https://wrenchli.lovable.app/find-shops`,
+      quote_url: p.quote_url || `https://wrenchli.net/find-shops`,
       booking_url: p.booking_url,
       is_dealer: p.is_dealer || false,
       dealer_brands: p.dealer_brands || [],

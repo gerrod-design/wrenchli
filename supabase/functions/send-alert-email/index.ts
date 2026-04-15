@@ -55,11 +55,11 @@ function buildMaintenanceEmail(data: MaintenanceEmailData): { subject: string; h
             <p style="margin:0;color:#4B5563;font-size:15px;">${data.milesText} · Estimated cost: $${data.costLow}–$${data.costHigh}</p>
           </div>
           <p style="margin:0 0 28px;color:#6B7280;font-size:14px;line-height:1.6;">${data.summary}</p>
-          <a href="https://wrenchli.lovable.app/garage" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;">View Maintenance Schedule →</a>
+          <a href="https://wrenchli.net/garage" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;">View Maintenance Schedule →</a>
         </td></tr>
         <tr><td style="padding:24px 32px;border-top:1px solid #E5E7EB;text-align:center;">
           <p style="margin:0;color:#9CA3AF;font-size:12px;">You're receiving this because you have maintenance email alerts enabled.<br>
-          <a href="https://wrenchli.lovable.app/notification-settings" style="color:#6B7280;">Manage preferences</a></p>
+          <a href="https://wrenchli.net/notification-settings" style="color:#6B7280;">Manage preferences</a></p>
         </td></tr>
       </table>
     </td></tr>
@@ -98,11 +98,11 @@ function buildMarketValueEmail(data: MarketValueEmailData): { subject: string; h
             <p style="margin:0;color:${color};font-size:18px;font-weight:700;">${arrow} ${data.changePercent.toFixed(1)}%</p>
           </div>
           <p style="margin:0 0 28px;color:#6B7280;font-size:14px;line-height:1.6;">${isUp ? "This could be a good time to evaluate your options." : "Market conditions may be shifting — keep an eye on trends."} Track your vehicle's value in your garage.</p>
-          <a href="https://wrenchli.lovable.app/vehicle-insights" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;">View Vehicle Insights →</a>
+          <a href="https://wrenchli.net/vehicle-insights" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;">View Vehicle Insights →</a>
         </td></tr>
         <tr><td style="padding:24px 32px;border-top:1px solid #E5E7EB;text-align:center;">
           <p style="margin:0;color:#9CA3AF;font-size:12px;">You're receiving this because you have market value email alerts enabled.<br>
-          <a href="https://wrenchli.lovable.app/notification-settings" style="color:#6B7280;">Manage preferences</a></p>
+          <a href="https://wrenchli.net/notification-settings" style="color:#6B7280;">Manage preferences</a></p>
         </td></tr>
       </table>
     </td></tr>

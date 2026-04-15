@@ -141,7 +141,7 @@ const providersSampleResponse = `{
       "response_time": "1 hour",
       "availability": "next_day",
       "wrenchli_verified": true,
-      "quote_url": "https://wrenchli.lovable.app/vehicle-insights?shop=birmingham_auto_europe"
+      "quote_url": "https://wrenchli.net/vehicle-insights?shop=birmingham_auto_europe"
     }
   ],
   "search_params": {
@@ -152,9 +152,9 @@ const providersSampleResponse = `{
     "results_count": 2
   },
   "wrenchli_services": {
-    "compare_quotes_url": "https://wrenchli.lovable.app/vehicle-insights?location=48009&service=brakes",
-    "book_service_url": "https://wrenchli.lovable.app/for-shops",
-    "get_more_options_url": "https://wrenchli.lovable.app/vehicle-insights?location=48009"
+    "compare_quotes_url": "https://wrenchli.net/vehicle-insights?location=48009&service=brakes",
+    "book_service_url": "https://wrenchli.net/for-shops",
+    "get_more_options_url": "https://wrenchli.net/vehicle-insights?location=48009"
   }
 }`;
 
@@ -207,8 +207,8 @@ const maintSampleResponse = `{
     "estimated_total_cost_high": 1375
   },
   "wrenchli_services": {
-    "garage_url": "https://wrenchli.lovable.app/garage",
-    "vehicle_insights_url": "https://wrenchli.lovable.app/vehicle-insights"
+    "garage_url": "https://wrenchli.net/garage",
+    "vehicle_insights_url": "https://wrenchli.net/vehicle-insights"
   }
 }`;
 
@@ -306,9 +306,9 @@ const valueSampleResponse = `{
     }
   },
   "wrenchli_services": {
-    "detailed_analysis_url": "https://wrenchli.lovable.app/garage",
-    "get_quotes_url": "https://wrenchli.lovable.app/vehicle-insights?year=2020&make=Toyota&model=Camry",
-    "garage_management_url": "https://wrenchli.lovable.app/garage"
+    "detailed_analysis_url": "https://wrenchli.net/garage",
+    "get_quotes_url": "https://wrenchli.net/vehicle-insights?year=2020&make=Toyota&model=Camry",
+    "garage_management_url": "https://wrenchli.net/garage"
   }
 }`;
 
@@ -393,8 +393,8 @@ const sampleResponse = `{
     "diy_feasible": false
   },
   "wrenchli_services": {
-    "get_quotes_url": "https://wrenchli.lovable.app/vehicle-insights?...",
-    "find_shops_url": "https://wrenchli.lovable.app/for-shops"
+    "get_quotes_url": "https://wrenchli.net/vehicle-insights?...",
+    "find_shops_url": "https://wrenchli.net/for-shops"
   }
 }`;
 

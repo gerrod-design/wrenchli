@@ -61,7 +61,7 @@ serve(async (req) => {
       logStep("Found existing Stripe customer", { customerId });
     }
 
-    const originUrl = req.headers.get("origin") || "https://wrenchli.lovable.app";
+    const originUrl = req.headers.get("origin") || "https://wrenchli.net";
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
