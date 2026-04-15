@@ -43,6 +43,9 @@ export default function Index() {
       {/* Cinematic Hero */}
       <CinematicHero />
 
+      {/* VIN Recall Check — high-trust, zero-friction entry point */}
+      <VinRecallCheck />
+
       <HowItWorksVideo />
 
       <InlineChatWidget />
