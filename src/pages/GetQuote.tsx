@@ -578,7 +578,7 @@ export default function GetQuote() {
                   <ul className="mt-2 space-y-1 text-muted-foreground text-left">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-                      <span>A trusted shop will review your diagnosis and estimate</span>
+                      <span>A trusted shop will review your assessment and estimate</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />

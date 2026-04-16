@@ -32,7 +32,7 @@ const REPAIRS: Record<string, RepairData> = {
   "check-engine-light": {
     slug: "check-engine-light",
     title: "Check Engine Light Assessment",
-    seoTitle: "Check Engine Light On? Free Assessment Free Diagnosis & Cost Cost Estimates",
+    seoTitle: "Check Engine Light On? Free Assessment Free Assessment Free Diagnosis & Cost Cost Estimates Cost Estimates",
     seoDescription:
       "Find out why your check engine light is on. Get a free AI assessment, repair cost estimates ($100–$1,500+), and compare local shop quotes instantly.",
     heroHeading: "Check Engine Light On?",
