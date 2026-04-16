@@ -121,6 +121,7 @@ const ProductImageDisplay = ({
         </div>
       )}
     </div>
+    {/* FTC affiliate disclosure rendered by parent — component is image-only */}
   );
 };
 

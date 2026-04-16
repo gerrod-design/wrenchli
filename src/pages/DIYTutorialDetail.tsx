@@ -411,8 +411,8 @@ export default function DIYTutorialDetail() {
         <div className="rounded-xl border border-accent/30 bg-accent/10 p-4 text-sm text-muted-foreground" role="note">
           <p>
             <strong className="text-foreground">Affiliate Disclosure:</strong>{" "}
-            Wrenchli is a participant in the Amazon Services LLC Associates Program.
-            We earn a small commission from qualifying purchases at no additional cost to you.
+            Some links on this page are affiliate links. If you purchase through them,
+            Wrenchli may earn a small commission at no additional cost to you.
           </p>
         </div>
       </div>
