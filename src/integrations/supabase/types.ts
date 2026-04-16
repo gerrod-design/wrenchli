@@ -397,6 +397,36 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_runs: {
+        Row: {
+          agent_results: Json | null
+          created_at: string
+          critical_count: number | null
+          generated_prompts: Json | null
+          id: string
+          overall_score: number | null
+          status: string
+        }
+        Insert: {
+          agent_results?: Json | null
+          created_at?: string
+          critical_count?: number | null
+          generated_prompts?: Json | null
+          id?: string
+          overall_score?: number | null
+          status?: string
+        }
+        Update: {
+          agent_results?: Json | null
+          created_at?: string
+          critical_count?: number | null
+          generated_prompts?: Json | null
+          id?: string
+          overall_score?: number | null
+          status?: string
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string
