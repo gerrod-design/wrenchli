@@ -1,3 +1,4 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
@@ -7,52 +8,50 @@ const API_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? "";
 const PAGES = [
   { name: "Homepage", url: "https://wrenchli.net" },
   { name: "For Shops", url: "https://wrenchli.net/for-shops" },
+  { name: "For Dealers", url: "https://wrenchli.net/for-dealers" },
   { name: "Blog", url: "https://wrenchli.net/blog" },
   { name: "About", url: "https://wrenchli.net/about" },
   { name: "Privacy Policy", url: "https://wrenchli.net/privacy" },
   { name: "Warranty Guide", url: "https://wrenchli.net/warranty-guide" },
+  { name: "Verified Score", url: "https://wrenchli.net/verified-score" },
+  { name: "Subprocessors", url: "https://wrenchli.net/subprocessors" },
 ];
+
+const TEXT_EXTRACT_LIMIT = 12000;
 
 function extractMeta(html: string): string {
   const parts: string[] = [];
 
-  // Title
   const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   if (titleMatch) parts.push(`Title: ${titleMatch[1].trim()}`);
 
-  // Meta description
   const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i)
     || html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i);
   if (descMatch) parts.push(`Description: ${descMatch[1].trim()}`);
 
-  // Meta keywords
   const kwMatch = html.match(/<meta[^>]*name=["']keywords["'][^>]*content=["']([^"']+)["']/i)
     || html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']keywords["']/i);
   if (kwMatch) parts.push(`Keywords: ${kwMatch[1].trim()}`);
 
-  // All OG tags
   const ogRegex = /<meta[^>]*property=["'](og:[^"']+)["'][^>]*content=["']([^"']+)["'][^>]*>/gi;
   let ogMatch;
   while ((ogMatch = ogRegex.exec(html)) !== null) {
     parts.push(`${ogMatch[1]}: ${ogMatch[2].trim()}`);
   }
-  // Also match reversed attribute order
   const ogRegex2 = /<meta[^>]*content=["']([^"']+)["'][^>]*property=["'](og:[^"']+)["'][^>]*>/gi;
   while ((ogMatch = ogRegex2.exec(html)) !== null) {
     parts.push(`${ogMatch[2]}: ${ogMatch[1].trim()}`);
   }
 
-  // Visible text outside script/style/div (headings, paragraphs, spans, li, etc.)
   const textOnly = html
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-    .replace(/<div[^>]*>[\s\S]*?<\/div>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
     .replace(/&nbsp;/g, " ").replace(/&quot;/g, '"').replace(/&#39;/g, "'")
     .replace(/\s+/g, " ").trim();
 
-  if (textOnly.length > 10) parts.push(`Page text: ${textOnly.substring(0, 2000)}`);
+  if (textOnly.length > 10) parts.push(`Page text: ${textOnly.substring(0, TEXT_EXTRACT_LIMIT)}`);
 
   return parts.join("\n");
 }
@@ -70,13 +69,110 @@ async function fetchPage(page: { name: string; url: string }) {
 
     if (content.length < 200) {
       console.warn(`[fetchPage] ${page.name} — extracted content only ${content.length} chars, using raw HTML fallback`);
-      content = `[FALLBACK: meta extraction returned <200 chars — raw HTML below]\n${html.substring(0, 2000)}`;
+      content = `[FALLBACK: meta extraction returned <200 chars — raw HTML below]\n${html.substring(0, TEXT_EXTRACT_LIMIT)}`;
     }
 
     return { ...page, content, status: res.status, error: null };
   } catch (err) {
     return { ...page, content: "", status: 0, error: String(err) };
   }
+}
+
+async function fetchPlatformData(): Promise<string> {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+  const sections: string[] = ["=== LIVE PLATFORM DATA (from database) ==="];
+
+  // 1. Assessment count
+  try {
+    const { count } = await supabase
+      .from("diagnostic_sessions")
+      .select("*", { count: "exact", head: true })
+      .in("status", ["complete", "outcome_reported"]);
+    sections.push(`Total completed assessments: ${count ?? 0}`);
+  } catch (e) {
+    sections.push(`Total completed assessments: [query failed: ${e}]`);
+  }
+
+  // 2. Partner shop count
+  try {
+    const { count } = await supabase
+      .from("shop_integrations")
+      .select("*", { count: "exact", head: true });
+    sections.push(`Partner shop integrations: ${count ?? 0}`);
+  } catch (e) {
+    sections.push(`Partner shop integrations: [query failed: ${e}]`);
+  }
+
+  // 3. Service providers count
+  try {
+    const { count } = await supabase
+      .from("service_providers")
+      .select("*", { count: "exact", head: true });
+    sections.push(`Total service providers in database: ${count ?? 0}`);
+  } catch (e) {
+    sections.push(`Service providers: [query failed: ${e}]`);
+  }
+
+  // 4. Published blog articles
+  try {
+    const { data: tutorials } = await supabase
+      .from("diy_tutorials")
+      .select("title, description, category, difficulty")
+      .eq("is_published", true)
+      .limit(20);
+    if (tutorials && tutorials.length > 0) {
+      sections.push(`\nPublished DIY tutorials (${tutorials.length}):`);
+      for (const t of tutorials) {
+        sections.push(`  - [${t.category}/${t.difficulty}] ${t.title}: ${t.description?.substring(0, 100)}`);
+      }
+    } else {
+      sections.push("Published DIY tutorials: 0");
+    }
+  } catch (e) {
+    sections.push(`DIY tutorials: [query failed: ${e}]`);
+  }
+
+  // 5. Outcome reports (accuracy data)
+  try {
+    const { count: outcomeCount } = await supabase
+      .from("outcome_reports")
+      .select("*", { count: "exact", head: true });
+    sections.push(`Outcome reports submitted: ${outcomeCount ?? 0}`);
+  } catch (e) {
+    sections.push(`Outcome reports: [query failed: ${e}]`);
+  }
+
+  // 6. Pro subscription count
+  try {
+    const { count: proCount } = await supabase
+      .from("pro_subscriptions")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active");
+    sections.push(`Active Pro subscribers: ${proCount ?? 0}`);
+  } catch (e) {
+    sections.push(`Pro subscribers: [query failed: ${e}]`);
+  }
+
+  // 7. Recent accuracy metrics
+  try {
+    const { data: metrics } = await supabase
+      .from("accuracy_metrics")
+      .select("metric_type, accuracy_rate, outcomes_count, trend")
+      .eq("metric_type", "overall")
+      .order("period_start", { ascending: false })
+      .limit(1);
+    if (metrics && metrics.length > 0) {
+      const m = metrics[0];
+      sections.push(`Latest accuracy: ${(m.accuracy_rate * 100).toFixed(1)}% (${m.outcomes_count} outcomes, trend: ${m.trend ?? "n/a"})`);
+    }
+  } catch (e) {
+    sections.push(`Accuracy metrics: [query failed: ${e}]`);
+  }
+
+  return sections.join("\n");
 }
 
 const WRENCHLI_BASE_CONTEXT = `
@@ -93,7 +189,7 @@ WRENCHLI PLATFORM — BASE CONTEXT:
 - SMS integrations built: Tekmetric, AutoLeap, Mitchell 1, CSV export
 - Key language: "symptom assessment" not "diagnosis", "Assessment always free" not "Always free"
 - Brand voice: knowledgeable neighbor, not tech startup
-- Key pages: /, /for-shops, /for-shops/onboarding, /shop/dashboard, /garage, /blog, /about, /privacy
+- Key pages: /, /for-shops, /for-dealers, /for-shops/onboarding, /shop/dashboard, /garage, /blog, /about, /privacy, /verified-score, /subprocessors
 `;
 
 const AGENTS = [
@@ -259,7 +355,7 @@ async function callAgent(agent: typeof AGENTS[0], pageContent: string) {
       system: agent.systemPrompt,
       messages: [{
         role: "user",
-        content: `Here is the actual live content scraped from the Wrenchli website:\n\n${pageContent}\n\nRun your full audit against this real content now. Return only the JSON object — no preamble, no markdown fences.`,
+        content: `Here is the actual live content scraped from the Wrenchli website, combined with real platform data from the database:\n\n${pageContent}\n\nRun your full audit against this real content now. Return only the JSON object — no preamble, no markdown fences.`,
       }],
     }),
   });
@@ -288,12 +384,19 @@ Deno.serve(async (req) => {
       ? AGENTS.filter(a => agentIds.includes(a.id))
       : AGENTS;
 
-    const pageResults = await Promise.all(PAGES.map(fetchPage));
+    // Fetch pages and platform data in parallel
+    const [pageResults, platformData] = await Promise.all([
+      Promise.all(PAGES.map(fetchPage)),
+      fetchPlatformData(),
+    ]);
 
     const pageContent = pageResults
       .filter(p => p.content)
       .map(p => `=== ${p.name} (${p.url}) ===\n${p.content}`)
       .join("\n\n");
+
+    // Combine scraped content with live platform data
+    const fullContext = `${pageContent}\n\n${platformData}`;
 
     const pagesMeta = pageResults.map(p => ({
       name: p.name,
@@ -304,7 +407,7 @@ Deno.serve(async (req) => {
     }));
 
     const agentResults = await Promise.all(
-      agentsToRun.map(agent => callAgent(agent, pageContent))
+      agentsToRun.map(agent => callAgent(agent, fullContext))
     );
 
     return new Response(
@@ -312,6 +415,7 @@ Deno.serve(async (req) => {
         success: true,
         scrapedAt: new Date().toISOString(),
         pages: pagesMeta,
+        platformData: platformData.substring(0, 500) + "...",
         agents: agentResults,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
