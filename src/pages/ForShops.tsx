@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroShops from "@/assets/hero-shops.jpg";
 import {
-  ArrowRight, Users, ClipboardCheck, TrendingUp, Plug, CheckCircle,
+  ArrowRight, Users, ClipboardCheck, TrendingUp, Plug, CheckCircle, MessageSquare,
 } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
@@ -56,9 +56,17 @@ export default function ForShops() {
               className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]"
             >
               <Link to="/for-shops/onboarding">
-                Apply for the Free Pilot <ArrowRight className="ml-2 h-5 w-5" />
+                Join the Free Pilot <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
+            <ul className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm md:text-base font-semibold text-primary-foreground/90">
+              {["Free 90-day pilot", "No fees, no commission", "No auto-billing after pilot"].map((point) => (
+                <li key={point} className="inline-flex items-center gap-1.5">
+                  <CheckCircle className="h-4 w-4 text-accent" />
+                  {point}
+                </li>
+              ))}
+            </ul>
           </SectionReveal>
         </div>
       </section>
