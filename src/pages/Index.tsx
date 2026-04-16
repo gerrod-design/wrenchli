@@ -12,7 +12,6 @@ import VinRecallCheck from "@/components/VinRecallCheck";
 import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 
-import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import HomeSocialProof from "@/components/HomeSocialProof";
 import WaitlistForm from "@/components/WaitlistForm";
 import { useLocation } from "@/contexts/LocationContext";
