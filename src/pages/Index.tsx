@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import SEO from "@/components/SEO";
-import { ShieldCheck, Zap, CreditCard, Check } from "lucide-react";
+import { Eye, MessageCircleQuestion, UserX, Check } from "lucide-react";
 
 import SectionReveal from "@/components/SectionReveal";
 import InlineChatWidget from "@/components/InlineChatWidget";
@@ -20,8 +20,9 @@ import { HomeJsonLd } from "@/components/JsonLd";
 import HomeFAQ from "@/components/HomeFAQ";
 
 const valueProps = [
-  { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
-  { icon: Zap, title: "Find Trusted Shops", desc: "Find trusted local shops and know exactly what questions to ask before you walk in." },
+  { icon: Eye, title: "Know Before You Go", desc: "Understand likely causes and fair cost ranges before you talk to a shop." },
+  { icon: MessageCircleQuestion, title: "Ask Better Questions", desc: "Walk in with the exact questions that get honest answers." },
+  { icon: UserX, title: "No Account Required", desc: "Get your full assessment free, instantly, with no sign-up." },
 ];
 
 
@@ -42,10 +43,10 @@ export default function Index() {
       {/* Cinematic Hero */}
       <CinematicHero />
 
-      {/* VIN Recall Check — high-trust, zero-friction entry point */}
-      <VinRecallCheck />
-
       <HowItWorksVideo />
+
+      {/* VIN Recall Check — secondary feature, below the fold */}
+      <VinRecallCheck />
 
       {/* Pricing Clarity */}
       <section className="section-padding bg-background">
