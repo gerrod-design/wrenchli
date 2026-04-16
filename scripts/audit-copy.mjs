@@ -57,7 +57,7 @@ const BANNED_WORDS = [
 ];
 
 // Words that make "broken" OK in technical context (e.g. "broken hose")
-const BROKEN_OK_CONTEXT = /\bbroken\s+(?:hose|belt|part|sensor|wire|cable|spring|mount|bolt|link|arm|line|pipe|clip|bracket|seal|gasket|valve|pump|rotor|caliper|strut|bushing|joint)\b/i;
+const BROKEN_OK_CONTEXT = /\bbroken\s+(?:hose|belt|part|sensor|wire|cable|spring|mount|bolt|link|arm|line|pipe|clip|bracket|seal|gasket|valve|pump|rotor|caliper|strut|bushing|joint|connection)\b/i;
 
 const PASSIVE_CTA_PATTERN = /(?:Learn more|More info|Details|Information|Click here|Submit|Next)\b/i;
 
@@ -173,6 +173,7 @@ function scan() {
           const matches = [...line.matchAll(rule.pattern)];
           for (const match of matches) {
             if (rule.contextCheck && rule.label.includes("broken") && BROKEN_OK_CONTEXT.test(line)) continue;
+            if (rule.contextOk && rule.contextOk.test(line)) continue;
             findings.push({ severity: "error", category: "Banned word", file: rel, line: i + 1, text: `"${match[0]}"`, fix: rule.fix });
           }
         }
@@ -182,6 +183,7 @@ function scan() {
           const matches = [...text.matchAll(rule.pattern)];
           for (const match of matches) {
             if (rule.contextCheck && rule.label.includes("broken") && BROKEN_OK_CONTEXT.test(text)) continue;
+            if (rule.contextOk && rule.contextOk.test(text)) continue;
             const lineNum = lines.findIndex((l) => l.includes(text.slice(0, 30))) + 1;
             findings.push({ severity: "error", category: "Banned word", file: rel, line: lineNum || "?", text: `"${match[0]}"`, fix: rule.fix });
           }
