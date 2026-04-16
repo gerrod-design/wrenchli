@@ -36,7 +36,7 @@ export const desktopSharedScreens = [
             </div>
           </div>
           <div className="w-full max-w-md rounded-lg bg-accent px-6 py-3 text-center text-sm font-bold text-accent-foreground">
-            Get Your Diagnosis
+            Get Your Assessment
           </div>
         </div>
       </div>
@@ -60,7 +60,7 @@ export const desktopSharedScreens = [
             </div>
           </div>
           <div className="w-full max-w-md rounded-lg bg-accent px-6 py-3 text-center text-sm font-bold text-accent-foreground">
-            Get Your Diagnosis
+            Get Your Assessment
           </div>
         </div>
       </div>
@@ -475,7 +475,7 @@ export const desktopShopScreens = [
           <div className="max-w-lg mx-auto space-y-3">
             <div className="rounded-xl border border-border bg-card p-3 shadow-sm">
               <p className="text-xs font-bold text-foreground mb-2">Quote Status</p>
-              {["Estimate Generated — $350–$800", "Referral Sent to Local Shop", "Shop Reviewing Your Diagnosis", "Quote Received — $425!"].map((s, i) => (
+              {["Estimate Generated — $350–$800", "Referral Sent to Local Shop", "Shop Reviewing Your Assessment", "Quote Received — $425!"].map((s, i) => (
                 <div key={s} className="flex items-center gap-2 mb-1">
                   <CheckCircle className="h-3 w-3 text-wrenchli-green" />
                   <span className="text-[10px] text-foreground font-medium">{s}</span>

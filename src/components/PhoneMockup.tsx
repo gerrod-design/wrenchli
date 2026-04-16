@@ -41,7 +41,7 @@ const sharedScreens = [
             </div>
           </div>
           <div className="w-full rounded-md bg-accent px-3 py-1.5 text-center text-[9px] font-bold text-accent-foreground">
-            Get Your Diagnosis
+            Get Your Assessment
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@ const sharedScreens = [
             </div>
           </div>
           <div className="w-full rounded-md bg-accent px-3 py-1.5 text-center text-[9px] font-bold text-accent-foreground">
-            Get Your Diagnosis
+            Get Your Assessment
           </div>
         </div>
       </div>

@@ -84,7 +84,7 @@ export default function BrandVideoModal({ isOpen, onClose }: Props) {
                   className="h-12 px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
                   onClick={onClose}
                 >
-                  <Link to="/#quote">Get Your Free Diagnosis</Link>
+                  <Link to="/#quote">Get Your Free Assessment</Link>
                 </Button>
                 <Button
                   variant="outline"

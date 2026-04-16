@@ -17,7 +17,7 @@ const journeys = [
       "Flexible financing options",
       "DIY guides & tutorials",
     ],
-    primaryCta: { label: "Get Your Free Diagnosis", to: "/#quote" },
+    primaryCta: { label: "Get Your Free Assessment", to: "/#quote" },
     secondaryCta: { label: "How It Works", to: "/for-car-owners" },
     gradient: "from-accent/8 via-transparent to-accent/4",
     iconBg: "bg-accent",

@@ -16,7 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const sharedSteps = [
   { step: 1, icon: Search, title: "Tell Us What's Wrong", desc: "Describe your issue or enter a diagnostic code." },
-  { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and estimated costs." },
+  { step: 2, icon: ClipboardList, title: "Get Your Assessment", desc: "See what's likely wrong, how urgent it is, and estimated costs." },
 ];
 
 const defaultSteps = [
