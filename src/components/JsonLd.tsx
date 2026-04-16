@@ -58,7 +58,7 @@ export function HomeJsonLd() {
         "@type": "Offer",
         price: "0",
         priceCurrency: "USD",
-        description: "Free vehicle diagnosis",
+        description: "Free vehicle symptom assessment",
       },
       hasOfferCatalog: {
         "@type": "OfferCatalog",

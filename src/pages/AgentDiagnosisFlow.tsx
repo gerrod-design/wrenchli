@@ -54,8 +54,8 @@ export default function AgentDiagnosisFlow() {
       setDiagnosis(result);
       setStep("diagnosis");
     } catch (e) {
-      console.error("Diagnosis error:", e);
-      toast.error(e instanceof Error ? e.message : "Failed to get diagnosis");
+      console.error("Assessment error:", e);
+      toast.error(e instanceof Error ? e.message : "Failed to get assessment");
     } finally {
       setIsLoading(false);
     }
@@ -159,8 +159,8 @@ export default function AgentDiagnosisFlow() {
   return (
     <>
       <SEO
-        title="AI Vehicle Diagnosis"
-        description="Get a transparent, data-driven AI diagnosis for your vehicle. Full observability on every recommendation."
+        title="AI Vehicle Assessment"
+        description="Get a transparent, data-driven AI symptom assessment for your vehicle. Full observability on every recommendation."
         path="/agent-diagnosis"
       />
       <main className="min-h-screen bg-secondary pt-8 pb-20 px-4">

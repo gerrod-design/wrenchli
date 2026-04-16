@@ -58,8 +58,8 @@ export default function DamageDiagnosisPage() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Photo Damage Diagnosis — Wrenchli"
-        description="Upload photos of your vehicle damage and get instant AI-powered diagnosis with repair options and cost estimates."
+        title="Photo Damage Assessment — Wrenchli"
+        description="Upload photos of your vehicle damage and get instant AI-powered symptom assessment with repair options and cost estimates."
         path="/damage-diagnosis"
       />
 
@@ -73,7 +73,7 @@ export default function DamageDiagnosisPage() {
                 AI-Powered Analysis
               </div>
               <h1 className="font-heading text-3xl md:text-5xl font-bold mb-4">
-                Photo Damage Diagnosis
+                Photo Damage Assessment
               </h1>
               <p className="text-lg text-primary-foreground/80">
                 Snap a photo of your vehicle damage and our AI will identify the issue, assess severity, and suggest repair options with estimated costs.

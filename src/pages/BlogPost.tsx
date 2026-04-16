@@ -83,7 +83,7 @@ export default function BlogPost() {
               Think your car has an issue?
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Wrenchli's AI diagnoses your symptoms and connects you with trusted local shops — for free.
+              Wrenchli's AI assesses your symptoms and connects you with trusted local shops — for free.
             </p>
             <Button asChild className="mt-4 bg-accent hover:bg-accent/90 text-white">
               <a href="https://wrenchli.net" target="_blank" rel="noopener noreferrer">

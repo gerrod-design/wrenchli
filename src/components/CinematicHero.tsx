@@ -84,7 +84,7 @@ export default function CinematicHero() {
               size="lg"
               className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base md:text-lg transition-transform hover:scale-[1.02] shadow-[0_4px_15px_hsl(var(--accent)/0.4)]"
             >
-              <Link to="/#quote">Get Your Free Diagnosis</Link>
+              <Link to="/#quote">Get Your Free Assessment</Link>
             </Button>
           </div>
           <p className="text-sm text-white/60 max-w-md text-center leading-relaxed">

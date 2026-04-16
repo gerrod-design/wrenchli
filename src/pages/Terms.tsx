@@ -59,7 +59,7 @@ export default function Terms() {
             <section>
               <h2 className="font-heading text-xl font-semibold text-foreground">5. Repair Shop Relationships</h2>
               <p>
-                Wrenchli connects vehicle owners with independent repair shops. We do not employ, endorse, or guarantee the work of any repair shop listed on our platform. Any agreement for repair services is between you and the shop. Wrenchli is not a party to those transactions and assumes no liability for the quality, timeliness, or outcome of repairs.
+                Wrenchli connects vehicle owners with independent repair shops. We do not employ, endorse, or guarantee the work of any repair shop listed on Wrenchli. Any agreement for repair services is between you and the shop. Wrenchli is not a party to those transactions and assumes no liability for the quality, timeliness, or outcome of repairs.
               </p>
             </section>
 

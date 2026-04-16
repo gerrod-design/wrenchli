@@ -39,7 +39,7 @@ Repair costs vary significantly depending on what's actually causing the code:
 - **Catalytic converter replacement:** $800–$2,500 depending on whether OEM or aftermarket, and your vehicle make and model
 - **Misfire diagnosis and repair:** $150–$600 depending on cause
 
-The most important thing to know: a shop that quotes you a catalytic converter replacement without first ruling out the cheaper causes is either cutting corners or not being thorough. A proper diagnosis takes time and equipment.
+The most important thing to know: a shop that quotes you a catalytic converter replacement without first ruling out the cheaper causes is either cutting corners or not being thorough. A proper assessment takes time and equipment.
 
 ## Is it safe to drive with a P0420 code?
 
@@ -63,7 +63,7 @@ A mechanic who answers these questions clearly and without frustration is a mech
 
 ## The bottom line
 
-P0420 is a starting point, not a verdict. Get a proper diagnosis before approving an expensive repair. If a shop quotes you a catalytic converter replacement as their first recommendation without ruling out the cheaper alternatives, get a second opinion.
+P0420 is a starting point, not a verdict. Get a proper assessment before approving an expensive repair. If a shop quotes you a catalytic converter replacement as their first recommendation without ruling out the cheaper alternatives, get a second opinion.
 
 Not sure what you're dealing with? Run your symptoms through Wrenchli's free assessment before your shop visit — it takes two minutes and gives you the likely causes, cost ranges, and the right questions to ask.
 

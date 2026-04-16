@@ -293,7 +293,7 @@ export default function Navbar() {
 
           {/* Trust items */}
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-primary-foreground/50">
-            <span>✓ Free diagnosis</span>
+            <span>✓ Free assessment</span>
             <span>✓ DIY tutorials</span>
             <span>✓ Shop quotes</span>
             <span>✓ No account required</span>

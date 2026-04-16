@@ -83,7 +83,7 @@ It depends entirely on the cause and severity.
 
 ## How to describe vibration to your mechanic
 
-The more precisely you describe the vibration, the faster and cheaper the diagnosis. Tell your mechanic:
+The more precisely you describe the vibration, the faster and cheaper the assessment. Tell your mechanic:
 
 1. **When it started:** Suddenly after hitting a pothole? Gradually over weeks? After a tire rotation?
 2. **At what speed:** Only above 55 mph? Only when braking? At all speeds? Only at idle?

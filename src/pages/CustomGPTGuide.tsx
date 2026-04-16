@@ -65,10 +65,10 @@ function CollapsibleSection({ title, children }: { title: string; children: Reac
 
 const OPENAPI_URL = "https://wrenchli.net/.well-known/openapi.yaml";
 
-const systemPromptExample = `You are a knowledgeable vehicle diagnostic assistant powered by Wrenchli.
+const systemPromptExample = `You are a knowledgeable vehicle assessment assistant powered by Wrenchli.
 
 When a user describes vehicle symptoms:
-1. Use the diagnoseVehicle action to identify the issue
+1. Use the assessVehicle action to identify the issue
 2. Use estimateRepairCost to provide cost estimates in their area
 3. Use getVehicleValue if they ask whether to repair or replace
 4. Use getMaintenanceSchedule to check upcoming maintenance
@@ -114,7 +114,7 @@ export default function CustomGPTGuide() {
               Custom GPT Actions Setup
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Turn any ChatGPT conversation into a full vehicle diagnostic assistant using Wrenchli's API — no code required.
+              Turn any ChatGPT conversation into a full vehicle assessment assistant using Wrenchli's API — no code required.
             </p>
           </div>
 
@@ -162,7 +162,7 @@ export default function CustomGPTGuide() {
               <p>Switch to the <strong className="text-foreground">Configure</strong> tab, scroll to <strong className="text-foreground">Actions</strong>, and click <strong className="text-foreground">Create new action</strong>.</p>
               <p>Click <strong className="text-foreground">Import from URL</strong> and paste:</p>
               <CopyBlock text={OPENAPI_URL} label="OpenAPI Schema URL" />
-              <p className="text-sm">This imports all five Wrenchli endpoints — diagnose, estimate, value, maintenance, and providers.</p>
+              <p className="text-sm">This imports all five Wrenchli endpoints — assess, estimate, value, maintenance, and providers.</p>
             </StepCard>
 
             <StepCard step={4} title="Configure Authentication" icon={Key}>
@@ -239,7 +239,7 @@ export default function CustomGPTGuide() {
               <p className="text-sm text-muted-foreground">No — Custom GPT Actions require ChatGPT Plus ($20/mo), Team, or Enterprise.</p>
             </CollapsibleSection>
             <CollapsibleSection title="How many API calls does each conversation use?">
-              <p className="text-sm text-muted-foreground">Each action call (diagnose, estimate, etc.) counts as one API request against your Wrenchli plan. A typical conversation uses 2–4 calls.</p>
+              <p className="text-sm text-muted-foreground">Each action call (assess, estimate, etc.) counts as one API request against your Wrenchli plan. A typical conversation uses 2–4 calls.</p>
             </CollapsibleSection>
             <CollapsibleSection title="Can I customize which endpoints my GPT uses?">
               <p className="text-sm text-muted-foreground">Yes — after importing the schema, you can disable specific actions in the GPT editor. For example, remove findServiceProviders if you only want diagnostics.</p>

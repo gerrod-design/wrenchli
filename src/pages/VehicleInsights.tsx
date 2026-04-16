@@ -121,7 +121,7 @@ export default function VehicleInsights() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Vehicle Insights — DIY Diagnostics"
-        description="Understand your vehicle before visiting the shop. AI-powered diagnostics, OBD2 code lookup, symptom checker, and maintenance schedules."
+        description="Understand your vehicle before visiting the shop. AI-powered symptom assessment, OBD2 code lookup, symptom checker, and maintenance schedules."
         path="/vehicle-insights"
       />
       {/* Hero */}
