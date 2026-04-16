@@ -23,7 +23,51 @@ interface MarketValueEmailData {
   summary: string;
 }
 
-type AlertEmailData = MaintenanceEmailData | MarketValueEmailData;
+interface BookingEmailData {
+  type: "booking";
+  shopName: string;
+  customerName: string;
+  customerPhone: string;
+  preferredTime: string;
+  vehicle: string;
+  diagnosisTitle: string;
+  notes?: string;
+}
+
+type AlertEmailData = MaintenanceEmailData | MarketValueEmailData | BookingEmailData;
+
+function buildBookingEmail(data: BookingEmailData): { subject: string; html: string } {
+  return {
+    subject: `New booking request — ${data.customerName} (${data.vehicle})`,
+    html: `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#F3F4F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:linear-gradient(135deg,#1E3A5F,#E07B39);padding:28px 32px;">
+          <h1 style="margin:0;color:#fff;font-size:22px;font-weight:700;">📅 New Booking Request</h1>
+          <p style="margin:6px 0 0;color:rgba(255,255,255,0.9);font-size:14px;">via Wrenchli</p>
+        </td></tr>
+        <tr><td style="padding:28px 32px;">
+          <p style="margin:0 0 16px;color:#374151;font-size:16px;">A customer requested an appointment at <strong>${data.shopName}</strong>.</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#F9FAFB;border-radius:8px;padding:16px;margin:0 0 20px;">
+            <tr><td style="padding:6px 0;color:#6B7280;font-size:14px;width:140px;">Customer</td><td style="padding:6px 0;color:#111827;font-size:15px;font-weight:600;">${data.customerName}</td></tr>
+            <tr><td style="padding:6px 0;color:#6B7280;font-size:14px;">Phone</td><td style="padding:6px 0;color:#111827;font-size:15px;font-weight:600;"><a href="tel:${data.customerPhone}" style="color:#2563EB;text-decoration:none;">${data.customerPhone}</a></td></tr>
+            <tr><td style="padding:6px 0;color:#6B7280;font-size:14px;">Preferred time</td><td style="padding:6px 0;color:#111827;font-size:15px;font-weight:600;">${data.preferredTime}</td></tr>
+            <tr><td style="padding:6px 0;color:#6B7280;font-size:14px;">Vehicle</td><td style="padding:6px 0;color:#111827;font-size:15px;">${data.vehicle}</td></tr>
+            <tr><td style="padding:6px 0;color:#6B7280;font-size:14px;">Concern</td><td style="padding:6px 0;color:#111827;font-size:15px;">${data.diagnosisTitle}</td></tr>
+          </table>
+          ${data.notes ? `<div style="margin:0 0 20px;"><p style="margin:0 0 6px;color:#6B7280;font-size:13px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;">Customer notes</p><p style="margin:0;color:#374151;font-size:14px;line-height:1.6;background:#FFF7ED;border-left:3px solid #E07B39;padding:10px 14px;border-radius:4px;">${data.notes}</p></div>` : ""}
+          <p style="margin:0;color:#6B7280;font-size:13px;line-height:1.6;">Please contact the customer within 24 hours to confirm. This request was sent via Wrenchli's assessment results page.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`,
+  };
+}
 
 function buildMaintenanceEmail(data: MaintenanceEmailData): { subject: string; html: string } {
   const priorityColors: Record<string, { bg: string; text: string; label: string }> = {
