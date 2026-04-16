@@ -3,27 +3,17 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 
 import heroShop from "@/assets/hero-shop.jpg";
 
 export default function CinematicHero() {
   const [isMobile, setIsMobile] = useState(false);
-  const [assessmentCount, setAssessmentCount] = useState<number | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
-  }, []);
-
-  useEffect(() => {
-    supabase.functions.invoke("assessment-count", { method: "GET" })
-      .then(({ data }) => {
-        if (data?.count != null) setAssessmentCount(data.count);
-      })
-      .catch(() => {});
   }, []);
 
   const handleScrollDown = () => {
