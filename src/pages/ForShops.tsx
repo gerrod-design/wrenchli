@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroShops from "@/assets/hero-shops.jpg";
 import {
-  ArrowRight, Users, ClipboardCheck, TrendingUp, Plug, CheckCircle,
+  ArrowRight, Users, ClipboardCheck, TrendingUp, Plug, CheckCircle, MessageSquare,
 } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
@@ -56,9 +56,17 @@ export default function ForShops() {
               className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]"
             >
               <Link to="/for-shops/onboarding">
-                Apply for the Free Pilot <ArrowRight className="ml-2 h-5 w-5" />
+                Join the Free Pilot <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
+            <ul className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm md:text-base font-semibold text-primary-foreground/90">
+              {["Free 90-day pilot", "No fees, no commission", "No auto-billing after pilot"].map((point) => (
+                <li key={point} className="inline-flex items-center gap-1.5">
+                  <CheckCircle className="h-4 w-4 text-accent" />
+                  {point}
+                </li>
+              ))}
+            </ul>
           </SectionReveal>
         </div>
       </section>
@@ -134,13 +142,31 @@ export default function ForShops() {
                   >
                     {step.num}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h3 className="font-heading text-lg font-semibold text-foreground">
                       {step.title}
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                       {step.body}
                     </p>
+                    {step.num === 3 && (
+                      <Card className="mt-4 border-2 border-wrenchli-trust-blue/30 bg-background shadow-sm max-w-md">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-wrenchli-trust-blue/10">
+                              <MessageSquare className="h-3.5 w-3.5 text-wrenchli-trust-blue" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs font-semibold text-foreground">Wrenchli Alert</p>
+                              <p className="text-[10px] text-muted-foreground">New customer match · just now</p>
+                            </div>
+                          </div>
+                          <p className="text-sm leading-relaxed text-foreground">
+                            <span className="font-semibold">2019 Ford F-150, 5.0L.</span> Customer reports grinding noise when braking. Top cause: <span className="font-semibold">Worn front brake pads (68%)</span>. Estimated repair: <span className="font-semibold">$180–$260</span>. Customer is <span className="font-semibold">3.2 miles away</span>.
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 </div>
               </SectionReveal>
