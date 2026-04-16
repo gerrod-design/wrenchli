@@ -121,7 +121,7 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
           <span className="font-semibold text-sm">Referral Package Created!</span>
         </div>
         <p className="text-xs text-muted-foreground">
-          Share this link with a repair shop — they'll see your full diagnosis, photos, audio, and cost estimate.
+          Share this link with a repair shop — they'll see your full assessment, photos, audio, and cost estimate.
         </p>
         <div className="flex gap-2">
           <input

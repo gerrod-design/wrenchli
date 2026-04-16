@@ -193,7 +193,7 @@ export default function ApiUsageAnalytics() {
         <KpiCard icon={Activity} label="Total Requests" value={logs.length.toLocaleString()} />
         <KpiCard icon={Zap} label="Success Rate" value={`${successRate}%`} />
         <KpiCard icon={Clock} label="Avg Response" value={`${avgResponseTime}ms`} sub={`P95: ${p95}ms`} />
-        <KpiCard icon={Stethoscope} label="Unique Diagnoses" value={Object.keys(diagCounts).length.toString()} />
+        <KpiCard icon={Stethoscope} label="Unique Assessments" value={Object.keys(diagCounts).length.toString()} />
         <KpiCard icon={Car} label="Valuations" value={valueLogs.length.toLocaleString()} sub={avgVehicleValue ? `Avg value: $${avgVehicleValue.toLocaleString()}` : undefined} />
         <KpiCard icon={Globe} label="Regions Served" value={Object.keys(geoCounts).length.toString()} sub={avgEstimate ? `Avg est: $${avgEstimate}` : undefined} />
       </div>
@@ -232,7 +232,7 @@ export default function ApiUsageAnalytics() {
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border border-border bg-card p-6">
           <h3 className="font-heading font-semibold mb-4 flex items-center gap-2">
-            <Stethoscope className="h-4 w-4 text-accent" /> Top Diagnoses
+            <Stethoscope className="h-4 w-4 text-accent" /> Top Assessments
           </h3>
           {topDiagnoses.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -244,7 +244,7 @@ export default function ApiUsageAnalytics() {
                 <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          ) : <p className="text-sm text-muted-foreground">No diagnosis data yet</p>}
+          ) : <p className="text-sm text-muted-foreground">No assessment data yet</p>}
         </div>
         <div className="rounded-xl border border-border bg-card p-6">
           <h3 className="font-heading font-semibold mb-4 flex items-center gap-2">

@@ -95,7 +95,7 @@ export const desktopSharedScreens = [
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-3 bg-primary px-6 py-3">
-          <span className="text-sm font-bold text-primary-foreground">Diagnosis</span>
+          <span className="text-sm font-bold text-primary-foreground">Assessment</span>
         </div>
         <div className="flex-1 overflow-hidden px-8 py-5">
           <div className="rounded-xl border border-border bg-card p-5 shadow-sm max-w-lg mx-auto">
@@ -420,7 +420,7 @@ export const desktopShopScreens = [
         <div className="flex-1 px-8 py-5">
           <div className="max-w-sm mx-auto space-y-3">
             <p className="text-sm font-bold text-foreground">Ready to Connect with a Shop?</p>
-            <p className="text-[10px] text-muted-foreground">Share your info and we'll connect you with a vetted local shop. They'll see your diagnosis and cost estimate — no surprises.</p>
+            <p className="text-[10px] text-muted-foreground">Share your info and we'll connect you with a trusted local shop. They'll see your assessment and cost estimate — no surprises.</p>
             <div className="space-y-2">
               <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-foreground">John Doe</div>
               <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-foreground">john@email.com</div>

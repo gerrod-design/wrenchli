@@ -100,7 +100,7 @@ const sharedScreens = [
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
-          <span className="text-[10px] font-bold text-primary-foreground">Diagnosis</span>
+          <span className="text-[10px] font-bold text-primary-foreground">Assessment</span>
         </div>
         <div className="flex-1 overflow-hidden px-3 py-3">
           <div className="rounded-lg border border-border bg-card p-2.5 shadow-sm">
@@ -739,7 +739,7 @@ export default function PhoneMockup({
                   isMobile ? "px-4 py-2 text-[10px]" : "px-6 py-3 text-sm"
                 )}
               >
-                Get Your Free Diagnosis
+                Get Your Free Assessment
               </Link>
 
               <button
