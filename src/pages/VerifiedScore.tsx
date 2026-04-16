@@ -10,7 +10,7 @@ const sections = [
   {
     icon: Clock,
     title: "When It Appears",
-    body: "A Verified Score is only displayed after a shop has at least 5 confirmed outcomes. New partner shops show a "New Partner" badge while their score is building.",
+    body: "A Verified Score is only displayed after a shop has at least 5 confirmed outcomes. New partner shops show a \u201CNew Partner\u201D badge while their score is building.",
   },
   {
     icon: ShieldCheck,
