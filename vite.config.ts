@@ -26,8 +26,7 @@ const prerenderRoutes: {
       <h2>Check your vehicle for open safety recalls</h2>
       <p>Enter your VIN — free, instant, no account required.</p>
       <h2>Transparent Pricing</h2><p>See real prices upfront. No surprises, no hidden fees.</p>
-      <h2>Instant Quotes</h2><p>Compare multiple shops in seconds. Book in minutes.</p>
-      <h2>Flexible Financing</h2><p>Payment plans that fit your budget. All credit types welcome.</p>
+      <h2>Find Trusted Shops</h2><p>Find trusted local shops and know exactly what questions to ask before you walk in.</p>
     `,
   },
   {

@@ -18,8 +18,7 @@ import MILoanBanner from "@/components/MILoanBanner";
 
 const valueProps = [
   { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
-  { icon: Zap, title: "Instant Quotes", desc: "Compare multiple shops in seconds. Book in minutes." },
-  { icon: CreditCard, title: "Flexible Financing", desc: "Payment plans that fit your budget. All credit types welcome." },
+  { icon: Zap, title: "Find Trusted Shops", desc: "Find trusted local shops and know exactly what questions to ask before you walk in." },
 ];
 
 export default function Owners() {
