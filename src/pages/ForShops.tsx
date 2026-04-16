@@ -67,6 +67,26 @@ export default function ForShops() {
                 </li>
               ))}
             </ul>
+
+            {/* Founding partners — quick proof near CTA */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm">
+              <span className="text-primary-foreground/70 font-medium">Founding partners:</span>
+              {[
+                { name: "Curt's Service", location: "Oak Park, MI" },
+                { name: "McInerney Auto Center", location: "Troy, MI" },
+              ].map((shop) => (
+                <span
+                  key={shop.name}
+                  className="inline-flex items-center gap-2 rounded-full border bg-accent/15 border-accent/40 px-3 py-1 text-primary-foreground"
+                >
+                  <Badge className="bg-accent text-accent-foreground hover:bg-accent text-[10px] uppercase tracking-wide px-1.5 py-0">
+                    Founding Partner
+                  </Badge>
+                  <span className="font-semibold">{shop.name}</span>
+                  <span className="text-primary-foreground/70">· {shop.location}</span>
+                </span>
+              ))}
+            </div>
           </SectionReveal>
         </div>
       </section>
