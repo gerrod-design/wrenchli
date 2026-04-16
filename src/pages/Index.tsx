@@ -129,7 +129,7 @@ export default function Index() {
         </div>
       </section>
 
-      <TestimonialsCarousel />
+      <HomeSocialProof />
 
       <HomeFAQ />
 
