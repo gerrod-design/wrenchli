@@ -91,6 +91,31 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
         </div>
       </div>
 
+      {/* Plain-English Summary Card */}
+      {diagnosis.possible_causes.length > 0 && (() => {
+        const top = diagnosis.possible_causes[0];
+        const urgencyText: Record<string, string> = {
+          immediate: "This is urgent — do not drive.",
+          soon: "This should be fixed soon.",
+          schedule: "Schedule a repair when you can.",
+          monitor: "You can monitor this for now.",
+        };
+        return (
+          <div
+            className="rounded-lg p-4"
+            style={{ background: "#E07B3910", borderLeft: "4px solid #E07B39", border: "1px solid #2A2D3750", borderLeftColor: "#E07B39", borderLeftWidth: 4 }}
+          >
+            <p className="text-sm leading-relaxed" style={{ color: "#F5F5F5" }}>
+              <span className="font-bold">Most likely your issue is {top.name.toLowerCase()}</span>
+              {diagnosis.explanation ? `, based on the symptoms you described` : ""}.{" "}
+              {urgencyText[diagnosis.urgency] ?? ""}{" "}
+              Budget <span className="font-semibold" style={{ color: "#E07B39" }}>${top.estimated_cost_low}–${top.estimated_cost_high}</span> at a local shop.
+            </p>
+            <p className="text-[11px] mt-2" style={{ color: "#6B7280" }}>📱 Screenshot this to share with your mechanic</p>
+          </div>
+        );
+      })()}
+
       {/* Explanation */}
       <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
         <p className="text-sm leading-relaxed" style={{ color: "#9CA3AF" }}>{diagnosis.explanation}</p>
