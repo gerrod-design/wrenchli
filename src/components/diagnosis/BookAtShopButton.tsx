@@ -54,9 +54,9 @@ export default function BookAtShopButton({
     setLoading(true);
     try {
       trackEvent({
-        event_type: "booking_request",
-        category: "shop_booking",
-        action: "submit",
+        event_type: "user_action",
+        category: "navigation",
+        action: "shop_booking_submit",
         label: shopName || "unknown_shop",
         metadata: { diagnosisTitle, vehicle },
       });
