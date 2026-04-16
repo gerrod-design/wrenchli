@@ -128,24 +128,28 @@ export default function VinRecallCheck() {
                   </span>
                 </div>
 
-                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
                   {state.recalls.map((r) => (
-                    <div
-                      key={r.NHTSACampaignNumber}
-                      className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 space-y-2"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="text-sm font-bold text-white">{r.Component}</span>
-                        <span className="text-xs font-mono text-white/40 shrink-0">
-                          {r.NHTSACampaignNumber}
-                        </span>
+                    <div key={r.NHTSACampaignNumber} className="space-y-2">
+                      <div
+                        className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 space-y-2"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-sm font-bold text-white">{r.Component}</span>
+                          <span className="text-xs font-mono text-white/40 shrink-0">
+                            {r.NHTSACampaignNumber}
+                          </span>
+                        </div>
+                        {r.Consequence && (
+                          <p className="text-sm text-white/70 leading-relaxed">{r.Consequence}</p>
+                        )}
                       </div>
-                      {r.Consequence && (
-                        <p className="text-sm text-white/70 leading-relaxed">{r.Consequence}</p>
-                      )}
-                      <p className="text-xs text-accent font-semibold">
-                        This recall is free to fix at any authorized dealer.
-                      </p>
+                      <RecallActionCard
+                        vin={sanitizeVin(vin)}
+                        make={state.vehicle.make}
+                        campaignNumber={r.NHTSACampaignNumber}
+                        component={r.Component}
+                      />
                     </div>
                   ))}
                 </div>
