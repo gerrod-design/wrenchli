@@ -21,7 +21,7 @@ const prerenderRoutes: {
       <h1>Vehicle Repair Finally Fixed</h1>
       <p>Affordable vehicle repair — transparent pricing, trusted shops.</p>
       <p>Assessment always free · DIY tutorials · Shop quotes · No account required</p>
-      <a href="/#quote">Get Your Free Diagnosis</a>
+      <a href="/#quote">Get Your Free Assessment</a>
       <p>This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.</p>
       <h2>Check your vehicle for open safety recalls</h2>
       <p>Enter your VIN — free, instant, no account required.</p>

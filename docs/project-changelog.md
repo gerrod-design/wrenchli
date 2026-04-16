@@ -25,14 +25,14 @@
 The homepage was audited for CTA overload (10 CTAs → 5). The following changes were made:
 
 **Current homepage flow (top to bottom):**
-1. **Cinematic Hero** — 1 CTA: "Get Your Free Diagnosis" (B2B "Join as a Partner Shop" CTA removed)
+1. **Cinematic Hero** — 1 CTA: "Get Your Free Assessment" (B2B "Join as a Partner Shop" CTA removed)
 2. **How It Works Video** — Product education walkthrough
 3. **QuickActionBar** — Core conversion tool: "Get Your Diagnosis" (accepts DTC codes + free-text symptoms)
 4. **Value Proposition Cards** — Transparent Pricing, Instant Quotes, Flexible Financing (no CTAs)
 5. **Recommend a Shop** — Community-driven lead gen: "Recommend a Shop" button
 6. **Testimonials Carousel** — Detroit-area social proof (no CTAs)
 7. **Waitlist Signup** — "Be the First to Know" with email + name form
-8. **Final CTA Banner** — 1 CTA: "Get Your Free Diagnosis" (B2B CTA removed, language aligned with hero)
+8. **Final CTA Banner** — 1 CTA: "Get Your Free Assessment" (B2B CTA removed, language aligned with hero)
 
 **Sections removed from homepage:**
 - "For Car Owners" card (redundant with hero messaging)
@@ -43,7 +43,7 @@ The homepage was audited for CTA overload (10 CTAs → 5). The following changes
 **Rationale**: Best practice is 1 primary CTA repeated 2–3x max. The homepage is strictly optimized for consumer conversion; B2B content lives on dedicated pages.
 
 ### CTA Language Decision
-- **"Get Your Free Diagnosis"** chosen over "Get Your Free Quote" because the product currently delivers diagnoses (DTC lookup, symptom matching, DIY guidance) but does not yet deliver live shop quotes
+- **"Get Your Free Assessment"** chosen over "Get Your Free Quote" because the product currently delivers assessments (DTC lookup, symptom matching, DIY guidance) but does not yet deliver live shop quotes
 - When shops are onboarded and quoting is live, CTA language should transition to "Get Your Free Quote"
 
 ### Waitlist Section Copy
