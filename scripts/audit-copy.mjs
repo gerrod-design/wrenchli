@@ -37,6 +37,7 @@ const SKIP_PATTERNS = [
   /ShopPortal/,
   /ShopLogin/,
   /SecurityStatusPanel/,
+  /Developers/,         // API docs page — uses API field names
 ];
 
 // ── Rules ──────────────────────────────────────────────────────
