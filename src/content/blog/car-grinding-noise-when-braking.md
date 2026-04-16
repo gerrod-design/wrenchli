@@ -112,4 +112,4 @@ Get the noise checked within a few days of noticing it. Ask the right questions.
 
 ---
 
-*This article is for informational purposes only and does not constitute professional mechanical advice. Always consult a certified technician for diagnosis and repair.*
+*This article is for informational purposes only and does not constitute professional mechanical advice. Always consult a certified technician for assessment and repair.*

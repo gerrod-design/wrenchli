@@ -32,7 +32,7 @@ const navItems: NavItem[] = [
       { label: "How It Works", to: "/for-car-owners" },
       { label: "Vehicle Insights", to: "/vehicle-insights" },
       { label: "DIY Repair Guides", to: "/diy" },
-      { label: "Photo Damage Diagnosis", to: "/damage-diagnosis" },
+      { label: "Photo Damage Assessment", to: "/damage-diagnosis" },
       { label: "Find Shops", to: "/find-shops" },
       { label: "Financing", to: "/financing-options" },
       { label: "🏛️ MI Affordable Loan ✨", to: "/mi-affordable-loan" },
@@ -293,7 +293,7 @@ export default function Navbar() {
 
           {/* Trust items */}
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-primary-foreground/50">
-            <span>✓ Free diagnosis</span>
+            <span>✓ Free assessment</span>
             <span>✓ DIY tutorials</span>
             <span>✓ Shop quotes</span>
             <span>✓ No account required</span>

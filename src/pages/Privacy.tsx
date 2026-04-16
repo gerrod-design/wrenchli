@@ -273,7 +273,7 @@ export default function Privacy() {
               <ul className="list-disc pl-6 space-y-1">
                 <li><strong>Partner shops</strong> — when you select a shop, your intake data is shared with that shop only</li>
                 <li><strong>Lending partners</strong> — when you apply for financing, with your explicit consent</li>
-                <li><strong>Service providers</strong> — who operate our platform (listed in Section 7), under data processing agreements</li>
+                <li><strong>Service providers</strong> — who operate Wrenchli (listed in Section 7), under data processing agreements</li>
                 <li><strong>Legal requirements</strong> — when required by law, court order, or to protect the rights and safety of Wrenchli and its users</li>
                 <li><strong>Business transfers</strong> — in connection with a merger, acquisition, or sale of all or substantially all of our assets, in which case your data would transfer to the acquiring entity subject to this policy</li>
               </ul>

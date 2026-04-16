@@ -22,7 +22,7 @@ export default function MobileBottomBar() {
     if (code) params.set("code", code);
 
     // Use code or symptom as diagnosis title fallback
-    const diagnosisTitle = code || symptom || "Vehicle Diagnosis";
+    const diagnosisTitle = code || symptom || "Vehicle Assessment";
     params.set("diagnosis", diagnosisTitle);
     params.set("vehicle", [year, make, model].filter(Boolean).join(" "));
 
@@ -55,7 +55,7 @@ export default function MobileBottomBar() {
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
             <Stethoscope className="h-4 w-4" />
-            Get a Diagnosis
+            Get a Assessment
           </Link>
           <Link
             to="/garage"
@@ -72,7 +72,7 @@ export default function MobileBottomBar() {
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-1 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
             <Stethoscope className="h-4 w-4" />
-            Diagnosis
+            Assessment
           </Link>
           <Link
             to="/find-shops"

@@ -52,10 +52,10 @@ export function MessageActions({ content }: Props) {
       {typeof navigator.share === "function" && (
         <button
           onClick={() => {
-            navigator.share({ title: "Wrenchli Diagnosis", text: content }).catch(() => {});
+            navigator.share({ title: "Wrenchli Assessment", text: content }).catch(() => {});
           }}
           className={btnClass}
-          title="Share diagnosis"
+          title="Share assessment"
         >
           <Share2 className="h-3 w-3" />
           Share

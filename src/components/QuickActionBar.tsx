@@ -161,7 +161,7 @@ export default function QuickActionBar() {
             onClick={handleSubmit}
             className="w-full h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-base"
           >
-            Get Your Diagnosis
+            Get Your Assessment
           </Button>
 
           {/* Validation error */}

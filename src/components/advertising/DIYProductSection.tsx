@@ -100,9 +100,7 @@ const DIYProductSection = ({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackAdClick({ ...trackCtx, click_type: "browse_parts", destination: "autozone" })}
-              aria-label="Search AutoZone for same-day pickup (opens in new tab)"
             >
-              <MapPin className="h-3 w-3 mr-1" aria-hidden="true" /> AutoZone — Same-day pickup
             </a>
           </Button>
           <Button variant="outline" size="sm" className="border-ad-info-border text-ad-info-text hover:bg-ad-info-bg" asChild>

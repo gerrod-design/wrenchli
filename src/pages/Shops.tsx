@@ -19,7 +19,7 @@ const valueProps = [
   {
     icon: Users,
     title: "Pre-Qualified Leads",
-    desc: "Every customer already knows their diagnosis and expected cost. No tire-kickers.",
+    desc: "Every customer already knows their assessment and expected cost. No tire-kickers.",
   },
   {
     icon: DollarSign,

@@ -289,7 +289,7 @@ export default function ForShops() {
                 When your 90-day pilot ends, nothing happens automatically. We schedule a call to review your results and discuss whether continuing makes sense for your shop. There is no auto-billing, no contract renewal, and no pressure.
               </p>
               <p>
-                If you decide to leave at any time: your shop listing is removed within 48 hours. No customer data collected through our platform is retained under your shop profile after you leave.
+                If you decide to leave at any time: your shop listing is removed within 48 hours. No customer data collected through Wrenchli is retained under your shop profile after you leave.
               </p>
             </div>
           </SectionReveal>

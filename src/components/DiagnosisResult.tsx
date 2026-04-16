@@ -173,7 +173,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
         {showInstantMatches && (
           <>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">
-              {symptomMatches.length > 0 ? "Quick Match Results" : "Ready to Diagnose"}
+              {symptomMatches.length > 0 ? "Quick Match Results" : "Ready to Assess"}
             </h2>
             <p className="mt-3 mb-8 text-center text-muted-foreground">
               {symptomMatches.length > 0
@@ -217,7 +217,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
                 className="h-14 px-10 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-bold text-lg transition-transform hover:scale-[1.02]"
               >
                 <Cpu className="mr-2 h-5 w-5" />
-                Run AI Diagnosis
+                Run AI Assessment
               </Button>
               <p className="mt-3 text-xs text-muted-foreground">
                 Free • No account required • Powered by AI
@@ -229,7 +229,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
         {/* DTC code flow — no instant matches, just the run button */}
         {codes && !hasRun && (
           <>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Ready to Diagnose</h2>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Ready to Assess</h2>
             <p className="mt-3 mb-8 text-center text-muted-foreground">
               Get an AI-powered diagnosis{vehicleStr ? ` for your ${vehicleStr}` : ""}
             </p>
@@ -240,7 +240,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
                 className="h-14 px-10 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-bold text-lg transition-transform hover:scale-[1.02]"
               >
                 <Cpu className="mr-2 h-5 w-5" />
-                Run AI Diagnosis
+                Run AI Assessment
               </Button>
               <p className="mt-3 text-xs text-muted-foreground">
                 Free • No account required • Powered by AI
@@ -286,7 +286,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
           <div className="space-y-6">
             {!showInstantMatches && (
               <>
-                <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Your AI Diagnosis</h2>
+                <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Your AI Assessment</h2>
                 <p className="mt-1 mb-4 text-center text-muted-foreground">
                   AI-powered analysis{vehicleStr ? ` for your ${vehicleStr}` : ""}
                 </p>

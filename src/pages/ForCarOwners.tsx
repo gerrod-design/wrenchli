@@ -15,7 +15,7 @@ import PhoneMockup from "@/components/PhoneMockup";
 
 const steps = [
   { step: 1, icon: MessageSquare, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner. No mechanic-speak required." },
-  { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and what it might cost — with plain-English explanations." },
+  { step: 2, icon: ClipboardList, title: "Get Your Assessment", desc: "See what's likely wrong, how urgent it is, and what it might cost — with plain-English explanations." },
   { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Choose your path: watch a DIY tutorial and order parts, or get quotes from vetted local shops." },
   { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing if you need it." },
   { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control. Rate your experience and help others." },
@@ -35,7 +35,7 @@ const faqs = [
   { q: "How do you verify the shops?", a: "Every shop on Wrenchli must be licensed, insured, and meet our quality standards. We verify credentials, check business history, and continuously monitor customer satisfaction ratings." },
   { q: "How accurate are the quotes?", a: "Quotes are binding once you accept them. Shops provide itemized breakdowns of parts, labor, and fees based on your vehicle and repair description. If additional work is discovered, the shop must get your approval before proceeding." },
   { q: "What financing options are available?", a: "We're partnering with multiple lenders to offer financing for all credit profiles — good, fair, and rebuilding. You'll be able to apply at checkout and see your options in minutes. This feature is launching soon." },
-  { q: "What about the DIY diagnostic tool?", a: "Vehicle Insights is our upcoming AI-powered diagnostic feature. Enter a trouble code or describe symptoms to get plain-English explanations, estimated repair costs, and maintenance schedules. It's currently in development." },
+  { q: "What about the DIY assessment tool?", a: "Vehicle Insights is our upcoming AI-powered assessment feature. Enter a trouble code or describe symptoms to get plain-English explanations, estimated repair costs, and maintenance schedules. It's currently in development." },
   { q: "Do you use affiliate links for parts?", a: "In the future, we may offer links to purchase parts directly. If we do, we'll always disclose any affiliate relationships transparently. Your trust comes first." },
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program that will include dispute resolution and quality assurance. Details will be announced before launch." },
   { q: "When is Wrenchli launching?", a: "We're launching in Detroit, Michigan first. Join the waitlist to be notified as soon as we go live in your area. We're onboarding shops now and aiming to launch soon." },
@@ -73,7 +73,7 @@ function CarOwnersWalkthrough() {
             See How It Works
           </p>
           <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
-            Watch a real diagnosis from start to finish.
+            Watch a real assessment from start to finish.
           </h2>
         </SectionReveal>
 
@@ -105,8 +105,8 @@ function CarOwnersWalkthrough() {
 
         <p className="mt-3 text-center text-xs text-muted-foreground">
           {activeTab === "diy"
-            ? "See the full DIY experience — diagnose, learn, order parts, and fix it yourself."
-            : "See the full shop experience — diagnose, compare quotes, finance, and book."}
+            ? "See the full DIY experience — assess, learn, order parts, and fix it yourself."
+            : "See the full shop experience — assess, compare quotes, finance, and book."}
         </p>
 
         <div className="mt-6 mx-auto max-w-[800px]">
@@ -127,7 +127,7 @@ function CarOwnersWalkthrough() {
           <div className="mt-8 text-center">
             <Button asChild size="lg" className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
               <Link to="/vehicle-insights">
-                Get Your Free Diagnosis <ArrowRight className="ml-2 h-5 w-5" />
+                Get Your Free Assessment <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>
@@ -159,7 +159,7 @@ export default function ForCarOwners() {
             </h1>
             <p className="mt-3 text-base font-semibold tracking-wide text-primary-foreground/90 md:text-lg">Mobility for All.</p>
             <p className="mt-3 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              Finding an honest mechanic shouldn't feel like a gamble. Wrenchli gives you transparent pricing, vetted shops, and the confidence to say yes to the right repair at the right price.
+              Finding an honest mechanic shouldn't feel like a gamble. Wrenchli gives you transparent pricing, trusted shops, and the confidence to say yes to the right repair at the right price.
             </p>
             <Button asChild size="lg" className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
               <Link to="/#quote">

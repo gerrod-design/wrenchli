@@ -5,7 +5,7 @@ export default function Terms() {
     <>
       <SEO
         title="Terms of Service"
-        description="Read Wrenchli's Terms of Service governing your use of our vehicle repair diagnosis and shop-matching platform."
+        description="Read Wrenchli's Terms of Service governing your use of our vehicle repair assessment and shop-matching platform."
         path="/terms"
       />
       <main className="min-h-screen bg-background py-16 md:py-24">
@@ -29,11 +29,11 @@ export default function Terms() {
               <h2 className="font-heading text-xl font-semibold text-foreground">2. Description of Services</h2>
               <p>Wrenchli provides:</p>
               <ul className="list-disc pl-6 space-y-1">
-                <li>AI-powered vehicle diagnostic tools and symptom analysis</li>
+                <li>AI-powered vehicle assessment tools and symptom analysis</li>
                 <li>Repair cost estimates and financing pre-qualification</li>
                 <li>Local repair shop discovery and quote requests</li>
                 <li>Vehicle maintenance tracking and recall alerts</li>
-                <li>Photo-based damage diagnosis</li>
+                <li>Photo-based damage assessment</li>
                 <li>DIY repair guidance and tutorials</li>
               </ul>
             </section>
@@ -41,7 +41,7 @@ export default function Terms() {
             <section>
               <h2 className="font-heading text-xl font-semibold text-foreground">3. Disclaimer — Not Professional Advice</h2>
               <p>
-                <strong>Wrenchli's diagnostic tools provide informational estimates only.</strong> Our AI-generated diagnoses, repair cost estimates, and recommendations are not substitutes for professional automotive inspection. Always consult a qualified mechanic before making repair decisions. Wrenchli is not liable for decisions made based on our diagnostic outputs.
+                <strong>Wrenchli's assessment tools provide informational estimates only.</strong> Our AI-generated assessments, repair cost estimates, and recommendations are not substitutes for professional automotive inspection. Always consult a qualified mechanic before making repair decisions. Wrenchli is not liable for decisions made based on our assessment outputs.
               </p>
             </section>
 
@@ -59,7 +59,7 @@ export default function Terms() {
             <section>
               <h2 className="font-heading text-xl font-semibold text-foreground">5. Repair Shop Relationships</h2>
               <p>
-                Wrenchli connects vehicle owners with independent repair shops. We do not employ, endorse, or guarantee the work of any repair shop listed on our platform. Any agreement for repair services is between you and the shop. Wrenchli is not a party to those transactions and assumes no liability for the quality, timeliness, or outcome of repairs.
+                Wrenchli connects vehicle owners with independent repair shops. We do not employ, endorse, or guarantee the work of any repair shop listed on Wrenchli. Any agreement for repair services is between you and the shop. Wrenchli is not a party to those transactions and assumes no liability for the quality, timeliness, or outcome of repairs.
               </p>
             </section>
 
@@ -87,7 +87,7 @@ export default function Terms() {
             <section>
               <h2 className="font-heading text-xl font-semibold text-foreground">9. Limitation of Liability</h2>
               <p>
-                To the fullest extent permitted by law, Wrenchli shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Services, including but not limited to vehicle damage, financial loss, or personal injury resulting from reliance on our diagnostic tools or shop recommendations.
+                To the fullest extent permitted by law, Wrenchli shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Services, including but not limited to vehicle damage, financial loss, or personal injury resulting from reliance on our assessment tools or shop recommendations.
               </p>
             </section>
 

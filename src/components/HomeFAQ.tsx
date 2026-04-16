@@ -14,16 +14,16 @@ interface FaqItem {
 const FAQ_ITEMS: FaqItem[] = [
   {
     q: "How does Wrenchli work?",
-    a: "Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly diagnoses the issue, estimates repair costs, and connects you with vetted local shops or DIY guides.",
+    a: "Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly assesses the issue, estimates repair costs, and connects you with trusted local shops or DIY guides.",
     richAnswer: (
-      <>Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly diagnoses the issue, estimates repair costs, and connects you with <Link to="/find-shops" className="text-primary underline hover:text-primary/80">vetted local shops</Link> or <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY guides</Link>.</>
+      <>Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly assesses the issue, estimates repair costs, and connects you with <Link to="/find-shops" className="text-primary underline hover:text-primary/80">trusted local shops</Link> or <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY guides</Link>.</>
     ),
   },
   {
     q: "Is the diagnosis really free?",
-    a: "Yes, 100% free. You can diagnose unlimited vehicle issues, get cost estimates, and browse DIY tutorials without paying a thing. You only pay if you choose to book a repair through a partner shop.",
+    a: "Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse DIY tutorials without paying a thing. You only pay if you choose to book a repair through a partner shop.",
     richAnswer: (
-      <>Yes, 100% free. You can diagnose unlimited vehicle issues, get cost estimates, and browse <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link> without paying a thing. You only pay if you choose to book a repair through a partner shop.</>
+      <>Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link> without paying a thing. You only pay if you choose to book a repair through a partner shop.</>
     ),
   },
   {
@@ -57,9 +57,9 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "Is my vehicle data private?",
-    a: "Yes. We don't sell your data. Vehicle information is used only to provide accurate diagnoses and estimates. Read our Privacy Policy for full details.",
+    a: "Yes. We don't sell your data. Vehicle information is used only to provide accurate assessments and estimates. Read our Privacy Policy for full details.",
     richAnswer: (
-      <>Yes. We don't sell your data. Vehicle information is used only to provide accurate diagnoses and estimates. Read our <Link to="/privacy" className="text-primary underline hover:text-primary/80">Privacy Policy</Link> for full details.</>
+      <>Yes. We don't sell your data. Vehicle information is used only to provide accurate assessments and estimates. Read our <Link to="/privacy" className="text-primary underline hover:text-primary/80">Privacy Policy</Link> for full details.</>
     ),
   },
 ];

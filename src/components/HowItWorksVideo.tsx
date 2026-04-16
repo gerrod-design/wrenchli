@@ -16,7 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const sharedSteps = [
   { step: 1, icon: Search, title: "Tell Us What's Wrong", desc: "Describe your issue or enter a diagnostic code." },
-  { step: 2, icon: ClipboardList, title: "Get Your Diagnosis", desc: "See what's likely wrong, how urgent it is, and estimated costs." },
+  { step: 2, icon: ClipboardList, title: "Get Your Assessment", desc: "See what's likely wrong, how urgent it is, and estimated costs." },
 ];
 
 const defaultSteps = [
@@ -32,7 +32,7 @@ const diySteps = [
 const shopSteps = [
   { step: 3, icon: DollarSign, title: "Get Your Cost Estimate", desc: "Enter your ZIP for localized pricing — parts, labor, and time, with financing options." },
   { step: 4, icon: GitFork, title: "Compare Repair vs. Replace", desc: "Side-by-side 3-year cost of ownership so you can make the smartest call." },
-  { step: 5, icon: Store, title: "Connect with a Local Shop", desc: "Submit your details and get matched with vetted shops in your area." },
+  { step: 5, icon: Store, title: "Connect with a Local Shop", desc: "Submit your details and get matched with trusted shops in your area." },
 ];
 
 /* ─── Path Toggle ─── */

@@ -162,7 +162,7 @@ export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRenam
       <div className="flex items-center gap-2 pt-1">
         <Button asChild size="sm" className="h-8 text-xs bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90">
           <Link to={`/vehicle-insights?${diagParams.toString()}`}>
-            <Search className="mr-1 h-3 w-3" /> Diagnose
+            <Search className="mr-1 h-3 w-3" /> Assess
           </Link>
         </Button>
         <Button asChild size="sm" variant="outline" className="h-8 text-xs">

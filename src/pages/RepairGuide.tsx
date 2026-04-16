@@ -31,17 +31,17 @@ interface RepairData {
 const REPAIRS: Record<string, RepairData> = {
   "check-engine-light": {
     slug: "check-engine-light",
-    title: "Check Engine Light Diagnosis",
-    seoTitle: "Check Engine Light On? Free Diagnosis & Cost Estimates",
+    title: "Check Engine Light Assessment",
+    seoTitle: "Check Engine Light On? Free Assessment & Cost Estimates",
     seoDescription:
-      "Find out why your check engine light is on. Get a free AI diagnosis, repair cost estimates ($100–$1,500+), and compare local shop quotes instantly.",
+      "Find out why your check engine light is on. Get a free AI assessment, repair cost estimates ($100–$1,500+), and compare local shop quotes instantly.",
     heroHeading: "Check Engine Light On?",
-    heroSub: "Get a free diagnosis in 60 seconds — no mechanic visit needed.",
+    heroSub: "Get a free assessment in 60 seconds — no mechanic visit needed.",
     costLow: 100,
     costHigh: 1500,
     timeEstimate: "1–4 hours at a shop",
     urgency: "medium",
-    urgencyLabel: "Don't ignore — diagnose soon",
+    urgencyLabel: "Don't ignore — assess soon",
     description: [
       <>The check engine light (CEL) is your vehicle's way of telling you something needs attention in the engine, emissions, or powertrain system. It can indicate anything from a loose gas cap to a failing <Link to="/repairs/catalytic-converter-replacement" className="text-primary underline hover:text-primary/80">catalytic converter</Link>.</>,
       "Ignoring it can lead to reduced fuel efficiency, increased emissions, and potentially expensive damage if the underlying issue worsens over time.",
@@ -74,11 +74,11 @@ const REPAIRS: Record<string, RepairData> = {
     faqs: [
       {
         q: "Is it safe to drive with the check engine light on?",
-        a: "A steady check engine light usually means you can drive short distances safely, but should get it diagnosed soon. A flashing check engine light means stop driving immediately — it indicates a severe misfire that can damage your catalytic converter.",
+        a: "A steady check engine light usually means you can drive short distances safely, but should get it assessed soon. A flashing check engine light means stop driving immediately — it indicates a severe misfire that can damage your catalytic converter.",
       },
       {
-        q: "How much does it cost to diagnose a check engine light?",
-        a: "Many auto parts stores offer free OBD2 code reads. A professional diagnosis at a shop typically costs $50–$150. Wrenchli provides a free AI-powered diagnosis instantly.",
+        q: "How much does it cost to assess a check engine light?",
+        a: "Many auto parts stores offer free OBD2 code reads. A professional assessment at a shop typically costs $50–$150. Wrenchli provides a free AI-powered assessment instantly.",
       },
       {
         q: "What is the most common check engine light cause?",
@@ -146,7 +146,7 @@ const REPAIRS: Record<string, RepairData> = {
     title: "Brake Pad Replacement",
     seoTitle: "Brake Pad Replacement Cost — $150–$400 Per Axle",
     seoDescription:
-      "How much does brake pad replacement cost? Get instant estimates, compare shop prices, or follow our DIY guide to save 50%. Free diagnosis.",
+      "How much does brake pad replacement cost? Get instant estimates, compare shop prices, or follow our DIY guide to save 50%. Free assessment.",
     heroHeading: "Brake Pads Worn Down?",
     heroSub: "Get an instant cost estimate and decide: shop or DIY.",
     costLow: 150,
@@ -267,7 +267,7 @@ const REPAIRS: Record<string, RepairData> = {
     urgencyLabel: "Driving risks further damage",
     description: [
       "The transmission is one of the most complex and expensive components in your vehicle. It transfers power from the engine to the wheels and allows you to shift between gears. When it fails, you may lose the ability to drive altogether.",
-      <>Transmission issues range from simple fixes like a fluid change ($150–$300) to major rebuilds ($2,500–$5,000+). Early diagnosis is critical — catching a problem early can save thousands. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a transmission specialist near you</Link> or explore <Link to="/financing-options" className="text-primary underline hover:text-primary/80">financing options</Link> for larger repairs.</>,
+      <>Transmission issues range from simple fixes like a fluid change ($150–$300) to major rebuilds ($2,500–$5,000+). Early assessment is critical — catching a problem early can save thousands. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a transmission specialist near you</Link> or explore <Link to="/financing-options" className="text-primary underline hover:text-primary/80">financing options</Link> for larger repairs.</>,
     ],
     symptoms: [
       "Slipping gears or delayed engagement",
@@ -325,7 +325,7 @@ const REPAIRS: Record<string, RepairData> = {
     urgencyLabel: "Battery will die — fix soon",
     description: [
       "The alternator charges your battery and powers electrical systems while the engine is running. When it fails, your battery drains quickly, and you'll eventually be stranded with a vehicle that won't start.",
-      <>A failing alternator is often confused with a bad battery. If you've replaced the battery recently and it keeps dying, the alternator is likely the culprit. Get a <Link to="/get-quote" className="text-primary underline hover:text-primary/80">free diagnosis</Link> to confirm before spending money on the wrong fix.</>,
+      <>A failing alternator is often confused with a bad battery. If you've replaced the battery recently and it keeps dying, the alternator is likely the culprit. Get a <Link to="/get-quote" className="text-primary underline hover:text-primary/80">free assessment</Link> to confirm before spending money on the wrong fix.</>,
     ],
     symptoms: [
       "Dimming or flickering headlights",

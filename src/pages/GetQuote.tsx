@@ -202,11 +202,11 @@ export default function GetQuote() {
           <div className="container-wrenchli max-w-2xl text-center">
             <h1 className="font-heading text-2xl font-bold md:text-4xl">Get a Repair Quote</h1>
             <p className="mt-4 text-muted-foreground">
-              Start with a diagnosis to get accurate repair cost estimates.
+              Start with an assessment to get accurate repair cost estimates.
             </p>
             <Button asChild className="mt-6 h-12 px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
               <Link to="/#quote">
-                <Car className="mr-2 h-4 w-4" /> Start Your Diagnosis
+                <Car className="mr-2 h-4 w-4" /> Start Your Assessment
               </Link>
             </Button>
           </div>
@@ -229,7 +229,7 @@ export default function GetQuote() {
           <SectionReveal>
             <h1 className="font-heading text-2xl font-bold md:text-4xl">Get Your Repair Estimate</h1>
             <div className="mt-4 rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-4 space-y-1">
-              <p className="text-sm text-primary-foreground/70">Diagnosis</p>
+              <p className="text-sm text-primary-foreground/70">Assessment</p>
               <p className="font-heading font-semibold text-lg">{diagnosis}</p>
               {code && (
                 <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-xs font-mono font-semibold text-accent">
@@ -391,7 +391,7 @@ export default function GetQuote() {
                       I'm interested in financing this repair
                     </span>
                     <p className="text-xs text-muted-foreground">
-                      We're building flexible payment options. Check this box and we'll notify you when financing is available in your area.
+                      We built flexible payment options. Check this box and we'll notify you when financing is available in your area.
                     </p>
                   </label>
                 </div>
@@ -482,7 +482,7 @@ export default function GetQuote() {
               <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-4">
                 <h3 className="font-heading text-lg font-bold">Ready to Connect with a Shop?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Share your contact info and we'll connect you with a vetted repair shop in your area. They'll see your diagnosis and this cost estimate — no surprises.
+                  Share your contact info and we'll connect you with a trusted repair shop in your area. They'll see your assessment and this cost estimate — no surprises.
                 </p>
 
                 <div className="space-y-3">
@@ -578,7 +578,7 @@ export default function GetQuote() {
                   <ul className="mt-2 space-y-1 text-muted-foreground text-left">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-                      <span>A vetted shop will review your diagnosis and estimate</span>
+                      <span>A trusted shop will review your assessment and estimate</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />

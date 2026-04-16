@@ -473,7 +473,7 @@ export default function Developers() {
     <>
       <Helmet>
         <title>API Documentation — Wrenchli Developers</title>
-        <meta name="description" content="Integrate Wrenchli's AI-powered vehicle diagnostics into your app. Code examples in Python, JavaScript, and curl." />
+        <meta name="description" content="Integrate Wrenchli's AI-powered vehicle assessment into your app. Code examples in Python, JavaScript, and curl." />
       </Helmet>
 
       <main className="min-h-screen bg-background pt-24 pb-20">
@@ -484,10 +484,10 @@ export default function Developers() {
               Developer API
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 font-heading">
-              Wrenchli Diagnostic API
+              Wrenchli Assessment API
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Add AI-powered vehicle diagnostics to any application. Get instant problem identification, urgency ratings, cost estimates, and repair recommendations.
+              Add AI-powered vehicle assessment to any application. Get instant problem identification, urgency ratings, cost estimates, and repair recommendations.
             </p>
           </div>
 
@@ -628,7 +628,7 @@ export default function Developers() {
                   </thead>
                   <tbody className="text-foreground">
                     {[
-                      ["diagnosis_title", "string", "Yes", "The diagnosed issue (e.g. \"Worn Brake Pads\")"],
+                      ["diagnosis_title", "string", "Yes", "The identified issue (e.g. \"Worn Brake Pads\")"],
                       ["zip_code", "string", "Yes", "5-digit US ZIP code for localized pricing"],
                       ["diagnosis_code", "string", "No", "DTC code if applicable (e.g. P0420)"],
                       ["vehicle_year", "string", "No", "Vehicle model year"],
