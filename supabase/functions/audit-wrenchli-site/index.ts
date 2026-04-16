@@ -5,16 +5,20 @@ const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
 const API_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? "";
 
+// Map each route to its prerender file so the audit reads real content
+// (Lovable hosting doesn't process vercel.json rewrites, so Googlebot UA
+// gets the SPA shell — we fetch the static prerender files directly instead.)
+const SITE = "https://wrenchli.net";
 const PAGES = [
-  { name: "Homepage", url: "https://wrenchli.net" },
-  { name: "For Shops", url: "https://wrenchli.net/for-shops" },
-  { name: "For Dealers", url: "https://wrenchli.net/for-dealers" },
-  { name: "Blog", url: "https://wrenchli.net/blog" },
-  { name: "About", url: "https://wrenchli.net/about" },
-  { name: "Privacy Policy", url: "https://wrenchli.net/privacy" },
-  { name: "Warranty Guide", url: "https://wrenchli.net/warranty-guide" },
-  { name: "Verified Score", url: "https://wrenchli.net/verified-score" },
-  { name: "Subprocessors", url: "https://wrenchli.net/subprocessors" },
+  { name: "Homepage",       url: `${SITE}/prerender/index.html` },
+  { name: "For Shops",      url: `${SITE}/prerender/for-shops.html` },
+  { name: "For Dealers",    url: `${SITE}/prerender/for-dealers.html` },
+  { name: "Blog",           url: `${SITE}/prerender/blog.html` },
+  { name: "About",          url: `${SITE}/prerender/about.html` },
+  { name: "Privacy Policy", url: `${SITE}/prerender/privacy.html` },
+  { name: "Warranty Guide", url: `${SITE}/prerender/warranty-guide.html` },
+  { name: "Verified Score", url: `${SITE}/prerender/verified-score.html` },
+  { name: "Subprocessors",  url: `${SITE}/prerender/subprocessors.html` },
 ];
 
 const TEXT_EXTRACT_LIMIT = 12000;
