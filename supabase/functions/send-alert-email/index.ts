@@ -182,6 +182,8 @@ Deno.serve(async (req) => {
     const { subject, html } =
       alertData.type === "maintenance"
         ? buildMaintenanceEmail(alertData as MaintenanceEmailData)
+        : alertData.type === "booking"
+        ? buildBookingEmail(alertData as BookingEmailData)
         : buildMarketValueEmail(alertData as MarketValueEmailData);
 
     const res = await fetch("https://api.resend.com/emails", {
