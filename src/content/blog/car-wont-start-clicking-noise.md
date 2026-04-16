@@ -32,7 +32,7 @@ If you turn the key and hear absolutely nothing — no click, no dash lights, no
 
 ## Most common causes, ranked by likelihood
 
-Understanding the probability helps you troubleshoot in the right order and avoid overpaying for diagnosis.
+Understanding the probability helps you troubleshoot in the right order and avoid overpaying for assessment.
 
 ### Dead or weak battery (most common)
 
@@ -93,7 +93,7 @@ Costs vary by cause, but here's what to expect:
 - **Starter motor replacement:** $300–$600 parts and labor, depending on vehicle
 - **Starter solenoid replacement:** $150–$400 if separate from the starter
 - **Alternator replacement (if battery wasn't charging):** $400–$800
-- **Parasitic drain diagnosis:** $80–$150 for the diagnostic time, plus repair cost
+- **Parasitic drain assessment:** $80–$150 for the assessment time, plus repair cost
 
 The battery-related fixes — replacement, terminal cleaning, or a jump plus recharge — are by far the most affordable. If a shop immediately quotes you a starter replacement without testing the battery first, push back and ask them to load-test the battery before proceeding.
 
@@ -124,7 +124,7 @@ A shop with a proper battery load tester can tell you definitively in 5 minutes 
 
 ## Five questions to ask your mechanic about a no-start
 
-1. Did you load-test the battery before diagnosing anything else?
+1. Did you load-test the battery before assessing anything else?
 2. What are the battery's cold cranking amps versus the spec for this vehicle?
 3. If the starter needs replacement, is the replacement part new or remanufactured — and what warranty does it carry?
 4. Did you check the charging system to make sure the alternator is keeping the battery charged?
@@ -142,7 +142,7 @@ Many no-start causes are very DIY-friendly:
 
 **Moderate-to-hard DIY:** Starter replacement varies dramatically by vehicle. On some trucks, the starter is easily accessible from underneath. On others, it's buried under the intake manifold. Check a tutorial for your specific vehicle before committing.
 
-**Shop required:** Parasitic drain diagnosis requires a multimeter and patience. Alternator testing requires a voltmeter at minimum. Both are doable at home but time-consuming.
+**Shop required:** Parasitic drain assessment requires a multimeter and patience. Alternator testing requires a voltmeter at minimum. Both are doable at home but time-consuming.
 
 Want to know the most likely cause for your specific vehicle? [Run your symptoms through Wrenchli's free assessment](https://wrenchli.net) — describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
 
@@ -154,4 +154,4 @@ Whatever the cause, don't let a shop skip the battery test and jump straight to 
 
 ---
 
-*This article is for informational purposes only and does not constitute professional mechanical advice. Always consult a certified technician for diagnosis and repair.*
+*This article is for informational purposes only and does not constitute professional mechanical advice. Always consult a certified technician for assessment and repair.*

@@ -90,7 +90,7 @@ The more precisely you describe the vibration, the faster and cheaper the assess
 3. **Where you feel it:** Steering wheel? Brake pedal? Seat? Floorboard? Entire car?
 4. **What else changed:** Any new noises? Pulling to one side? Check engine light? Recent tire or brake work?
 
-This information can cut diagnosis time in half — saving you labor cost.
+This information can cut assessment time in half — saving you labor cost.
 
 ## Five questions to ask your mechanic about vibration
 
@@ -100,7 +100,7 @@ This information can cut diagnosis time in half — saving you labor cost.
 4. If the rotors are the issue, are they within spec for resurfacing or do they need replacement?
 5. Could this vibration be caused by something I already had repaired recently — like a tire rotation or brake job done incorrectly?
 
-A mechanic who test-drives your car at the speed where you experience the problem is a mechanic who takes diagnosis seriously.
+A mechanic who test-drives your car at the speed where you experience the problem is a mechanic who takes assessment seriously.
 
 ## Can you fix vibration yourself
 
@@ -122,4 +122,4 @@ Don't ignore vibration that's getting worse. What starts as a tire balance issue
 
 ---
 
-*This article is for informational purposes only and does not constitute professional mechanical advice. Always consult a certified technician for diagnosis and repair.*
+*This article is for informational purposes only and does not constitute professional mechanical advice. Always consult a certified technician for assessment and repair.*
