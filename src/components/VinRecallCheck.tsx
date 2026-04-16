@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SectionReveal from "@/components/SectionReveal";
 import { isValidVin, sanitizeVin, decodeVin, type DecodedVehicle } from "@/lib/vinDecoder";
+import RecallActionCard from "@/components/recall/RecallActionCard";
 
 interface NHTSARecall {
   NHTSACampaignNumber: string;
