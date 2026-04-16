@@ -52,36 +52,22 @@ export default function CinematicHero() {
         {/* Headline */}
         <motion.h1
           {...fadeUp(0.8)}
-          className="mt-5 md:mt-6 font-heading text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] text-white"
+          className="mt-5 md:mt-6 font-heading text-3xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] text-white"
           style={{ textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
         >
-          Vehicle Repair
+          Hear a strange noise?
           <br />
-          Finally <span className="text-accent">Fixed</span>
+          Find out what it means <span className="text-accent">before you go to the shop.</span>
         </motion.h1>
 
-        {/* Regional info */}
+        {/* Subhead */}
         <motion.p
           {...fadeUp(1.5, 10)}
-          className="mt-4 text-base md:text-xl font-semibold text-white max-w-[600px]"
+          className="mt-5 text-base md:text-lg font-medium text-white max-w-[680px] leading-relaxed"
           style={{ textShadow: "0 3px 16px rgba(0,0,0,0.7), 0 1px 6px rgba(0,0,0,0.5)" }}
         >
-          Affordable vehicle repair — transparent pricing, trusted shops.
+          Describe your symptom in plain English — get likely causes, fair cost ranges, and questions to ask your mechanic. Free, instant, no account needed.
         </motion.p>
-
-        {/* Trust badges */}
-        <motion.div
-          {...fadeUp(1.7, 10)}
-          className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm md:text-base font-semibold text-white"
-          style={{ textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
-        >
-          {["Assessment always free", "DIY tutorials", "Shop quotes", "No account required"].map((label) => (
-            <span key={label} className="inline-flex items-center gap-1.5">
-              <span className="text-accent text-lg leading-none">✓</span>
-              {label}
-            </span>
-          ))}
-        </motion.div>
 
         {/* Assessment count */}
         {assessmentCount !== null && (
@@ -101,15 +87,20 @@ export default function CinematicHero() {
           {...fadeUp(1.6, 10)}
           className="mt-8 flex flex-col items-center gap-3"
         >
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              asChild
-              size="lg"
-              className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base md:text-lg transition-transform hover:scale-[1.02] shadow-[0_4px_15px_hsl(var(--accent)/0.4)]"
-            >
-              <Link to="/#quote">Get Your Free Assessment</Link>
-            </Button>
-          </div>
+          <Button
+            asChild
+            size="lg"
+            className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base md:text-lg transition-transform hover:scale-[1.02] shadow-[0_4px_15px_hsl(var(--accent)/0.4)]"
+          >
+            <Link to="/#quote">Start Your Free Assessment</Link>
+          </Button>
+          <span
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-white"
+            style={{ textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
+          >
+            <span className="text-accent text-lg leading-none">✓</span>
+            Assessment always free
+          </span>
           <p className="text-sm text-white/60 max-w-md text-center leading-relaxed">
             This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.
           </p>
