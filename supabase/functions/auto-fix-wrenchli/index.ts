@@ -3,6 +3,28 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 
+function computeHmac(data: string, secret: string): string {
+  // Simple HMAC-like hash using Web Crypto is async, so we use a sync approach
+  // We'll use a basic hash for token generation
+  let hash = 0;
+  const combined = secret + ":" + data;
+  for (let i = 0; i < combined.length; i++) {
+    const char = combined.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(36) + combined.length.toString(36);
+}
+
+async function computeHmacAsync(data: string, secret: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const msgData = encoder.encode(data);
+  const key = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, msgData);
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("Origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -16,6 +38,7 @@ Deno.serve(async (req) => {
     const anthropicModel = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
     const githubToken = Deno.env.get("GITHUB_TOKEN") ?? "";
     const resendKey = Deno.env.get("RESEND_API_KEY") ?? "";
+    const approvalSecret = Deno.env.get("APPROVAL_SECRET") ?? "";
 
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
@@ -122,20 +145,22 @@ Output ONLY a valid JSON array, no other text:
     // ── Step 3: Store in audit_runs ──
     console.log("[auto-fix] Step 3 — storing in audit_runs");
 
-    const { error: insertError } = await supabase.from("audit_runs").insert({
+    const { data: insertedRun, error: insertError } = await supabase.from("audit_runs").insert({
       overall_score: overallScore,
       critical_count: criticalCount,
       agent_results: agentResults,
       generated_prompts: generatedPrompts,
       status: "pending_review",
-    });
+    }).select("id").single();
 
     if (insertError) console.error("[auto-fix] Insert error:", insertError);
+
+    const runId = insertedRun?.id ?? "unknown";
 
     // ── Step 4: Create GitHub issues ──
     console.log("[auto-fix] Step 4 — creating GitHub issues");
 
-    const ghResults: Array<{ title: string; url?: string; error?: string }> = [];
+    const ghResults: Array<{ title: string; url?: string; number?: number; error?: string }> = [];
 
     for (const fix of generatedPrompts) {
       try {
@@ -151,7 +176,7 @@ Output ONLY a valid JSON array, no other text:
             },
             body: JSON.stringify({
               title: `[Audit Fix] ${fix.title}`,
-              body: `**Severity:** ${fix.severity}\n**Agent:** ${fix.agent}\n**Priority:** ${fix.priority}\n\n---\n\n**Lovable Prompt — paste this directly into Lovable:**\n\n${fix.prompt}`,
+              body: `**Severity:** ${fix.severity}\n**Agent:** ${fix.agent}\n**Priority:** ${fix.priority}\n**Run ID:** ${runId}\n\n---\n\n**Lovable Prompt — paste this directly into Lovable:**\n\n${fix.prompt}`,
               labels: ["audit-fix"],
             }),
           }
@@ -161,7 +186,7 @@ Output ONLY a valid JSON array, no other text:
         if (!ghRes.ok) {
           ghResults.push({ title: fix.title, error: `GitHub ${ghRes.status}: ${JSON.stringify(ghData)}` });
         } else {
-          ghResults.push({ title: fix.title, url: ghData.html_url });
+          ghResults.push({ title: fix.title, url: ghData.html_url, number: ghData.number });
         }
       } catch (err) {
         ghResults.push({ title: fix.title, error: String(err) });
@@ -170,7 +195,7 @@ Output ONLY a valid JSON array, no other text:
 
     console.log("[auto-fix] GitHub issues created:", ghResults.length);
 
-    // ── Step 5: Send summary email ──
+    // ── Step 5: Send summary email with deploy buttons ──
     console.log("[auto-fix] Step 5 — sending summary email");
 
     const topPriorities = agentResults
@@ -179,10 +204,37 @@ Output ONLY a valid JSON array, no other text:
       )
       .join("\n");
 
+    // Generate fix cards with deploy buttons
+    const fixCardsHtml = await Promise.all(generatedPrompts.map(async (fix, idx) => {
+      const ghResult = ghResults[idx];
+      const issueNumber = ghResult?.number ?? 0;
+      const token = await computeHmacAsync(String(issueNumber), approvalSecret);
+      const deployUrl = `${supabaseUrl}/functions/v1/deploy-audit-fix?issue=${issueNumber}&run_id=${runId}&priority=${fix.priority}&token=${token}`;
+      const promptPreview = fix.prompt.substring(0, 200) + (fix.prompt.length > 200 ? "…" : "");
+      const severityBg = fix.severity === "critical" ? "#FEE2E2" : "#FEF3C7";
+      const severityColor = fix.severity === "critical" ? "#991B1B" : "#92400E";
+
+      return `
+        <div style="background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:24px;margin:0 0 16px;">
+          <div style="display:flex;align-items:center;gap:12px;margin:0 0 12px;">
+            <span style="display:inline-block;background:#1E3A5F;color:#fff;border-radius:50%;width:28px;height:28px;text-align:center;line-height:28px;font-size:14px;font-weight:700;">${fix.priority}</span>
+            <span style="display:inline-block;background:${severityBg};color:${severityColor};border-radius:4px;padding:3px 8px;font-size:11px;font-weight:700;text-transform:uppercase;">${fix.severity}</span>
+          </div>
+          <h3 style="margin:0 0 6px;color:#1E3A5F;font-size:16px;font-weight:700;">${fix.title}</h3>
+          <p style="margin:0 0 8px;color:#6B7280;font-size:12px;">Flagged by: ${fix.agent}</p>
+          <p style="margin:0 0 16px;color:#4B5563;font-size:13px;line-height:1.5;background:#F9FAFB;border-radius:6px;padding:12px;">${promptPreview}</p>
+          <a href="${deployUrl}" style="display:inline-block;background:#E07B39;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;">Deploy This Fix →</a>
+        </div>`;
+    }));
+
+    // Deploy All token
+    const deployAllToken = await computeHmacAsync(`all:${runId}`, approvalSecret);
+    const deployAllUrl = `${supabaseUrl}/functions/v1/deploy-audit-fix?all=true&run_id=${runId}&token=${deployAllToken}`;
+
     const emailSubject = `Wrenchli weekly audit — ${overallScore}/100, ${criticalCount} critical issues`;
     const emailHtml = `
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#F3F4F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6;padding:32px 16px;">
     <tr><td align="center">
@@ -204,8 +256,17 @@ Output ONLY a valid JSON array, no other text:
           <p style="margin:0 0 8px;color:#374151;font-size:14px;font-weight:600;">Agents run: 6</p>
           <h3 style="margin:20px 0 12px;color:#1E3A5F;font-size:16px;">Top Priority Per Agent</h3>
           <pre style="background:#F9FAFB;border-radius:8px;padding:16px;font-size:13px;color:#374151;line-height:1.6;white-space:pre-wrap;margin:0 0 24px;">${topPriorities}</pre>
-          <p style="margin:0 0 8px;color:#374151;font-size:14px;font-weight:600;">${generatedPrompts.length} fix prompts generated → GitHub issues created</p>
-          <a href="https://github.com/gerrod-design/wrenchli/issues?q=label%3Aaudit-fix+is%3Aopen" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;margin:16px 0 0;">Review & Paste Fixes →</a>
+          
+          <h3 style="margin:24px 0 16px;color:#1E3A5F;font-size:18px;font-weight:700;">🛠 One-Tap Fixes</h3>
+          ${fixCardsHtml.join("")}
+          
+          <div style="text-align:center;margin:24px 0 0;padding:24px 0 0;border-top:2px solid #E5E7EB;">
+            <a href="${deployAllUrl}" style="display:inline-block;background:linear-gradient(135deg,#E07B39,#D96A25);color:#fff;text-decoration:none;padding:16px 36px;border-radius:10px;font-size:16px;font-weight:800;box-shadow:0 4px 14px rgba(224,123,57,0.4);">🚀 Deploy All ${generatedPrompts.length} Fixes →</a>
+          </div>
+          
+          <p style="margin:24px 0 0;text-align:center;">
+            <a href="https://github.com/gerrod-design/wrenchli/issues?q=label%3Aaudit-fix+is%3Aopen" style="color:#2563EB;font-size:14px;text-decoration:none;">View all issues on GitHub →</a>
+          </p>
         </td></tr>
         <tr><td style="padding:24px 32px;border-top:1px solid #E5E7EB;text-align:center;">
           <p style="margin:0;color:#9CA3AF;font-size:12px;">Automated weekly audit by Wrenchli Engineering</p>
@@ -242,6 +303,7 @@ Output ONLY a valid JSON array, no other text:
         criticalCount,
         fixesGenerated: generatedPrompts.length,
         githubIssues: ghResults,
+        runId,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
