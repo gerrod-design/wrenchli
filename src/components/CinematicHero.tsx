@@ -3,17 +3,27 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 import heroShop from "@/assets/hero-shop.jpg";
 
 export default function CinematicHero() {
   const [isMobile, setIsMobile] = useState(false);
+  const [assessmentCount, setAssessmentCount] = useState<number | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    supabase.functions.invoke("assessment-count", { method: "GET" })
+      .then(({ data }) => {
+        if (data?.count != null) setAssessmentCount(data.count);
+      })
+      .catch(() => {});
   }, []);
 
   const handleScrollDown = () => {
@@ -72,6 +82,19 @@ export default function CinematicHero() {
             </span>
           ))}
         </motion.div>
+
+        {/* Assessment count */}
+        {assessmentCount !== null && (
+          <motion.p
+            {...fadeUp(1.8, 10)}
+            className="mt-3 text-sm font-medium text-white/50"
+            style={{ textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
+          >
+            {assessmentCount >= 100
+              ? `${assessmentCount.toLocaleString()} assessments completed by Michigan & Ohio drivers`
+              : "Growing fast in Metro Detroit"}
+          </motion.p>
+        )}
 
         {/* CTA Buttons */}
         <motion.div
