@@ -13,8 +13,14 @@ export default function Privacy() {
           <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl mb-2">
             Privacy Policy
           </h1>
+          <p className="text-sm text-muted-foreground mb-2">
+            Last updated: April 2026 | Version 1.2
+          </p>
           <p className="text-sm text-muted-foreground mb-10">
-            Last updated: April 4, 2026
+            Wrenchli, Inc. | Delaware Corporation | Contact:{" "}
+            <a href="mailto:privacy@wrenchli.net" className="text-accent hover:underline font-medium">
+              privacy@wrenchli.net
+            </a>
           </p>
 
           <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground/90 leading-relaxed">
@@ -32,7 +38,20 @@ export default function Privacy() {
             </section>
 
             <section>
-              <h2 className="font-heading text-xl font-semibold text-foreground">2. Information We Collect</h2>
+              <h2 className="font-heading text-xl font-semibold text-foreground">2. Categories of Data Collected</h2>
+              <p>We collect the following data when you use Wrenchli:</p>
+              <ul className="list-disc pl-6 space-y-2 mt-2">
+                <li><strong>Vehicle Identification Numbers (VINs)</strong> — used for recall lookup via NHTSA.</li>
+                <li><strong>Vehicle year, make, and model</strong> — used to generate your symptom assessment.</li>
+                <li><strong>Symptom descriptions you enter</strong> — transmitted to Anthropic (Claude API) for assessment generation.</li>
+                <li><strong>Audio or video recordings</strong> if you use the audio feature — transmitted to Google AI (Gemini), not stored by Wrenchli after analysis.</li>
+                <li><strong>Email address</strong> if you create an account.</li>
+                <li><strong>Payment information</strong> if you subscribe to Pro — processed by Stripe, never stored by Wrenchli.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="font-heading text-xl font-semibold text-foreground">3. Information We Collect (Detail)</h2>
 
               <h3 className="font-heading text-lg font-medium text-foreground">From Consumers</h3>
 
@@ -298,7 +317,15 @@ export default function Privacy() {
 
             <section>
               <h2 className="font-heading text-xl font-semibold text-foreground">10. Data Retention</h2>
-              <div className="overflow-x-auto mt-4">
+              <p className="font-medium">Retention schedule:</p>
+              <ul className="list-disc pl-6 space-y-2 mt-2">
+                <li><strong>VINs and vehicle data:</strong> retained while your account is active, deleted within 30 days of account deletion.</li>
+                <li><strong>Symptom descriptions:</strong> retained for 12 months then anonymized.</li>
+                <li><strong>Audio/video:</strong> not retained after analysis.</li>
+                <li><strong>Payment records:</strong> retained 7 years per financial regulations.</li>
+              </ul>
+              <p className="mt-4 text-sm text-muted-foreground">Additional retention details by data type:</p>
+              <div className="overflow-x-auto mt-2">
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-border">
@@ -398,6 +425,12 @@ export default function Privacy() {
               <p className="mt-2">
                 We do not sell your personal information, including your VIN, symptom descriptions, or assessment history, to any third party.
               </p>
+              <h3 className="font-heading text-lg font-medium text-foreground mt-6">Michigan Residents (MCDPA)</h3>
+              <p className="mt-2">
+                If we deny your privacy request, you have the right to appeal by emailing{" "}
+                <a href="mailto:privacy@wrenchli.net" className="text-accent hover:underline font-medium">privacy@wrenchli.net</a>{" "}
+                with subject line <strong>MCDPA Appeal</strong>. We respond to appeals within 60 days.
+              </p>
             </section>
 
             <section>
@@ -405,11 +438,11 @@ export default function Privacy() {
               <p>For questions, concerns, or to exercise your privacy rights:</p>
               <p className="mt-2">
                 <strong>Wrenchli, Inc.</strong><br />
+                Delaware Corporation<br />
                 Email:{" "}
                 <a href="mailto:privacy@wrenchli.net" className="text-accent hover:underline font-medium">
                   privacy@wrenchli.net
-                </a><br />
-                Delaware Corporation
+                </a>
               </p>
               <p className="mt-2">
                 For security-related concerns or to report a vulnerability, please email{" "}
