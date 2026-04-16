@@ -368,3 +368,6 @@ export default function ForShops() {
           </SectionReveal>
         </div>
       </section>
+    </main>
+  );
+}
