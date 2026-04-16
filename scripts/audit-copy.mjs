@@ -45,7 +45,7 @@ const BANNED_WORDS = [
   { pattern: /\bdiagnos(?:is|e[sd]?|ing)\b/gi, label: "diagnosis/diagnose", fix: 'Use "symptom assessment" or "likely causes"' },
   { pattern: /\bPro Only\b/gi, label: "Pro Only", fix: 'Use "Shop Required"' },
   { pattern: /\bProfessional Only\b/gi, label: "Professional Only", fix: 'Use "Shop Required"' },
-  { pattern: /\bAlways free\b/gi, label: "Always free", fix: 'Use "Assessment always free"' },
+  { pattern: /\bAlways free\b/gi, label: "Always free", fix: 'Use "Assessment always free"', contextOk: /Assessment always free/i },
   { pattern: /\bvetted shops?\b/gi, label: "vetted shops", fix: 'Use "trusted shops"' },
   { pattern: /\bwe(?:'re| are) building\b/gi, label: "we're building", fix: 'Use "we built" — product is live' },
   { pattern: /\bour platform\b/gi, label: "our platform", fix: 'Use "Wrenchli"' },
