@@ -341,6 +341,33 @@ export default function ForShops() {
           </SectionReveal>
         </div>
       </section>
+
+      {/* Post-Pilot Pricing */}
+      <section className="section-padding bg-muted/30 border-t border-border">
+        <div className="container-wrenchli max-w-3xl">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl mb-6 text-center">
+              What happens after 90 days
+            </h2>
+            <div className="space-y-5 text-muted-foreground leading-relaxed md:text-lg">
+              <p>
+                We schedule a call to review your results. If Wrenchli delivered value, we discuss continuing. If not, you walk away with zero obligation.
+              </p>
+              <div className="rounded-xl border border-border bg-card p-6 md:p-7">
+                <p className="text-foreground">
+                  Post-pilot pricing starts at <span className="font-bold text-accent">$299/month</span> for unlimited leads and full analytics. <span className="font-semibold text-foreground">Founding pilot partners receive a 90-day rate lock at pilot terms</span> before any pricing takes effect.
+                </p>
+              </div>
+              <p className="text-center text-base md:text-lg pt-2">
+                Questions? Call Gerrod directly:{" "}
+                <a href="tel:+13133125455" className="font-bold text-accent hover:underline whitespace-nowrap">
+                  313.312.5455
+                </a>
+              </p>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
     </main>
   );
 }
