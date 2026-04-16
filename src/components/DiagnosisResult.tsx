@@ -293,13 +293,22 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
               </>
             )}
 
-            <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 mb-2">
-              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-blue-600" />
-              <p className="text-sm leading-relaxed text-blue-900">
-                This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.
-              </p>
-            </div>
-            <DisclaimerBanner />
+            {(() => {
+              const hasHigh = diagnoses.some((d) => d.urgency === "high");
+              const hasMedium = diagnoses.some((d) => d.urgency === "medium");
+              const bannerUrgency = hasHigh ? "immediate" : hasMedium ? "soon" : "monitor";
+              return (
+                <>
+                  <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 mb-2">
+                    <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-blue-600" />
+                    <p className="text-sm leading-relaxed text-blue-900">
+                      This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.
+                    </p>
+                  </div>
+                  <DisclaimerBanner urgency={bannerUrgency} />
+                </>
+              );
+            })()}
             <VehicleContextBar vehicleStr={vehicleStr} onChangeVehicle={handleChangeVehicle} />
 
             <div className="space-y-6">
