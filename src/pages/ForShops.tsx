@@ -142,13 +142,31 @@ export default function ForShops() {
                   >
                     {step.num}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h3 className="font-heading text-lg font-semibold text-foreground">
                       {step.title}
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                       {step.body}
                     </p>
+                    {step.num === 3 && (
+                      <Card className="mt-4 border-2 border-wrenchli-trust-blue/30 bg-background shadow-sm max-w-md">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-wrenchli-trust-blue/10">
+                              <MessageSquare className="h-3.5 w-3.5 text-wrenchli-trust-blue" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs font-semibold text-foreground">Wrenchli Alert</p>
+                              <p className="text-[10px] text-muted-foreground">New customer match · just now</p>
+                            </div>
+                          </div>
+                          <p className="text-sm leading-relaxed text-foreground">
+                            <span className="font-semibold">2019 Ford F-150, 5.0L.</span> Customer reports grinding noise when braking. Top cause: <span className="font-semibold">Worn front brake pads (68%)</span>. Estimated repair: <span className="font-semibold">$180–$260</span>. Customer is <span className="font-semibold">3.2 miles away</span>.
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 </div>
               </SectionReveal>
