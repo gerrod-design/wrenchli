@@ -89,39 +89,43 @@ const ProductImageDisplay = ({
   const current = images[currentIdx];
 
   return (
-    <div className={`relative ${sizeClasses[size]} ${className}`}>
-      {state === "loading" && (
-        <div className="absolute inset-0 bg-muted rounded-lg flex items-center justify-center z-10">
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        </div>
-      )}
-      <img
-        src={current.url}
-        alt={current.alt}
-        className="w-full h-full object-cover rounded-lg"
-        loading="lazy"
-        onLoad={() => setState("loaded")}
-        onError={() => {
-          if (currentIdx < images.length - 1) {
-            setCurrentIdx((p) => p + 1);
-            setState("loading");
-          } else {
-            setState("error");
-          }
-        }}
-      />
-      {product.badge && (
-        <Badge className="absolute -top-1 -right-1 text-xs px-1 py-0.5 bg-accent text-accent-foreground">
-          {product.badge}
-        </Badge>
-      )}
-      {images.length > 1 && state === "loaded" && (
-        <div className="absolute bottom-0 right-0 bg-foreground/50 text-background text-xs px-1 rounded-tl">
-          {currentIdx + 1}/{images.length}
-        </div>
-      )}
-    </div>
-    {/* FTC affiliate disclosure rendered by parent — component is image-only */}
+    <>
+      <div className={`relative ${sizeClasses[size]} ${className}`}>
+        {state === "loading" && (
+          <div className="absolute inset-0 bg-muted rounded-lg flex items-center justify-center z-10">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          </div>
+        )}
+        <img
+          src={current.url}
+          alt={current.alt}
+          className="w-full h-full object-cover rounded-lg"
+          loading="lazy"
+          onLoad={() => setState("loaded")}
+          onError={() => {
+            if (currentIdx < images.length - 1) {
+              setCurrentIdx((p) => p + 1);
+              setState("loading");
+            } else {
+              setState("error");
+            }
+          }}
+        />
+        {product.badge && (
+          <Badge className="absolute -top-1 -right-1 text-xs px-1 py-0.5 bg-accent text-accent-foreground">
+            {product.badge}
+          </Badge>
+        )}
+        {images.length > 1 && state === "loaded" && (
+          <div className="absolute bottom-0 right-0 bg-foreground/50 text-background text-xs px-1 rounded-tl">
+            {currentIdx + 1}/{images.length}
+          </div>
+        )}
+      </div>
+      <p className="text-[10px] text-muted-foreground mt-1">
+        Some links on this page are affiliate links. Wrenchli may earn a small commission at no additional cost to you.
+      </p>
+    </>
   );
 };
 
