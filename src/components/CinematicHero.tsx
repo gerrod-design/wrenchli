@@ -83,6 +83,19 @@ export default function CinematicHero() {
           ))}
         </motion.div>
 
+        {/* Assessment count */}
+        {assessmentCount !== null && (
+          <motion.p
+            {...fadeUp(1.8, 10)}
+            className="mt-3 text-sm font-medium text-white/50"
+            style={{ textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
+          >
+            {assessmentCount >= 100
+              ? `${assessmentCount.toLocaleString()} assessments completed by Michigan & Ohio drivers`
+              : "Growing fast in Metro Detroit"}
+          </motion.p>
+        )}
+
         {/* CTA Buttons */}
         <motion.div
           {...fadeUp(1.6, 10)}
