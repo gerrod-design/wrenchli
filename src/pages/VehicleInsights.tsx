@@ -55,7 +55,7 @@ const symptomCategories = [
 ];
 
 const diyItems = ["Cabin air filter", "Wiper blades", "Headlight bulbs", "Battery replacement", "Fluid top-offs", "Tire pressure"];
-const shopItems = ["Brake pads & rotors", "Timing belt", "Transmission repair", "Steering & suspension", "Electrical diagnosis", "AC system"];
+const shopItems = ["Brake pads & rotors", "Timing belt", "Transmission repair", "Steering & suspension", "Electrical assessment", "AC system"];
 
 const partsPartners = ["Amazon Automotive", "O'Reilly", "Advance Auto Parts", "RockAuto", "NAPA"];
 
@@ -120,7 +120,7 @@ export default function VehicleInsights() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Vehicle Insights — DIY Diagnostics"
+        title="Vehicle Insights — DIY Assessment"
         description="Understand your vehicle before visiting the shop. AI-powered symptom assessment, OBD2 code lookup, symptom checker, and maintenance schedules."
         path="/vehicle-insights"
       />
@@ -146,7 +146,7 @@ export default function VehicleInsights() {
               className="mt-8 h-14 px-10 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-bold text-lg transition-transform hover:scale-[1.02]"
               onClick={() => document.getElementById("diagnosis-input")?.scrollIntoView({ behavior: "smooth" })}
             >
-              Start Free Diagnosis <ArrowRight className="ml-2 h-5 w-5" />
+              Start Free Assessment <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </SectionReveal>
         </div>
@@ -207,7 +207,7 @@ export default function VehicleInsights() {
                             <div className="flex items-start gap-2">
                               <span className="font-mono font-bold text-wrenchli-teal shrink-0">{d.code}</span>
                               <span className="text-muted-foreground">
-                                Code {d.code} recognized as a valid OBD2 diagnostic code, but detailed information is not yet in our database. We recommend getting a professional diagnosis to understand this code.
+                                Code {d.code} recognized as a valid OBD2 diagnostic code, but detailed information is not yet in our database. We recommend getting a professional assessment to understand this code.
                               </span>
                             </div>
                             <Button
@@ -242,7 +242,7 @@ export default function VehicleInsights() {
                   initialVin={urlVin}
                 />
                 <Button onClick={handleDiagnose} className="w-full h-12 bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90 font-semibold px-6 whitespace-nowrap">
-                  Get Your Diagnosis
+                  Get Your Assessment
                 </Button>
               </div>
             </Tabs>
@@ -435,7 +435,7 @@ export default function VehicleInsights() {
                 </div>
                 <h2 className="font-heading text-2xl font-bold md:text-3xl">Using an OBD2 Scanner?</h2>
                 <p className="mt-3 text-primary-foreground/70 leading-relaxed">
-                  Wrenchli works with popular OBD2 scanners. Read your codes, enter them above, and get instant diagnostics with shop quotes.
+                  Wrenchli works with popular OBD2 scanners. Read your codes, enter them above, and get instant assessments with shop quotes.
                 </p>
                 <Button variant="outline" className="mt-6 border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10">
                   How to Read Your Codes →

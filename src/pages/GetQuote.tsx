@@ -229,7 +229,7 @@ export default function GetQuote() {
           <SectionReveal>
             <h1 className="font-heading text-2xl font-bold md:text-4xl">Get Your Repair Estimate</h1>
             <div className="mt-4 rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-4 space-y-1">
-              <p className="text-sm text-primary-foreground/70">Diagnosis</p>
+              <p className="text-sm text-primary-foreground/70">Assessment</p>
               <p className="font-heading font-semibold text-lg">{diagnosis}</p>
               {code && (
                 <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-xs font-mono font-semibold text-accent">
@@ -482,7 +482,7 @@ export default function GetQuote() {
               <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-4">
                 <h3 className="font-heading text-lg font-bold">Ready to Connect with a Shop?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Share your contact info and we'll connect you with a trusted repair shop in your area. They'll see your diagnosis and this cost estimate — no surprises.
+                  Share your contact info and we'll connect you with a trusted repair shop in your area. They'll see your assessment and this cost estimate — no surprises.
                 </p>
 
                 <div className="space-y-3">
