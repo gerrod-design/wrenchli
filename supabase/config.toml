@@ -95,3 +95,9 @@ verify_jwt = false
 
 [functions.audit-wrenchli-site]
 verify_jwt = false
+
+[functions.auto-fix-wrenchli]
+verify_jwt = false
+
+[functions.assessment-count]
+verify_jwt = false
