@@ -75,3 +75,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Registered wrenchli-COMPLIANCE.md as fourteenth skill file. Copy compliance enforcement layer — 8-check COPY CHECK rule covering banned phrases, required terminology, length, voice, CTAs, SEO, privacy disclosures, and claim verification. Pre-existing file, origin session unknown, contents validated and confirmed active. Coordinates with SKILL.md, MARKETING.md, and ACCURACY.md.
 
 - 2026-04-18: Corrected registry filename references to match actual filenames on disk for legacy non-prefixed skill files.
+
+- 2026-04-18: Created wrenchli-CRISIS.md as fifteenth skill file. Crisis Activation framework, incident response coordination, board and investor notification protocols, media and regulatory response posture, financial crisis response, data breach legal response playbook, executive departure protocol, and agent authority suspension during active crisis established. Forward-declared in wrenchli-GOVERNANCE.md. Owned by Gerrod Parchmon (Founder/CEO) with Rhett Holloway coordinating execution and Evelyn Marchetti leading legal response. Session 2 Round 5 complete.
