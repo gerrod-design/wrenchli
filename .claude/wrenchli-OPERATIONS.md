@@ -1,440 +1,177 @@
-# Wrenchli Operational Infrastructure Skill
-# This file governs all agentic automation, MCP integrations, scheduled routines, testing infrastructure, and the self-improving skill library for Wrenchli.
-# Read this before responding to any prompt involving: automating a repetitive task, setting up a new integration, scheduling a routine, running a quality check, building testing workflows, or deploying an agent to handle a recurring business process.
+# Wrenchli Operations Skill
+
+# Revision 2 — Updated 2026-04-18 to incorporate 16-skill institutional infrastructure
+
+# This file governs Wrenchli's operating rhythm, decision-making framework, agent team structure, three-tier escalation architecture, and the cross-skill execution order that coordinates all institutional skill files.
+
+# Read this before responding to any prompt involving: how decisions are made, who has authority over what, how the agent team is structured, what the operating cadence looks like, how conflicts between skill files are resolved, or any question about Wrenchli's internal governance and operating processes.
+
+# Owned by: Rhett Holloway (Chief of Staff), coordinating execution across all functions. Gerrod Parchmon (Founder/CEO) retains authority over all Tier 3 decisions. Coordinates with all 16 installed skill files.
+
 # ============================================================
 
-## Activation Rule
+## Core Posture
 
-This skill triggers automatically — without announcement — when the prompt involves:
-- Automating any manual task Gerrod is doing more than once a week
-- Adding, configuring, or testing an MCP (Model Context Protocol) integration
-- Setting up scheduled or event-triggered routines
-- Building or updating QA test workflows for the Wrenchli platform
-- Monitoring infrastructure (model deprecation, API health, security scans, N8N execution)
-- Deploying a sub-agent for a specific business function (marketing, sales outreach, support triage, content production)
-- Writing or evaluating binary assertions for any quality gate
-- Organizing or pruning the skill library itself
+Wrenchli operates as a disciplined, agent-augmented startup. The operating framework has two purposes that must stay in balance. First, it enables speed — the agent team handles analysis, documentation, and coordination so the founder can make decisions faster and with better information than would otherwise be possible. Second, it ensures quality — no decision with material consequences is made without the right checks running, the right authority approving, and the documentation existing to explain why.
 
-When triggered, determine whether the work belongs to an existing agent, requires a new skill or routine, or should remain manual. The goal is not maximum automation — it is maximum founder leverage. Automate the laborious 80 percent. Reserve human judgment for the 20 percent that genuinely needs taste, relationship, or strategic discretion.
+The operating principle: structure enables speed. A company without operating discipline moves fast until it hits a wall — a legal problem that wasn't anticipated, a financial decision that wasn't modeled, a product change that broke a partner commitment. Wrenchli's skill library exists so that the walls are anticipated and avoided, not discovered.
 
-This skill sits operationally beneath `wrenchli-STRATEGY.md` and alongside `wrenchli-SKILL.md` and `wrenchli-MARKETING.md`. Strategy decides what to do. Operations decides how to do it repeatedly without Gerrod's constant attention.
+Rhett Holloway (Chief of Staff) owns the operating rhythm. He coordinates the agent team, maintains the decision log, tracks pending actions, and escalates to the founder when Tier 3 authority is required. He does not make Tier 3 decisions — he ensures they reach the founder with the information needed to make them well.
 
 ---
 
-## Core Operating Principle: Goal-to-Result, Not Question-to-Answer
+## The Skill Library — Current State
 
-Wrenchli's operational posture is agentic, not conversational. A well-built agent receives a goal, observes the environment, thinks about the next action, acts, observes again, and loops until the goal is achieved. A well-written skill is an SOP the agent follows — not a prompt it tries to interpret.
+Wrenchli's institutional infrastructure is encoded in 16 installed skill files plus this operations file. The skill files are the authoritative source for how decisions are made in each domain. When a skill file conflicts with memory, convention, or a prior conversation, the skill file governs.
 
-When designing any operational workflow, the test is: can this run while Gerrod is asleep? If the answer is no, the workflow is under-specified. Either the skill needs tighter instructions, the quality gates need to be binary (not subjective), or the task genuinely requires a human and should stop pretending otherwise.
+### Active Skill Registry
 
-The Agent Loop that every Wrenchli agent follows:
-1. Observe — scan the relevant files, API responses, or data state
-2. Think — evaluate against the goal, plan the next action
-3. Act — execute a tool call, write a file, send an email, make an API request
-4. Repeat — observe the new state, think, act, until the goal condition is met
+| # | File | Domain | Owner |
 
----
+|---|---|---|---|
 
-## Agentic Execution Rule
+| 1 | SKILL.md | Brand, technical architecture, engineering rules | Gerrod Parchmon |
 
-Before building a new agent or automation, evaluate whether the task warrants agentic handling. Not every task should be automated — automation is debt if the task does not recur, does not have binary success criteria, or changes too rapidly for SOPs to stabilize.
+| 2 | wrenchli-OPERATIONS.md (this file) | Operating rhythm, decision framework, agent team | Rhett Holloway |
 
-Run the five diagnostic questions:
+| 3 | MARKETING.md | CRO, copywriting, SEO, email sequences | Rhett Holloway |
 
-1. Frequency: does this task recur at least weekly? If no, manual is correct.
-2. Stability: does the task's definition change more than once a month? If yes, the SOP will drift faster than it can be maintained.
-3. Binary success criteria: can success be measured with true/false assertions? If no, the agent cannot self-verify and will need human review each run — which partially defeats the purpose.
-4. Tool coverage: do the tools the agent needs exist in the current MCP stack (or is a specific MCP available to add)? If no, specify the blocking integration before proceeding.
-5. Blast radius: what breaks if the agent makes a mistake? If the answer is "consumer PII leaks, Stripe charges duplicate, or the assessment flow goes down," the agent needs human approval gates, not autonomous execution.
+| 4 | wrenchli-ACCURACY.md | Factual verification, claim validation | Imani Whitfield |
 
-Output format:
+| 5 | wrenchli-SECURITY.md | Data security, access controls, incident response | Sloane Ashford |
 
-AGENTIC FIT CHECK:
-Frequency: [sufficient / insufficient]
-Stability: [stable / volatile]
-Binary criteria: [possible / not possible]
-Tool coverage: [complete / missing: name the missing MCP]
-Blast radius: [low / medium / high]
-Verdict: [full autonomy / autonomy with human approval gate / keep manual / defer until prerequisite]
-Recommendation: [single next step]
+| 6 | wrenchli-REGULATORY.md | Compliance, consumer protection, financial services law | Amara Oduya |
 
-High blast-radius tasks (Stripe, PII, production deploys to the assessment flow) require a human approval gate even if everything else qualifies. This is non-negotiable.
+| 7 | wrenchli-STRATEGY.md | Strategic decision-making, market positioning | Amara Vex |
 
----
+| 8 | wrenchli-DECISIONS.md | Cross-skill conflict resolution, decision rubric | Rhett Holloway |
 
-## Binary Assertion Rule
+| 9 | wrenchli-GOVERNANCE.md | Corporate governance, board operations, ESG | Evelyn Marchetti |
 
-Every quality gate in every agent must be binary — true or false, pass or fail. Subjective assertions like "the copy is compelling" or "the UI looks clean" cannot be evaluated by an agent and should not appear in any skill file. They create the illusion of quality control without delivering it.
+| 10 | wrenchli-LEGAL.md | Entity structure, IP, contracts, dispute resolution | Evelyn Marchetti |
 
-When writing or reviewing a skill's quality gates:
+| 11 | wrenchli-FINANCE.md | Financial controls, cap table, unit economics, reporting | Darya Nazari |
 
-Replace subjective with binary:
-- "Is the response helpful?" → "Word count is between 150 and 300"
-- "Is the email professional?" → "Does not contain exclamation marks, does not contain 'just', opens with the recipient's first name"
-- "Is the assessment accurate?" → "The probability score for the top cause is above 0.4, urgency is one of four valid values, cost range is non-empty"
-- "Is the blog post SEO-ready?" → "Title tag is under 60 characters, meta description is under 155 characters, at least three H2 tags exist, at least one internal link to the homepage assessment flow"
+| 12 | wrenchli-PEOPLE.md | Contractor/employee framework, agent governance | Rhett Holloway |
 
-Wrenchli's existing binary quality gates — keep these intact and extend them when adding new agents:
+| 13 | wrenchli-COMMERCIAL.md | Partnership lifecycle, product governance | Rhett Holloway / Gerrod Parchmon |
 
-Assessment smoke test (from project memory, must remain in place):
-- Probability scores appear on results page
-- Urgency level is one of: immediate, soon, schedule, monitor
-- Cost range is present and non-empty
-- Shop questions section is populated
-- No console errors during the assessment flow
+| 14 | wrenchli-COMPLIANCE.md | Copy compliance, banned phrase enforcement | Rhett Holloway |
 
-Security scan assertions (after every deploy):
-- No RLS policy reverted to public without explicit opt-in
-- No new secret is hardcoded (all in Supabase secrets)
-- No AutoZone references reintroduced
-- Amazon affiliate tag matches wrenchli-20 exactly
-- The AI model string matches the ANTHROPIC_MODEL secret value
+| 15 | wrenchli-CRISIS.md | Crisis activation, incident coordination | Gerrod Parchmon |
 
-Blog article assertions (per MARKETING.md):
-- Title tag under 60 characters
-- Meta description under 155 characters
-- Minimum three H2 tags
-- Internal link to homepage assessment flow present
-- Article word count meets the tier minimum (800 / 1,200 / 600)
-- Image alt text present on every image
+| 16 | wrenchli-FUNDRAISING.md | Raise readiness, investor process, SAFE mechanics | Darya Nazari |
 
-Email sequence assertions (shop onboarding, recall alerts, Pro welcome):
-- Contains the recipient's shop or first name
-- Single clear CTA present
-- No references to diagnosis, Pro Only, or Always free (brand violations)
-- Link to the correct destination URL
-- Send succeeded (webhook 200 response from email provider)
+### Skill File Precedence
 
-When building any new skill, the first question is always: what are the binary assertions that define success? If they cannot be written in under ten minutes, the skill is not ready.
+When two skill files produce conflicting guidance, wrenchli-DECISIONS.md governs the resolution. The general precedence hierarchy when no explicit conflict resolution exists:
+
+1. wrenchli-CRISIS.md — during an active declared crisis, overrides all other skill files
+
+2. wrenchli-SECURITY.md — security vetoes on data access decisions precede all other checks
+
+3. wrenchli-LEGAL.md and wrenchli-REGULATORY.md — hard stops precede commercial or product decisions
+
+4. wrenchli-GOVERNANCE.md — governance requirements precede operational decisions
+
+5. wrenchli-FINANCE.md — financial controls and approval thresholds govern all expenditure decisions
+
+6. Remaining skill files — per the 16-step execution order below
 
 ---
 
-## Memory Discipline Rule
+## The Agent Team
 
-Each agent or agentic context maintains a `memory.md` file that stores persistent learnings, environment-specific quirks, and corrections. Without memory discipline, agents repeat the same mistakes forever.
+Wrenchli operates with a human-AI hybrid team. Agents execute defined business functions with specific authority boundaries established by their governing skill files. Agents recommend. The founder decides on all Tier 3 matters. No agent has autonomous authority to commit Wrenchli legally, financially, or publicly.
 
-Rules for `memory.md` files:
+### Current Agent Roster
 
-1. Under 200 lines per file. Beyond this length, agents begin to ignore entries or conflate them. If a memory file is growing past 200 lines, either split it by domain or prune stale entries.
-2. Written as declarative facts, not instructions. "The Tekmetric sandbox returns 429 after 60 requests per minute" is a fact. "Be careful with Tekmetric rate limits" is a vibe.
-3. Update in place, not append-only. When a memory becomes stale (a bug fixed, a workaround obsolete, a vendor policy changed), remove the outdated entry. Memory files are not logs — they are the current state of what is true.
-4. One file per agent domain, not one file for everything. A QA agent has its own memory. A marketing agent has its own memory. Mixing them creates cross-domain confusion.
-5. Never store secrets, PII, VINs, or credentials. Memory files are read by every invocation — treat them as low-trust storage.
+| Agent | Role | Skill File | Reports To | Tier Authority |
 
-Wrenchli's current operational memory (maintain in each agent's local `memory.md`):
+|---|---|---|---|---|
 
-Platform and deployment:
-- Deploys go through Lovable; production is Vercel
-- Supabase secrets cannot be edited in place within Lovable — must delete and re-add
-- Model string lives in the ANTHROPIC_MODEL Supabase secret, not hardcoded
-- After any RLS change, the guest assessment flow must be verified (anonymous read, anonymous session results, authenticated data isolation)
+| Amara Vex | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon | Tier 1-2 analysis; Tier 3 to founder |
 
-External integrations:
-- Tekmetric API application submitted April 5 2026; approval expected April 19-26
-- Stripe live activation blocked pending EIN submission
-- NHTSA vPIC API is free and stable, no key required
-- N8N workspace at wrenchli.app.n8n.cloud, Starter plan is 1,000 executions per month
+| Sloane Ashford | Security | wrenchli-SECURITY.md | Gerrod Parchmon | Tier 1-2 controls; containment under founder direction |
 
-Known failure modes to watch:
-- Claude API responses wrap JSON in markdown fences; must strip before parsing
-- Supabase auth.users table requires service role key, not anon key — store as secure credential in N8N
-- Supabase Secrets within Lovable do not support in-place editing
+| Amara Oduya | Regulatory | wrenchli-REGULATORY.md | Evelyn Marchetti | Tier 1-2 compliance; Tier 3 to Evelyn then founder |
 
----
+| Imani Whitfield | Accuracy | wrenchli-ACCURACY.md | Darya Nazari | Tier 1-2 verification; flags unverifiable claims to owner |
 
-## Routine Deployment Rule
+| Evelyn Marchetti | General Counsel | wrenchli-LEGAL.md | Gerrod Parchmon | Tier 1-2 legal; Tier 3 to founder |
 
-Routines are scheduled or event-triggered workflows that run without human initiation. They are the highest-leverage operational pattern because they convert Gerrod's time from "doing the task" to "reviewing the output." Every task that runs daily, weekly, or on a predictable trigger is a candidate for a routine.
+| Darya Nazari | CFO | wrenchli-FINANCE.md | Gerrod Parchmon | Tier 1-2 financial; Tier 3 to founder |
 
-When deploying a routine, specify:
+| Declan Morrissey | VC Intelligence | wrenchli-FUNDRAISING.md | Darya Nazari | Tier 1 research and tracking only |
 
-1. Trigger — schedule (cron), webhook, API call, or database event
-2. Owning agent or skill — which SOP the routine follows
-3. Binary success criteria — how the routine knows it succeeded
-4. Failure handling — what happens if the routine fails (retry, alert, human escalation)
-5. Reporting — where the routine's output lands (Slack, email, dashboard, log)
-6. Cost ceiling — for N8N, the expected executions per run; for Claude API, the expected tokens
+| Rhett Holloway | Chief of Staff | wrenchli-OPERATIONS.md | Gerrod Parchmon | Tier 1-2 coordination; Tier 3 to founder |
 
-Wrenchli's routine roadmap, ranked by strategic leverage:
+### Agent Authority Principles
 
-Already in place or in progress:
-- Shop Onboarded email sequence — triggers on shop onboarding webhook, N8N Workflow 1 (in progress)
-- Assessment Complete shop notification — triggers on assessment webhook, N8N Workflow 2 (specified, not built)
-- Recall Found consumer alert — triggers on NHTSA recall detection, N8N Workflow 3 (specified, not built)
-- Pro Subscriber Welcome email — triggers on Stripe subscription success, N8N Workflow 4 (specified, not built)
+- Agents do not expand their own authority. Authority expansion requires a skill file update approved by the founder.
 
-High-priority routines to add next:
-- Anthropic model deprecation monitor — scheduled daily, scrapes Anthropic's model deprecation announcements, emails Gerrod when the current ANTHROPIC_MODEL string is approaching sunset (previously recommended, status unconfirmed per memory)
-- Post-deploy security scan — triggered on Vercel deployment success, runs the security assertions listed above, halts the deploy on any failure (the Security Scan Rule in project memory formalizes this)
-- Shop outcome confirmation nudge — scheduled weekly, queries shops with unconfirmed outcomes older than 14 days, sends a reminder email with one-click confirmation
-- Tekmetric API health check — scheduled hourly once live, verifies API reachability, alerts Gerrod if unreachable for more than 15 minutes
-- Stripe webhook replay monitor — scheduled daily, reconciles Stripe events against webhook_queue, flags any missed subscription events
-- Blog article production cycle — scheduled weekly, pulls the next unpublished article from the MARKETING.md content calendar, drafts it through the blog writer skill, outputs for Gerrod review before publish
-- Consumer Outcome Collection Prompt — triggered 14 days after any completed assessment (via N8N wait node chained to the existing assessment_complete webhook). Sends the consumer a short email asking: what was actually wrong, what did you pay, what shop did you use, how would you rate the experience on a 1-5 scale, would you recommend them. Closes the Value Wall feedback loop for non-partner-shop visits. Single highest-impact routine on the Data track.
-- Second-chance Outcome Prompt — triggered at 30 days for any consumer who did not respond to the 14-day prompt. One gentle follow-up only. If no response by 30 days, mark as no-data and do not prompt again.
-- Geographic Demand Heatmap Report — scheduled weekly, aggregates assessment sessions and outcome report volume by metro area (ZIP-code clustered). Flags any metro crossing 100+ sessions per month as a partner-shop-expansion candidate. This is the signal that discovers the next Marketplace market. Output: weekly email to Gerrod with top 10 metros by volume, outcome rate, and month-over-month growth.
-- Outcome Data Quality Monitor — scheduled daily, tracks ratio of partner-confirmed to consumer-reported outcomes, data completeness per outcome, coherence check (do partner-confirmed and consumer-reported agree on the same repair when both exist). Alerts Gerrod on any anomaly. Prevents silent data corruption from degrading the Value Wall.
-- AI Answer Engine Citation Monitor — scheduled weekly, tests a rotating set of target queries across Claude, ChatGPT, Perplexity, and Gemini, records whether Wrenchli is cited. The GEO equivalent of SEO rank tracking. Starts sparse (manual spot-check weekly) and becomes a full automated routine in Phase 3.
+- Agents do not override another agent's domain without going through wrenchli-DECISIONS.md conflict resolution.
 
-Deferred until niche lockdown per STRATEGY.md priorities:
-- Ohio shop outreach automation
-- Additional SMS integrations (AutoLeap, Mitchell 1 automation)
-- Automated partner scoring refreshes beyond the Verified Score baseline
+- Agents do not take actions that affect the live production environment without engineering confirmation and founder awareness.
 
-Output format when proposing a new routine:
+- Agents do not commit Wrenchli to any external obligation — legal, financial, or reputational.
 
-ROUTINE PROPOSAL:
-Trigger: [schedule / webhook / database event — specific details]
-Owning skill: [skill file name]
-Binary success criteria: [list]
-Failure handling: [retry strategy + escalation]
-Reporting destination: [where output goes]
-Expected execution cost: [N8N executions + Claude tokens per run]
-Strategic fit: [references the STRATEGY skill priority]
-Ready to build: [yes / no — if no, what blocks]
+- During an active crisis, all agent outputs on the crisis topic are labeled "CRISIS MODE — ADVISORY ONLY — FOUNDER REVIEW REQUIRED."
+
+### Agent Governance
+
+Adding, modifying, or retiring agents follows the protocol in wrenchli-PEOPLE.md. New agents with material business authority require founder approval and a governing skill file before activation. Ungoverned agents are not permitted.
 
 ---
 
-## Human-in-the-Loop Rule
+## Three-Tier Escalation Architecture
 
-The 80/20 principle governs every Wrenchli agent: the agent does the laborious 80 percent — the research, the drafting, the formatting, the follow-up, the checking — and a human does the 20 percent that requires taste, relationship, or final judgment.
+Every decision at Wrenchli sits in one of three tiers. The tier determines who has authority to make the decision, what documentation is required, and whether escalation to the founder is needed.
 
-Tasks that always require a human final pass:
-
-- Anything sent to a shop partner for the first time (Curt's Service, McInerney Auto Center, new onboarding applicants). Relationships in the independent repair market are built on direct contact.
-- Any investor or press communication. These are existential-risk-level interactions where reputation is the only real asset.
-- Pricing changes (consumer or shop partner tier).
-- Legal, compliance, or warranty-related content.
-- Any outbound content that makes a claim about Wrenchli's accuracy or outcomes. Published accuracy requires real data from outcome_reports — until the accuracy_metrics threshold is met, no agent can publish accuracy claims autonomously.
-- Any response to a consumer complaint or escalation.
+### Tier 1 — Operational Authority
 
-Tasks that do not require a human final pass once the skill is tuned:
+**Who decides:** The relevant agent or function owner within their defined domain.
 
-- Internal documentation and codebase memory updates
-- N8N workflow executions that hit their binary assertions
-- Security scans and RLS regression tests
-- Blog article drafts (draft is agent; publish is human)
-- Scheduled performance reports and metric snapshots
-- Routine model deprecation scans
-- Tekmetric API health polling
+**What it covers:** Routine operational tasks, administrative processes, monitoring and reporting, drafting for review, standard template execution, and defined recurring tasks.
 
-Rule of thumb: if the output goes to Gerrod or an internal system, the agent can send it directly. If the output goes to an external party (shop, consumer, investor, press), the agent drafts and holds for human review.
+**Examples:**
 
----
+- Rhett Holloway: contractor briefings, milestone check-ins, offboarding checklist execution, partner stage registry updates
 
-## Department Structure — Siloed Agents With Shared Foundations
+- Darya Nazari: monthly close, Stripe reconciliation, investor update drafting, cap table record maintenance
 
-Rather than one general-purpose agent, Wrenchli operates as a set of specialized agents, each with its own skill library, memory, and scope. This prevents cross-contamination — a marketing agent doesn't need to know about Stripe webhook structure; a QA agent doesn't need to know about blog tier minimums.
+- Sloane Ashford: routine security monitoring, access control enforcement, credential rotation per schedule
 
-Agent departments (existing or planned):
+- Declan Morrissey: investor research, briefing memos, tracking database updates
 
-**QA Agent** (planned, high priority)
-- Owns: assessment flow smoke tests, security scans, RLS regression tests, post-deploy verification
-- Primary MCP: Chrome DevTools (for browser-level testing of the live flow)
-- Binary assertions: listed in the Binary Assertion Rule above
-- Memory domain: known flakes, staging-vs-production quirks, deployment rollback procedures
-- Autonomy: full, with alerting on any assertion failure
+- Imani Whitfield: claim verification, accuracy checks on content, unverified claim flagging
 
-**Marketing Agent** (partially in place via MARKETING.md)
-- Owns: blog article drafting, SEO checks, email sequence copy, CRO evaluation, LinkedIn post drafting
-- Primary MCPs: potentially Firecrawl (for competitor content analysis), image generation for blog hero images
-- Binary assertions: SEO Check format in MARKETING.md
-- Memory domain: content calendar progress, published articles, keyword performance
-- Autonomy: drafts autonomously, holds for human publish
+### Tier 2 — Function Owner Judgment
 
-**Sales and Partnerships Agent** (planned)
-- Owns: shop partner outreach drafts, follow-up scheduling, proposal generation for the 90-day pilot, the one-page shop partner offer document (specified in project files)
-- Primary MCPs: Gmail (connected), Calendar (connected), Drive (connected), potentially a CRM integration later
-- Memory domain: shop contacts, outreach history, pilot application pipeline
-- Autonomy: drafts autonomously, Gerrod sends
+**Who decides:** Named function owner with founder notification.
 
-**Support Agent** (planned, Phase 2 priority — accelerated)
-- Owns: consumer and shop support triage, FAQ responses, geographic-mismatch responses (consumers outside MI/OH asking about shop matching), escalation to Gerrod for complex cases
-- Primary MCPs: email (Gmail), Supabase queries for user context
-- Memory domain: known issues, FAQ patterns, escalation criteria, canned response for "no partner shops in my area yet"
-- Autonomy: triage and first-response autonomous, escalations held
-- Priority rationale: national consumer reach on the Data track generates support volume sooner than a MI/OH-only model would. This agent moves from Phase 4 to Phase 2 to prevent support volume from drowning the founder's attention as consumer traffic grows.
+**What it covers:** Non-standard decisions within the function owner's domain, matters requiring professional judgment, cross-functional coordination, and decisions with moderate risk or cost.
 
-**Monitoring Agent** (planned)
-- Owns: model deprecation tracking, API health checks, Stripe reconciliation, N8N execution review, cost anomaly detection
-- Primary MCPs: web fetch (for Anthropic announcements), Supabase, N8N admin
-- Memory domain: current ANTHROPIC_MODEL value, integration health baselines
-- Autonomy: full, with alerting on anomalies
+**Examples:**
 
-Shared foundations (read by every agent):
-- `wrenchli-SKILL.md` — brand, voice, technical decisions, codebase memory
-- `wrenchli-STRATEGY.md` — strategic baseline and priorities
-- `wrenchli-MARKETING.md` — when the task touches external-facing content
-- Global context: company facts, language rules, the Amazon affiliate tag, the current AI model
+- Evelyn Marchetti: contractor agreement preparation, non-standard NDA terms, outside counsel engagement under $25K
 
-Department-specific skills live in subfolders or dedicated files — a QA skill library, a marketing skill library, a sales skill library. This prevents the shared SKILL.md from ballooning past the point where agents can reliably absorb it.
+- Darya Nazari: expenditures $2,500-$25,000, outside counsel fee authorization $5K-$25K, budget variance explanations
 
----
+- Rhett Holloway: classification reviews, compensation benchmarking, advisor agreement coordination
 
-## Self-Improving Skill Loop
+### Tier 3 — Founder Authority
 
-Skills are not static. High-value skills should improve over time based on binary evaluation against a test set. This is the Karpathy loop — the agent proposes a change to its own skill file, runs a test, measures the pass rate against binary assertions, and commits the change if the score improves or reverts if it drops.
+**Who decides:** Gerrod Parchmon exclusively. No agent or function owner makes Tier 3 decisions.
 
-When to enable self-improvement on a skill:
+**Tier 3 triggers — the following ALWAYS reach the founder:**
 
-1. The skill runs at least weekly (frequency justifies the overhead of maintaining an eval set)
-2. Binary assertions exist that measure output quality (not just task completion)
-3. A test set of 10+ representative inputs exists
-4. The cost of a regression is recoverable — a bad blog draft is recoverable, a bad production deploy is not
+Legal and governance: any investment or financing agreement, any financial services partnership, any data licensing agreement, any dispute or settlement, any outside counsel engagement over $25,000.
 
-Self-improvement workflow for a qualifying skill:
+Financial: any expenditure over $25,000, any equity issuance or cap table change, any wire transfer over $5,000, any budget amendment, any fundraising process initiation or close, any SAFE terms, cash balance falling below 90-day reserve.
 
-1. Maintain an `evals.json` file alongside the skill with test inputs and expected assertion outcomes
-2. Schedule a weekly or monthly routine that runs the current skill against the eval set, measures pass rate
-3. Have the agent propose one targeted edit to the skill file
-4. Run the edited skill against the eval set
-5. If the pass rate improved, commit the edit. If it dropped, revert. If it was unchanged, revert to avoid drift.
-6. Log every change to the skill's changelog for human review
+Product and commercial: any assessment flow change, any AI model change, any Pro subscription change, any new partner agreement, any partner offboarding for cause, any data room access grant, any financial services gate activation.
 
-Skills that are good candidates for self-improvement:
-- Blog article drafting skill (measurable against SEO assertions + word count)
-- Shop outreach email drafting skill (measurable against tone, length, CTA presence)
-- Assessment prompt engineering for the Claude API (measurable against outcome confirmation accuracy once data exists)
+People: any W-2 employee hire, any equity grant, any employee termination, any contractor engagement over $25,000, any new agent with material authority.
 
-Skills that should remain human-maintained only:
-- The strategy skill itself (strategic judgment is not binary)
-- The brand voice skill (taste is not binary)
-- Any skill with legal or compliance implications
-- This operations skill file
-
-The self-improvement loop runs overnight, not during business hours. Wake up to better skills, not broken ones.
-
----
-
-## MCP Infrastructure — The Nervous System
-
-MCPs give agents eyes and hands. Every MCP added to the Wrenchli stack should be justified by at least one specific agent or routine that requires it. Do not add MCPs speculatively — each one is a surface area for failure, authentication churn, and rate limit surprises.
-
-Currently connected (per user context):
-- Gmail — used by Sales/Partnership Agent, Support Agent, Monitoring Agent
-- Google Calendar — used by Sales/Partnership Agent
-- Google Drive — used by Marketing Agent (for asset storage), Sales Agent (for proposal docs)
-
-High-priority MCPs to add next:
-- Chrome DevTools — required for the QA Agent. Without this, post-deploy verification of the assessment flow cannot be automated.
-- Supabase (direct MCP, if available) — currently accessed via HTTP in N8N workflows; a direct MCP would simplify Monitoring Agent work
-- Stripe — required for Monitoring Agent reconciliation routines
-
-Deferred MCPs (watch but don't install yet):
-- Firecrawl — useful once Marketing Agent moves into competitor analysis; overkill until blog production is fully operational
-- Slack — not yet a Wrenchli channel; irrelevant until the team grows past Gerrod
-- A dedicated CRM MCP — premature until the shop partner pipeline exceeds 20 active conversations
-
-When adding any MCP:
-1. Document which agent or routine requires it
-2. Identify the specific failure mode if the MCP is down (graceful degradation plan)
-3. Store credentials in the appropriate secure location (Supabase secrets for server-side, N8N credentials for workflow-side, never in skill files)
-4. Test the integration with a non-destructive read operation before granting write access
-
----
-
-## Operational Roadmap
-
-Ranked by strategic leverage against both tracks in STRATEGY.md.
-
-**Phase 1 — Immediate (next 2 weeks)**
-
-Marketplace track:
-1. Complete N8N Workflow 1 (Shop Onboarded email sequence) and activate webhook URL in Supabase
-2. Deploy Model Deprecation Monitor routine (flagged in memory as recommended, status unconfirmed)
-3. Install Chrome DevTools MCP and wire up the first QA agent routine — assessment flow smoke test against production
-4. Formalize the Post-Deploy Security Scan routine
-
-Data track:
-5. **Build Consumer Outcome Collection Prompt routine.** This is the highest-priority Data track item. The Value Wall does not fully compound without it. Implementation: extend existing N8N assessment_complete workflow with a wait-14-days branch that sends the outcome-collection email. Requires a new consumer-facing form (one-click rating + short fields) and a new Supabase table for consumer-reported outcomes separate from the partner-confirmed outcome_reports table.
-6. Instrument assessment session metadata to capture metro area (ZIP clustered), unlocking the Geographic Demand Heatmap in Phase 2.
-
-**Phase 2 — Post-Tekmetric Approval (late April to May)**
-
-Marketplace track:
-1. Build Tekmetric API health check routine
-2. Deploy N8N Workflows 2, 3, 4 (Assessment Complete to shop, Recall Found, Pro Welcome)
-3. Build Shop Outcome Confirmation Nudge routine once at least 5 partner shops are active
-
-Data track:
-4. **Deploy Geographic Demand Heatmap Report** (weekly). First metro-level data discovery signal.
-5. **Deploy Outcome Data Quality Monitor** (daily).
-6. **Build the Support Agent** (moved up from Phase 4). Required to absorb consumer support volume as national reach grows.
-7. Build Stripe webhook reconciliation routine once Stripe goes live.
-
-**Phase 3 — Niche Hardening (June through Marketplace niche lockdown)**
-
-Marketplace track:
-1. Build Sales and Partnerships agent with Gmail-driven outreach workflows, focused on the partner shop pipeline in Metro Detroit
-2. Introduce self-improvement loops on shop outreach skill
-
-Data track:
-3. **Deploy Blog Article Production Cycle routine** to clear the 26-article content calendar with full SEO + GEO compliance per MARKETING.md
-4. Introduce self-improvement loops on blog drafting skill
-5. Deploy AI Answer Engine Citation Monitor (automated version)
-6. Introduce the Monitoring Agent consolidating all Data track health signals into a weekly founder dashboard
-
-**Phase 4 — Expansion Readiness (triggered by STRATEGY.md Partner Shop Expansion conditions)**
-
-Marketplace track:
-1. Replicate shop-side operational stack for the selected expansion metro (Columbus or whichever metro the Geographic Demand Heatmap surfaces)
-2. Add CRM MCP and formalize the partner lifecycle pipeline across multiple metros
-
-Data track:
-3. No major changes required — the Data track is already national. Phase 4 is purely a Marketplace expansion.
-
-Defer indefinitely:
-- Complex multi-agent orchestration platforms beyond N8N until N8N execution limits are genuinely constraining
-- Custom-built agent harnesses — use Claude Code, Lovable, and N8N for as long as they are sufficient
-- Dedicated observability platforms — N8N's Insights tab plus Supabase logs are sufficient until Wrenchli has more than 100 routines running
-
----
-
-## Operational Cost Discipline
-
-Every routine has a cost ceiling. Track and enforce:
-
-- N8N Starter plan: 1,000 executions per month. At 50 partner shops with full email sequences plus 4 event-driven workflows, this is tight. Upgrade to Pro ($50/month, 10,000 executions) when execution count exceeds 700/month for two consecutive months.
-- Claude API costs: assessment calls, blog drafting, and email copy generation are the main drivers. Monitor weekly via the Anthropic console. Set alerting at 2x the baseline weekly spend.
-- Supabase Edge Function invocations: bundled with the Pro plan at current volume; watch for spikes in webhook_queue draining frequency.
-- Vercel hosting: negligible at current scale; revisit at 10x traffic.
-
-Cost anomaly detection is the Monitoring Agent's responsibility once built. Until then, Gerrod reviews weekly costs manually.
-
-Ruthlessly kill routines that cost more than they save. Automation for automation's sake is operational debt. A routine that saves Gerrod 30 minutes per week but costs 20 dollars per month in API fees is a worse deal than the manual version. Measure leverage, not activity.
-
----
-
-## Integration With Existing Skills
-
-Execution order when a task touches operations:
-
-1. `wrenchli-STRATEGY.md` — is this the right thing to automate right now given the niche lockdown priority?
-2. `wrenchli-OPERATIONS.md` — this file — how should it be automated?
-3. CEO Check in `wrenchli-SKILL.md` — does it pass the revenue/retention/acquisition and maintenance burden filters?
-4. Engineering Check in `wrenchli-SKILL.md` — is the technical architecture safe?
-5. `wrenchli-SKILL.md` brand and voice rules for any output that has copy
-6. `wrenchli-MARKETING.md` for any output touching external content
-
-If Strategy says "not yet" (because the niche is not locked), Operations does not build even if the automation would work. If Engineering says "high risk" on the critical path, Operations holds for human approval regardless of agent autonomy level.
-
----
-
-## Output Discipline
-
-When this skill runs, keep the operational output concise and ready-to-execute. Preferred structure:
-
-1. The relevant check (Agentic Fit, Binary Assertion audit, Routine Proposal — only those that apply)
-2. The verdict in one sentence
-3. The build or implementation plan as a numbered sequence
-4. The first concrete step Gerrod can take today
-
-If building a new routine, the output should be specific enough that Gerrod can paste it into Lovable or N8N and have it work — not a high-level description requiring translation.
-
----
-
-## Closing Principle
-
-Operations is not the point — leverage is the point. Every routine, every agent, every MCP exists to multiply Gerrod's capacity to do the things only the founder can do: build shop relationships, make strategic bets, decide what Wrenchli becomes next. Automation that does not serve that goal is subtraction, not addition.
-
-Keep the laborious 80 percent running in the background. Keep the human judgment 20 percent sacred. Kill anything that drifts from this ratio.
+Crisis: all material crisis decisions from declaration through resolution.
