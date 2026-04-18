@@ -243,3 +243,31 @@ Add one shop owner quote in the social proof section. Placeholder until real quo
 The primary CTA must be 'Apply for the Free Pilot' not 'Apply to Become a Partner Shop.' Shorter, benefit-forward.
 
 Remove any sentence over 25 words from the page body copy.
+
+## Consumer Messaging — Primary Value Propositions
+
+For vehicle owners:
+- Know what's wrong before you pay — free AI assessment of any U.S. vehicle in under two minutes
+- Stop overpaying for repairs — see honest cost ranges based on your vehicle, ZIP, and symptom
+- Get matched with a trusted partner shop (currently live in Michigan and Ohio, expanding one metro at a time)
+- Track every vehicle, recall, and repair in one place with the free Garage; upgrade to Pro for unlimited vehicles and alerts
+
+**Geographic honesty in consumer communications:**
+
+Wrenchli's assessment platform works anywhere in the United States. Partner shop matching is currently active only in Michigan and Ohio, expanding one metro at a time. Always surface this distinction in consumer-facing copy. Acceptable language:
+- "Free assessment available nationwide. Shop matching currently live in Michigan and Ohio."
+- "Know what's wrong before you pay — anywhere in the U.S. Get matched with a trusted partner shop if you're in Michigan or Ohio."
+
+Never-acceptable language:
+- "Wrenchli partners with shops nationwide" (untrue — partner network is MI/OH only)
+- "Find a shop in your area" without the MI/OH caveat when the consumer is outside MI/OH
+- Any implication that shop matching coverage is broader than it actually is
+
+Consumers outside MI/OH should be offered a waitlist capture: "We're expanding one metro at a time. Enter your ZIP to get notified when Wrenchli partner shops launch in your area." This also doubles as a geographic demand signal feeding the Geographic Demand Heatmap Report.
+
+For shop owners:
+- Every customer arrives already knowing what's wrong — pre-assessed, pre-educated on cost ranges
+- Reduce intake overhead and trust friction; convert more first-time customers
+- Build a publicly visible Verified Score from confirmed outcomes — defensible differentiation against chains and dealers
+- Free 90-day pilot for Metro Detroit Tekmetric shops; no fee until proven value
+
