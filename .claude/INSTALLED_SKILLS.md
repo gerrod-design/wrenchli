@@ -26,7 +26,9 @@
 
 11. wrenchli-FINANCE.md — Financial controls, cap table discipline, unit economics, budget approval, financial reporting, banking and cash management, outside counsel spend authorization, investor relations, Financial Impact Check
 
-12. wrenchli-COMMERCIAL.md — Shop partner lifecycle, integration partner governance, affiliate relationships, data licensing operations, financial services partner transition, product decision rights, assessment flow protection, Pro subscription governance, consumer-facing change approval, product roadmap governance, Commercial Impact Check
+12. wrenchli-PEOPLE.md — Contractor classification and onboarding, IP assignment discipline, compensation philosophy and approval, employee hiring framework, equity participation, performance and separation protocols, agent team governance, People Impact Check
+
+13. wrenchli-COMMERCIAL.md — Shop partner lifecycle, integration partner governance, affiliate relationships, data licensing operations, financial services partner transition, product decision rights, assessment flow protection, Pro subscription governance, consumer-facing change approval, product roadmap governance, Commercial Impact Check
 
 ## Execution Order
 
