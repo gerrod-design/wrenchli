@@ -31,3 +31,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Added GEO Rules section to wrenchli-MARKETING.md
 
 - 2026-04-18: Published llms.txt at site root for AI answer engine discovery
+
+- 2026-04-18: Dual-track geography revision installed. STRATEGY.md updated to distinguish Marketplace DNA (local density, strict geographic gating) from Digital Product DNA (nationwide data flywheel, no geographic gating). OPERATIONS.md updated to accelerate Support Agent to Phase 2 and add Consumer Outcome Collection, Geographic Demand Heatmap, Outcome Data Quality Monitor, Second-chance Outcome Prompt, and AI Answer Engine Citation Monitor routines. MARKETING.md updated with Consumer Outcome Follow-up email sequence and Geographic honesty rule for consumer-facing copy.
