@@ -24,6 +24,8 @@
 
 10. wrenchli-LEGAL.md — Entity structure, IP protection, contract framework, dispute resolution, outside counsel, legal records, litigation readiness
 
+11. wrenchli-FINANCE.md — Financial controls, cap table discipline, unit economics, budget approval, financial reporting, banking and cash management, outside counsel spend authorization, investor relations, Financial Impact Check
+
 ## Execution Order
 
 For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
