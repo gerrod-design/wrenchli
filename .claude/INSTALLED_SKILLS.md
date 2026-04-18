@@ -30,6 +30,8 @@
 
 13. wrenchli-COMMERCIAL.md — Shop partner lifecycle, integration partner governance, affiliate relationships, data licensing operations, financial services partner transition, product decision rights, assessment flow protection, Pro subscription governance, consumer-facing change approval, product roadmap governance, Commercial Impact Check
 
+14. wrenchli-COMPLIANCE.md — Copy compliance enforcement: 8-check COPY CHECK rule covering banned phrases, required terminology, length, voice, CTAs, SEO, privacy disclosures, and claim verification
+
 ## Execution Order
 
 For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
@@ -69,3 +71,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Created wrenchli-COMMERCIAL.md as thirteenth skill file. Unified commercial framework covering shop partner lifecycle, integration partner governance, affiliate relationships, data licensing operations, financial services partner transition protocol, product decision rights, assessment flow protection, Pro subscription governance, consumer-facing change approval, product roadmap governance, and the Commercial Impact Check. Owned by Rhett Holloway (Chief of Staff) for partnership operations and Gerrod Parchmon (Founder/CEO) for product authority. Coordinates with LEGAL.md, FINANCE.md, PEOPLE.md, SECURITY.md, REGULATORY.md, MARKETING.md, GOVERNANCE.md, and DECISIONS.md. Session 2 Round 4 complete.
 
 - 2026-04-18: Reinstalled wrenchli-PEOPLE.md as twelfth skill file. Renumbered wrenchli-COMMERCIAL.md to thirteenth. Registry sequence 1-13 confirmed with no gaps.
+
+- 2026-04-18: Registered wrenchli-COMPLIANCE.md as fourteenth skill file. Copy compliance enforcement layer — 8-check COPY CHECK rule covering banned phrases, required terminology, length, voice, CTAs, SEO, privacy disclosures, and claim verification. Pre-existing file, origin session unknown, contents validated and confirmed active. Coordinates with SKILL.md, MARKETING.md, and ACCURACY.md.
