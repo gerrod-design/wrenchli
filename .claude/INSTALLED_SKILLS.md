@@ -20,6 +20,8 @@
 
 8. wrenchli-DECISIONS.md — Decision Resolution Rubric, veto hierarchy, conflict routing, founder override protocol
 
+9. wrenchli-GOVERNANCE.md — Corporate governance, board operations, decision rights, fiduciary duties, D&O, ESG posture
+
 ## Execution Order
 
 For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
@@ -49,3 +51,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Created wrenchli-ACCURACY.md as seventh skill file. Anti-hallucination discipline established as first-class function with eight-layer framework and Fact Checker protocol. Accuracy Check added to execution order between Engineering Check and Security Check. References forward-declared roles: Chief Learning Officer Evren Matsuda, Verification and Accuracy Agent Imani Whitfield. References forward-declared skill files: DECISIONS.md (Round 4), OPERATIONS.md revision (Round 12), META_SKILLS.md (Round 17). Incorporates Fact Checker patterns from meta-skills framework.
 
 - 2026-04-18: Created wrenchli-DECISIONS.md as eighth skill file. Decision Resolution Rubric established with five-role veto authority hierarchy (CISO, General Counsel, CHRO, CFO, CTO). Conflict classification and routing rules specified. Founder override protocol with documentation requirement. References forward-declared roles: Mira Sokolov (Change Management Agent), Rhett Holloway (Chief of Staff), and all five C-suite veto holders. References forward-declared skill files: GOVERNANCE.md (Round 5), OPERATIONS.md revision (Round 12), META_SKILLS.md (Round 17).
+
+- 2026-04-18: Created wrenchli-GOVERNANCE.md as ninth skill file. Corporate governance, board operations, decision rights, stakeholder obligations, and ESG posture established. Stage-Appropriate Governance Framework with pre-seed/seed/Series A/Series B/growth progressions. References forward-declared skill files: LEGAL.md (Round 6), FINANCE.md (Round 7), CRISIS.md (Round 10), OPERATIONS.md revision (Round 12). Session 1 Round 5 of 5 complete — ready for end-of-Session-1 regression test.
