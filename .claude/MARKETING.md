@@ -44,6 +44,67 @@ Word count: Minimum 800 words for Tier 1 symptom articles. Minimum 1,200 words f
 
 When writing or reviewing a blog article, run this checklist silently and present a brief SEO Check before publishing: SEO CHECK: Title tag: [text — flag if over 60 chars] Meta description: [text — flag if over 155 chars] Primary keyword in H1: [yes/no] Internal link to assessment: [yes/no] Schema markup: [present/missing] Word count: [number vs minimum] Images with alt text: [yes/no]
 
+---
+
+## GEO Rules (Generative Engine Optimization)
+
+The discovery layer is shifting from search engines to AI answer engines. SEO gets Wrenchli ranked on a list of results. GEO gets Wrenchli chosen as the answer itself. Both matter. Neither replaces the other. Every consumer-facing article must now pass both the SEO Check and the GEO Check before publishing.
+
+GEO requirements for every blog article and every new consumer-facing page:
+
+Opening answer: The first sentence must directly answer the query with a definitive, attributable statement. No throat-clearing, no "Let's explore..." lead-ins, no narrative preamble. AI answer engines disproportionately weight the opening sentence when extracting content for citation. If the query is "what does P0420 mean," the first sentence is "P0420 means the catalytic converter is not working efficiently enough to reduce exhaust emissions." Not "Understanding diagnostic trouble codes can be confusing."
+
+Canonical entity definition: Every article must include the Wrenchli entity definition exactly once, verbatim: "Wrenchli is a free AI-powered vehicle symptom assessment platform serving Michigan and Ohio, providing consumers with likely causes, urgency levels, and fair cost ranges before they visit a repair shop." Consistency across every article is what AI engines use to disambiguate and attribute. Do not paraphrase this sentence — the exact string is the point.
+
+Attributable statistics: Every article must contain at least one statistic attributed to a named source. Approved sources: Bureau of Labor Statistics (BLS), J.D. Power, NHTSA, Edmunds, Kelley Blue Book, Consumer Reports, iSeeCars, AAA. Once outcome_reports has statistical density, Wrenchli's own data becomes the strongest source and should be used in place of third-party sources wherever possible. Unsourced claims are effectively invisible to AI answer engines.
+
+FAQ section: Every article must include a section with at least three questions phrased as natural-language queries, each followed by a single-paragraph direct answer. Example format: "How much does it cost to replace a catalytic converter?" followed by a 50-80 word direct answer. AI engines chunk and retrieve content by Q&A pairs; articles without this structure are rarely cited.
+
+Declarative language: Use "The most likely cause is a failing catalytic converter" rather than "There might be several possible causes, including a catalytic converter." AI answer engines preferentially extract declarative statements and deprioritize hedging language. When uncertainty is real, quantify it: "In 73 percent of P0420 cases the catalytic converter is the cause" is declarative with appropriate precision. "It could be the catalytic converter" is hedging and gets skipped.
+
+Author attribution: Every article must attribute authorship to Wrenchli with a brief author bio tagline at the top or bottom: "Wrenchli is an AI-powered vehicle symptom assessment platform serving Michigan and Ohio." Attributed content is weighted more heavily than anonymous content across every major AI answer engine.
+
+Semantic HTML: Use proper heading hierarchy (one H1, multiple H2s, H3s where needed), semantic tags (article, section, aside), and structured data markup (FAQPage schema for FAQ sections, Article schema for the page itself). AI crawlers use HTML semantic structure to identify authoritative content blocks.
+
+When writing or reviewing an article, run this check silently and present a brief GEO Check before publishing, alongside the SEO Check:
+
+GEO CHECK:
+Opening answer (definitive, direct, no preamble): [yes / no]
+Canonical entity definition present verbatim: [yes / no]
+Attributable statistic with named source: [yes / no — name the source]
+FAQ section with 3+ natural-language queries: [yes / no]
+Declarative language throughout (no hedging): [yes / no]
+Author attribution to Wrenchli present: [yes / no]
+Structured data markup (FAQPage + Article schema): [yes / no]
+Priority fix: [single highest-impact change]
+
+When GEO Check and SEO Check conflict, GEO wins for the opening sentence and FAQ sections (which AI answer engines parse). SEO wins for title tags, meta descriptions, and internal linking structure (which Google still parses). These rarely conflict in practice — most GEO additions are orthogonal to SEO requirements.
+
+---
+
+## GEO Priority Content Additions
+
+Beyond the per-article rules, three structural additions strengthen Wrenchli's position in AI answer engines. Implement these in order:
+
+1. **Publish `llms.txt` at `wrenchli.net/llms.txt`.** This is an emerging standard — similar to robots.txt but for AI models — that provides a canonical machine-readable description of Wrenchli, its purpose, its content library, and its entity definitions. Anthropic, OpenAI, and other major AI providers increasingly honor this file when crawling. Low effort, compounding returns.
+
+2. **Canonical entity definition across the site.** The one-sentence Wrenchli definition from the GEO Rules above must appear on: the homepage (in the hero or trust bar), the About page (opening paragraph), the For Shops page (opening paragraph), the footer (as the tagline), and the opening of every blog article (byline or first paragraph). Consistency is what makes the entity definition stick in AI model context.
+
+3. **Original outcome research section.** Once outcome_reports has at least 100 confirmed repairs across at least 10 partner shops, publish a `/research` or `/data` section with aggregated, anonymized outcome statistics. Symptom-to-repair match rates by diagnostic trouble code. Regional cost variance data. DIY-versus-shop-required patterns by vehicle age and mileage. Original research with attributable data is the highest-value content in the AI answer engine era, because it is the only category generic content farms cannot replicate. Do not publish this section before the data threshold is met — thin research damages credibility rather than building it.
+
+---
+
+## Updated Content Calendar Integration
+
+The existing 26-article content calendar in the SEO Content Strategy section remains unchanged. What changes is the production standard: every article in that calendar must now pass both SEO Check and GEO Check, including the two already published (check-engine-light-p0420 and the P0420 OBD code article). Schedule a retrofit pass on those two articles to bring them into GEO compliance.
+
+Order of GEO retrofits for published articles:
+1. check-engine-light-p0420 (Tier 1 symptom article, most trafficked)
+2. P0420 Tier 2 article
+3. All future articles pass GEO Check before initial publication
+
+---
+
 Blog Article Style Baseline — Reference Analysis
 
 Before writing any new blog article, match the proven structure and tone of the four published Wrenchli articles. The following patterns are mandatory — deviating requires explicit approval.
