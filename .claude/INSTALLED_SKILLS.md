@@ -34,6 +34,8 @@
 
 15. wrenchli-CRISIS.md — Crisis Activation framework, incident response coordination, board and investor notification, media and regulatory response, financial crisis response, data breach legal response, executive departure protocol, agent authority suspension during active crisis
 
+16. wrenchli-FUNDRAISING.md — Raise readiness criteria, VC targeting and outreach methodology, investor meeting preparation discipline, SAFE negotiation framework, data room contents and sequencing, term sheet evaluation criteria, pre-close legal and financial checklist, Fundraising Impact Check
+
 ## Execution Order
 
 For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
@@ -79,3 +81,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Corrected registry filename references to match actual filenames on disk for legacy non-prefixed skill files.
 
 - 2026-04-18: Created wrenchli-CRISIS.md as fifteenth skill file. Crisis Activation framework, incident response coordination, board and investor notification protocols, media and regulatory response posture, financial crisis response, data breach legal response playbook, executive departure protocol, and agent authority suspension during active crisis established. Forward-declared in wrenchli-GOVERNANCE.md. Owned by Gerrod Parchmon (Founder/CEO) with Rhett Holloway coordinating execution and Evelyn Marchetti leading legal response. Session 2 Round 5 complete.
+
+- 2026-04-18: Created wrenchli-FUNDRAISING.md as sixteenth skill file. Raise readiness criteria, VC targeting and outreach methodology, investor meeting preparation discipline, SAFE negotiation framework, data room contents and sequencing, term sheet evaluation criteria, pre-close legal and financial checklist, and Fundraising Impact Check established. Owned by Darya Nazari (CFO) with Declan Morrissey executing VC intelligence and Evelyn Marchetti leading legal. Coordinates with FINANCE.md, LEGAL.md, GOVERNANCE.md, PEOPLE.md, COMMERCIAL.md, and DECISIONS.md. Session 2 Round 6 complete.
