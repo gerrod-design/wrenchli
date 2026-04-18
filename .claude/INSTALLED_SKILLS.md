@@ -22,6 +22,8 @@
 
 9. wrenchli-GOVERNANCE.md — Corporate governance, board operations, decision rights, fiduciary duties, D&O, ESG posture
 
+10. wrenchli-LEGAL.md — Entity structure, IP protection, contract framework, dispute resolution, outside counsel, legal records, litigation readiness
+
 ## Execution Order
 
 For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
