@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
-const STORAGE_KEY = "wrenchli_site_access_v3";
+const STORAGE_KEY = "wrenchli_site_access_v4";
 
 export default function SitePasswordGate({ children }: { children: React.ReactNode }) {
   const [unlocked, setUnlocked] = useState(false);
