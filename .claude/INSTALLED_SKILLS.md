@@ -8,7 +8,7 @@
 
 2. wrenchli-OPERATIONS.md — Agentic automation, MCP integrations, routines, QA
 
-3. wrenchli-SKILL.md — Brand, voice, technical decisions, codebase memory
+3. SKILL.md — Brand, voice, technical decisions, codebase memory
 
 4. wrenchli-MARKETING.md — CRO, copywriting, SEO, email sequences
 
@@ -73,3 +73,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Reinstalled wrenchli-PEOPLE.md as twelfth skill file. Renumbered wrenchli-COMMERCIAL.md to thirteenth. Registry sequence 1-13 confirmed with no gaps.
 
 - 2026-04-18: Registered wrenchli-COMPLIANCE.md as fourteenth skill file. Copy compliance enforcement layer — 8-check COPY CHECK rule covering banned phrases, required terminology, length, voice, CTAs, SEO, privacy disclosures, and claim verification. Pre-existing file, origin session unknown, contents validated and confirmed active. Coordinates with SKILL.md, MARKETING.md, and ACCURACY.md.
+
+- 2026-04-18: Corrected registry filename references to match actual filenames on disk for legacy non-prefixed skill files.
