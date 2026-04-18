@@ -32,6 +32,8 @@
 
 14. wrenchli-COMPLIANCE.md — Copy compliance enforcement: 8-check COPY CHECK rule covering banned phrases, required terminology, length, voice, CTAs, SEO, privacy disclosures, and claim verification
 
+15. wrenchli-CRISIS.md — Crisis Activation framework, incident response coordination, board and investor notification, media and regulatory response, financial crisis response, data breach legal response, executive departure protocol, agent authority suspension during active crisis
+
 ## Execution Order
 
 For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
