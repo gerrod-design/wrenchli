@@ -170,6 +170,11 @@ High-priority routines to add next:
 - Tekmetric API health check — scheduled hourly once live, verifies API reachability, alerts Gerrod if unreachable for more than 15 minutes
 - Stripe webhook replay monitor — scheduled daily, reconciles Stripe events against webhook_queue, flags any missed subscription events
 - Blog article production cycle — scheduled weekly, pulls the next unpublished article from the MARKETING.md content calendar, drafts it through the blog writer skill, outputs for Gerrod review before publish
+- Consumer Outcome Collection Prompt — triggered 14 days after any completed assessment (via N8N wait node chained to the existing assessment_complete webhook). Sends the consumer a short email asking: what was actually wrong, what did you pay, what shop did you use, how would you rate the experience on a 1-5 scale, would you recommend them. Closes the Value Wall feedback loop for non-partner-shop visits. Single highest-impact routine on the Data track.
+- Second-chance Outcome Prompt — triggered at 30 days for any consumer who did not respond to the 14-day prompt. One gentle follow-up only. If no response by 30 days, mark as no-data and do not prompt again.
+- Geographic Demand Heatmap Report — scheduled weekly, aggregates assessment sessions and outcome report volume by metro area (ZIP-code clustered). Flags any metro crossing 100+ sessions per month as a partner-shop-expansion candidate. This is the signal that discovers the next Marketplace market. Output: weekly email to Gerrod with top 10 metros by volume, outcome rate, and month-over-month growth.
+- Outcome Data Quality Monitor — scheduled daily, tracks ratio of partner-confirmed to consumer-reported outcomes, data completeness per outcome, coherence check (do partner-confirmed and consumer-reported agree on the same repair when both exist). Alerts Gerrod on any anomaly. Prevents silent data corruption from degrading the Value Wall.
+- AI Answer Engine Citation Monitor — scheduled weekly, tests a rotating set of target queries across Claude, ChatGPT, Perplexity, and Gemini, records whether Wrenchli is cited. The GEO equivalent of SEO rank tracking. Starts sparse (manual spot-check weekly) and becomes a full automated routine in Phase 3.
 
 Deferred until niche lockdown per STRATEGY.md priorities:
 - Ohio shop outreach automation
@@ -243,11 +248,12 @@ Agent departments (existing or planned):
 - Memory domain: shop contacts, outreach history, pilot application pipeline
 - Autonomy: drafts autonomously, Gerrod sends
 
-**Support Agent** (planned, post-niche-lockdown)
-- Owns: consumer and shop support triage, FAQ responses, escalation to Gerrod for complex cases
-- Primary MCPs: email, Supabase queries for user context
-- Memory domain: known issues, FAQ patterns, escalation criteria
+**Support Agent** (planned, Phase 2 priority — accelerated)
+- Owns: consumer and shop support triage, FAQ responses, geographic-mismatch responses (consumers outside MI/OH asking about shop matching), escalation to Gerrod for complex cases
+- Primary MCPs: email (Gmail), Supabase queries for user context
+- Memory domain: known issues, FAQ patterns, escalation criteria, canned response for "no partner shops in my area yet"
 - Autonomy: triage and first-response autonomous, escalations held
+- Priority rationale: national consumer reach on the Data track generates support volume sooner than a MI/OH-only model would. This agent moves from Phase 4 to Phase 2 to prevent support volume from drowning the founder's attention as consumer traffic grows.
 
 **Monitoring Agent** (planned)
 - Owns: model deprecation tracking, API health checks, Stripe reconciliation, N8N execution review, cost anomaly detection
@@ -329,31 +335,53 @@ When adding any MCP:
 
 ## Operational Roadmap
 
-Ranked by strategic leverage (cross-referenced against STRATEGY.md priorities):
+Ranked by strategic leverage against both tracks in STRATEGY.md.
 
 **Phase 1 — Immediate (next 2 weeks)**
+
+Marketplace track:
 1. Complete N8N Workflow 1 (Shop Onboarded email sequence) and activate webhook URL in Supabase
-2. Build and deploy the Model Deprecation Monitor routine (flagged in memory as recommended, status unconfirmed)
-3. Install Chrome DevTools MCP and wire up the first QA agent routine — the assessment flow smoke test against production
-4. Formalize the Post-Deploy Security Scan routine using the existing Security Scan Rule
+2. Deploy Model Deprecation Monitor routine (flagged in memory as recommended, status unconfirmed)
+3. Install Chrome DevTools MCP and wire up the first QA agent routine — assessment flow smoke test against production
+4. Formalize the Post-Deploy Security Scan routine
+
+Data track:
+5. **Build Consumer Outcome Collection Prompt routine.** This is the highest-priority Data track item. The Value Wall does not fully compound without it. Implementation: extend existing N8N assessment_complete workflow with a wait-14-days branch that sends the outcome-collection email. Requires a new consumer-facing form (one-click rating + short fields) and a new Supabase table for consumer-reported outcomes separate from the partner-confirmed outcome_reports table.
+6. Instrument assessment session metadata to capture metro area (ZIP clustered), unlocking the Geographic Demand Heatmap in Phase 2.
 
 **Phase 2 — Post-Tekmetric Approval (late April to May)**
+
+Marketplace track:
 1. Build Tekmetric API health check routine
-2. Build Stripe webhook reconciliation routine once Stripe goes live
-3. Deploy N8N Workflows 2, 3, 4 (Assessment Complete, Recall Found, Pro Welcome)
-4. Build Shop Outcome Confirmation Nudge routine once at least 5 partner shops are active
+2. Deploy N8N Workflows 2, 3, 4 (Assessment Complete to shop, Recall Found, Pro Welcome)
+3. Build Shop Outcome Confirmation Nudge routine once at least 5 partner shops are active
 
-**Phase 3 — Niche Hardening (June through niche lockdown)**
-1. Deploy Blog Article Production Cycle routine to clear the 26-article content calendar efficiently
-2. Build the Sales and Partnerships agent with Gmail-driven outreach workflows
-3. Introduce self-improvement loops on blog drafting and shop outreach skills
-4. Add the Monitoring Agent with full dashboard consolidation
+Data track:
+4. **Deploy Geographic Demand Heatmap Report** (weekly). First metro-level data discovery signal.
+5. **Deploy Outcome Data Quality Monitor** (daily).
+6. **Build the Support Agent** (moved up from Phase 4). Required to absorb consumer support volume as national reach grows.
+7. Build Stripe webhook reconciliation routine once Stripe goes live.
 
-**Phase 4 — Expansion Readiness (triggered by STRATEGY.md expansion conditions)**
-1. Replicate the operational stack for the Ohio market (Columbus first)
-2. Build Support Agent before consumer volume justifies it, not after
-3. Add CRM MCP and formalize the partner lifecycle pipeline
-4. Introduce cross-agent orchestration where one agent's output triggers another agent's routine
+**Phase 3 — Niche Hardening (June through Marketplace niche lockdown)**
+
+Marketplace track:
+1. Build Sales and Partnerships agent with Gmail-driven outreach workflows, focused on the partner shop pipeline in Metro Detroit
+2. Introduce self-improvement loops on shop outreach skill
+
+Data track:
+3. **Deploy Blog Article Production Cycle routine** to clear the 26-article content calendar with full SEO + GEO compliance per MARKETING.md
+4. Introduce self-improvement loops on blog drafting skill
+5. Deploy AI Answer Engine Citation Monitor (automated version)
+6. Introduce the Monitoring Agent consolidating all Data track health signals into a weekly founder dashboard
+
+**Phase 4 — Expansion Readiness (triggered by STRATEGY.md Partner Shop Expansion conditions)**
+
+Marketplace track:
+1. Replicate shop-side operational stack for the selected expansion metro (Columbus or whichever metro the Geographic Demand Heatmap surfaces)
+2. Add CRM MCP and formalize the partner lifecycle pipeline across multiple metros
+
+Data track:
+3. No major changes required — the Data track is already national. Phase 4 is purely a Marketplace expansion.
 
 Defer indefinitely:
 - Complex multi-agent orchestration platforms beyond N8N until N8N execution limits are genuinely constraining
