@@ -16,11 +16,13 @@
 
 6. wrenchli-REGULATORY.md — Regulatory monitoring, multi-jurisdiction compliance, expansion discipline, regulatory authority interaction
 
+7. wrenchli-ACCURACY.md — Anti-hallucination discipline, source citation, Fact Checker protocol, verification across agents
+
 ## Execution Order
 
-For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
+For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
 
-Strategy determines what. Operations determines how. CEO and Engineering gate the execution. Security Check gates as a hard filter after Engineering — adversarial-actor exposure rejected here cannot proceed without founder override. Regulatory Impact Check gates after Security — legal/regulatory exposure rejected here cannot proceed without founder override. Brand and Marketing govern the output.
+Strategy determines what. Operations determines how. CEO and Engineering gate the execution. Accuracy Check gates next as a hard filter — unverified factual claims rejected here cannot proceed without founder override. Security Check gates after Accuracy — adversarial-actor exposure rejected here cannot proceed without founder override. Regulatory Impact Check gates after Security — legal/regulatory exposure rejected here cannot proceed without founder override. Brand and Marketing govern the output.
 
 ## Model
 
@@ -41,3 +43,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Created wrenchli-SECURITY.md as fifth skill file. Cybersecurity posture now established as core function. Security Check rule added to execution order as gating check after Engineering Check. References forward-declared roles: CISO Sloane Ashford, CTO Keegan Alaric, Cybersecurity Monitoring Agent Caleb Voss. References forward-declared skill files: ACCURACY.md (Round 3), REGULATORY.md (Round 2), OPERATIONS.md revision (Round 12), META_SKILLS.md (Round 17).
 
 - 2026-04-18: Created wrenchli-REGULATORY.md as sixth skill file. Regulatory compliance posture established as first-class function. Regulatory Impact Check added to execution order between Security Check and Brand/Marketing compliance. References forward-declared roles: General Counsel Evelyn Marchetti, Regulatory Intelligence Agent Amara Oduya. References forward-declared skill files: ACCURACY.md (Round 3), DECISIONS.md (Round 4), LEGAL.md (Round 6), OPERATIONS.md revision (Round 12), META_SKILLS.md (Round 17).
+
+- 2026-04-18: Created wrenchli-ACCURACY.md as seventh skill file. Anti-hallucination discipline established as first-class function with eight-layer framework and Fact Checker protocol. Accuracy Check added to execution order between Engineering Check and Security Check. References forward-declared roles: Chief Learning Officer Evren Matsuda, Verification and Accuracy Agent Imani Whitfield. References forward-declared skill files: DECISIONS.md (Round 4), OPERATIONS.md revision (Round 12), META_SKILLS.md (Round 17). Incorporates Fact Checker patterns from meta-skills framework.
