@@ -8,7 +8,7 @@
 
 2. wrenchli-OPERATIONS.md — Agentic automation, MCP integrations, routines, QA
 
-3. wrenchli-SKILL.md — Brand, voice, technical decisions, codebase memory
+3. SKILL.md — Brand, voice, technical decisions, codebase memory
 
 4. wrenchli-MARKETING.md — CRO, copywriting, SEO, email sequences
 
