@@ -26,7 +26,9 @@
 
 11. wrenchli-FINANCE.md — Financial controls, cap table discipline, unit economics, budget approval, financial reporting, banking and cash management, outside counsel spend authorization, investor relations, Financial Impact Check
 
-12. wrenchli-COMMERCIAL.md — Shop partner lifecycle, integration partner governance, affiliate relationships, data licensing operations, financial services partner transition, product decision rights, assessment flow protection, Pro subscription governance, consumer-facing change approval, product roadmap governance, Commercial Impact Check
+12. wrenchli-PEOPLE.md — Contractor classification and onboarding, IP assignment discipline, compensation philosophy and approval, employee hiring framework, equity participation, performance and separation protocols, agent team governance, People Impact Check
+
+13. wrenchli-COMMERCIAL.md — Shop partner lifecycle, integration partner governance, affiliate relationships, data licensing operations, financial services partner transition, product decision rights, assessment flow protection, Pro subscription governance, consumer-facing change approval, product roadmap governance, Commercial Impact Check
 
 ## Execution Order
 
@@ -65,3 +67,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Created wrenchli-FINANCE.md as eleventh skill file. Financial controls, cap table discipline, unit economics, budget approval, financial reporting, banking and cash management, outside counsel spend authorization, investor relations mechanics, and Financial Impact Check established. Owned by Darya Nazari (CFO). Coordinates with GOVERNANCE.md, LEGAL.md, and DECISIONS.md. Session 2 Round 2 complete.
 
 - 2026-04-18: Created wrenchli-COMMERCIAL.md as thirteenth skill file. Unified commercial framework covering shop partner lifecycle, integration partner governance, affiliate relationships, data licensing operations, financial services partner transition protocol, product decision rights, assessment flow protection, Pro subscription governance, consumer-facing change approval, product roadmap governance, and the Commercial Impact Check. Owned by Rhett Holloway (Chief of Staff) for partnership operations and Gerrod Parchmon (Founder/CEO) for product authority. Coordinates with LEGAL.md, FINANCE.md, PEOPLE.md, SECURITY.md, REGULATORY.md, MARKETING.md, GOVERNANCE.md, and DECISIONS.md. Session 2 Round 4 complete.
+
+- 2026-04-18: Reinstalled wrenchli-PEOPLE.md as twelfth skill file. Renumbered wrenchli-COMMERCIAL.md to thirteenth. Registry sequence 1-13 confirmed with no gaps.
