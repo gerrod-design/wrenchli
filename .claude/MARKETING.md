@@ -206,6 +206,30 @@ Email 5 — Day 30 — Subject: 'Your 30-day Wrenchli pilot summary' Content: Fu
 
 CONSUMER RECALL ALERT (triggered when check-recalls finds a new recall for a saved vehicle): Subject: 'Safety recall on your [Year Make Model] — what to do' Content: Vehicle name, recall component, brief plain-English summary of the consequence, remedy available, NHTSA campaign number, link to official recall page. CTA: Find a Wrenchli Partner Shop Near You. Tone: Informative, calm, not alarming. Recalls are common — most are minor. Never use the word 'dangerous' unless the NHTSA classification is Emergency.
 
+CONSUMER OUTCOME FOLLOW-UP SEQUENCE (triggered 14 days after completed assessment):
+
+Wrenchli has two active email sequences now expanding to three. The consumer outcome follow-up closes the Value Wall feedback loop for consumers regardless of whether they used a Wrenchli partner shop, whether they did the repair themselves, or whether they decided not to repair at all. Every response strengthens the assessment model and grows the data moat.
+
+Email 1 — Day 14
+Subject: Quick question about your [Year Make Model]
+Content: Friendly, short, low-pressure ask. Reference the specific vehicle and the primary symptom they described. Ask four questions in a single-click-per-answer format: what was actually wrong, what did you end up paying (range selection), what shop did you use (or "did it myself" / "haven't repaired yet"), how would you rate the experience (1-5 stars). Close with: "Your answer helps the next vehicle owner with the same problem get a more accurate assessment." Single CTA: Share What Happened (link to a pre-filled form).
+Tone: A neighbor asking how the project went. Not a survey. Not a sales pitch.
+
+Email 2 — Day 30 (only if no response to Day 14)
+Subject: Last ask — how did the [specific symptom] turn out?
+Content: One final gentle nudge. Same form link. Make it easier by reducing to two questions: what was actually wrong, how would you rate the experience. If still no response, the consumer drops from the outcome follow-up entirely. Do not re-trigger on future assessments of the same vehicle.
+
+Never send:
+- More than two outcome-follow-up emails per assessment
+- Any variant that implies the consumer owes Wrenchli a response
+- Language that makes the consumer feel tracked or surveilled — keep it about helping the next vehicle owner
+
+Rules for consumer outcome data handling:
+- Responses land in a separate consumer_reported_outcomes table distinct from partner-confirmed outcome_reports
+- Both tables feed the Value Wall, but are weighted differently in model training (partner-confirmed = higher signal weight, consumer-reported = higher volume weight)
+- Consumer PII rules from SKILL.md apply — never store names, emails, or identifying details in the outcome data itself, only in the authentication layer
+- A consumer can opt out of outcome follow-up at any time via a single-click unsubscribe in either email
+
 /for-shops Page CRO Priority Fixes
 
 Apply these specific improvements to the /for-shops page in this order:
