@@ -27,3 +27,7 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-14: Model upgraded from claude-sonnet-4-20250514 to claude-sonnet-4-6
 
 - 2026-04-18: Added wrenchli-STRATEGY.md and wrenchli-OPERATIONS.md
+
+- 2026-04-18: Added GEO Rules section to wrenchli-MARKETING.md
+
+- 2026-04-18: Published llms.txt at site root for AI answer engine discovery
