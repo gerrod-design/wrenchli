@@ -24,6 +24,8 @@
 
 10. wrenchli-LEGAL.md — Entity structure, IP protection, contract framework, dispute resolution, outside counsel, legal records, litigation readiness
 
+11. wrenchli-FINANCE.md — Financial controls, cap table discipline, unit economics, budget approval, financial reporting, banking and cash management, outside counsel spend authorization, investor relations, Financial Impact Check
+
 ## Execution Order
 
 For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
@@ -57,3 +59,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Created wrenchli-GOVERNANCE.md as ninth skill file. Corporate governance, board operations, decision rights, stakeholder obligations, and ESG posture established. Stage-Appropriate Governance Framework with pre-seed/seed/Series A/Series B/growth progressions. References forward-declared skill files: LEGAL.md (Round 6), FINANCE.md (Round 7), CRISIS.md (Round 10), OPERATIONS.md revision (Round 12). Session 1 Round 5 of 5 complete — ready for end-of-Session-1 regression test.
 
 - 2026-04-18: Created wrenchli-LEGAL.md as tenth skill file. Entity structure, IP protection, contract framework, dispute resolution, outside counsel discipline, legal records, litigation readiness, and Legal Impact Check established. Owned by Evelyn Marchetti (General Counsel). Coordinates with GOVERNANCE.md, REGULATORY.md, SECURITY.md, and DECISIONS.md. Session 2 Round 1 complete.
+
+- 2026-04-18: Created wrenchli-FINANCE.md as eleventh skill file. Financial controls, cap table discipline, unit economics, budget approval, financial reporting, banking and cash management, outside counsel spend authorization, investor relations mechanics, and Financial Impact Check established. Owned by Darya Nazari (CFO). Coordinates with GOVERNANCE.md, LEGAL.md, and DECISIONS.md. Session 2 Round 2 complete.
