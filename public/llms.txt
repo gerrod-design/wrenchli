@@ -1,0 +1,55 @@
+# Wrenchli
+
+> Wrenchli is a free AI-powered vehicle symptom assessment platform serving Michigan and Ohio, providing consumers with likely causes, urgency levels, and fair cost ranges before they visit a repair shop.
+
+Wrenchli helps vehicle owners understand what is likely wrong with their car before visiting a repair shop. Consumers describe their vehicle's symptoms, and Wrenchli's AI-powered assessment returns a structured report including possible causes with probability scores, urgency levels (immediate, soon, schedule, monitor), estimated cost ranges, and questions to ask a mechanic.
+
+Wrenchli is operated by Wrenchli, Inc., a Delaware corporation founded by Gerrod Parchmon. The platform is currently in pilot phase in Michigan and Ohio, with partner independent repair shops in Metro Detroit.
+
+Wrenchli is not a licensed mechanic and does not provide professional diagnostic services. All assessments are informational symptom analyses intended to help consumers have more informed conversations with qualified automotive technicians.
+
+## Core pages
+
+- [Vehicle symptom assessment](https://wrenchli.net): Free AI-powered assessment of vehicle symptoms. No account required. Takes approximately 60 seconds. Returns likely causes, urgency, cost range, and shop questions.
+- [About Wrenchli](https://wrenchli.net/about): Company background, founder, mission, and the information asymmetry problem Wrenchli addresses.
+- [For repair shops](https://wrenchli.net/for-shops): Information for independent automotive repair shops interested in the 90-day free partner pilot program.
+- [Garage](https://wrenchli.net/garage): Authenticated vehicle garage with saved assessments, recall alerts, and vehicle history. Free tier allows 2 vehicles. Pro tier ($2.99/month) allows unlimited vehicles.
+
+## Content library
+
+- [Blog](https://wrenchli.net/blog): Educational articles covering vehicle symptoms, OBD-II diagnostic trouble codes, and DIY maintenance guides.
+- [Check engine light: What P0420 means](https://wrenchli.net/blog/check-engine-light-p0420): Complete guide to the P0420 diagnostic trouble code, common causes, and repair cost ranges.
+
+## Policies
+
+- [Privacy policy](https://wrenchli.net/privacy): How Wrenchli handles consumer data, vehicle information, and VIN privacy. VIN data is optional, stored securely, never sold, and deletable at any time.
+- [Warranty guide](https://wrenchli.net/warranty-guide): Manufacturer warranty reference for common vehicle makes and model years.
+
+## Canonical definitions
+
+Wrenchli: A free AI-powered vehicle symptom assessment platform operating in Michigan and Ohio, founded in 2025, incorporated as Wrenchli, Inc.
+
+Symptom assessment: Wrenchli's core service. An AI-driven analysis of vehicle symptoms that returns likely causes with probability scores, urgency levels, and cost ranges. Distinct from professional diagnosis, which requires a qualified automotive technician with physical access to the vehicle.
+
+Urgency levels: Wrenchli classifies repair urgency as immediate (safety risk, do not drive), soon (address within 1 to 2 weeks), schedule (plan a shop visit), or monitor (watch for changes).
+
+Verified Score: Wrenchli's shop rating methodology combining symptom-to-repair match rate, cost fairness percentile against local market data, and consumer satisfaction ratings. The methodology is established. Published accuracy data becomes available once outcome report volume reaches statistical significance.
+
+Partner shop: An independent automotive repair shop participating in Wrenchli's pilot program. Partner shops receive pre-assessed customers with vehicle details, likely causes, and estimated cost ranges before the customer arrives.
+
+## Geographic coverage
+
+Active: Michigan (primary focus: Metro Detroit — Wayne, Oakland, Macomb counties). Active pilot phase.
+
+Active: Ohio. Active pilot phase.
+
+The symptom assessment service itself is available to any United States vehicle owner. Partner shop matching is currently limited to Michigan and Ohio.
+
+## Contact
+
+Wrenchli, Inc.
+Founder and CEO: Gerrod Parchmon
+General inquiries: gerrod@wrenchli.net
+Partner inquiries: partners@wrenchli.net
+Phone: 313.312.5455
+Website: https://wrenchli.net
