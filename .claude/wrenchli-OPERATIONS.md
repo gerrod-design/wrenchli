@@ -34,7 +34,7 @@ Wrenchli's institutional infrastructure is encoded in 16 installed skill files p
 
 | 2 | wrenchli-OPERATIONS.md (this file) | Operating rhythm, decision framework, agent team | Rhett Holloway |
 
-| 3 | MARKETING.md | CRO, copywriting, SEO, email sequences | Rhett Holloway |
+| 3 | wrenchli-MARKETING.md | CRO, copywriting, SEO, email sequences | Rhett Holloway |
 
 | 4 | wrenchli-ACCURACY.md | Factual verification, claim validation | Imani Whitfield |
 
@@ -210,7 +210,7 @@ When a decision triggers multiple skill files, the following execution order gov
 
 14. **wrenchli-FUNDRAISING.md** — If fundraising-related: is the process structured and narrative locked?
 
-15. **MARKETING.md / wrenchli-COMPLIANCE.md** — Does output comply with brand standards and COPY CHECK?
+15. **wrenchli-MARKETING.md / wrenchli-COMPLIANCE.md** — Does output comply with brand standards and COPY CHECK?
 
 16. **wrenchli-DECISIONS.md** — If any skill outputs conflict: apply the decision resolution rubric.
 

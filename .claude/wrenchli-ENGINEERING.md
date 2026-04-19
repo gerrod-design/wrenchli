@@ -1,6 +1,6 @@
 # Wrenchli — Engineering Architecture & Technical Rules
 
-> Related files: [SKILL.md](SKILL.md) · [MARKETING.md](MARKETING.md) · [memory.md](memory.md)
+> Related files: [SKILL.md](SKILL.md) · [wrenchli-MARKETING.md](wrenchli-MARKETING.md) · [memory.md](memory.md)
 
 ## Evaluation Rules
 

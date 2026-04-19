@@ -1,6 +1,6 @@
 # Wrenchli — Learned Preferences & Corrections
 
-> Related files: [SKILL.md](SKILL.md) · [ENGINEERING.md](ENGINEERING.md) · [MARKETING.md](MARKETING.md)
+> Related files: [SKILL.md](SKILL.md) · [wrenchli-ENGINEERING.md](wrenchli-ENGINEERING.md) · [wrenchli-MARKETING.md](wrenchli-MARKETING.md)
 
 Read this file at the start of every session. Update it whenever
 a new correction or preference is established during a conversation.
@@ -73,4 +73,4 @@ easy · moderate · Shop Required
 
 - 2026-04-12: Initial memory file seeded from SKILL.md and past session corrections
 - 2026-04-12: Unsplash search queries should exclude vehicle year — returns unrelated photos. Use `{make} {model} car exterior` instead.
-- 2026-04-12: UI/UX Audit Rule added to ENGINEERING.md — 5-point mandatory checklist for all consumer-facing visual changes.
+- 2026-04-12: UI/UX Audit Rule added to wrenchli-ENGINEERING.md — 5-point mandatory checklist for all consumer-facing visual changes.
