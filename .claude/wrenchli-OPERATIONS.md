@@ -175,3 +175,205 @@ Product and commercial: any assessment flow change, any AI model change, any Pro
 People: any W-2 employee hire, any equity grant, any employee termination, any contractor engagement over $25,000, any new agent with material authority.
 
 Crisis: all material crisis decisions from declaration through resolution.
+
+---
+
+## The 16-Step Skill Execution Order
+
+When a decision triggers multiple skill files, the following execution order governs. Each applicable skill runs its check. A veto from any skill file stops the decision at that step until the veto condition is resolved.
+
+1. **wrenchli-STRATEGY.md** — Is the right problem being solved?
+
+2. **wrenchli-OPERATIONS.md** (this file) — What tier is this decision? How does it fit the operating rhythm?
+
+3. **SKILL.md** (CEO Check) — Does it pass revenue/retention/acquisition filters?
+
+4. **SKILL.md** (Engineering Check) — Is the technical architecture safe? Does it affect the critical path?
+
+5. **wrenchli-ACCURACY.md** — Are all factual claims verified?
+
+6. **wrenchli-SECURITY.md** — Does it preserve security posture? Is data access appropriately scoped?
+
+7. **wrenchli-REGULATORY.md** — Does it comply with applicable law?
+
+8. **wrenchli-GOVERNANCE.md** — Does it require board approval?
+
+9. **wrenchli-LEGAL.md** — Does it create or expose legal obligations?
+
+10. **wrenchli-FINANCE.md** — What does it cost? Who approves it? Is the cap table affected?
+
+11. **wrenchli-PEOPLE.md** — Is the engagement structure complete? Is access scoped?
+
+12. **wrenchli-COMMERCIAL.md** — Do external commitments and internal product capabilities align?
+
+13. **wrenchli-CRISIS.md** — Is this a crisis event? If crisis declared, override to crisis protocol.
+
+14. **wrenchli-FUNDRAISING.md** — If fundraising-related: is the process structured and narrative locked?
+
+15. **MARKETING.md / wrenchli-COMPLIANCE.md** — Does output comply with brand standards and COPY CHECK?
+
+16. **wrenchli-DECISIONS.md** — If any skill outputs conflict: apply the decision resolution rubric.
+
+**Crisis override:** If wrenchli-CRISIS.md declares a crisis at step 13, steps 14-16 are suspended for crisis-topic decisions. The four-track crisis response framework replaces the standard execution order until resolution is declared.
+
+**Security gating:** The Security Check at step 6 gates all data-access decisions. A security veto stops the execution order regardless of how other steps resolve.
+
+**Not every step runs on every decision.** Simple decisions trigger one or two checks. Complex decisions trigger the full sequence. When in doubt, more checks are run rather than fewer.
+
+---
+
+## Operating Cadence
+
+### Daily
+
+- Rhett Holloway reviews pending decisions and actions
+
+- Sloane Ashford reviews security monitoring logs — anomalies flagged to Gerrod Parchmon
+
+- Darya Nazari reviews bank and Stripe activity — unauthorized transactions flagged within 24 hours
+
+- N8N workflow health check — Rhett Holloway confirms no failed webhook deliveries or email failures
+
+### Weekly
+
+- Darya Nazari reviews bank statements and Stripe reports independently
+
+- Declan Morrissey updates investor tracking database
+
+- Rhett Holloway reviews N8N execution count against Starter plan limit (1,000/month)
+
+- Contractor milestone check-ins for any engagement over 30 days
+
+### Monthly (by day 10 of the following month)
+
+- Darya Nazari closes the books and produces the monthly financial package
+
+- Darya Nazari reconciles Stripe payouts to bank deposits and updates the 13-week cash flow forecast
+
+- Rhett Holloway conducts affiliate link audit — all Amazon wrenchli-20 tags confirmed correct
+
+- Gerrod Parchmon reviews financial package with Darya Nazari
+
+- Investor update email sent (when investors are on the cap table)
+
+- N8N workflow error log reviewed
+
+### Quarterly
+
+- Darya Nazari produces break-even analysis update
+
+- Imani Whitfield conducts accuracy audit on all published blog content and consumer-facing claims
+
+- Sloane Ashford conducts security scan — stops on errors, flags warnings before proceeding
+
+- Evelyn Marchetti reviews open source license compliance
+
+- Darya Nazari reviews contractor classification for any engagement exceeding 90 days or $10,000
+
+### Annually
+
+- Annual shareholder meeting (written consent in lieu of meeting at current stage)
+
+- Delaware franchise tax filing (due March 1 — use assumed par value capital method, not authorized shares method)
+
+- Federal and state tax returns
+
+- D&O insurance renewal (when policy in place)
+
+- Darya Nazari prepares Annual Operating Plan for following year (Q4, approved before December 31)
+
+- Evelyn Marchetti conducts open source license audit
+
+- Darya Nazari conducts financial controls review
+
+- Rhett Holloway conducts agent quality and accuracy review — systematic errors addressed in skill files
+
+---
+
+## Decision Log Discipline
+
+Every Tier 2 and Tier 3 decision is documented in the decision log maintained by Rhett Holloway. Each entry includes: date, decision description, tier level, decision-maker, checks that ran, rationale, dissenting views, and follow-up actions required.
+
+The decision log is the institutional memory that makes due diligence possible, protects the founder from hindsight criticism, and enables the post-crisis retrospective process in wrenchli-CRISIS.md. Decisions that are not documented are decisions that cannot be explained.
+
+---
+
+## Cross-Skill Coordination Protocols
+
+### When Multiple Checks Conflict
+
+If two or more skill checks produce incompatible recommendations, wrenchli-DECISIONS.md governs resolution. Rhett Holloway identifies conflicts and routes them through the DECISIONS.md rubric. He escalates to the relevant function owners and, if they disagree, to the founder.
+
+### When a Decision Falls Between Skill Files
+
+- Data flowing to or from a third party → Security Check leads, Legal Check follows
+
+- New external commitment → Legal Check leads, Commercial Check follows
+
+- Money moving → Finance Check leads, Legal Check follows for any contract
+
+- Person doing work → People Check leads, Legal and Finance follow
+
+- What the product does → Commercial Check leads, Engineering Check follows
+
+- What Wrenchli says publicly → Compliance Check leads, Accuracy Check follows
+
+- Raising capital → Fundraising Check leads, Finance and Legal follow
+
+### The Bright-Line Rules
+
+These rules are absolute constraints encoded across multiple skill files. They do not bend to business pressure, founder preference, or agent recommendation. Rhett Holloway enforces them and escalates immediately if any decision would violate them.
+
+Never:
+
+- Use the word "diagnosis" or "diagnose" in any consumer-facing context
+
+- Share Tier 1 consumer PII with any shop partner, regardless of the commercial relationship
+
+- Deploy an assessment flow change without founder approval
+
+- Change the AI model without the full model upgrade protocol
+
+- Issue equity without a board resolution
+
+- Execute a financial services partnership without completing all six gates in wrenchli-COMMERCIAL.md
+
+- Respond to a regulatory enforcement action without outside counsel
+
+- Delete logs or evidence during an active security incident
+
+- Issue a public statement during an active crisis without founder approval
+
+- Proceed with a fundraising process before all 10 raise readiness gates are met
+
+---
+
+## Wrenchli's Current Operating Priorities
+
+As of the revision date (2026-04-18), in priority order:
+
+1. **Tekmetric live activation** — API approval expected April 19-26. Upon approval: live credential configuration, smoke test, first shop connection. Rhett Holloway coordinates. Gerrod Parchmon approves production deploy.
+
+2. **Stripe live activation** — blocked on EIN submission. Upon EIN confirmation: complete Stripe live activation checklist. Darya Nazari owns.
+
+3. **N8N Workflow 1 completion** — Shop Onboarded Email Sequence in progress. Complete and test before Tekmetric goes live.
+
+4. **Shop partner conversion conversations** — First 90-day pilot mark approaching for earliest pilot shops. Rhett Holloway prepares conversion framework. Darya Nazari prepares pricing model.
+
+5. **Blog content** — 2 of 26 articles published. Next three articles per wrenchli-MARKETING.md content calendar.
+
+6. **Raise readiness gate assessment** — Darya Nazari assesses which of the 10 fundraising readiness gates are currently met and produces a written readiness report for Gerrod Parchmon.
+
+---
+
+## Integration With Existing Skills
+
+This file is the operating layer that sits between the skill library and the day-to-day work. It coordinates the checks that the other 15 skill files define. The three-tier escalation structure, the agent roster, and the 16-step execution order in this file are the authoritative versions. If another skill file references the escalation structure or execution order, this file supersedes that reference on matters of structure. The other skill file supersedes this one on matters of domain-specific substance.
+
+---
+
+## Closing Principle
+
+Operations is the connective tissue of the institutional infrastructure. The skill library defines what the rules are. Operations defines how the rules are applied — who runs which checks, in what order, with what authority, and with what documentation.
+
+The principle that governs this skill: *Speed without structure produces rework. Structure without speed produces paralysis. Wrenchli's operating framework is designed to produce the fastest path to good decisions — not the slowest path to perfect ones. Every check that runs, every escalation that reaches the right authority, every decision that gets documented is the operating discipline that makes Wrenchli's velocity sustainable rather than reckless.*
