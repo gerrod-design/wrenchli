@@ -289,7 +289,7 @@ The AI model is a product decision, not an engineering decision. The current mod
 
 **Known model history:**
 - Upgraded April 14, 2026 from `claude-sonnet-4-20250514` to `claude-sonnet-4-6`
-- All four Edge Functions and ENGINEERING.md updated; no remaining references to old model string
+- All four Edge Functions and wrenchli-ENGINEERING.md updated; no remaining references to old model string
 
 ### Pro Subscription Governance
 

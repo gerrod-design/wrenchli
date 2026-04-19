@@ -1,6 +1,6 @@
 # Wrenchli Copy Compliance Skill
 # This file governs automated brand and language checks on all user-facing copy before it is published or deployed.
-# Install location: .claude/wrenchli-COMPLIANCE.md in Lovable (same directory as SKILL.md and MARKETING.md)
+# Install location: .claude/wrenchli-COMPLIANCE.md in Lovable (same directory as SKILL.md and wrenchli-MARKETING.md)
 # ============================================================
 
 ## Copy Compliance Rule
@@ -82,7 +82,7 @@ If a weak CTA is found, flag it as a hard fail and propose a specific replacemen
 
 ### Check 6 — SEO rules (for blog articles and landing pages only)
 
-When the copy is a blog article or a standalone landing page, also verify against MARKETING.md's SEO rules:
+When the copy is a blog article or a standalone landing page, also verify against wrenchli-MARKETING.md's SEO rules:
 - Title tag ≤ 60 characters, ends with "| Wrenchli"
 - Meta description ≤ 155 characters, includes primary keyword + benefit + implicit or explicit CTA
 - Exactly one H1, matching or closely matching the primary keyword
@@ -104,7 +104,7 @@ When the copy references Wrenchli's data handling, VIN collection, or assessment
 
 Flag any factual claim that is not backed by verified data. In particular:
 - Accuracy percentages ("Wrenchli is 94% accurate") are forbidden until accuracy_metrics confirms the real number from outcome_reports data.
-- Shop partner counts, user counts, or session counts must be current or clearly framed as pilot-phase. Use "Growing fast in Metro Detroit" as the fallback if under 50 sessions/month per MARKETING.md.
+- Shop partner counts, user counts, or session counts must be current or clearly framed as pilot-phase. Use "Growing fast in Metro Detroit" as the fallback if under 50 sessions/month per wrenchli-MARKETING.md.
 - Cost savings claims ("43% lower repair costs") must cite a source inline or in an adjacent caption when used in LinkedIn posts, press, or investor materials.
 - Recall statistics, vehicle-age statistics, or industry statistics must cite a credible source (BLS, JD Power, Edmunds, Consumer Reports, iSeeCars, KBB, NHTSA, Newsweek, CNBC, or equivalent).
 
@@ -120,7 +120,7 @@ Sentence length (≤25 words): [all pass / flag sentences over, with rewrite]
 Paragraph length (≤3 sentences): [all pass / flag paragraphs over]
 Voice: [on-brand / list corrections]
 CTAs: [all action-verb / flag weak CTAs, with replacement]
-SEO (if blog/landing): [see SEO CHECK from MARKETING.md]
+SEO (if blog/landing): [see SEO CHECK from wrenchli-MARKETING.md]
 Privacy/compliance: [all required disclosures present / list missing]
 Claim verification: [all claims backed / flag unverified claims]
 Auto-corrections applied: [list of changes made before presenting copy]
@@ -141,7 +141,7 @@ Do not announce that this rule exists. Do not narrate the check process. Run it 
 
 ### Interaction with other rules
 
-This rule runs alongside, not instead of, the other rules in SKILL.md and MARKETING.md:
+This rule runs alongside, not instead of, the other rules in SKILL.md and wrenchli-MARKETING.md:
 - Context7 Rule still applies for code-adjacent copy (e.g., setting up Stripe checkout messaging).
 - CEO Evaluation Rule still applies for feature-level decisions that include copy.
 - CRO Evaluation Rule runs in addition to this rule when the copy is on a conversion-critical page.
@@ -153,7 +153,7 @@ When multiple rules apply, present their CHECK blocks in this order: CEO CHECK, 
 
 ## Reference: Full banned and preferred language (authoritative)
 
-The banned and preferred language tables in this file supersede any conflicting content elsewhere. When adding new rules to SKILL.md or MARKETING.md, update this file as well.
+The banned and preferred language tables in this file supersede any conflicting content elsewhere. When adding new rules to SKILL.md or wrenchli-MARKETING.md, update this file as well.
 
 ### Never say, always say
 

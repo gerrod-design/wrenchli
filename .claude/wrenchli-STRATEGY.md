@@ -255,7 +255,7 @@ The Value Wall is the most important thing to protect. Any decision that weakens
 **Data Starting Line (nationwide consumer surface):**
 - Assessment platform: live and serving national traffic
 - Consumer outcome data collection: partially in place (partner-shop-confirmed only; consumer-reported outcomes not yet captured — this is an urgent gap)
-- AI answer engine presence: in progress (GEO rules now in MARKETING.md, llms.txt deployed)
+- AI answer engine presence: in progress (GEO rules now in wrenchli-MARKETING.md, llms.txt deployed)
 - Blog content surface: 2 articles published, 24 remaining in calendar
 - Pro subscription: built, sandbox active, live activation pending EIN
 - **Status: operational but under-optimized.** Strategic imperative: close the consumer outcome reporting gap, accelerate blog content production, protect data quality as volume grows.
@@ -288,7 +288,7 @@ Priorities in rank order:
 
 1. **Consumer outcome reporting mechanism.** Currently outcome_reports only captures partner-shop-confirmed outcomes. Add a consumer-reported outcome path — email or in-app prompt 14 days post-assessment asking "what was actually wrong, what did you pay, were you treated fairly, would you go back?" This is the highest-leverage gap on the Data track. Without it, the Value Wall compounds only at Marketplace speed instead of Data speed.
 2. Geographic demand signal capture. Instrument assessment session data to report by metro area so that consumer demand density can be measured nationally. This becomes the signal for future Marketplace expansion — data discovers the next partner shop market rather than founder intuition guessing it.
-3. Blog content production velocity. 24 articles remaining in the calendar. Full GEO compliance per MARKETING.md. Target pace: one article per week minimum.
+3. Blog content production velocity. 24 articles remaining in the calendar. Full GEO compliance per wrenchli-MARKETING.md. Target pace: one article per week minimum.
 4. AI answer engine citation monitoring. Track when and how Wrenchli is cited by Claude, ChatGPT, Perplexity, and Gemini. This is the Digital Product equivalent of SEO ranking tracking. Build it into the Monitoring Agent.
 5. Pro subscription conversion instrumentation. Measure free-to-Pro conversion by acquisition channel and geography.
 
@@ -381,7 +381,7 @@ When a single decision has metrics impact across tracks, surface both. A decisio
 This strategy skill works alongside — not in competition with — the existing skill files in `.claude/`:
 
 - `wrenchli-SKILL.md` governs brand, voice, technical decisions, and codebase memory. When strategic decisions require code or brand output, strategy runs first; SKILL.md governs the execution.
-- `wrenchli-MARKETING.md` governs CRO, copy, SEO, and email sequences. When strategic decisions impact the marketing surface, strategy runs first and may update MARKETING.md's content calendar or CRO priorities.
+- `wrenchli-MARKETING.md` governs CRO, copy, SEO, and email sequences. When strategic decisions impact the marketing surface, strategy runs first and may update wrenchli-MARKETING.md's content calendar or CRO priorities.
 - The CEO Evaluation Rule and Engineering Manager Evaluation Rule in SKILL.md operate at the tactical and technical level. This Strategy skill operates at the level above those — it is the "should we even be building this" filter before CEO (worth building) and Engineering (safe to build).
 
 Execution order for any significant decision:
@@ -390,7 +390,7 @@ Execution order for any significant decision:
 2. CEO check (revenue/retention/acquisition impact, simplest version, maintenance burden, build vs buy)
 3. Engineering check (single point of failure, RLS, dependencies, rollback, duplication, critical path)
 4. Brand/voice compliance per SKILL.md
-5. Marketing/CRO compliance per MARKETING.md
+5. Marketing/CRO compliance per wrenchli-MARKETING.md
 
 If strategy rejects, the downstream checks do not run. Do not waste cycles evaluating the execution of a strategically misaligned decision.
 

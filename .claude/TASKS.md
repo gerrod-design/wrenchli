@@ -1,6 +1,6 @@
 # Wrenchli — Open Action Items
 
-> Related files: [SKILL.md](SKILL.md) · [ENGINEERING.md](ENGINEERING.md) · [MARKETING.md](MARKETING.md) · [memory.md](memory.md)
+> Related files: [SKILL.md](SKILL.md) · [wrenchli-ENGINEERING.md](wrenchli-ENGINEERING.md) · [wrenchli-MARKETING.md](wrenchli-MARKETING.md) · [memory.md](memory.md)
 
 ## Critical
 
@@ -24,4 +24,4 @@
 - [x] **Garage vehicle card redesign** — Replaced basic list-item cards with premium dashboard-style cards inspired by Rivian/BMW ConnectedDrive. Full-width hero, corner health ring, stats bar with IBM Plex Mono, recall badge, stacked CTAs, hover lift animation. Status: *complete*
 - [x] **Unsplash integration for garage vehicle photos** — Created `unsplash-search` edge function and `useVehiclePhoto` hook. Replaces SVG silhouettes with real vehicle photography via Unsplash API. Dark gradient overlay for text readability. Fallback to clean dark card if no photo found. Query optimized to `{make} {model} car exterior` (year excluded for better results). Status: *complete*
 - [x] **Demo mode for garage** — Added temporary demo vehicles (F-150, Camry, CR-V) to garage page so cards can be previewed without authentication. Status: *complete*
-- [x] **UI/UX Audit Rule added to ENGINEERING.md** — 5-point checklist (mobile 375px, contrast 4.5:1, 44px touch targets, loading states, no text overflow) required before any consumer-facing visual change is marked complete. Status: *complete*
+- [x] **UI/UX Audit Rule added to wrenchli-ENGINEERING.md** — 5-point checklist (mobile 375px, contrast 4.5:1, 44px touch targets, loading states, no text overflow) required before any consumer-facing visual change is marked complete. Status: *complete*

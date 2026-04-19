@@ -1,6 +1,6 @@
 # Wrenchli — Brand Voice, Language & Visual Design
 
-> Related files: [ENGINEERING.md](ENGINEERING.md) · [MARKETING.md](MARKETING.md) · [memory.md](memory.md)
+> Related files: [wrenchli-ENGINEERING.md](wrenchli-ENGINEERING.md) · [wrenchli-MARKETING.md](wrenchli-MARKETING.md) · [memory.md](memory.md)
 
 ## Identity
 
