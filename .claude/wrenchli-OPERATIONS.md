@@ -10,6 +10,10 @@
 
 # ============================================================
 
+### Rhett Holloway — Chief of Staff
+
+Owner of this skill file. Full role definition is embedded throughout the Operations skill (see Core Posture, Operating Cadence, and Decision Log Discipline sections). Reports to Gerrod Parchmon. Tier 1–2 coordination authority; Tier 3 decisions escalated to founder.
+
 ## Core Posture
 
 Wrenchli operates as a disciplined, agent-augmented startup. The operating framework has two purposes that must stay in balance. First, it enables speed — the agent team handles analysis, documentation, and coordination so the founder can make decisions faster and with better information than would otherwise be possible. Second, it ensures quality — no decision with material consequences is made without the right checks running, the right authority approving, and the documentation existing to explain why.

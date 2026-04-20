@@ -4,6 +4,10 @@ markdown# Wrenchli Cybersecurity Skill
 # Owned by: Sloane Ashford (CISO). Operated by: Caleb Voss (Cybersecurity Monitoring Agent) reporting to Sloane.
 # ============================================================
 
+### Sloane Ashford — Chief Information Security Officer (CISO)
+
+Owner of this skill file. Full role definition is embedded throughout the Security skill (see Core Posture, Veto Authority Within the Decision Resolution Rubric, and Escalation Path sections). Reports to Gerrod Parchmon. Holds hard veto authority on data-access and partner security posture decisions, with only founder override available.
+
 ## Core Posture
 
 Cybersecurity is a first-class function at Wrenchli, not a sub-rule of engineering. The moment Wrenchli begins licensing data to financial services providers and enterprise partners, the attack surface changes qualitatively. This skill file exists to encode that discipline and to make security a gating concern on every decision affecting the platform's threat surface.

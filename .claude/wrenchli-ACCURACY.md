@@ -251,7 +251,7 @@ Specific practices that violate the Accuracy Discipline and are not permitted fr
 
 ---
 
-## Agent Responsibilities Under Accuracy Discipline
+### Imani Whitfield — Verification and Accuracy Agent
 
 Imani Whitfield (Verification and Accuracy Agent) has the following specific responsibilities:
 

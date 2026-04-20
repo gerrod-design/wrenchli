@@ -4,6 +4,10 @@
 # Owned by: Evelyn Marchetti (General Counsel). Coordinated with Gerrod Parchmon (Founder/CEO) for all decisions above Tier 1 authority. Coordinates with wrenchli-GOVERNANCE.md (corporate formalities), wrenchli-REGULATORY.md (compliance obligations), wrenchli-SECURITY.md (incident response legal obligations), and wrenchli-DECISIONS.md (decision resolution rubric).
 # ============================================================
 
+### Evelyn Marchetti — General Counsel
+
+Owner of this skill file. Full role definition is embedded throughout the Legal skill (see Core Posture, Signature Authority Matrix, Outside Counsel Relationships, and Escalation Path sections). Reports to Gerrod Parchmon. Tier 1–2 legal authority; Tier 3 matters escalate to founder.
+
 ## Core Posture
 
 Legal infrastructure at Wrenchli serves three compounding purposes. First, it protects what has already been built — the codebase, the brand, the customer relationships, the data architecture, and the operational know-how that make Wrenchli competitively distinct. Second, it enables what comes next — contracts that close deals cleanly, IP assignments that keep equity undisputed, entity structures that support growth without restructuring friction. Third, it signals institutional seriousness — to investors, enterprise customers, and shop partners, a company with clean legal infrastructure is a company worth betting on.
