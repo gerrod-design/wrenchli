@@ -87,3 +87,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-18: Revised wrenchli-OPERATIONS.md (skill #2) to incorporate 16-skill institutional infrastructure. Updated three-tier escalation structure, agent roster, 16-step skill execution order, cross-skill coordination protocols, and financial and legal approval thresholds. Session 2 Round 7 complete — final round of Session 2.
 
 - 2026-04-19: Round 13.0 prep — renamed MARKETING.md to wrenchli-MARKETING.md and ENGINEERING.md to wrenchli-ENGINEERING.md for naming-convention consistency. Updated cross-references. No content changes.
+
+- 2026-04-19: Round 13a — Added three agents to wrenchli-PEOPLE.md: Sienna Kilmartin (CHRO, reports to founder), Noor Bergström (People Ops Agent, reports to Sienna), and Evren Matsuda (Chief Learning Officer, reports to Sienna). Updated Imani Whitfield's reporting line in wrenchli-ACCURACY.md from Darya Nazari to Evren Matsuda. Part of Round 13 agent roster reconciliation installing 32 missing internal agents across 8 skill files.
