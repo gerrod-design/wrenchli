@@ -89,3 +89,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-19: Round 13.0 prep — renamed MARKETING.md to wrenchli-MARKETING.md and ENGINEERING.md to wrenchli-ENGINEERING.md for naming-convention consistency. Updated cross-references. No content changes.
 
 - 2026-04-19: Round 13a — Added three agents to wrenchli-PEOPLE.md: Sienna Kilmartin (CHRO, reports to founder), Noor Bergström (People Ops Agent, reports to Sienna), and Evren Matsuda (Chief Learning Officer, reports to Sienna). Updated Imani Whitfield's reporting line in wrenchli-ACCURACY.md from Darya Nazari to Evren Matsuda. Part of Round 13 agent roster reconciliation installing 32 missing internal agents across 8 skill files.
+
+- 2026-04-19: Round 13b — Added four agents to wrenchli-OPERATIONS.md: Miles Traeger (COO, reports to founder), Fiona Brenner (Founder Triage Agent, reports to Rhett), Mira Sokolov (Change Management Agent, reports to Miles), and Tomás Rivera (Operations Coordinator, reports to Miles). Part of Round 13 agent roster reconciliation.
