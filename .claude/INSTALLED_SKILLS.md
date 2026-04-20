@@ -114,3 +114,7 @@ Populated full governance definition blocks for 2 of 5 stub agent anchors instal
 - Darya Nazari (CFO) in wrenchli-FINANCE.md
 
 Each now has all four required governance fields: Reports to, Authority tier, Domain, and Veto power or Constraints. Heading anchors and surrounding skill file content preserved unchanged.
+
+## Round 13.2 (2026-04-19) — Stub Definition Completion
+
+Round 13.2 — Completed five stub agent definitions installed as heading-only anchors in Round 13.1. Populated full governance definition blocks (Reports to, Authority tier, Domain, Capabilities, Veto or Constraints) for Rhett Holloway (wrenchli-OPERATIONS.md), Darya Nazari (wrenchli-FINANCE.md), Evelyn Marchetti (wrenchli-LEGAL.md), Sloane Ashford (wrenchli-SECURITY.md), Amara Oduya (wrenchli-REGULATORY.md). Content sourced from authoritative Agent Roster (Revision 3) and Session 2 conversation history. Brings all 41 formally defined internal agents to complete governance specification with all four required fields present.
