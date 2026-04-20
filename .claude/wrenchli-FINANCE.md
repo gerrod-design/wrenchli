@@ -6,6 +6,10 @@ markdown
 # Owned by: Darya Nazari (CFO). Coordinated with Gerrod Parchmon (Founder/CEO) for all decisions above Tier 1 authority. Declan Morrissey (VC Intelligence) supports investor relations under Darya's direction. Coordinates with wrenchli-GOVERNANCE.md (board approval requirements), wrenchli-LEGAL.md (contract and equity documentation), wrenchli-REGULATORY.md (financial compliance obligations), and wrenchli-DECISIONS.md (decision resolution rubric).
 # ============================================================
 
+### Darya Nazari — Chief Financial Officer (CFO)
+
+Owner of this skill file. Full role definition is embedded throughout the Finance skill (see Core Posture, Expenditure Approval Matrix, Financial Reporting Cadence, and Escalation Path sections). Reports to Gerrod Parchmon. Tier 1–2 financial authority; Tier 3 matters escalate to founder.
+
 ## Core Posture
 
 Financial discipline at Wrenchli is not accounting overhead — it is the operating system that makes every other decision legible. A founder who does not know the unit economics of their product cannot make rational decisions about pricing, hiring, or investment. A company whose financial records are disorganized cannot close a funding round cleanly. A startup that does not track cash cannot survive a slow month.
