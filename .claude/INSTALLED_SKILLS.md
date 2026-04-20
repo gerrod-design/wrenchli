@@ -96,3 +96,5 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 
 - 2026-04-19: Round 13c.1 — Cleanup of residual Amara Vex references in roster tables. Updated wrenchli-OPERATIONS.md (lines 45 and 93) and wrenchli-PEOPLE.md (line 335) to reference Tobias Wren in place of the retired Amara Vex. Prior Round 13c change log entry preserved as historical record of the retirement/replacement.
 2026-04-19 — Round 13d — Added four agents to wrenchli-MARKETING.md: Cassius Vance (CMO, reports to founder), Juno Blackwood (Marketing Agent, reports to Cassius), Atticus Fenwick (Content Production Agent, reports to Cassius), and Simone Delacroix (Partnership Opportunity Detection Agent, reports to Cassius). Part of Round 13 agent roster reconciliation.
+
+- 2026-04-19: Round 13e-part-1 — Added three C-suite agents to wrenchli-COMMERCIAL.md: Nadia Petrov (CRO), Augustin Reyes (CPO), Helena Ostrowski (CCO). All three share authority over the unified commercial + product + customer governance file per Session 2 Round 9 consolidation. Part of Round 13 agent roster reconciliation. Specialist team for each C-suite agent installs in Round 13e-part-2.
