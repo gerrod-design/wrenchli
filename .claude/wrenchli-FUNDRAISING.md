@@ -120,7 +120,7 @@ Wrenchli is ready to run a fundraising process when ALL of the following criteri
 
 ---
 
-## VC Intelligence Function — Declan Morrissey
+### Declan Morrissey — VC Intelligence Agent
 
 Declan Morrissey (VC Intelligence) is responsible for the research, targeting, tracking, and briefing infrastructure that supports the fundraising process. His work product feeds every investor conversation Gerrod Parchmon has. Darya Nazari reviews and prioritizes his outputs.
 
