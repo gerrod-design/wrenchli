@@ -42,7 +42,7 @@ Wrenchli's institutional infrastructure is encoded in 16 installed skill files p
 
 | 6 | wrenchli-REGULATORY.md | Compliance, consumer protection, financial services law | Amara Oduya |
 
-| 7 | wrenchli-STRATEGY.md | Strategic decision-making, market positioning | Amara Vex |
+| 7 | wrenchli-STRATEGY.md | Strategic decision-making, market positioning | Tobias Wren |
 
 | 8 | wrenchli-DECISIONS.md | Cross-skill conflict resolution, decision rubric | Rhett Holloway |
 
@@ -90,7 +90,7 @@ Wrenchli operates with a human-AI hybrid team. Agents execute defined business f
 
 |---|---|---|---|---|
 
-| Amara Vex | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon | Tier 1-2 analysis; Tier 3 to founder |
+| Tobias Wren | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon | Tier 1-2 analysis; Tier 3 to founder |
 
 | Sloane Ashford | Security | wrenchli-SECURITY.md | Gerrod Parchmon | Tier 1-2 controls; containment under founder direction |
 

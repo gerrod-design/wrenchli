@@ -332,7 +332,7 @@ The following agents are active as of the current session:
 
 | Agent | Primary Function | Skill File Authority | Reports To |
 |---|---|---|---|
-| Amara Vex | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon |
+| Tobias Wren | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon |
 | Sloane Ashford | Security | wrenchli-SECURITY.md | Gerrod Parchmon |
 | Amara Oduya | Regulatory | wrenchli-REGULATORY.md | Evelyn Marchetti |
 | Imani Whitfield | Accuracy | wrenchli-ACCURACY.md | Darya Nazari |
