@@ -106,3 +106,11 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 - 2026-04-19: Round 13g — Added Caleb Voss (Cybersecurity Monitoring Agent, reports to Sloane Ashford) to wrenchli-SECURITY.md. Final sub-round of Round 13 agent roster reconciliation. Full Round 13 scope: 32 agent additions across 8 skill files plus one retirement (Amara Vex) and one rename (Kai Brennan to Elias Thorne).
 
 - 2026-04-19 — Round 13.1 — Heading-level normalization for seven pre-existing agent definitions. Promoted to ### Name — Role format: Imani Whitfield (wrenchli-ACCURACY.md, was '## Agent Responsibilities Under Accuracy Discipline'), Declan Morrissey (wrenchli-FUNDRAISING.md, was '## VC Intelligence Function — Declan Morrissey'). Inserted new ### heading anchors (no prior personal heading existed; metadata-only references): Rhett Holloway (wrenchli-OPERATIONS.md), Sloane Ashford (wrenchli-SECURITY.md), Evelyn Marchetti (wrenchli-LEGAL.md), Darya Nazari (wrenchli-FINANCE.md), Amara Oduya (wrenchli-REGULATORY.md). All seven now detectable by heading-based inventory scans.
+
+## Round 13.2 (2026-04-20) — Stub Definition Population
+
+Populated full governance definition blocks for 2 of 5 stub agent anchors installed in Round 13.1:
+- Rhett Holloway (Chief of Staff) in wrenchli-OPERATIONS.md
+- Darya Nazari (CFO) in wrenchli-FINANCE.md
+
+Each now has all four required governance fields: Reports to, Authority tier, Domain, and Veto power or Constraints. Heading anchors and surrounding skill file content preserved unchanged.
