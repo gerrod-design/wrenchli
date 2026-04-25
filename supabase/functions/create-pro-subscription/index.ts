@@ -24,6 +24,7 @@ Deno.serve(async (req) => {
   try {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
+    if (!PRICE_ID) throw new Error("STRIPE_PRO_PRICE_ID not configured — refusing to create subscription with no Price ID");
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
