@@ -10,11 +10,11 @@ const journeys = [
     title: "Vehicle Owner",
     subtitle: "Need your car fixed?",
     description:
-      "Get instant AI diagnostics, compare shop quotes, and access financing—all in one place.",
+      "Get a free symptom assessment, compare shop quotes, and explore your repair options—all in one place.",
     features: [
-      "Free AI diagnosis in 60 seconds",
+      "Free symptom assessment in 60 seconds",
       "Compare quotes from trusted shops",
-      "Flexible financing options",
+      "Repair financing on the way",
       "DIY guides & tutorials",
     ],
     primaryCta: { label: "Get Your Free Assessment", to: "/#quote" },

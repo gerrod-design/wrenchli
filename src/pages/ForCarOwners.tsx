@@ -142,7 +142,7 @@ export default function ForCarOwners() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="For Vehicle Owners"
-        description="Stop overpaying for vehicle repairs. Get instant quotes from vetted local shops, compare prices, and finance if you need to. Free for vehicle owners."
+        description="Know what's wrong before you pay for it. Get a free symptom assessment, compare quotes from trusted local shops, and walk in ready to book. Free for vehicle owners."
         path="/for-car-owners"
       />
       {/* Hero */}
