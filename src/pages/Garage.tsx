@@ -342,9 +342,6 @@ function FreeVsProComparison({ onUpgrade }: { onUpgrade: () => void }) {
     { label: "Saved vehicles", free: "2", pro: "Unlimited" },
     { label: "Recall alerts", free: true, pro: true },
     { label: "Assessment history", free: true, pro: true },
-    { label: "PDF report export", free: false, pro: true },
-    { label: "AI vehicle health insights", free: false, pro: "Coming soon" },
-    { label: "Priority processing", free: false, pro: "Coming soon" },
   ];
 
   return (
