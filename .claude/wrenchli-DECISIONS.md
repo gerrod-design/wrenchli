@@ -224,6 +224,26 @@ Wrenchli operates with a triple-track DNA: Marketplace (local density, geographi
 
 ---
 
+## Positive Precedents Log
+
+Decisions that exemplify institutional discipline and should be referenced as binding precedent for future agent behavior. Logged by Rhett Holloway (Chief of Staff).
+
+### 2026-04-25 — "No Ceremonial Commits"
+
+**Context.** During a TIER 2 INVESTIGATION + ATOMIC EDIT for /for-shops compliance violations surfaced via Google search results, Imani Whitfield (Verification and Accuracy) executed a repo-wide grep for the reported banned phrases ("Stop overpaying", "instant AI diagnostics", "vetted local shops", etc.) and returned zero hits. The offending copy was traced to stale Google cache, not live source. Prior cleanup commits had already removed the violations.
+
+**Decision.** The agent team refused to ship an empty atomic commit. Veto register cleared with all agents (Evelyn, Imani, Cassius, Juno, Augustin, Dex, Keegan, Sloane, Sienna, Darya) noting that the institutional rule "no partial deploy / address all findings in one commit" cuts both ways: when there are zero findings, the correct atomic commit is no commit. Tomás Rivera (Ops) signed; Miles Traeger (COO) countersigned the recommendation to wait for natural Google cache refresh (3–5 day window) rather than ship ceremonial code changes.
+
+**Principle established.** Ceremonial commits — code changes that perform responsiveness without fixing anything — degrade institutional credibility over time. Refusing to ship work that isn't warranted is the same discipline as refusing to ship work that violates a veto. Both protect the integrity of the system. The agent layer governs execution; it does not perform it for show.
+
+**Reference thread.** TIER 2 INVESTIGATION + ATOMIC EDIT — /for-shops COMPLIANCE EMERGENCY (2026-04-25, third iteration; investigation closed without code change).
+
+**Tag.** Positive precedent. Cite when any future agent recommendation proposes a code change whose only justification is symbolic responsiveness rather than substantive fix.
+
+**Codification status.** Promoted to wrenchli-OPERATIONS.md → "The Bright-Line Rules" as a first-class execution rule on the same commit (see Evren Matsuda's recommendation, 2026-04-25).
+
+---
+
 ## Closing Principle
 
 Decisions are where strategy becomes operations. An organization without a clear decision resolution mechanism either paralyzes under disagreement or resolves conflicts by whoever has the loudest voice or the latest conversation — both of which produce bad outcomes over time.
