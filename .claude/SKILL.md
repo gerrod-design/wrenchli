@@ -44,6 +44,29 @@ NEVER say:
 - "paper tickets and phone calls" (condescending to shop owners)
 - "dealerships do worse work" (never compare quality across types)
 
+## Geographic Framing — Bifurcated Rule (added 2026-04-25)
+
+The symptom assessment product is **national** (any U.S. vehicle owner). The
+**trusted shop network** is bounded to Michigan and Ohio. Apply geographic
+language by surface:
+
+- **Consumer surfaces** (homepage `<title>`/meta, hero, footer tagline,
+  blog meta, OG/Twitter cards, JSON-LD description, prerender HTML):
+  do NOT gate on "Michigan and Ohio." Describe the product, not the
+  service area. Geographic context belongs only at the shop-matching
+  step (e.g., empty-state on `/find-shops`, the homepage waitlist for
+  shop matching, the FAQ "what areas do you serve" answer).
+- **Shop-partner surfaces** (`/for-shops`, `/for-dealers`, prerender for
+  same, founding-partner copy): KEEP "Michigan and Ohio." It is the
+  recruiting target and an asset.
+- **Investor / About surfaces** (`/investors`, `/about`): KEEP
+  "Michigan and Ohio" framing. It is proof of focused execution.
+- **Compliance / legal surfaces** (`/privacy` state-rights sections):
+  unchanged — driven by jurisdiction, not marketing.
+
+Never claim national shop coverage. Never imply the assessment is gated
+to MI/OH.
+
 ## Voice and Tone
 
 - Primary tone: knowledgeable neighbor, not tech startup

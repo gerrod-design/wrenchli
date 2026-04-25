@@ -12,7 +12,7 @@ export function HomeJsonLd() {
       url: SITE,
       logo: `${SITE}/favicon.png`,
       description:
-        "Wrenchli connects vehicle owners with transparent repair pricing, instant shop quotes, DIY guides, and flexible financing — launching in Michigan and Ohio.",
+        "Wrenchli is a free vehicle symptom assessment platform. Describe your car symptom in plain English and get likely causes, fair cost ranges, and exactly what to ask your shop — no account required.",
       sameAs: [],
       contactPoint: {
         "@type": "ContactPoint",

@@ -33,8 +33,8 @@ export default function Index() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Free Vehicle Symptom Assessment | Wrenchli — Michigan & Ohio"
-        description="Describe your car symptom in plain English — get a free instant assessment of likely causes and repair costs. Serving Michigan and Ohio drivers."
+        title="Free Vehicle Symptom Assessment | Wrenchli"
+        description="Describe your car symptom in plain English — get a free instant assessment of likely causes, cost ranges, and exactly what to ask your shop. Free, no account required."
         path="/"
       />
       <HomeJsonLd />
@@ -140,7 +140,7 @@ export default function Index() {
               Be the First to Know
             </h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Wrenchli is launching in {userLocation.region} soon. Join the early access list and get notified when we go live.
+              Our trusted shop network is rolling out in {userLocation.region}. Join the early access list and we'll notify you when shop matching goes live in your area.
             </p>
             <div className="mt-8">
               <WaitlistForm source="home-waitlist" />

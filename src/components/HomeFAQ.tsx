@@ -28,7 +28,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "What areas does Wrenchli serve?",
-    a: "We're launching in Michigan and Ohio first, with plans to expand nationwide. Join our waitlist to be notified when we go live in your area.",
+    a: "The symptom assessment is free for any U.S. vehicle owner. Our trusted shop network is currently in Michigan and Ohio — if you're elsewhere, you can still complete your assessment, save it, and share it with whichever shop you trust.",
   },
   {
     q: "How accurate are the repair cost estimates?",
