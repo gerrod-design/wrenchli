@@ -378,6 +378,8 @@ Never:
 
 - Proceed with a fundraising process before all 10 raise readiness gates are met
 
+- Ship a ceremonial commit — i.e., a code change whose only justification is appearing responsive rather than fixing a verified live issue. When investigation returns zero findings, the correct atomic action is no commit. Refusing unwarranted work is the same discipline as refusing vetoed work; both protect institutional credibility. (Codified 2026-04-25 from positive precedent logged in wrenchli-DECISIONS.md.)
+
 ---
 
 ## Wrenchli's Current Operating Priorities
