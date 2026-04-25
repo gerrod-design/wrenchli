@@ -140,7 +140,7 @@ export default function Index() {
               Be the First to Know
             </h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Wrenchli is launching in {userLocation.region} soon. Join the early access list and get notified when we go live.
+              Our trusted shop network is rolling out in {userLocation.region}. Join the early access list and we'll notify you when shop matching goes live in your area.
             </p>
             <div className="mt-8">
               <WaitlistForm source="home-waitlist" />
