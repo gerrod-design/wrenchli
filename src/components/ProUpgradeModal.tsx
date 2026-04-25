@@ -148,7 +148,7 @@ export default function ProUpgradeModal({ open, onClose, onSuccess }: Props) {
             Upgrade to Wrenchli Pro
           </DialogTitle>
           <DialogDescription style={{ color: "#6B7280" }}>
-            Unlimited vehicles, recall alerts, PDF exports, and more — $2.99/month.
+            Unlimited vehicles, recall alerts, and more — $2.99/month.
           </DialogDescription>
         </DialogHeader>
 
