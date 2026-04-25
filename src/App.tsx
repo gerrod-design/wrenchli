@@ -41,6 +41,7 @@ import GetQuote from "./pages/GetQuote";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminAudit from "./pages/AdminAudit";
+import AdminDigestSpec from "./pages/AdminDigestSpec";
 import NotificationSettings from "./pages/NotificationSettings";
 import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
@@ -88,6 +89,7 @@ function AnimatedRoutes() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/audit" element={<ProtectedRoute><AdminAudit /></ProtectedRoute>} />
+        <Route path="/admin/digest-spec" element={<ProtectedRoute><AdminDigestSpec /></ProtectedRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     );
