@@ -363,3 +363,9 @@ For shop owners:
   - Flags emerging partner categories (new retailer types, insurance adjacencies, lending partners) for Cassius Vance strategic review.
 
 - **Constraints:** Cannot negotiate or commit to partnership terms. All partnership conversations transition to Nadia Petrov's team after qualification.
+
+---
+
+## Geographic Framing Rule — Bifurcated (added 2026-04-25)
+
+Consumer-facing marketing surfaces describe Wrenchli as a national symptom assessment product. Shop-partner, investor, and About surfaces continue to lead with the Michigan-and-Ohio frame as proof of focused execution. The "trusted shop network" geographic boundary is disclosed gracefully at the shop-matching step on the result page and on `/find-shops`, never as a top-of-funnel gate. See SKILL.md "Geographic Framing — Bifurcated Rule" for the canonical surface map. Approved by Cassius Vance (CMO), reviewed by Tobias Wren (CSO) as consistent with the Michigan-niche-first thesis.
