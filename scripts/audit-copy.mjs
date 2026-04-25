@@ -52,8 +52,12 @@ const BANNED_WORDS = [
   { pattern: /\bour platform\b/gi, label: "our platform", fix: 'Use "Wrenchli"' },
   { pattern: /\bAutoZone\b/g, label: "AutoZone", fix: "AutoZone was removed — omit entirely" },
   { pattern: /\bAI[- ]powered diagnos/gi, label: "AI-powered diagnosis", fix: "Avoid technical jargon in consumer copy" },
+  { pattern: /\bAI[- ]powered\b/gi, label: "AI-powered", fix: 'Use "structured" or remove the AI framing in consumer copy' },
   { pattern: /\bmachine learning diagnos/gi, label: "machine learning diagnosis", fix: "Avoid technical jargon in consumer copy" },
   { pattern: /\bdiagnose your car\b/gi, label: "diagnose your car", fix: 'Use "assess your symptoms"' },
+  { pattern: /\bBuilt[- ]in financing\b/gi, label: "Built-in financing", fix: 'Financing does not exist — say "repair financing on the way" or remove' },
+  { pattern: /\bPre[- ]approved financing\b/gi, label: "Pre-approved financing", fix: 'Financing does not exist — use "Pre-assessed, ready to book"' },
+  { pattern: /\bembedded financing\b/gi, label: "embedded financing", fix: 'Use "repair financing on the way"' },
   { pattern: /\bbroken\b/gi, label: '"broken" (repair experience)', fix: 'Use "harder than it needs to be"', contextCheck: true },
 ];
 

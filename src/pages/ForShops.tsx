@@ -23,7 +23,7 @@ const valueCards = [
   {
     icon: TrendingUp,
     title: "Higher Approval Rates",
-    desc: "Customers who understand their repair approve bigger jobs. Built-in financing means they can afford it too.",
+    desc: "Customers who understand the repair approve bigger jobs. They walk in ready to book, not negotiate.",
   },
 ];
 

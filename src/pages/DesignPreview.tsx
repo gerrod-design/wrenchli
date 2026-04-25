@@ -136,7 +136,7 @@ export default function DesignPreview() {
             How it works — 4 simple steps
           </p>
           <div className="flex items-center justify-center gap-0 mb-8 flex-wrap">
-            {["Vehicle", "Symptoms", "Diagnosis", "Plan"].map((label, i) => (
+            {["Vehicle", "Symptoms", "Assessment", "Plan"].map((label, i) => (
               <div key={label} className="flex items-center">
                 <div className="flex items-center gap-2">
                   <span
@@ -248,7 +248,7 @@ export default function DesignPreview() {
           <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
             {[
               { icon: Shield, title: "Transparent Pricing", desc: "See real cost ranges before you visit a shop. No surprises." },
-              { icon: Zap, title: "Instant Assessment", desc: "AI-powered symptom analysis in seconds, backed by real outcome data." },
+              { icon: Zap, title: "Instant Assessment", desc: "Structured symptom assessment in seconds, with confidence-scored likely causes." },
               { icon: Activity, title: "Accuracy Tracked", desc: "We track our symptom-to-repair match rate — and publish the results." },
             ].map((v) => (
               <div key={v.title} className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
@@ -293,7 +293,7 @@ export default function DesignPreview() {
                 {
                   icon: DollarSign,
                   title: "Higher Approval Rates",
-                  desc: "Customers who understand the repair approve bigger jobs. Built-in financing means they can afford it, too.",
+                  desc: "Customers who understand the repair approve bigger jobs. They walk in ready to book, not negotiate.",
                 },
               ].map((b) => (
                 <div key={b.title} className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
