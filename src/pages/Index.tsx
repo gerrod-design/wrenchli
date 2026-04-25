@@ -33,8 +33,8 @@ export default function Index() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Free Vehicle Symptom Assessment | Wrenchli — Michigan & Ohio"
-        description="Describe your car symptom in plain English — get a free instant assessment of likely causes and repair costs. Serving Michigan and Ohio drivers."
+        title="Free Vehicle Symptom Assessment | Wrenchli"
+        description="Describe your car symptom in plain English — get a free instant assessment of likely causes, cost ranges, and exactly what to ask your shop. Free, no account required."
         path="/"
       />
       <HomeJsonLd />
