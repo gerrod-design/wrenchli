@@ -7,12 +7,13 @@ import { Crown, Loader2, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { STRIPE_PUBLISHABLE_KEY } from "@/config/stripe";
 
 // Lazy-load Stripe only when the modal opens to avoid blank-screen crashes
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
 function getStripe() {
   if (!stripePromise) {
-    stripePromise = loadStripe("pk_test_51T1QqsGgIpvcscSeR1qGlKdIfTomSNBZoZqKhM0Ou6vji7JFyxAX8wNPmxEjACaerUJY1BhoQWxKRsvvFyzHyo2L00IchfYaT2").catch((err) => {
+    stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY).catch((err) => {
       console.warn("[Stripe] Failed to load Stripe.js:", err);
       stripePromise = null; // allow retry
       return null;
@@ -147,7 +148,7 @@ export default function ProUpgradeModal({ open, onClose, onSuccess }: Props) {
             Upgrade to Wrenchli Pro
           </DialogTitle>
           <DialogDescription style={{ color: "#6B7280" }}>
-            Unlimited vehicles, recall alerts, PDF exports, and more — $2.99/month.
+            Unlimited vehicles, recall alerts, and more — $2.99/month.
           </DialogDescription>
         </DialogHeader>
 

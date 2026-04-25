@@ -2,7 +2,10 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
-const PRICE_ID = "price_1TKaxDGgIpvcscSeDceeWkFo";
+const PRICE_ID = Deno.env.get("STRIPE_PRO_PRICE_ID");
+if (!PRICE_ID) {
+  console.error("[create-pro-subscription] STRIPE_PRO_PRICE_ID env var is not set");
+}
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
@@ -21,6 +24,7 @@ Deno.serve(async (req) => {
   try {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY not configured");
+    if (!PRICE_ID) throw new Error("STRIPE_PRO_PRICE_ID not configured — refusing to create subscription with no Price ID");
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
