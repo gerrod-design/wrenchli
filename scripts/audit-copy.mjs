@@ -58,6 +58,10 @@ const BANNED_WORDS = [
   { pattern: /\bBuilt[- ]in financing\b/gi, label: "Built-in financing", fix: 'Financing does not exist — say "repair financing on the way" or remove' },
   { pattern: /\bPre[- ]approved financing\b/gi, label: "Pre-approved financing", fix: 'Financing does not exist — use "Pre-assessed, ready to book"' },
   { pattern: /\bembedded financing\b/gi, label: "embedded financing", fix: 'Use "repair financing on the way"' },
+  { pattern: /\binstant AI diagnostics?\b/gi, label: "instant AI diagnostics", fix: 'Use "free symptom assessment"' },
+  { pattern: /\bAI diagnostics?\b/gi, label: "AI diagnostics", fix: 'Use "symptom assessment"' },
+  { pattern: /\bStop overpaying for (?:auto|vehicle) repairs?\b/gi, label: "Stop overpaying (banned framing)", fix: 'Use "Know what\'s wrong before you pay for it"' },
+  { pattern: /\bvetted local shops?\b/gi, label: "vetted local shops", fix: 'Use "trusted local shops"' },
   { pattern: /\bbroken\b/gi, label: '"broken" (repair experience)', fix: 'Use "harder than it needs to be"', contextCheck: true },
 ];
 

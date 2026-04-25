@@ -16,14 +16,14 @@ import PhoneMockup from "@/components/PhoneMockup";
 const steps = [
   { step: 1, icon: MessageSquare, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner. No mechanic-speak required." },
   { step: 2, icon: ClipboardList, title: "Get Your Assessment", desc: "See what's likely wrong, how urgent it is, and what it might cost — with plain-English explanations." },
-  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Choose your path: watch a DIY tutorial and order parts, or get quotes from vetted local shops." },
+  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Choose your path: watch a DIY tutorial and order parts, or get quotes from trusted local shops." },
   { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing if you need it." },
   { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control. Rate your experience and help others." },
 ];
 
 const benefits = [
   { icon: DollarSign, title: "True Price Transparency", desc: "The price you see is the price you pay. Every quote includes parts, labor, and fees — fully itemized." },
-  { icon: ShieldCheck, title: "Vetted Local Shops", desc: "Every shop is verified for quality, licensing, insurance, and customer satisfaction before joining Wrenchli." },
+  { icon: ShieldCheck, title: "Trusted Local Shops", desc: "Every shop is verified for quality, licensing, insurance, and customer satisfaction before joining Wrenchli." },
   { icon: Star, title: "Real Customer Reviews", desc: "Honest feedback from real customers tied to real repairs. No fake reviews, no gaming the system." },
   { icon: CreditCard, title: "Financing for Everyone", desc: "Multiple lending partners, all credit profiles welcome. Apply at checkout and get approved in minutes." },
   { icon: Calendar, title: "Book Online, Anytime", desc: "Schedule your repair 24/7 — no phone tag, no waiting on hold. Pick the time that works for you." },
@@ -142,7 +142,7 @@ export default function ForCarOwners() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="For Vehicle Owners"
-        description="Stop overpaying for vehicle repairs. Get instant quotes from vetted local shops, compare prices, and finance if you need to. Free for vehicle owners."
+        description="Know what's wrong before you pay for it. Get a free symptom assessment, compare quotes from trusted local shops, and walk in ready to book. Free for vehicle owners."
         path="/for-car-owners"
       />
       {/* Hero */}
