@@ -50,7 +50,7 @@ export default function Home() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Wrenchli — Vehicle Repair, Finally Fixed"
-        description="Wrenchli connects vehicle owners with trusted repair shops, transparent pricing, and affordable financing. Launching in Michigan & Ohio."
+        description="Wrenchli connects vehicle owners with trusted repair shops, transparent pricing, and repair financing on the way. Free symptom assessment, no account required."
         path="/home"
       />
 
