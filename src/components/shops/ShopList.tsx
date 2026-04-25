@@ -35,8 +35,7 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
           No Shops Found{searchedZip ? ` Near ${searchedZip}` : ""}
         </h3>
         <p className="text-muted-foreground max-w-md mx-auto mb-6">
-          We're currently expanding our verified shop network across Michigan and Ohio.
-          Your area may not have coverage yet — but you can help us grow!
+          Wrenchli's trusted shop network is currently in Michigan and Ohio. If you're outside those states, we'll show you what to ask any qualified mechanic — and you can save your assessment to share with whichever shop you trust.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
