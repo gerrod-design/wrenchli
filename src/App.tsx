@@ -89,6 +89,7 @@ function AnimatedRoutes() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/audit" element={<ProtectedRoute><AdminAudit /></ProtectedRoute>} />
+        <Route path="/admin/digest-spec" element={<ProtectedRoute><AdminDigestSpec /></ProtectedRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     );
