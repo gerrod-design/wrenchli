@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import AudioWaveform from "./chatbot/AudioWaveform";
 import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 import { trackVoiceEvent } from "@/lib/voiceTelemetry";
+import { handleStartFailure } from "@/lib/voiceRetry";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.";
 
@@ -623,7 +624,7 @@ export default function InlineChatWidget() {
                       const started = startListening(VOICE_OWNER);
                       trackVoiceEvent("inline_voice_button", started ? "start_success" : "start_failure");
                       if (!started) {
-                        toast.error("Couldn't start listening. Check mic permission and try again.");
+                        void handleStartFailure("inline_voice_button", () => startListening(VOICE_OWNER));
                       }
                       unlockAudioPlayback();
                     }
@@ -690,7 +691,7 @@ export default function InlineChatWidget() {
                         const started = startListening(VOICE_OWNER);
                         trackVoiceEvent("inline_switch_to_voice", started ? "start_success" : "start_failure");
                         if (!started) {
-                          toast.error("Microphone access is blocked. Allow mic permission and try again.");
+                          void handleStartFailure("inline_switch_to_voice", () => startListening(VOICE_OWNER));
                         }
                       }
                       unlockAudioPlayback().then((unlocked) => {

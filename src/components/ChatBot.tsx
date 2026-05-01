@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { trackVoiceEvent } from "@/lib/voiceTelemetry";
+import { handleStartFailure } from "@/lib/voiceRetry";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
 
@@ -444,7 +445,7 @@ export default function ChatBot() {
                             const started = startListening(VOICE_OWNER);
                             trackVoiceEvent("chatbot_header", started ? "start_success" : "start_failure");
                             if (!started) {
-                              toast.error("Microphone access is blocked. Please allow mic permission and try again.");
+                              void handleStartFailure("chatbot_header", () => startListening(VOICE_OWNER));
                             }
                           }
                           // Audio unlock + toast can happen async without breaking the gesture chain.
@@ -842,7 +843,7 @@ export default function ChatBot() {
                               const started = startListening(VOICE_OWNER);
                               trackVoiceEvent("chatbot_input", started ? "start_success" : "start_failure");
                               if (!started) {
-                                toast.error("Couldn't start listening. Check mic permission and try again.");
+                                void handleStartFailure("chatbot_input", () => startListening(VOICE_OWNER));
                               }
                               unlockAudioPlayback().then((unlocked) => {
                                 if (!unlocked) {
