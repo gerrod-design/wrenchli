@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AudioWaveform from "./chatbot/AudioWaveform";
 import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
+import { trackVoiceEvent } from "@/lib/voiceTelemetry";
 
 const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.";
 

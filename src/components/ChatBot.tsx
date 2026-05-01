@@ -22,6 +22,7 @@ import { decodeVin, sanitizeVin, isValidVin, type DecodedVehicle } from "@/lib/v
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { trackVoiceEvent } from "@/lib/voiceTelemetry";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
 
