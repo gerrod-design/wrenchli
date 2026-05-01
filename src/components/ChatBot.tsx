@@ -431,26 +431,26 @@ export default function ChatBot() {
                 {(supportsSTT || supportsTTS) && (
                   <div className="relative">
                     <button
-                      onClick={async () => {
+                      onClick={() => {
                         const turningOn = !voiceEnabled;
-                        if (turningOn) {
-                          const unlocked = await unlockAudioPlayback();
-                          if (!unlocked) {
-                            toast.warning("Speaker audio may stay muted for now, but voice mode is still enabled.");
-                          }
-                        }
                         toggleVoice();
                         setShowVoiceTip(false);
                         if (turningOn) {
-                          toast.success("🎙️ Voice mode on — I'll speak my responses and listen for yours!", { duration: 3000 });
+                          // Start listening SYNCHRONOUSLY inside the user gesture so the
+                          // browser allows mic access (iOS Safari + Chrome enforce this).
                           if (supportsSTT) {
-                            setTimeout(() => {
-                              const started = startListening(VOICE_OWNER);
-                              if (!started) {
-                                toast.error("Microphone access is blocked. Please allow mic permission and try again.");
-                              }
-                            }, 0);
+                            const started = startListening(VOICE_OWNER);
+                            if (!started) {
+                              toast.error("Microphone access is blocked. Please allow mic permission and try again.");
+                            }
                           }
+                          // Audio unlock + toast can happen async without breaking the gesture chain.
+                          unlockAudioPlayback().then((unlocked) => {
+                            if (!unlocked) {
+                              toast.warning("Speaker audio may stay muted. Tap Voice again to retry.");
+                            }
+                          });
+                          toast.success("🎙️ Voice mode on — I'll speak my responses and listen for yours!", { duration: 3000 });
                         } else {
                           stopListening(VOICE_OWNER);
                           stopSpeaking();
@@ -830,18 +830,20 @@ export default function ChatBot() {
                         {isListening && <AudioWaveform />}
                         <button
                           type="button"
-                          onClick={async () => {
+                          onClick={() => {
                             if (isListening) {
                               stopListening(VOICE_OWNER);
                             } else {
-                              const unlocked = await unlockAudioPlayback();
-                              if (!unlocked) {
-                                toast.warning("Mic is on. If replies are muted, tap Voice once more to unlock speaker audio.");
-                              }
+                              // SYNC start inside gesture — required for mic permission on Safari/Chrome.
                               const started = startListening(VOICE_OWNER);
                               if (!started) {
                                 toast.error("Couldn't start listening. Check mic permission and try again.");
                               }
+                              unlockAudioPlayback().then((unlocked) => {
+                                if (!unlocked) {
+                                  toast.warning("Mic is on. If replies are muted, tap Voice once more to unlock speaker audio.");
+                                }
+                              });
                             }
                           }}
                           disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
