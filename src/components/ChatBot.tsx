@@ -431,8 +431,9 @@ export default function ChatBot() {
                 {(supportsSTT || supportsTTS) && (
                   <div className="relative">
                     <button
-                      onClick={() => {
+                       onClick={() => {
                         const turningOn = !voiceEnabled;
+                        trackVoiceEvent("chatbot_header", "tap", { turningOn });
                         toggleVoice();
                         setShowVoiceTip(false);
                         if (turningOn) {
@@ -440,6 +441,7 @@ export default function ChatBot() {
                           // browser allows mic access (iOS Safari + Chrome enforce this).
                           if (supportsSTT) {
                             const started = startListening(VOICE_OWNER);
+                            trackVoiceEvent("chatbot_header", started ? "start_success" : "start_failure");
                             if (!started) {
                               toast.error("Microphone access is blocked. Please allow mic permission and try again.");
                             }
@@ -831,11 +833,13 @@ export default function ChatBot() {
                         <button
                           type="button"
                           onClick={() => {
+                            trackVoiceEvent("chatbot_input", "tap", { isListening });
                             if (isListening) {
                               stopListening(VOICE_OWNER);
                             } else {
                               // SYNC start inside gesture — required for mic permission on Safari/Chrome.
                               const started = startListening(VOICE_OWNER);
+                              trackVoiceEvent("chatbot_input", started ? "start_success" : "start_failure");
                               if (!started) {
                                 toast.error("Couldn't start listening. Check mic permission and try again.");
                               }

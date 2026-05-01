@@ -614,11 +614,13 @@ export default function InlineChatWidget() {
                 <button
                   type="button"
                   onClick={() => {
+                    trackVoiceEvent("inline_voice_button", "tap", { isListening });
                     if (isListening) {
                       stopListening(VOICE_OWNER);
                     } else {
                       // SYNC start inside gesture — required for mic permission on Safari/Chrome.
                       const started = startListening(VOICE_OWNER);
+                      trackVoiceEvent("inline_voice_button", started ? "start_success" : "start_failure");
                       if (!started) {
                         toast.error("Couldn't start listening. Check mic permission and try again.");
                       }
@@ -680,10 +682,12 @@ export default function InlineChatWidget() {
                   <button
                     type="button"
                     onClick={() => {
+                      trackVoiceEvent("inline_switch_to_voice", "tap");
                       toggleVoice();
                       // SYNC start inside gesture so the mic permission prompt is allowed.
                       if (supportsSTT) {
                         const started = startListening(VOICE_OWNER);
+                        trackVoiceEvent("inline_switch_to_voice", started ? "start_success" : "start_failure");
                         if (!started) {
                           toast.error("Microphone access is blocked. Allow mic permission and try again.");
                         }
