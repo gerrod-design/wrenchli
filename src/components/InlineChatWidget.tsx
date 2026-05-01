@@ -613,15 +613,16 @@ export default function InlineChatWidget() {
                 {isListening && <AudioWaveform />}
                 <button
                   type="button"
-                  onClick={async () => {
+                  onClick={() => {
                     if (isListening) {
                       stopListening(VOICE_OWNER);
                     } else {
-                      await unlockAudioPlayback();
+                      // SYNC start inside gesture — required for mic permission on Safari/Chrome.
                       const started = startListening(VOICE_OWNER);
                       if (!started) {
                         toast.error("Couldn't start listening. Check mic permission and try again.");
                       }
+                      unlockAudioPlayback();
                     }
                   }}
                   disabled={loading || isSpeaking || (isListening && voiceOwner !== VOICE_OWNER)}
@@ -678,21 +679,21 @@ export default function InlineChatWidget() {
                 {(supportsSTT || supportsTTS) && (
                   <button
                     type="button"
-                    onClick={async () => {
-                      const unlocked = await unlockAudioPlayback();
-                      if (!unlocked) {
-                        toast.warning("Speaker audio may stay muted — but voice mode is on.");
-                      }
+                    onClick={() => {
                       toggleVoice();
-                      toast.success("🎙️ Voice mode on — I'll speak my responses!", { duration: 3000 });
+                      // SYNC start inside gesture so the mic permission prompt is allowed.
                       if (supportsSTT) {
-                        setTimeout(() => {
-                          const started = startListening(VOICE_OWNER);
-                          if (!started) {
-                            toast.error("Microphone access is blocked. Allow mic permission and try again.");
-                          }
-                        }, 0);
+                        const started = startListening(VOICE_OWNER);
+                        if (!started) {
+                          toast.error("Microphone access is blocked. Allow mic permission and try again.");
+                        }
                       }
+                      unlockAudioPlayback().then((unlocked) => {
+                        if (!unlocked) {
+                          toast.warning("Speaker audio may stay muted — but voice mode is on.");
+                        }
+                      });
+                      toast.success("🎙️ Voice mode on — I'll speak my responses!", { duration: 3000 });
                     }}
                     disabled={loading}
                     className="flex h-10 items-center gap-1.5 rounded-xl bg-emerald-500/10 border border-emerald-400/30 px-3 text-sm font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors disabled:opacity-40"
