@@ -1,6 +1,6 @@
 # Installed Skills Registry
 
-# Last updated: 2026-04-18
+# Last updated: 2026-05-02
 
 ## Active Skills (execution order)
 
@@ -35,6 +35,8 @@
 15. wrenchli-CRISIS.md — Crisis Activation framework, incident response coordination, board and investor notification, media and regulatory response, financial crisis response, data breach legal response, executive departure protocol, agent authority suspension during active crisis
 
 16. wrenchli-FUNDRAISING.md — Raise readiness criteria, VC targeting and outreach methodology, investor meeting preparation discipline, SAFE negotiation framework, data room contents and sequencing, term sheet evaluation criteria, pre-close legal and financial checklist, Fundraising Impact Check
+
+17. wrenchli-SENSING.md — Situational awareness layer: founder time observation, external signal scanning, agent roster drift, capability/innovation gap detection, decision quality review. Parallel-track (NOT in execution order). Owned by Astrid Vellholm (Chief Sensing Officer). Signals only — no autonomous action authority.
 
 ## Execution Order
 
@@ -118,3 +120,13 @@ Each now has all four required governance fields: Reports to, Authority tier, Do
 ## Round 13.2 (2026-04-19) — Stub Definition Completion
 
 Round 13.2 — Completed five stub agent definitions installed as heading-only anchors in Round 13.1. Populated full governance definition blocks (Reports to, Authority tier, Domain, Capabilities, Veto or Constraints) for Rhett Holloway (wrenchli-OPERATIONS.md), Darya Nazari (wrenchli-FINANCE.md), Evelyn Marchetti (wrenchli-LEGAL.md), Sloane Ashford (wrenchli-SECURITY.md), Amara Oduya (wrenchli-REGULATORY.md). Content sourced from authoritative Agent Roster (Revision 3) and Session 2 conversation history. Brings all 41 formally defined internal agents to complete governance specification with all four required fields present.
+
+## 2026-05-02 — Round 14.0 — Sensing Skill Installed
+
+Created wrenchli-SENSING.md as seventeenth skill file. Situational awareness layer covering founder time observation, external signal scanning, agent roster drift detection, capability/innovation gap monitoring, and decision quality review. Owned by Astrid Vellholm (Chief Sensing Officer, Tier 1 — observation/classification/routing/recommendation only, no autonomous action authority). Five sub-agents installed: Iver Halstein, Solenne Marchetto, Tomek Brandeis, Yusra Eldridge, Calix Worthington.
+
+**Parallel-track skill — NOT inserted into the eight-step execution order.** The Strategy → Operations → CEO → Engineering → Accuracy → Security → Regulatory → Brand chain is unchanged. Sensing runs on its own cadence and surfaces signals to the existing C-suite per the coordination map inside the skill file.
+
+**Calibration mode (first 30 days, through 2026-06-01):** Daily morning brief, weekly synthesis, monthly capability audit, and monthly decision quality review are invoked manually by the founder. No automated triggers or scheduled workflows built yet — automation work deferred until after calibration.
+
+No existing skill file was modified as part of this integration.
