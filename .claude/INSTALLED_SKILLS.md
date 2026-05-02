@@ -36,6 +36,8 @@
 
 16. wrenchli-FUNDRAISING.md — Raise readiness criteria, VC targeting and outreach methodology, investor meeting preparation discipline, SAFE negotiation framework, data room contents and sequencing, term sheet evaluation criteria, pre-close legal and financial checklist, Fundraising Impact Check
 
+17. wrenchli-SENSING.md — Situational awareness layer: founder time observation, external signal scanning, agent roster drift, capability/innovation gap detection, decision quality review. Parallel-track (NOT in execution order). Owned by Astrid Vellholm (Chief Sensing Officer). Signals only — no autonomous action authority.
+
 ## Execution Order
 
 For any significant decision, run Strategy → Operations → CEO Check → Engineering Check → Accuracy Check → Security Check → Regulatory Impact Check → Brand/Marketing compliance.
