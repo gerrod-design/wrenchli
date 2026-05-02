@@ -1,6 +1,6 @@
 # Installed Skills Registry
 
-# Last updated: 2026-04-18
+# Last updated: 2026-05-02
 
 ## Active Skills (execution order)
 
