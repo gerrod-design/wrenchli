@@ -12,7 +12,7 @@ Deno.serve((req: Request) => {
   return new Response(
     JSON.stringify({ analysis: MAINTENANCE_MESSAGE, maintenance: true }),
     {
-      status: 503,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     },
   );
