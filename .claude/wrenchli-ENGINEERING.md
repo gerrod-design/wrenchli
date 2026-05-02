@@ -78,13 +78,52 @@ scan. Errors → stop and fix. Warnings → flag and ask confirmation.
 
 ## Technical Stack — Never Change Without Instruction
 
-- AI model: claude-sonnet-4-6 ONLY
+- AI model: claude-sonnet-4-6 (via ANTHROPIC_MODEL secret) is the
+  platform default. See "Native Audio Analysis Exception" below for
+  the only sanctioned deviation.
 - Database: Supabase PostgreSQL
 - Edge Functions: Deno runtime
 - Frontend: React + TypeScript + Vite
 - Hosting: Vercel
 - CORS: always use _shared/cors.ts (never import from supabase-js)
 - JSON parsing: always strip markdown code fences before parsing
+
+### Native Audio Analysis Exception
+
+Wrenchli's platform standard is Anthropic Claude (model from
+ANTHROPIC_MODEL secret, currently claude-sonnet-4-6). All
+AI-calling edge functions must use Claude unless they fall under
+the documented native-audio exception below.
+
+**Native Audio Analysis Exception.** Anthropic's Messages API does
+not currently accept raw audio input. Claude has no native audio
+modality. Functions that require waveform-level audio fidelity for
+product quality may use Google Gemini via the Lovable AI Gateway
+(LOVABLE_API_KEY), with model google/gemini-2.5-flash hardcoded in
+the function source.
+
+Functions currently exercising this exception:
+
+- analyze-car-audio (live as of Round 14.6)
+- analyze-video-combined (audio-track analysis when re-enabled in
+  Round 14.7)
+
+Conditions for the exception:
+
+- The function must require waveform-level audio analysis, not just
+  transcript-level.
+- The function must use the Lovable AI Gateway, not direct Gemini
+  API access.
+- When Anthropic ships native audio input support, these functions
+  migrate to Claude and the exception is retired.
+- All other governance rules (COPY CHECK, brand voice, accuracy,
+  security) apply to these functions identically to Claude-powered
+  functions.
+
+**Sunset condition:** This exception retires when Anthropic releases
+native audio input support compatible with the product's quality
+requirements. The exception is reviewed quarterly; if Anthropic
+ships before the next review, the migration is scoped immediately.
 
 ## Deliberate Decisions — Never Reverse
 
