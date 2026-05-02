@@ -138,3 +138,7 @@ Updated wrenchli-SENSING.md cadence specification to Option C pattern — Sensin
 ## 2026-05-02 — Round 14.2 — Sensing Severity Bands Persisted
 
 Persisted severity classification bands (HIGH/MED/LOW definitions plus founder-authorized-actions rule) into wrenchli-SENSING.md after first calibration cycle. No other skill files modified.
+
+## 2026-05-02 — Round 14.4 — Consumer AI Functions Disabled (COPY CHECK)
+
+Disabled three consumer-facing AI edge functions pending COPY CHECK remediation: chat (Mike orchestrator), analyze-car-audio, analyze-video-combined. Reason: Round 14.3 scan confirmed active runtime violations of banned vocabulary in wrenchli-COMPLIANCE.md (instruction-text and template-text leaks of "diagnose"/"diagnosis" reaching Claude context and consumer output). HTTP routes preserved so frontend continues to function; function bodies replaced with the standard maintenance message pointing users to the assessment flow at /agent-diagnosis. Re-enablement gated on prompt rewrites passing a post-rewrite COPY CHECK scan with zero instruction or template leaks. agent-diagnose, diagnose, diagnose-vehicle, and diagnose-damage-photo deliberately NOT disabled — they carry violations too but disabling them would take the core symptom assessment flow offline; they will be addressed via prompt rewrite. No frontend changes. No other edge functions modified.
