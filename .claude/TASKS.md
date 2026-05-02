@@ -12,7 +12,8 @@
 - [ ] **Call Curt's Service and McInerney Auto Center** — Pilot shop outreach for Michigan market. Status: *not started*
 - [ ] **Send Tekmetric follow-up** — Email support@tekmetric.com and security@tekmetric.com re: API application submitted April 5 2026. Expected approval April 19-26. Status: *waiting on response*
 - [ ] **Complete N8N Workflows 3 and 4** — Requires Supabase service role key to be configured in N8N. Status: *blocked on key*
-- [ ] **Fix remaining 369 audit-copy errors** — Run `node scripts/audit-copy.mjs` and resolve all consumer-facing text violations. Status: *in progress*
+- [ ] **Fix remaining 369 audit-copy errors (static pages)** — Run `node scripts/audit-copy.mjs` and resolve violations on static pages. Note: Consumer-facing AI runtime COPY CHECK is partially addressed — Wave 1 complete (chat, analyze-car-audio, analyze-video-combined live with v2 prompts as of 2026-05-02 Rounds 14.5–14.7); Waves 2 and 3 pending (see below). Static-page audit-copy errors are a separate workstream from the runtime AI prompt rewrites. Status: *in progress*
+- [ ] **Plan Wave 2 prompt rewrite migration sequence** — Wave 2 covers agent-diagnose, diagnose, diagnose-vehicle, diagnose-damage-photo. Unlike Wave 1, these functions are live and cannot be disabled during migration. Migration plan needs: parallel-function deploy strategy (e.g., agent-diagnose-v2 alongside agent-diagnose), traffic routing approach, validation criteria before traffic cutover, rollback procedure tested before first migration, ordering decision (which function first based on risk assessment). Owner: TBD. Status: *not started*. Trigger: fresh planning session, not continuation of 2026-05-02 Wave 1 work.
 
 ## This Month
 
