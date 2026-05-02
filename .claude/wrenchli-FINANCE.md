@@ -573,4 +573,4 @@ Financial decisions escalate through the three-tier structure:
 
 Financial discipline is not a constraint on ambition — it is what makes ambition executable. A company that runs out of cash cannot pursue any strategy, regardless of how compelling that strategy is. A cap table that is disputed or disorganized cannot attract the investors needed to fund growth. Unit economics that are not understood cannot be improved.
 
-The principle that governs this skill: *Know what every dollar costs. Know what eve
+The principle that governs this skill: *Know what every dollar costs. Know what every dollar produces. Know where the money will be in 90 days. A founder who has that visibility can make every other decision with confidence — because the financial foundation underneath those decisions is solid enough to hold them.*
