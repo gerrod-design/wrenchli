@@ -409,6 +409,18 @@ Recommended action: <specific, time-bounded>
 Routing:       <which Wrenchli agent or function should respond>
 ```
 
+### Severity Classification Bands
+
+All Sensing sub-agents producing severity-tagged outputs (Solenne Marchetto, Tomek Brandeis, Yusra Eldridge, Calix Worthington, and Astrid Vellholm when synthesizing) classify signals using these bands:
+
+- **HIGH** — signals the founder would want to know immediately and would not otherwise be aware of. Reserved for genuinely surfacing events, not for noting routine system state.
+- **MED** — signals worth founder attention this week. Material but not urgent.
+- **LOW** — context only. Useful background; no action implied.
+
+**Calibration rule:** founder-authorized actions taken with full awareness are never HIGH, regardless of their material impact. The HIGH band is reserved for signals that surprise the founder or require immediate attention. A planned launch, a deliberate configuration change, or any other action the founder authorized in advance defaults to LOW unless its outcome was unexpected.
+
+This calibration applies to all severity-tagged outputs across the Sensing layer.
+
 ### Daily Morning Brief
 
 ```

@@ -134,3 +134,7 @@ No existing skill file was modified as part of this integration.
 ## 2026-05-02 — Round 14.1 — Sensing Cadence Revision
 
 Updated wrenchli-SENSING.md cadence specification to Option C pattern — Sensing daily brief Tue-Fri, Sensing weekly synthesis Mon, both at 7am ET. Added Cadence Coordination Note documenting separation from existing morning-briefing-daily operations cron. Calibration mode unchanged. No other skill files modified.
+
+## 2026-05-02 — Round 14.2 — Sensing Severity Bands Persisted
+
+Persisted severity classification bands (HIGH/MED/LOW definitions plus founder-authorized-actions rule) into wrenchli-SENSING.md after first calibration cycle. No other skill files modified.
