@@ -85,9 +85,9 @@ other skills. It runs continuously in the background, with five
 output cadences:
 
 - **Continuous** — critical alerts (push to founder immediately)
-- **Daily** — morning brief (delivered before 7am ET each day)
-- **Weekly** — synthesis brief (delivered Sunday evening for the
-  week ahead)
+- **Tuesday-Friday** — morning brief (delivered at 7am ET);
+  **Monday** — weekly synthesis (delivered at 7am ET, replacing
+  that day's daily brief)
 - **Monthly** — capability audit and decision quality review
 - **Annual** — Sensing Layer self-audit and horizon list refresh
 
@@ -370,13 +370,25 @@ Cadence applied:
 | Output | Frequency | Owner |
 |---|---|---|
 | Critical alerts | Continuous | Solenne Marchetto |
-| Morning brief | Daily, 7am ET | Solenne Marchetto |
-| Weekly synthesis | Sunday 8pm ET | Solenne Marchetto |
+| Morning brief | Tuesday-Friday, 7am ET | Solenne Marchetto |
+| Weekly synthesis | Monday, 7am ET (replaces that day's daily brief; covers prior week + week ahead) | Solenne Marchetto |
 | Founder leverage delta | Weekly, Sunday 8pm ET | Iver Halstein |
 | Capability audit | Monthly, first Monday | Tomek Brandeis |
 | Innovation brief | Weekly, Friday 5pm ET | Yusra Eldridge |
 | Decision quality memo | Monthly, first Monday | Calix Worthington |
 | Sensing Layer self-audit | Annually, anniversary of installation | Astrid Vellholm |
+
+### Cadence Coordination Note
+
+The existing operations briefing (`morning-briefing-daily` cron, 11:00 UTC / 7am ET, every day) is a separate operational artifact from the Sensing brief. The two briefs are intentionally complementary:
+
+- **Operations brief:** daily, every day. Surfaces operational state (pending tasks, partner status, integration health).
+- **Sensing daily brief:** Tuesday-Friday only. Surfaces external signals from the horizon list and founder time observations.
+- **Sensing weekly synthesis:** Monday only, replacing that day's Sensing daily brief. Surfaces patterns across the prior week.
+
+On Mondays, Gerrod receives the operations brief and the Sensing weekly synthesis. On Tuesday-Friday, Gerrod receives the operations brief and the Sensing daily brief. On Saturday and Sunday, Gerrod receives only the operations brief.
+
+The cadence pattern was chosen to keep each brief tight and distinct rather than merging them, and to avoid the alert fatigue that would result from two same-time briefs covering different content.
 
 Re-calibrate cadences when team size or clock speed materially
 changes. Tomek Brandeis surfaces this on annual review.
