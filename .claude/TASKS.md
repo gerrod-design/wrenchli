@@ -18,6 +18,7 @@
 
 - [ ] **Build N8N Workflow 5 — Weekly Agent Digest** — Automated weekly summary of agent activity and accuracy metrics. Status: *not started*
 - [ ] **Apply to CJ Affiliate for AutoZone and O'Reilly** — Affiliate program applications for parts revenue. Note: AutoZone removed from product; affiliate would be link-only if approved. Status: *not started*
+- [ ] **DB column rename: diagnosis_title/diagnosis_code → assessment_title/assessment_code** — Plan and execute migration across all affected tables (quote_requests, repair_outcomes, referral_packages, api_usage_logs, smart_repair_intel_logs, diagnosis_records, etc.), update 13 frontend files (useSmartRepairIntel, useProductRecommendations, GetQuote, ShareWithShopButton, ContextualAdvertising, ReferralPackage, AdminDashboard, ApiUsageAnalytics, ReferralAnalytics, advertising/types, adClickTracker, referralTracking), regenerate Supabase types, handle public API deprecation on /developers (Custom GPT Action — current spec exposes diagnosis_title/diagnosis_code; needs versioned deprecation), and fix /developers page COPY CHECK violation (banned vocabulary in user-facing API documentation). Owner: TBD. Status: *not started*
 
 ## Completed — April 12 2026 (Tonight)
 
