@@ -130,3 +130,7 @@ Created wrenchli-SENSING.md as seventeenth skill file. Situational awareness lay
 **Calibration mode (first 30 days, through 2026-06-01):** Daily morning brief, weekly synthesis, monthly capability audit, and monthly decision quality review are invoked manually by the founder. No automated triggers or scheduled workflows built yet — automation work deferred until after calibration.
 
 No existing skill file was modified as part of this integration.
+
+## 2026-05-02 — Round 14.1 — Sensing Cadence Revision
+
+Updated wrenchli-SENSING.md cadence specification to Option C pattern — Sensing daily brief Tue-Fri, Sensing weekly synthesis Mon, both at 7am ET. Added Cadence Coordination Note documenting separation from existing morning-briefing-daily operations cron. Calibration mode unchanged. No other skill files modified.
