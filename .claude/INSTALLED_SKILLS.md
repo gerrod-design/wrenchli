@@ -1,6 +1,6 @@
 # Installed Skills Registry
 
-# Last updated: 2026-05-02
+# Last updated: 2026-05-06
 
 ## Active Skills (execution order)
 
@@ -37,6 +37,8 @@
 16. wrenchli-FUNDRAISING.md — Raise readiness criteria, VC targeting and outreach methodology, investor meeting preparation discipline, SAFE negotiation framework, data room contents and sequencing, term sheet evaluation criteria, pre-close legal and financial checklist, Fundraising Impact Check
 
 17. wrenchli-SENSING.md — Situational awareness layer: founder time observation, external signal scanning, agent roster drift, capability/innovation gap detection, decision quality review. Parallel-track (NOT in execution order). Owned by Astrid Vellholm (Chief Sensing Officer). Signals only — no autonomous action authority.
+
+18. wrenchli-CONSUMER_ADVISORS.md — Governs the five consumer-facing AI advisor personas (Mike, Sam, Jess, Kai, Priya), the architectural firewall between the consumer-advisor and internal-agent populations, sampling-based accuracy audit loop, and lifecycle discipline (activation, pause, retirement). Owned jointly by Augustin Reyes (CPO, advisor behavior) and Helena Ostrowski (CCO, advisor performance). Coordinates with ACCURACY.md, LEGAL.md, SECURITY.md, MARKETING.md, OPERATIONS.md.
 
 ## Execution Order
 
@@ -166,3 +168,7 @@ Wave 1 complete (Rounds 14.4 through 14.7, plus 14.6.1 governance update). All t
 ## 2026-05-02 — Round 14.8 — TASKS.md Updated for Wave 1 Closeout and Wave 2/3 Planning
 
 TASKS.md updated to reflect Wave 1 closeout and the structure of Wave 2, Wave 3, and broader architectural alignment work. Existing audit-copy errors item reframed as static-page workstream separate from runtime AI prompt rewrites. Wave 2 planning task added under This Week (parallel-deploy strategy, traffic routing, validation, rollback, ordering decision). Wave 3, /developers page COPY CHECK fix, and quarterly architectural alignment audit (ideally automated via Sensing's Tomek Brandeis) added under This Month. No edge function or other skill file modified.
+
+## 2026-05-06 — wrenchli-CONSUMER_ADVISORS.md Installed
+
+Registered wrenchli-CONSUMER_ADVISORS.md as eighteenth skill file. Governs the five consumer-facing AI advisor personas (Mike, Sam, Jess, Kai, Priya) embedded in the Wrenchli product at wrenchli.net. Establishes the architectural firewall between the consumer-advisor population and the internal agent network (twelve C-suite agents and twenty-nine specialists), the sampling-based accuracy audit loop coordinated with Imani Whitfield (Fact Checker Protocol), and the lifecycle discipline for activation, pause, and retirement of consumer-facing agents. Owned jointly by Augustin Reyes (CPO, advisor behavior — prompts, routing, persona definition) and Helena Ostrowski (CCO, advisor performance — consumer experience quality, feedback loops, lifecycle status). Coordinates with wrenchli-ACCURACY.md, wrenchli-LEGAL.md, wrenchli-SECURITY.md, wrenchli-MARKETING.md, and wrenchli-OPERATIONS.md. Parallel-track skill — NOT inserted into the eight-step execution order; consumer-advisor governance runs alongside internal governance. No edge function or other skill file modified. Note: this registration is independent of the in-flight PocketOS-class security remediation (Batch 1, Task 1.1 still pending founder report).
