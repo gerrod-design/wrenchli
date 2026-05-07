@@ -1,92 +1,69 @@
+## Goal
 
+Convert `user-uploads://Wrenchli_Agent_Package_Source_Revision_4.md` into two artifacts in `/mnt/documents/`:
 
-# Wrenchli — Full Website Build Plan
+- `Wrenchli_Agent_Package_Rev4.html` — self-contained, web-viewable
+- `Wrenchli_Agent_Package_Rev4.pdf` — print-rendered from the same HTML
 
-## Overview
-A professional, multi-page marketing website for Wrenchli's pre-launch phase. The site follows the provided design system (deep blue nav/footer, light content sections, orange CTAs) with working waitlist forms backed by Supabase. Mobile-first, scroll-animated, and built to establish trust and credibility.
+Both match wrenchli.net brand (no Plus Jakarta Sans — using site tokens per your decision).
 
----
+## Visual system (locked to wrenchli.net)
 
-## Pages (7 total)
+Pulled from `src/index.css` and existing dark-theme overrides:
 
-### 1. Home / Landing Page
-- **Hero section** (75-80vh on mobile): Bold headline about fixing the broken auto repair experience, animated stat counters (e.g. "$288B industry," "300% price variance," "2 in 3 don't trust their mechanic"), two CTAs — "Join the Waitlist" (orange) + "I'm a Shop Owner" (secondary)
-- **How It Works**: 3-step visual flow (Describe Your Repair → Compare Quotes → Book & Save)
-- **Three Pillars section**: Cards for Marketplace, Shop SaaS, and Financing — each with icon, description, and link to detail page
-- **Why Wrenchli**: Trust indicators, transparency messaging, "coming to Detroit" positioning
-- **Waitlist signup** inline section with email capture
-- **Footer**: Company info, nav links, social links (LinkedIn), legal links
+- Background: `#0F1117` (dark) with warm cream `#F8F8F6` for inset cards
+- Primary accent: Wrenchli orange `#E07B39`
+- Secondary accent: deep blue `hsl(212 52% 25%)`
+- Typography: **Poppins** 600/700/800 for headings, **Inter** 400/500/600 for body, **DM Sans** for stats — same stack used across the app
+- No symmetric 3-col grids on desktop (per Core memory)
 
-### 2. For Car Owners (Consumer)
-- Value proposition for consumers: price transparency, vetted shops, easy booking
-- Feature cards: Instant quotes, shop comparison, verified reviews, financing options
-- "How pricing works" explainer section
-- Waitlist CTA: "Get notified when we launch in Detroit"
+## Layout structure
 
-### 3. For Shop Owners
-- Value proposition for shops: pre-qualified customers, modern tools, grow your business
-- SaaS features showcase: scheduling, inspections, payments, customer management
-- Pricing preview ($299/mo positioning)
-- "Apply for Early Access" waitlist form (collects shop name, location, email, phone)
+Mirrors the Rev 3 organization implied by the source:
 
-### 4. Vehicle Insights (DIY / Diagnostic)
-- Teal-themed section explaining the diagnostic feature concept
-- Tabs/modes: DTC Code Lookup, Symptom Checker, Maintenance Schedules
-- Pre-launch: static explainer content with "Coming Soon" badges
-- CTA to join waitlist for early access
+1. **Cover** — full-bleed dark hero, orange rule, title, confidential tag, stat table as a 2-column key/value strip
+2. **Section blocks** — left orange tick + section number, large Poppins H2, body in Inter, generous vertical rhythm
+3. **Agent grid** — card-per-agent (name, role, tier badge, reporting line, governing skill file). Asymmetric 2-col on desktop, single col on mobile
+4. **Skill-file blocks** — compact rows: filename (mono), domain, operative rule
+5. **Governance / execution-order** — numbered vertical rail with orange step pips
+6. **Footer** — revision, date, maintainer, confidential mark
 
-### 5. About / Team
-- Company story, mission, Detroit roots
-- Founding team section (placeholder cards — name, title, bio)
-- Timeline / milestones visual
-- Values section (Transparency, Trust, Accessibility)
+## Build approach (single Python script)
 
-### 6. FAQ
-- Accordion-style FAQ covering: How it works, pricing, for shops, financing, launch timeline
-- Separate sections for Consumer FAQs and Shop Owner FAQs
-- CTA at bottom to contact or join waitlist
+`/tmp/build_agent_package.py`:
 
-### 7. Contact
-- Contact form (name, email, subject dropdown, message) — stored in Supabase
-- Company address (Detroit, MI)
-- Links to LinkedIn and future social channels
+1. Read the source markdown
+2. Parse with `markdown-it-py` (preserves tables, lists, headings)
+3. Post-process tokens to wrap agent rosters and skill listings into branded card sections (detected by section heading patterns like "Agent Roster", "Skill Files", "Execution Order")
+4. Inject into an HTML template with inline CSS (Google Fonts via `<link>`, fallback system stack for offline PDF)
+5. Write `Wrenchli_Agent_Package_Rev4.html` to `/mnt/documents/`
+6. Render PDF via Playwright/Chromium print at A4, 18mm margins, `print-color-adjust: exact` so the dark theme survives
+7. Write `Wrenchli_Agent_Package_Rev4.pdf` to `/mnt/documents/`
 
----
+## QA pass (Augustin)
 
-## Shared Components
+Mandatory before delivery:
 
-- **Navigation**: Sticky top nav with logo, page links, "Join Waitlist" CTA button. Mobile: hamburger → full-screen overlay with large tap-friendly links
-- **Sticky Mobile Bottom Bar**: Fixed bottom bar with "Get a Quote" + "DIY Diagnosis" buttons (60px tall, blur background)
-- **Footer**: Multi-column with links, company info, social, legal
-- **Back-to-top button**: Appears after 2 viewport heights of scrolling
-- **Waitlist modal/form**: Reusable component, email + optional name, Supabase integration
+1. `pdftoppm -jpeg -r 150 Wrenchli_Agent_Package_Rev4.pdf /tmp/qa/page`
+2. `code--view` every page image (not just page 1)
+3. Check: clipped text, broken tables, agent cards splitting awkwardly across page breaks, font fallback to Times (= Google Fonts didn't embed), orange rendering as muted brown (color profile issue), confidential footer overlap
+4. Open the HTML in headless and screenshot at 1280px and 375px to confirm responsive layout
+5. Fix → re-render → re-inspect until clean
+6. Report findings inline in chat with "issues found / fixes applied" or "clean pass, nothing flagged"
 
----
+## Deliverables
 
-## Backend (Supabase)
+Two `<lov-artifact>` tags at the end:
 
-- **Waitlist table**: Captures email, name, user type (consumer/shop), source page, timestamp
-- **Shop interest table**: Shop name, owner name, email, phone, location, timestamp
-- **Contact submissions table**: Name, email, subject, message, timestamp
-- No authentication required — public forms with basic validation
+```
+<lov-artifact path="Wrenchli_Agent_Package_Rev4.html" mime_type="text/html"></lov-artifact>
+<lov-artifact path="Wrenchli_Agent_Package_Rev4.pdf" mime_type="application/pdf"></lov-artifact>
+```
 
----
+Plus a 3-line QA summary from Augustin.
 
-## Design & UX Details
+## Out of scope
 
-- **Colors**: Deep blue (#1E3A5F) headers/nav/footer, light (#F0F4F8) alternating sections, orange (#E67E22) CTAs, green/teal/blue accent sections per pillar
-- **Typography**: Poppins/DM Sans headings, Inter body text, large stat numbers
-- **Animations**: Staggered hero fade-in, scroll-triggered section reveals, card hover lifts, animated number counters, skeleton loading states
-- **Mobile-first**: 44px+ touch targets, proper input types, responsive grids, lazy-loaded images, 16px minimum font size
-- **Honest positioning**: "Launching in Detroit" / "Coming Soon" language throughout — no fabricated testimonials or claims
-
----
-
-## What's NOT Included (Future Phases)
-- Actual quote/booking functionality
-- Shop onboarding portal
-- Financing application flow
-- User accounts / authentication
-- Blog with CMS
-- Real diagnostic tool integration
-
+- Editing the markdown source content (verbatim conversion only)
+- Updating any in-repo files (`src/`, `.claude/`, `public/`) — this is a `/mnt/documents/` artifact job, no app code touched
+- Resuming PocketOS Batch 1 Task 1.1 — still awaiting your A/B/C decision on the backup posture report
