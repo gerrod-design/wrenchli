@@ -138,6 +138,18 @@ Wrenchli operates with a human-AI hybrid team. Agents execute defined business f
 
 | Rhett Holloway | Chief of Staff | wrenchli-OPERATIONS.md | Gerrod Parchmon | Tier 1-2 coordination; Tier 3 to founder |
 
+### Consumer Advisor Roster (Governed by wrenchli-CONSUMER_ADVISORS.md)
+
+| Persona | Role | Skill File | Owner | Status |
+|---|---|---|---|---|
+| Mike | Lead Advisor | wrenchli-CONSUMER_ADVISORS.md | Augustin Reyes + Helena Ostrowski | Active |
+| Sam | Cost Specialist | wrenchli-CONSUMER_ADVISORS.md | Augustin Reyes + Helena Ostrowski | Active |
+| Jess | Parts & DIY Expert | wrenchli-CONSUMER_ADVISORS.md | Augustin Reyes + Helena Ostrowski | Active |
+| Kai | Finance Specialist | wrenchli-CONSUMER_ADVISORS.md | Augustin Reyes + Helena Ostrowski | Paused — see wrenchli-CONSUMER_ADVISORS.md |
+| Priya | Prevention Coach | wrenchli-CONSUMER_ADVISORS.md | Augustin Reyes + Helena Ostrowski | Paused — see wrenchli-CONSUMER_ADVISORS.md |
+
+Consumer advisors are product personas, not internal-agent decision-support agents. They face customers directly via the product chat. They do not participate in the three-tier authority architecture, do not sit in the 16-step execution order, and do not have access to internal data. Lifecycle, audit, and governance run through wrenchli-CONSUMER_ADVISORS.md.
+
 ### Agent Authority Principles
 
 - Agents do not expand their own authority. Authority expansion requires a skill file update approved by the founder.
@@ -150,9 +162,11 @@ Wrenchli operates with a human-AI hybrid team. Agents execute defined business f
 
 - During an active crisis, all agent outputs on the crisis topic are labeled "CRISIS MODE — ADVISORY ONLY — FOUNDER REVIEW REQUIRED."
 
+- Consumer-facing advisor personas (Mike, Sam, Jess, Kai, Priya) are governed by wrenchli-CONSUMER_ADVISORS.md. They do not have access to internal data, do not participate in internal governance, and are subject to the architectural firewall described in that file. Internal agents do not directly govern live consumer conversations; consumer-advisor signal reaches internal agents only through the Sample Audit Pipeline.
+
 ### Agent Governance
 
-Adding, modifying, or retiring agents follows the protocol in wrenchli-PEOPLE.md. New agents with material business authority require founder approval and a governing skill file before activation. Ungoverned agents are not permitted.
+Adding, modifying, or retiring agents follows the protocol in wrenchli-PEOPLE.md. New agents with material business authority require founder approval and a governing skill file before activation. Ungoverned agents are not permitted. The consumer-advisor population is governed by wrenchli-CONSUMER_ADVISORS.md, which provides the lifecycle protocol (activation, pause, retirement, reactivation) and the Sample Audit Pipeline that produces institutional learning loops for advisor outputs.
 
 ---
 
@@ -251,6 +265,8 @@ When a decision triggers multiple skill files, the following execution order gov
 **Security gating:** The Security Check at step 6 gates all data-access decisions. A security veto stops the execution order regardless of how other steps resolve.
 
 **Not every step runs on every decision.** Simple decisions trigger one or two checks. Complex decisions trigger the full sequence. When in doubt, more checks are run rather than fewer.
+
+**Consumer-advisor coordination:** Decisions affecting the consumer-advisor population (Mike, Sam, Jess, Kai, Priya) are coordinated through wrenchli-CONSUMER_ADVISORS.md. The advisors themselves do not sit inside the execution order — the architectural firewall preserves their separation from internal governance. But changes to the advisor population (new personas, retirements, prompt revisions, audit-pipeline modifications) are decisions about the agent team and flow through this execution order with wrenchli-CONSUMER_ADVISORS.md as the operative governance file.
 
 ---
 

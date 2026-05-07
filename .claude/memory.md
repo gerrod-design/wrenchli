@@ -43,8 +43,8 @@ easy · moderate · Shop Required
 
 ## Removed Features — Do Not Rebuild
 
-- Kai (Finance AI advisor) — removed from chat routing
-- Priya (Prevention Coach) — removed from chat routing
+- Kai (Finance AI advisor) — Paused per wrenchli-CONSUMER_ADVISORS.md. Reactivation gated on six-gate financial-services completion in SKILL.md. Do not reference financing in chat or copy until founder confirms gate close.
+- Priya (Prevention Coach) — Paused under investigation per wrenchli-CONSUMER_ADVISORS.md. Reactivation gated on persona review completion (90-day target). Do not re-route to Priya or reference prevention coaching in chat until founder confirms review outcome.
 - Jenine Parchmon leadership card — removed from About page
 - Finance Providers footer column — removed from footer
 - $299/month shop pricing — removed from /for-shops

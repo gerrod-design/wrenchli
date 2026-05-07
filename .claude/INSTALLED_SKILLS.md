@@ -172,3 +172,46 @@ TASKS.md updated to reflect Wave 1 closeout and the structure of Wave 2, Wave 3,
 ## 2026-05-06 — wrenchli-CONSUMER_ADVISORS.md Installed
 
 Registered wrenchli-CONSUMER_ADVISORS.md as eighteenth skill file. Governs the five consumer-facing AI advisor personas (Mike, Sam, Jess, Kai, Priya) embedded in the Wrenchli product at wrenchli.net. Establishes the architectural firewall between the consumer-advisor population and the internal agent network (twelve C-suite agents and twenty-nine specialists), the sampling-based accuracy audit loop coordinated with Imani Whitfield (Fact Checker Protocol), and the lifecycle discipline for activation, pause, and retirement of consumer-facing agents. Owned jointly by Augustin Reyes (CPO, advisor behavior — prompts, routing, persona definition) and Helena Ostrowski (CCO, advisor performance — consumer experience quality, feedback loops, lifecycle status). Coordinates with wrenchli-ACCURACY.md, wrenchli-LEGAL.md, wrenchli-SECURITY.md, wrenchli-MARKETING.md, and wrenchli-OPERATIONS.md. Parallel-track skill — NOT inserted into the eight-step execution order; consumer-advisor governance runs alongside internal governance. No edge function or other skill file modified. Note: this registration is independent of the in-flight PocketOS-class security remediation (Batch 1, Task 1.1 still pending founder report).
+
+## 2026-05-06 — Round 14 — Consumer Advisor Operations Patch Applied
+
+Applied six surgical edits to wrenchli-OPERATIONS.md per the operations patch: (1) added "Consumer-advisor coordination" note after the 16-step execution order (16 steps unchanged); (2) appended a separate Consumer Advisor Roster sub-table below the internal C-suite roster, listing Mike/Sam/Jess/Kai/Priya with wrenchli-CONSUMER_ADVISORS.md as governing skill file and Augustin Reyes + Helena Ostrowski as joint owners; (3) added a sixth Agent Authority Principles bullet establishing the architectural firewall at the operating-skill level; (4) appended a sentence to the Agent Governance paragraph cross-referencing wrenchli-CONSUMER_ADVISORS.md as the operative file for consumer-advisor lifecycle and the Sample Audit Pipeline. Three-tier escalation architecture, the 16-step order numbering, the five hard-veto roles, and the Decision Resolution Rubric were not modified.
+
+## 2026-05-06 — Round 14.1 — Consumer Advisor Lifecycle Finalization (Kai & Priya)
+
+Closed out the pending disposition for Kai (Finance Specialist) and Priya (Prevention Coach) under the lifecycle protocol in wrenchli-CONSUMER_ADVISORS.md. Both personas remain on the consumer-advisor roster as Paused, with documented reactivation triggers.
+
+**Kai — Finance Specialist.** Status: Paused. Reactivation trigger: completion of the six financial-services gates in SKILL.md. Founder estimate places financing capability within 6 months, well inside the 12-month persona-reuse window. Brand investment in the persona is preserved.
+
+**Priya — Prevention Coach.** Status: Paused — under investigation. Reactivation trigger: completion of a documented persona review by Augustin Reyes and Helena Ostrowski covering original removal rationale, current product capability, scope-overlap with Mike, and refreshed prompt alignment. Review completion target: 90 days from this entry (target 2026-08-04). If review does not complete within 90 days, default action flips to retirement.
+
+**New governance rule added** to wrenchli-CONSUMER_ADVISORS.md under "Lifecycle Discipline for Consumer Advisors": Maximum Pause Duration. Concrete external triggers have no maximum but require quarterly review of validity. Investigation triggers have a 90-day maximum, extendable once by founder approval. Undefined triggers are not permitted.
+
+**Concurrent updates applied this round:**
+- wrenchli-CONSUMER_ADVISORS.md "Lifecycle Status — Current State" table updated with finalized Kai and Priya entries.
+- wrenchli-COMMERCIAL.md Part Two "explicitly deferred features" — Kai and Priya entries replaced with paused-with-trigger language and cross-reference to wrenchli-CONSUMER_ADVISORS.md.
+- memory.md "Removed Features — Do Not Rebuild" — Kai and Priya entries replaced with paused-with-trigger language and cross-reference to wrenchli-CONSUMER_ADVISORS.md.
+
+**Concurrent updates NOT applied (gaps to flag):**
+- Wrenchli Agent Package (HTML and PDF): no Agent Package artifact exists in the project repo. Roster column update from "(product)" placeholder to "wrenchli-CONSUMER_ADVISORS.md" and Status column addition for rows 1–5 deferred until the Agent Package is sourced or recreated. Founder owns this gap.
+- Standalone decision log: no standalone decision log file exists in the project. The Round 14.1 decision log entry is recorded inline below in lieu of a separate file.
+
+**Decision log entry (Round 14.1):**
+- decision_date: 2026-05-06
+- conflict_classification: n/a — scheduled lifecycle disposition, no conflict
+- agents_involved: Augustin Reyes, Helena Ostrowski, Rhett Holloway, Gerrod Parchmon
+- decision_description: Finalize lifecycle disposition for Kai and Priya following installation of wrenchli-CONSUMER_ADVISORS.md in Round 14.
+- recommendations_produced: Three options surfaced — formal retirement, paused with reactivation trigger, or split disposition. Founder selected paused-with-trigger for both with different trigger types (concrete external trigger for Kai, investigation trigger for Priya).
+- resolution_path: Tier 3 founder decision; Augustin and Helena execute lifecycle documentation; Rhett records and coordinates concurrent file updates.
+- decision_maker: Gerrod Parchmon
+- decision: Both personas remain Paused on the consumer-advisor roster. Kai reactivation gated on six financial-services gates per SKILL.md. Priya reactivation gated on documented persona review with 90-day target; default action flips to retirement if review not complete within 90 days. New governance rule added to wrenchli-CONSUMER_ADVISORS.md establishing maximum pause durations.
+- reasoning: Kai pause is structurally honest given documented trigger and near-term financing roadmap; retirement would waste persona investment within the 12-month reuse window. Priya pause preserves brand investment per founder priority while the missing removal rationale is reconstructed; 90-day forcing function prevents indefinite drift.
+- dissenting_views: None at the agent layer.
+- success_criteria: Kai — reactivation when six gates close, with operational continuity (no Kai references during pause, no consumer-facing financing language). Priya — review completion within 90 days resulting in either documented reactivation or clean retirement.
+- review_date: 30/60/90-day Priya progress checks (2026-06-05, 2026-07-06, 2026-08-04). Kai reviewed at next monthly roadmap review and at six-gate close.
+
+**Founder check-in cadence:**
+- Kai status reviewed at next monthly roadmap review and at the financial-services six-gate close.
+- Priya status reviewed at the 30-day, 60-day, and 90-day marks. At 90 days, the review either reactivates Priya, requests one 90-day extension, or executes default retirement under wrenchli-PEOPLE.md.
+
+**No changes to:** the architectural firewall, the Sample Audit Pipeline behavior, the three-tier authority architecture, the 16-step execution order, the five hard-veto roles, or the Decision Resolution Rubric. Round 14.1 is a closeout, not a structural change.
