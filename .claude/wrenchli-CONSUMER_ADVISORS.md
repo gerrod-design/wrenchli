@@ -242,6 +242,18 @@ To reactivate a paused persona:
 4. Engineering reactivates routing; Sample Audit Pipeline begins immediately and runs at 100% sampling (not the standard 50/week minimum) for the first four weeks of reactivation.
 5. Status updates flow through the same documentation chain as activation: Agent Package, INSTALLED_SKILLS.md, memory.md, wrenchli-COMMERCIAL.md.
 
+### Maximum Pause Duration
+
+A paused persona with a defined trigger is honest if the trigger is observable and time-bounded. A paused persona with an open-ended or undefined trigger is at risk of becoming an undocumented retirement — the failure mode this file exists to prevent.
+
+To prevent that drift, the following maximum pause durations apply:
+
+- **Pause with a concrete external trigger** (e.g., a product capability shipping, a regulatory gate closing, a partnership going live): no maximum duration, but the trigger condition must be reviewed quarterly by Augustin Reyes and Helena Ostrowski to confirm it is still valid and still expected within a reasonable horizon.
+- **Pause with an investigation trigger** (e.g., reconstructing an unclear removal rationale, reviewing scope overlap, validating fit for current product reality): maximum 90 days from the date of pause documentation. If the investigation does not complete within 90 days, the default action flips to retirement under the standard retirement protocol.
+- **Pause with no defined trigger:** not permitted. Any persona in this state must be either given a trigger or retired, by the next quarterly review at the latest.
+
+The 90-day investigation window is a forcing function, not a punishment. Investigations that uncover a legitimate reactivation case can extend by a single 90-day renewal with founder approval; investigations that stall without progress retire the persona cleanly rather than letting status drift continue.
+
 ### Activating a New Consumer Advisor
 
 To add a new consumer-facing persona:
@@ -299,8 +311,8 @@ This section is the canonical status record for the consumer-advisor population.
 | Mike | Lead Advisor | Active | n/a | Initial activation (legacy) |
 | Sam | Cost Specialist | Active | n/a | Initial activation (legacy) |
 | Jess | Parts & DIY Expert | Active | n/a | Initial activation (legacy) |
-| Kai | Finance Specialist | Paused — pending final disposition | Six financial-services gates per SKILL.md must close before reactivation | TBD — founder decision pending |
-| Priya | Prevention Coach | Paused — pending final disposition | Removal rationale to be confirmed; trigger to be defined or persona to be retired | TBD — founder decision pending |
+| Kai | Finance Specialist | Paused | Reactivation gated on completion of the six financial-services gates in SKILL.md. Financing scheduled within 6 months per founder estimate; trigger expected to close inside 12-month persona-reuse window. | Round 14.1 — 2026-05-06 |
+| Priya | Prevention Coach | Paused — under investigation | Original removal rationale unclear and to be reconstructed. Reactivation gated on completion of a documented persona review by Augustin Reyes and Helena Ostrowski covering: (a) original removal rationale, (b) current product capability for prevention coaching, (c) scope-overlap check against Mike, (d) refreshed prompt aligned to current rules. **Review completion target: 90 days from this entry (target 2026-08-04). If review is not complete within 90 days, default action flips to retirement per Section "Lifecycle Discipline" of this file.** | Round 14.1 — 2026-05-06 |
 
 When the Kai/Priya dispositions are finalized, this table is updated and the corresponding INSTALLED_SKILLS.md, memory.md, wrenchli-COMMERCIAL.md, and Agent Package entries are reconciled.
 
