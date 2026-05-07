@@ -188,7 +188,7 @@ No internal agent receives direct read access to live conversation transcripts. 
 
 ### Status to Be Resolved
 
-**Kai — Finance Specialist (currently paused).** Removed from chat routing per the documented rationale in wrenchli-COMMERCIAL.md Part Two: "financing does not exist yet." Kai's reactivation gate is the completion of the six financial-services gates specified in wrenchli-SKILL.md. Until those six gates are confirmed complete by Gerrod Parchmon, no consumer-facing copy or chat routing may reference Kai or financing capabilities. **Final status — retire formally or maintain as paused with the documented gate — pending founder decision.**
+**Kai — Finance Specialist (currently paused).** Removed from chat routing per the documented rationale in wrenchli-COMMERCIAL.md Part Two: "financing does not exist yet." Kai's reactivation gate is the completion of the seven financial-services gates specified in wrenchli-COMMERCIAL.md (including Gate 7: Backup Posture Hardened, added Round 14.2 / 2026-05-07). Until those seven gates are confirmed complete by Gerrod Parchmon, no consumer-facing copy or chat routing may reference Kai or financing capabilities. **Final status — retire formally or maintain as paused with the documented gate — pending founder decision.**
 
 **Priya — Prevention Coach (currently paused).** Removed from chat routing without a documented rationale in the existing skill files. **Final status — pending founder decision; the discovery question is whether the removal was a product-gap pause (prevention features deferred), a quality-issue pause (response performance below bar), or a scope-drift pause (overlap with Mike or marketing content).**
 
