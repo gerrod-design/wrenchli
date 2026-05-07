@@ -188,7 +188,7 @@ No internal agent receives direct read access to live conversation transcripts. 
 
 ### Status to Be Resolved
 
-**Kai — Finance Specialist (currently paused).** Removed from chat routing per the documented rationale in wrenchli-COMMERCIAL.md Part Two: "financing does not exist yet." Kai's reactivation gate is the completion of the six financial-services gates specified in wrenchli-SKILL.md. Until those six gates are confirmed complete by Gerrod Parchmon, no consumer-facing copy or chat routing may reference Kai or financing capabilities. **Final status — retire formally or maintain as paused with the documented gate — pending founder decision.**
+**Kai — Finance Specialist (currently paused).** Removed from chat routing per the documented rationale in wrenchli-COMMERCIAL.md Part Two: "financing does not exist yet." Kai's reactivation gate is the completion of the seven financial-services gates specified in wrenchli-COMMERCIAL.md (including Gate 7: Backup Posture Hardened, added Round 14.2 / 2026-05-07). Until those seven gates are confirmed complete by Gerrod Parchmon, no consumer-facing copy or chat routing may reference Kai or financing capabilities. **Final status — retire formally or maintain as paused with the documented gate — pending founder decision.**
 
 **Priya — Prevention Coach (currently paused).** Removed from chat routing without a documented rationale in the existing skill files. **Final status — pending founder decision; the discovery question is whether the removal was a product-gap pause (prevention features deferred), a quality-issue pause (response performance below bar), or a scope-drift pause (overlap with Mike or marketing content).**
 
@@ -311,7 +311,7 @@ This section is the canonical status record for the consumer-advisor population.
 | Mike | Lead Advisor | Active | n/a | Initial activation (legacy) |
 | Sam | Cost Specialist | Active | n/a | Initial activation (legacy) |
 | Jess | Parts & DIY Expert | Active | n/a | Initial activation (legacy) |
-| Kai | Finance Specialist | Paused | Reactivation gated on completion of the six financial-services gates in SKILL.md. Financing scheduled within 6 months per founder estimate; trigger expected to close inside 12-month persona-reuse window. | Round 14.1 — 2026-05-06 |
+| Kai | Finance Specialist | Paused | Reactivation gated on completion of the seven financial-services gates in wrenchli-COMMERCIAL.md (including Gate 7: Backup Posture Hardened). Financing scheduled within 6 months per founder estimate; trigger expected to close inside 12-month persona-reuse window. | Round 14.1 — 2026-05-06 |
 | Priya | Prevention Coach | Paused — under investigation | Original removal rationale unclear and to be reconstructed. Reactivation gated on completion of a documented persona review by Augustin Reyes and Helena Ostrowski covering: (a) original removal rationale, (b) current product capability for prevention coaching, (c) scope-overlap check against Mike, (d) refreshed prompt aligned to current rules. **Review completion target: 90 days from this entry (target 2026-08-04). If review is not complete within 90 days, default action flips to retirement per Section "Lifecycle Discipline" of this file.** | Round 14.1 — 2026-05-06 |
 
 When the Kai/Priya dispositions are finalized, this table is updated and the corresponding INSTALLED_SKILLS.md, memory.md, wrenchli-COMMERCIAL.md, and Agent Package entries are reconciled.
