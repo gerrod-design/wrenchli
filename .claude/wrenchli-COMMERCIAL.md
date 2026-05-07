@@ -667,7 +667,7 @@ The product roadmap is the authoritative source of what Wrenchli is building, in
 5. Roadmap is reviewed and updated monthly by Gerrod Parchmon with Rhett Holloway's coordination
 
 **Features that are explicitly deferred (do not build, do not promise):**
-- Kai (Finance AI advisor): Paused per wrenchli-CONSUMER_ADVISORS.md. Removed from chat routing; financing does not exist yet. Reactivation triggered by completion of the six financial-services gates in SKILL.md. Brand investment in the persona is preserved within the 12-month reuse window. Do not promise financing capabilities in any consumer-facing surface until founder confirms gate close.
+- Kai (Finance AI advisor): Paused per wrenchli-CONSUMER_ADVISORS.md. Removed from chat routing; financing does not exist yet. Reactivation triggered by completion of the seven financial-services gates in wrenchli-COMMERCIAL.md (including Gate 7: Backup Posture Hardened). Brand investment in the persona is preserved within the 12-month reuse window. Do not promise financing capabilities in any consumer-facing surface until founder confirms gate close.
 - Priya (Prevention Coach): Paused — under investigation per wrenchli-CONSUMER_ADVISORS.md. Reactivation triggered by completion of a documented persona review by Augustin Reyes and Helena Ostrowski with a 90-day completion target. Default retirement applies if review does not complete in 90 days. Do not re-route to Priya or build prevention-coaching features that depend on her availability until founder confirms review outcome.
 - All-in-one shop management software functionality: Wrenchli is not an SMS
 - Warranty advertising partnerships: not yet established

@@ -311,7 +311,7 @@ This section is the canonical status record for the consumer-advisor population.
 | Mike | Lead Advisor | Active | n/a | Initial activation (legacy) |
 | Sam | Cost Specialist | Active | n/a | Initial activation (legacy) |
 | Jess | Parts & DIY Expert | Active | n/a | Initial activation (legacy) |
-| Kai | Finance Specialist | Paused | Reactivation gated on completion of the six financial-services gates in SKILL.md. Financing scheduled within 6 months per founder estimate; trigger expected to close inside 12-month persona-reuse window. | Round 14.1 — 2026-05-06 |
+| Kai | Finance Specialist | Paused | Reactivation gated on completion of the seven financial-services gates in wrenchli-COMMERCIAL.md (including Gate 7: Backup Posture Hardened). Financing scheduled within 6 months per founder estimate; trigger expected to close inside 12-month persona-reuse window. | Round 14.1 — 2026-05-06 |
 | Priya | Prevention Coach | Paused — under investigation | Original removal rationale unclear and to be reconstructed. Reactivation gated on completion of a documented persona review by Augustin Reyes and Helena Ostrowski covering: (a) original removal rationale, (b) current product capability for prevention coaching, (c) scope-overlap check against Mike, (d) refreshed prompt aligned to current rules. **Review completion target: 90 days from this entry (target 2026-08-04). If review is not complete within 90 days, default action flips to retirement per Section "Lifecycle Discipline" of this file.** | Round 14.1 — 2026-05-06 |
 
 When the Kai/Priya dispositions are finalized, this table is updated and the corresponding INSTALLED_SKILLS.md, memory.md, wrenchli-COMMERCIAL.md, and Agent Package entries are reconciled.
