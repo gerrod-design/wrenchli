@@ -39,7 +39,7 @@ NEVER say:
 - "broken" when describing the repair experience
   (say "harder than it needs to be" instead)
 - "vetted shops" (say "trusted shops" — not yet vetted)
-- "embedded financing" (say "repair financing on the way")
+- "embedded financing" (say "repair financing on the way" — gated by the seven-gate Financial Services Partner Transition Protocol in wrenchli-COMMERCIAL.md, including Gate 7: Backup Posture Hardened, added 2026-05-07 / Round 14.2)
 - "modern tools for shops" (implies SMS — Wrenchli is not SMS)
 - "paper tickets and phone calls" (condescending to shop owners)
 - "dealerships do worse work" (never compare quality across types)
