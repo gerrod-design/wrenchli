@@ -510,7 +510,9 @@ Repair financing is currently described as "repair financing on the way" in all 
 
 **Gate 6 — Brand standard updated:** wrenchli-SKILL.md is updated to remove "repair financing on the way" and replace with the accurate live description. Status: NOT COMPLETE.
 
-No agent, no prompt, and no Lovable session may change the "repair financing on the way" language to a live description until all six gates are confirmed complete by Gerrod Parchmon. This is a bright-line rule.
+**Gate 7 — Backup posture hardened (PocketOS-class protection):** P0 + P1 backup remediation per the 2026-05-07 Backup Posture Report is live in production AND a successful restore drill has been executed and signed off by Sloane Ashford. Specifically: PITR enabled with at least 7-day retention; nightly out-of-account encrypted database export to a separate AWS account with S3 Object Lock and KMS; storage bucket versioning enabled on damage-photos; documented RPO ≤ 24h / RTO ≤ 4h; and at least one full restore drill from the out-of-account backup completed end-to-end with timing recorded. Owner: Keegan Alaric (build), Sloane Ashford (verify). Status: NOT COMPLETE. Authorized 2026-05-07 by Gerrod Parchmon as Round 14.2.
+
+No agent, no prompt, and no Lovable session may change the "repair financing on the way" language to a live description until all seven gates are confirmed complete by Gerrod Parchmon. This is a bright-line rule.
 
 ---
 
