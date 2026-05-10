@@ -76,54 +76,240 @@ is submitted.
 **Security Scan Rule:** After every deployment, run an updated security
 scan. Errors → stop and fix. Warnings → flag and ask confirmation.
 
+## Claude Code Operational Discipline
+
+This section governs how Claude Code sessions are run when building,
+debugging, or refactoring Wrenchli. It exists because session quality
+degrades measurably as context grows: retrieval accuracy drops from
+~92% at 256K tokens to ~78% at 1M tokens, and in long sessions roughly
+98% of tokens are spent re-reading conversation history rather than
+producing new work. Treating context as a hygiene problem — not a
+limits problem — is the operational discipline these rules enforce.
+
+### Session Initialization Rule
+
+Every new build session begins with three checks before any code is
+generated:
+
+1. The relevant `claude.md` (or equivalent project constitution file)
+   has been loaded and is under 200 lines. If the file exceeds 200
+   lines, refactor it into a router that links to specialized files
+   before proceeding.
+2. Plan Mode is engaged for any task larger than a single targeted
+   change. The model must state assumptions and ask clarifying
+   questions until it reaches ~95% confidence in the implementation
+   path before writing code. Imperative ("do X then Y then Z")
+   instructions are downgraded to declarative ("achieve outcome X
+   subject to constraints Y") wherever possible.
+3. The terminal status line is enabled so context percentage and
+   model state are visible in real time.
+
+Skip this initialization only for trivial single-file edits.
+
+### 60% Threshold Protocol
+
+Manual `/compact` is required at 60% context capacity. Do not wait
+for the 95% auto-compact trigger; by then context rot has already
+set in and retrieval accuracy has dropped. The compaction prompt
+must be specific:
+
+> "/compact: summarize current state but preserve all [API integration
+> decisions / RLS policies / database schemas / pending tasks / open
+> decisions] verbatim."
+
+After compaction, verify the summary preserved what matters before
+continuing. If a critical decision was lost, re-inject it manually.
+
+### 5-Minute Cache Rule
+
+Claude Code's prompt cache expires after 5 minutes of idle time. If
+a session is paused for longer than 5 minutes, the next prompt
+reprocesses the entire context at full token cost. Before stepping
+away from a session for any meaningful interval, run `/clear` or
+`/compact` first. This is especially important when context is
+already above 40% — resuming an idle 60%-loaded session burns
+tokens at the highest rate of any common pattern.
+
+### Assembly Line Session Model
+
+Long builds (any task estimated to require more than ~2 hours of
+work) are decomposed into specialized sessions rather than executed
+in one continuous session. The standard decomposition:
+
+- **Discovery session** — ingesting documentation, reading the
+  relevant codebase, identifying constraints. Output: a written
+  summary of findings.
+- **Planning session** — establishing the technical roadmap, success
+  criteria, and decision points. Input: the Discovery summary. Output:
+  a written plan with explicit Done criteria.
+- **Execution session** — surgical code implementation against the
+  plan. Input: the plan. Output: the code change, tested.
+
+Each session starts fresh with only the prior session's output as
+input. This preserves retrieval accuracy across the full build by
+keeping any single session under the threshold where context rot
+begins.
+
+### MCP-vs-CLI Rule
+
+Prefer CLI integrations over MCP servers wherever both options exist.
+A connected MCP server can inject up to ~18,000 tokens of tool
+definitions into context on every message, even when the tools are
+not used in that turn. CLIs do not carry this overhead.
+
+When MCP is genuinely required (the integration has no CLI equivalent,
+or the MCP-specific capability is being used), disconnect the MCP
+server when the session moves to work that does not need it. Do not
+leave MCP servers connected as a default.
+
+### Sub-Agent Delegation Rule
+
+Model selection is treated as resource allocation, not preference:
+
+- **Architectural planning, deep debugging, system-wide refactors**
+  → Opus (or the highest-capability model available).
+- **Implementation and standard build work** → Sonnet.
+- **Research, summarization, document ingestion, exploratory reads
+  of large codebases** → Haiku as a sub-agent, with results returned
+  to the primary agent as a summary rather than as raw context.
+
+Delegating research and summarization to Haiku sub-agents preserves
+the primary agent's context window for reasoning about the work
+itself, and reduces total token spend by routing high-volume / low-
+complexity work to a cheaper model.
+
+### Surgical Reference Rule
+
+Repository-dumping is forbidden. When the agent needs to see code,
+reference specific files or functions using the project's targeting
+syntax (`@filename`, `@function`, or equivalent) rather than pasting
+broad sections. The smaller the reference surface, the higher the
+retrieval accuracy on the surface that matters.
+
+When an implementation branch fails, prefer rewinding the session
+(`/re` or equivalent) over attempting corrective follow-ups. Follow-
+ups stack failed code into permanent history and pollute the model's
+working memory; rewinding deletes the bad branch entirely.
+
+### End-of-Session Token Hygiene
+
+At the end of any working session, before clearing or closing:
+
+1. Save the session summary (decisions made, files touched, pending
+   items, open questions) to the appropriate project file.
+2. Note any TASKS.md updates implied by the session.
+3. Run `/clear` rather than leaving the session open to expire.
+
+This complements the existing End-of-Session Documentation Rule
+(below) by ensuring no productive context is lost when a session
+closes.
+
+### State Verification Rule
+
+Any claim about the state of an external system — payment processor
+status, API integration approval, scheduled job execution, third-party
+service activation, EIN registration, regulatory filing acceptance,
+shop partner onboarding — must be paired with a concrete verification
+step that takes less than 10 minutes and confirms the actual state of
+the system.
+
+This applies in three directions:
+
+1. **Founder-stated claims about external systems.** When the founder
+   asserts a state ("EIN is registered," "Stripe is in live mode,"
+   "the cron job ran last night," "Tekmetric approved the API"),
+   the assertion is recorded in the relevant doc *and* a verification
+   step is proposed in the same response. The verification is not
+   optional friction; it is how documentation stays accurate.
+
+2. **Agent-stated claims about external systems.** When any agent
+   (including any Claude session) reports that an external action
+   completed, the report is treated as a hypothesis until verified.
+   Agents can be wrong about what they actually did, especially in
+   long-running or multi-step tasks. The verification step is part
+   of the task, not a follow-up.
+
+3. **Documented assumptions about external systems.** Any skill file,
+   TASKS.md entry, or planning document that asserts an external
+   state must reference how that state was last verified and when.
+   "Stripe live mode active (verified 2026-05-09)" is a complete
+   record; "Stripe live mode active" alone is not.
+
+The rule exists because external system state is the most common
+source of documentation drift. Internal claims (what an agent
+recommends, what a skill file requires) are governed by the agent
+and skill file structure. External claims depend on the actual
+behavior of systems Claude does not control. Drift between
+documentation and reality on external systems is a leading indicator
+of larger operational drift.
+
+When verification fails — when the actual state does not match the
+documented state — the response is to update the documentation
+immediately, not to argue with the verification result. The
+documentation serves the system, not the other way around.
+
+### Constitutional Reference Rule
+
+Before any design, architecture, or governance work in any session,
+the first action is to read the canonical "what exists" references —
+not as supplementary context, but as constitutional reading that
+defines the system the new work must integrate with.
+
+The canonical references for Wrenchli are:
+
+1. **`INSTALLED_SKILLS.md`** — the registry of every installed skill
+   file, the execution order, and the change log. This is the master
+   index of governance.
+2. **`Wrenchli_Agent_Package_Rev[N].md` (current revision)** — the
+   complete agent roster with authority tiers, reporting lines, and
+   skill file ownership. This is the master index of *who exists* and
+   *what they own*.
+3. **The skill file directly governing the domain of the new work.**
+   If the new work touches engineering, read `wrenchli-ENGINEERING.md`.
+   If it touches operations, read `wrenchli-OPERATIONS.md`. If it
+   touches situational awareness or external signals, read
+   `wrenchli-SENSING.md`. If it touches governance or decisions, read
+   `wrenchli-DECISIONS.md` and `wrenchli-GOVERNANCE.md`.
+4. **`wrenchli-OPERATIONS.md`** for the eight-step execution order
+   and the operating rhythm — relevant to almost any architectural
+   work because most work touches multiple domains.
+
+Reading these *after* a design is drafted produces designs that have
+to be rebuilt against existing governance — the architectural firewall
+gets violated, agents get duplicated, authority tiers get inverted, or
+new work gets routed to the wrong specialist. Reading them *before*
+prevents these errors at the source.
+
+This rule exists because of a documented incident on 2026-05-09 to
+2026-05-10 in which a multi-component pipeline ("Praxis") was
+designed to feed a specific agent (Evren Matsuda, Chief Learning
+Officer) when in fact a different agent (Astrid Vellholm, Chief
+Sensing Officer) was the architecturally correct consumer. The
+correct consumer was already defined in `wrenchli-SENSING.md`, an
+installed skill file that had not been read before the design work
+began. The error was caught only when the founder requested an
+inventory exercise to verify project state. The rule formalizes the
+discipline that would have prevented the error: read first, design
+second.
+
+The Constitutional Reference Rule is a pre-condition for the
+Assembly Line Session Model. Discovery sessions begin with a
+constitutional read; Planning and Execution sessions inherit that
+read and may add domain-specific reads as the work narrows.
+
+When the canonical references conflict with each other or with
+in-flight work, the conflict itself is the finding — escalate to
+the founder rather than choosing one source over another.
+
 ## Technical Stack — Never Change Without Instruction
 
-- AI model: claude-sonnet-4-6 (via ANTHROPIC_MODEL secret) is the
-  platform default. See "Native Audio Analysis Exception" below for
-  the only sanctioned deviation.
+- AI model: claude-sonnet-4-6 ONLY
 - Database: Supabase PostgreSQL
 - Edge Functions: Deno runtime
 - Frontend: React + TypeScript + Vite
 - Hosting: Vercel
 - CORS: always use _shared/cors.ts (never import from supabase-js)
 - JSON parsing: always strip markdown code fences before parsing
-
-### Native Audio Analysis Exception
-
-Wrenchli's platform standard is Anthropic Claude (model from
-ANTHROPIC_MODEL secret, currently claude-sonnet-4-6). All
-AI-calling edge functions must use Claude unless they fall under
-the documented native-audio exception below.
-
-**Native Audio Analysis Exception.** Anthropic's Messages API does
-not currently accept raw audio input. Claude has no native audio
-modality. Functions that require waveform-level audio fidelity for
-product quality may use Google Gemini via the Lovable AI Gateway
-(LOVABLE_API_KEY), with model google/gemini-2.5-flash hardcoded in
-the function source.
-
-Functions currently exercising this exception:
-
-- analyze-car-audio (live as of Round 14.6)
-- analyze-video-combined (audio-track analysis when re-enabled in
-  Round 14.7)
-
-Conditions for the exception:
-
-- The function must require waveform-level audio analysis, not just
-  transcript-level.
-- The function must use the Lovable AI Gateway, not direct Gemini
-  API access.
-- When Anthropic ships native audio input support, these functions
-  migrate to Claude and the exception is retired.
-- All other governance rules (COPY CHECK, brand voice, accuracy,
-  security) apply to these functions identically to Claude-powered
-  functions.
-
-**Sunset condition:** This exception retires when Anthropic releases
-native audio input support compatible with the product's quality
-requirements. The exception is reviewed quarterly; if Anthropic
-ships before the next review, the migration is scoped immediately.
 
 ## Deliberate Decisions — Never Reverse
 
@@ -156,7 +342,7 @@ compute-funnel-metrics, sms-export-csv, sms-tekmetric-prefill
 
 | Integration | Status | Notes |
 |---|---|---|
-| Stripe | Sandbox active | Price ID price_1TKaxDGgIpvcscSeDceeWkFo. Live pending EIN. |
+| Stripe | Live mode active | Price ID price_1TKaxDGgIpvcscSeDceeWkFo. EIN registered; live mode active. No real payments yet (pilot phase). |
 | Tekmetric | Pending | API application April 5 2026. Expected April 19-26. |
 | NHTSA vPIC | Active | VIN decode + recall lookup. No API key needed. |
 | AutoZone | Removed | Same-day pickup search URL only. No affiliate tag. |
