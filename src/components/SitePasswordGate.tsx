@@ -8,8 +8,12 @@ import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 const STORAGE_KEY = "wrenchli_site_access_v4";
 
 export default function SitePasswordGate({ children }: { children: React.ReactNode }) {
-  // Passcode gate ENABLED — site in private preview during fixes.
+  // Passcode gate TEMPORARILY DISABLED for QA Pass B until the timestamp below.
+  // Re-enable by removing this bypass block.
+  const GATE_BYPASS_UNTIL = new Date("2026-05-23T23:59:00Z").getTime();
+  const bypass = Date.now() < GATE_BYPASS_UNTIL;
   const [unlocked, setUnlocked] = useState(() => {
+    if (bypass) return true;
     try {
       return sessionStorage.getItem(STORAGE_KEY) === "granted";
     } catch {
