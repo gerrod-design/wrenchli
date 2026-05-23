@@ -53,7 +53,7 @@ export const desktopSharedScreens = [
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-4 px-12">
           <div className="w-full max-w-md rounded-xl border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground mb-2">Or enter a diagnostic code:</p>
+            <p className="text-sm text-muted-foreground mb-2">Or enter an OBD-II code:</p>
             <div className="flex items-center gap-2 rounded-lg bg-muted px-4 py-3">
               <span className="text-sm font-mono font-bold text-foreground">P0420</span>
               <span className="ml-auto rounded-full bg-accent/20 px-3 py-1 text-[10px] font-semibold text-accent">OBD-II Detected</span>
@@ -450,7 +450,7 @@ export const desktopShopScreens = [
             <p className="text-xs text-muted-foreground">A trusted shop in your area will reach out soon with a final quote.</p>
             <div className="rounded-lg bg-accent/5 border border-accent/20 p-3 text-left space-y-1.5">
               <p className="text-xs font-semibold text-foreground">What happens next:</p>
-              {["A vetted shop will review your diagnosis", "They'll contact you within 24 hours", "No obligation — you decide if the price is right"].map((item, i) => (
+              {["A trusted shop will review your assessment", "They'll contact you within 24 hours", "No obligation — you decide if the price is right"].map((item, i) => (
                 <div key={i} className="flex items-start gap-1.5">
                   <CheckCircle className="h-3 w-3 text-accent shrink-0 mt-0.5" />
                   <span className="text-[10px] text-muted-foreground">{item}</span>
