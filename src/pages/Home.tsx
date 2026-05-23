@@ -4,7 +4,7 @@ import { Car, Wrench, TrendingUp, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import SectionReveal from "@/components/SectionReveal";
-import StatCounter from "@/components/StatCounter";
+
 
 const userPaths = [
   {
@@ -131,16 +131,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="bg-primary text-primary-foreground py-16 md:py-20">
-        <div className="container-wrenchli">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <StatCounter end={5247} label="Repairs Completed" />
-            <StatCounter end={1.2} prefix="$" suffix="M" label="Saved by Customers" />
-            <StatCounter end={4.8} suffix="★" label="Average Rating" />
-          </div>
-        </div>
-      </section>
+      {/* Stats section removed pending verified launch metrics — do not re-add unsourced counters. */}
     </main>
   );
 }

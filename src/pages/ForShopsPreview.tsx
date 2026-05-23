@@ -170,16 +170,15 @@ export default function ForShopsPreview() {
               Earn Your Verified Badge
             </h2>
             <p className="text-lg max-w-2xl mx-auto leading-relaxed mb-10" style={{ color: "#6B7280" }}>
-              Visible to every Wrenchli customer searching for a shop in your area. Shows your track record in three key metrics:
+              Visible to every Wrenchli customer searching for a shop in your area. The Verified badge will reflect three live metrics once your shop is onboarded:
             </p>
             <div className="grid sm:grid-cols-3 gap-6">
               {[
-                { label: "Symptom-to-Repair Match Rate", value: "92%", desc: "How often your findings match the Wrenchli assessment" },
-                { label: "Cost Fairness Rating", value: "A+", desc: "Your pricing vs. local average for the same repair" },
-                { label: "Customer Satisfaction", value: "4.8★", desc: "Post-repair feedback from Wrenchli customers" },
+                { label: "Symptom-to-Repair Match Rate", desc: "How often your findings match the Wrenchli assessment" },
+                { label: "Cost Fairness Rating", desc: "Your pricing vs. local average for the same repair" },
+                { label: "Customer Satisfaction", desc: "Post-repair feedback from Wrenchli customers" },
               ].map((m) => (
                 <div key={m.label} className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
-                  <div className="text-3xl font-bold mb-2" style={{ fontFamily: MONO, color: "#E07B39" }}>{m.value}</div>
                   <div className="font-semibold text-sm mb-1">{m.label}</div>
                   <div className="text-xs" style={{ color: "#6B7280" }}>{m.desc}</div>
                 </div>
