@@ -33,19 +33,7 @@ export default function Investors() {
         </div>
       </section>
 
-      {/* Market Stats */}
-      <section className="bg-primary text-primary-foreground py-16 md:py-20">
-        <div className="container-wrenchli">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <StatCounter end={5247} label="Repairs Completed" />
-            <StatCounter end={1.2} prefix="$" suffix="M" label="Saved by Customers" />
-            <StatCounter end={300} suffix="+" label="Shops in MI & OH" />
-          </div>
-          <div className="mt-8 text-center">
-            <StatCounter end={4.8} suffix="★" label="Average Rating" />
-          </div>
-        </div>
-      </section>
+      {/* Market stats removed pending verified launch metrics. Re-add only with sourced numbers. */}
 
       {/* The Problem */}
       <section className="section-padding bg-background">
