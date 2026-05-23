@@ -20,7 +20,7 @@ import OptimizationEngine from "@/components/OptimizationEngine";
 import ApiKeyManager from "@/components/ApiKeyManager";
 import ApiUsageAnalytics from "@/components/ApiUsageAnalytics";
 import ReferralAnalytics from "@/components/ReferralAnalytics";
-import MILoanFunnel from "@/components/MILoanFunnel";
+
 import ConversionMetrics from "@/components/ConversionMetrics";
 import KnownIssuesManager from "@/components/KnownIssuesManager";
 import YouTubeEngagement from "@/components/YouTubeEngagement";
@@ -301,7 +301,7 @@ export default function AdminDashboard() {
         <Tabs defaultValue="finance" className="w-full">
           <TabsList className="flex w-full overflow-x-auto">
             <TabsTrigger value="finance"><CreditCard className="h-4 w-4 mr-1.5 hidden sm:inline" />Finance</TabsTrigger>
-            <TabsTrigger value="mi-loan"><Landmark className="h-4 w-4 mr-1.5 hidden sm:inline" />MI Loan</TabsTrigger>
+            
             <TabsTrigger value="quotes"><FileText className="h-4 w-4 mr-1.5 hidden sm:inline" />Quotes</TabsTrigger>
             <TabsTrigger value="referrals"><Link2 className="h-4 w-4 mr-1.5 hidden sm:inline" />Referrals</TabsTrigger>
             <TabsTrigger value="waitlist"><Users className="h-4 w-4 mr-1.5 hidden sm:inline" />Waitlist</TabsTrigger>
@@ -338,10 +338,6 @@ export default function AdminDashboard() {
             <ZipDemandHeatmap />
           </TabsContent>
 
-          {/* MI Loan Funnel Tab */}
-          <TabsContent value="mi-loan" className="mt-6">
-            <MILoanFunnel />
-          </TabsContent>
 
           {/* Conversion Metrics Tab */}
           <TabsContent value="conversion" className="mt-6">
