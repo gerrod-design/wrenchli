@@ -12,7 +12,7 @@ const userPaths = [
     title: "Vehicle Owners",
     subtitle: "Need your car fixed?",
     description:
-      "Get free AI diagnosis, shop quotes, and affordable financing — all in one place.",
+      "Get a free symptom assessment, compare trusted local shops, and walk in knowing what to ask.",
     href: "/owners",
     tokenBg: "bg-wrenchli-teal/10",
     tokenBorder: "border-wrenchli-teal/20 hover:border-wrenchli-teal/40",

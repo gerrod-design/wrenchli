@@ -35,7 +35,6 @@ const navItems: NavItem[] = [
       { label: "Photo Damage Assessment", to: "/damage-diagnosis" },
       { label: "Find Shops", to: "/find-shops" },
       { label: "Financing", to: "/financing-options" },
-      { label: "🏛️ MI Affordable Loan ✨", to: "/mi-affordable-loan" },
     ],
   },
   {

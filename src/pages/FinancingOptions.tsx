@@ -1,13 +1,12 @@
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import SEO from "@/components/SEO";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  CheckCircle, CreditCard, DollarSign, Building, Star, Sparkles, ArrowRight,
+  CheckCircle, CreditCard, DollarSign, Building, ArrowRight,
 } from "lucide-react";
-import { isMichiganZip, calculateMonthlyPayment, calculateFinancingScenario, formatCurrency, MI_LOAN } from "@/lib/financing";
 import { useEffect } from "react";
 import { trackEvent } from "@/lib/analytics";
 
@@ -16,12 +15,6 @@ export default function FinancingOptions() {
   const repairCost = Number(searchParams.get("repair")) || 500;
   const diagnosis = searchParams.get("diagnosis") || "Car Repair";
   const zip = searchParams.get("zip") || "";
-  const year = searchParams.get("year") || "";
-  const make = searchParams.get("make") || "";
-  const model = searchParams.get("model") || "";
-
-  const isMI = isMichiganZip(zip);
-  const scenario = calculateFinancingScenario(repairCost);
 
   useEffect(() => {
     trackEvent({
@@ -30,32 +23,10 @@ export default function FinancingOptions() {
       action: "financing_options_viewed",
       value: repairCost,
       zip_code: zip,
-      metadata: { is_michigan: isMI },
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const miEligible = !scenario.isTooHigh; // eligible for full or partial
-  const affirmMonthly = Math.round((repairCost * 1.10) / 12);
 
-  const miLoanCard = {
-    id: "mi-loan",
-    title: "MI Affordable Loan",
-    icon: <Star className="h-6 w-6" />,
-    highlight: true,
-    badge: scenario.isPartial ? "🏛️ PARTIAL FINANCING — Michigan Residents" : "🏛️ FEATURED — Michigan Residents Only",
-    amount: `~${formatCurrency(scenario.monthlyPayment)}/mo`,
-    subtitle: `${MI_LOAN.termMonths} months • ${MI_LOAN.maxApr}% APR max`,
-    features: [
-      `Loan amount: ${formatCurrency(scenario.loanAmount)}`,
-      "✨ No traditional credit check",
-      "✅ State of Michigan program",
-      "🏅 Designed for unexpected car repairs",
-      ...(scenario.isPartial
-        ? [`⚠️ You pay ${formatCurrency(scenario.outOfPocket)} at shop`]
-        : ["Quick eligibility check"]),
-    ],
-    buttonText: "Check Eligibility",
-    buttonLink: `/mi-loan-eligibility?repair=${repairCost}&diagnosis=${encodeURIComponent(diagnosis)}&zip=${zip}&year=${year}&make=${make}&model=${model}`,
-  };
+  const affirmMonthly = Math.round((repairCost * 1.10) / 12);
 
   const otherOptions = [
     {
@@ -96,41 +67,25 @@ export default function FinancingOptions() {
     },
   ];
 
-  function renderCard(opt: typeof otherOptions[0], featured = false) {
+  function renderCard(opt: typeof otherOptions[0]) {
     return (
-      <Card
-        className={`relative h-full transition-all duration-300 hover:shadow-lg ${
-          featured
-            ? "border-2 border-accent ring-2 ring-accent/20 shadow-xl"
-            : opt.highlight
-            ? "border-2 border-accent ring-2 ring-accent/20"
-            : "border-border"
-        }`}
-      >
+      <Card className="relative h-full transition-all duration-300 hover:shadow-lg border-border">
         {opt.badge && (
           <Badge className="absolute -top-3 left-4 bg-accent text-accent-foreground">
-            <Sparkles className="h-3 w-3 mr-1" />
             {opt.badge}
           </Badge>
         )}
-        {featured && (
-          <div className="absolute -top-3 -right-3 bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-            🎉 NEW!
-          </div>
-        )}
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-              opt.highlight || featured ? "bg-accent/10 text-accent" : "bg-muted text-muted-foreground"
-            }`}>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
               {opt.icon}
             </div>
-            <CardTitle className={featured ? "text-xl" : "text-lg"}>{opt.title}</CardTitle>
+            <CardTitle className="text-lg">{opt.title}</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <p className={`font-heading font-extrabold text-foreground ${featured ? "text-4xl" : "text-3xl"}`}>
+            <p className="font-heading font-extrabold text-foreground text-3xl">
               {opt.amount}
             </p>
             <p className="text-sm text-muted-foreground">{opt.subtitle}</p>
@@ -143,19 +98,12 @@ export default function FinancingOptions() {
               </li>
             ))}
           </ul>
-          {opt.buttonLink?.startsWith("/") ? (
+          {opt.buttonLink ? (
             <Button
-              className={`w-full ${opt.highlight || featured ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
-              variant={opt.highlight || featured ? "default" : "outline"}
-              size={featured ? "lg" : "default"}
-              asChild
+              className="w-full"
+              variant="outline"
+              onClick={() => window.open(opt.buttonLink!, "_blank", "noopener,noreferrer")}
             >
-              <Link to={opt.buttonLink}>
-                {opt.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          ) : opt.buttonLink ? (
-            <Button className="w-full" variant="outline" onClick={() => window.open(opt.buttonLink!, "_blank")}>
               {opt.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
@@ -172,7 +120,7 @@ export default function FinancingOptions() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Financing Options — Wrenchli"
-        description="Flexible financing for car repairs including MI Affordable Loan, Affirm, and credit union options."
+        description="Compare ways to pay for your car repair: pay in full, Affirm, or a credit union loan."
         path="/financing-options"
       />
 
@@ -184,19 +132,15 @@ export default function FinancingOptions() {
               Choose how you'd like to pay for your <span className="font-semibold">${repairCost.toLocaleString()}</span> repair
               {diagnosis !== "Car Repair" && <> — {diagnosis}</>}.
             </p>
+            <p className="mt-3 text-xs text-primary-foreground/60">
+              Wrenchli repair financing is on the way. Until then, here are third-party options to consider.
+            </p>
           </SectionReveal>
         </div>
       </section>
 
       <section className="section-padding bg-background">
         <div className="container-wrenchli max-w-4xl">
-          {/* MI Loan featured card — full width for MI users */}
-          {isMI && miEligible && (
-            <SectionReveal className="mb-6">
-              {renderCard(miLoanCard, true)}
-            </SectionReveal>
-          )}
-
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {otherOptions.map((opt, i) => (
               <SectionReveal key={opt.id} delay={i * 80}>
@@ -204,22 +148,6 @@ export default function FinancingOptions() {
               </SectionReveal>
             ))}
           </div>
-
-          {/* Show MI Loan as smaller card for non-MI or over-limit */}
-          {(!isMI || !miEligible) && (
-            <SectionReveal delay={300}>
-              <div className="mt-6 rounded-xl border border-border bg-muted/50 p-6 text-center">
-                <Star className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">MI Affordable Loan</span> — Available to Michigan residents for car repairs (up to $1,200 loan, partial financing for higher amounts).
-                  {!isMI && " Enter a Michigan ZIP code to check eligibility."}
-                </p>
-                <Button variant="outline" size="sm" className="mt-3" asChild>
-                  <Link to="/mi-affordable-loan">Learn More</Link>
-                </Button>
-              </div>
-            </SectionReveal>
-          )}
         </div>
       </section>
     </main>

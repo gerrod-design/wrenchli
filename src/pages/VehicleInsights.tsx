@@ -157,7 +157,7 @@ export default function VehicleInsights() {
         <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">What's going on with your vehicle?</h2>
-            <p className="mt-3 text-center text-muted-foreground">Describe symptoms or enter a diagnostic code to get started.</p>
+            <p className="mt-3 text-center text-muted-foreground">Describe symptoms or enter an OBD-II code to get started.</p>
           </SectionReveal>
 
           <SectionReveal>
@@ -207,7 +207,7 @@ export default function VehicleInsights() {
                             <div className="flex items-start gap-2">
                               <span className="font-mono font-bold text-wrenchli-teal shrink-0">{d.code}</span>
                               <span className="text-muted-foreground">
-                                Code {d.code} recognized as a valid OBD2 diagnostic code, but detailed information is not yet in our database. We recommend getting a professional assessment to understand this code.
+                                Code {d.code} is a valid OBD-II code, but detailed information isn't in our library yet. We recommend a professional assessment to understand this code.
                               </span>
                             </div>
                             <Button

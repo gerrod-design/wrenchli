@@ -52,11 +52,8 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
 import FinancingOptions from "./pages/FinancingOptions";
-import MILoanEligibility from "./pages/MILoanEligibility";
-import MILoanApplication from "./pages/MILoanApplication";
-import MILoanApproved from "./pages/MILoanApproved";
-import MILoanDenied from "./pages/MILoanDenied";
-import MIAffordableLoan from "./pages/MIAffordableLoan";
+// MI Affordable Loan pages disabled per Financial Services 7-Gate Protocol
+// (no financing copy live until all gates close). Routes redirect to /financing-options.
 import DIYTutorials from "./pages/DIYTutorials";
 import DIYTutorialDetail from "./pages/DIYTutorialDetail";
 import ResetPassword from "./pages/ResetPassword";
@@ -129,11 +126,11 @@ function AnimatedRoutes() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/financing-options" element={<FinancingOptions />} />
-          <Route path="/mi-affordable-loan" element={<MIAffordableLoan />} />
-          <Route path="/mi-loan-eligibility" element={<MILoanEligibility />} />
-          <Route path="/mi-loan-application" element={<MILoanApplication />} />
-          <Route path="/mi-loan/approved" element={<MILoanApproved />} />
-          <Route path="/mi-loan/denied" element={<MILoanDenied />} />
+          <Route path="/mi-affordable-loan" element={<Navigate to="/financing-options" replace />} />
+          <Route path="/mi-loan-eligibility" element={<Navigate to="/financing-options" replace />} />
+          <Route path="/mi-loan-application" element={<Navigate to="/financing-options" replace />} />
+          <Route path="/mi-loan/approved" element={<Navigate to="/financing-options" replace />} />
+          <Route path="/mi-loan/denied" element={<Navigate to="/financing-options" replace />} />
           <Route path="/diy" element={<DIYTutorials />} />
           <Route path="/diy/:slug" element={<DIYTutorialDetail />} />
           <Route path="/repairs" element={<RepairGuidesIndex />} />
