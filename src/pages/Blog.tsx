@@ -20,7 +20,7 @@ export default function Blog() {
             Wrenchli Blog
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Repair tips, diagnostic guides, and industry insights.
+            Repair tips, symptom guides, and industry insights.
           </p>
 
           <div className="mt-10 space-y-8">

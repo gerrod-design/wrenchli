@@ -14,7 +14,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import PhoneMockup from "@/components/PhoneMockup";
 
 const steps = [
-  { step: 1, icon: MessageSquare, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter a diagnostic code from your OBD2 scanner. No mechanic-speak required." },
+  { step: 1, icon: MessageSquare, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter an OBD-II code from your scanner. No mechanic-speak required." },
   { step: 2, icon: ClipboardList, title: "Get Your Assessment", desc: "See what's likely wrong, how urgent it is, and what it might cost — with plain-English explanations." },
   { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Choose your path: watch a DIY tutorial and order parts, or get quotes from trusted local shops." },
   { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing if you need it." },

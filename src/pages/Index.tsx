@@ -15,7 +15,7 @@ import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 import HomeSocialProof from "@/components/HomeSocialProof";
 import WaitlistForm from "@/components/WaitlistForm";
 import { useLocation } from "@/contexts/LocationContext";
-import MILoanBanner from "@/components/MILoanBanner";
+
 import { HomeJsonLd } from "@/components/JsonLd";
 import HomeFAQ from "@/components/HomeFAQ";
 
@@ -38,7 +38,8 @@ export default function Index() {
         path="/"
       />
       <HomeJsonLd />
-      <MILoanBanner />
+
+
 
       {/* Cinematic Hero */}
       <CinematicHero />
