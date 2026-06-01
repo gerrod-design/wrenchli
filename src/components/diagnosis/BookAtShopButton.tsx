@@ -61,21 +61,19 @@ export default function BookAtShopButton({
         metadata: { diagnosisTitle, vehicle },
       });
 
-      const { error } = await supabase.functions.invoke("send-alert-email", {
+      const { error } = await supabase.functions.invoke("submit-booking-request", {
         body: {
           to: shopEmail || "bookings@wrenchli.net",
-          alertData: {
-            type: "booking",
-            shopName: shopName || "your shop",
-            customerName: form.name,
-            customerPhone: form.phone,
-            preferredTime: form.preferredTime,
-            vehicle,
-            diagnosisTitle,
-            notes: form.notes,
-          },
+          shopName: shopName || "your shop",
+          customerName: form.name,
+          customerPhone: form.phone,
+          preferredTime: form.preferredTime,
+          vehicle,
+          diagnosisTitle,
+          notes: form.notes,
         },
       });
+
 
       if (error) throw error;
 
