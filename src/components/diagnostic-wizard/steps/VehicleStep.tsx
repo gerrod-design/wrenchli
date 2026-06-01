@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, Lock } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import type { VehicleData } from "../DiagnosticWizard";
 import { getAnonSessionId } from "@/lib/anonSession";
@@ -180,6 +181,14 @@ export default function VehicleStep({ onNext }: Props) {
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Continue <ArrowRight className="h-4 w-4" /></>}
       </button>
+      <p
+        className="flex items-center justify-center gap-1.5 text-[11px] font-medium"
+        style={{ color: "#9CA3AF" }}
+      >
+        <Lock className="h-3 w-3" aria-hidden="true" style={{ color: "#22C55E" }} />
+        We do not sell your data.
+      </p>
     </div>
+
   );
 }
