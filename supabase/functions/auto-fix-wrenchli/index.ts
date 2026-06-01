@@ -31,6 +31,13 @@ Deno.serve(async (req) => {
   const optionsResp = handleCorsOptions(req);
   if (optionsResp) return optionsResp;
 
+  // Internal-only: cron/function-to-function callers must present INTERNAL_SECRET
+  const internalSecret = Deno.env.get('INTERNAL_SECRET');
+  const callerSecret = req.headers.get('x-internal-secret');
+  if (!internalSecret || callerSecret !== internalSecret) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+  }
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -49,9 +56,11 @@ Deno.serve(async (req) => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${serviceRoleKey}`,
+        "x-internal-secret": internalSecret,
       },
       body: JSON.stringify({}),
     });
+
 
     if (!auditRes.ok) {
       const errText = await auditRes.text();

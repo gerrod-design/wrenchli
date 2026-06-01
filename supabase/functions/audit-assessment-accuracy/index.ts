@@ -72,6 +72,15 @@ Deno.serve(async (req) => {
   const origin = req.headers.get("Origin");
   const headers = { ...getCorsHeaders(origin), "Content-Type": "application/json" };
 
+  // Internal-only: cron/function-to-function callers must present INTERNAL_SECRET
+  const internalSecret = Deno.env.get('INTERNAL_SECRET');
+  const callerSecret = req.headers.get('x-internal-secret');
+  if (!internalSecret || callerSecret !== internalSecret) {
+    return new Response('Unauthorized', { status: 401, headers });
+  }
+
+
+
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
