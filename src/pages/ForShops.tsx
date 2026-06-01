@@ -33,9 +33,11 @@ export default function ForShops() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Free Pilot Program for Independent Repair Shops | Wrenchli"
+        title="Free Pilot Program for Independent Repair Shops"
         description="Join Wrenchli's free 90-day pilot. Your customers arrive pre-assessed — vehicle details, likely causes, and fair cost range before they walk in. No fees, no commission."
         path="/for-shops"
+        ogTitle="Partner with Wrenchli — Free Pilot for Metro Detroit Shops"
+        ogDescription="Wrenchli's free 90-day pilot connects your Metro Detroit repair shop with pre-assessed customers who already know what's wrong. No setup fees. No commissions. Apply today."
       />
 
       {/* Hero */}
