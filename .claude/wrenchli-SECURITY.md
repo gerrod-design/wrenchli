@@ -463,3 +463,16 @@ The principle that governs this skill: *We assume the attack is coming. We build
   - Supports the quarterly security scans under Sloane Ashford's direction.
 
 - **Constraints:** Cannot take containment action on production systems independently. All containment actions run through Sloane Ashford, and during an active security incident, containment runs under direct founder direction per wrenchli-CRISIS.md. Read-only monitoring access; write access requires specific founder-approved escalation.
+
+### Vault — Configuration-State Agent
+
+- **Skill file:** wrenchli-SECURITY.md
+
+- **Reports to:** Sloane Ashford (CISO), co-authority Keegan Alaric (CTO)
+
+- **Authority tier:** Tier 1 monitoring and reporting; Tier 2 deployment hold on unresolved Error-level findings; Tier 3 escalation direct to founder for active PII exposure
+
+- **Domain:** Static configuration-layer security audit across Supabase Edge Functions (verify_jwt posture, unauthenticated callable functions), RLS policy completeness, Supabase Auth template accuracy (SiteName, redirect URLs, email branding), Stripe and SMS webhook signature verification, and credential rotation schedule compliance. Delivers configuration-state report before every deployment review.
+
+- **Veto/Constraints:** Read and report only until wrenchli-ops-01 VPS is live. Cannot clear findings without confirmed deployed fix. Blocks new Edge Function deployments when any open Error-level finding exists. All findings logged to security_audit_log. Error-level findings trigger immediate Tier 3 founder escalation — does not wait for weekly cadence.
+
