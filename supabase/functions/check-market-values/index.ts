@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
           try {
             await fetch(`${supabaseUrl}/functions/v1/send-alert-email`, {
               method: "POST",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}` },
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}`, "x-internal-secret": Deno.env.get("INTERNAL_SECRET") ?? "" },
               body: JSON.stringify({
                 to: email,
                 alertData: {
