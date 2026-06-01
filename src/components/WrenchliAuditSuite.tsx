@@ -49,18 +49,14 @@ export default function WrenchliAuditSuite() {
     AGENTS.forEach(a => updateAgent(a.id, { status: "running", result: null, error: null }));
 
     try {
-      const res = await fetch(EDGE_FUNCTION_URL, {
+      const { data, error: invokeError } = await supabase.functions.invoke("admin-audit-site", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-        },
-        body: JSON.stringify({}),
+        body: {},
       });
 
-      const data = await res.json();
+      if (invokeError) throw invokeError;
+      if (!data?.success) throw new Error(data?.error || "Audit failed");
 
-      if (!data.success) throw new Error(data.error || "Audit failed");
 
       setPages(data.pages || []);
       setLastRun(data.scrapedAt);
