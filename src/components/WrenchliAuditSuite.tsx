@@ -1,8 +1,10 @@
 import { useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/audit-wrenchli-site`;
+const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/admin-audit-site`;
+
 
 const AGENTS = [
   { id: "conversion", name: "Conversion Analyst", icon: "◈", color: "#E07B39", bg: "#FEF3EA", description: "CRO audit on homepage, /for-shops, and /garage" },

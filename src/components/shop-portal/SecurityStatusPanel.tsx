@@ -77,10 +77,11 @@ export default function SecurityStatusPanel() {
   const runCheck = async () => {
     setRunning(true);
     try {
-      const { data, error } = await supabase.functions.invoke("security-monitor", {
+      const { data, error } = await supabase.functions.invoke("admin-security-monitor", {
         method: "POST",
         body: {},
       });
+
       if (error) throw error;
       toast.success(`Security check complete — ${data.passed} passed, ${data.warnings} warnings, ${data.failed} failed`);
       await loadData();

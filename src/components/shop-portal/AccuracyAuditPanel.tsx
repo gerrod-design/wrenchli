@@ -62,10 +62,11 @@ export default function AccuracyAuditPanel() {
     setRunning(true);
     setLastResult(null);
     try {
-      const { data, error } = await supabase.functions.invoke("audit-assessment-accuracy", {
+      const { data, error } = await supabase.functions.invoke("admin-audit-accuracy", {
         method: "POST",
         body: {},
       });
+
 
       if (error) throw error;
       setLastResult(data);
