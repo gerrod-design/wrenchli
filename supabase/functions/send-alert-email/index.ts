@@ -163,6 +163,14 @@ Deno.serve(async (req) => {
   const optionsResp = handleCorsOptions(req);
   if (optionsResp) return optionsResp;
 
+  // Internal-only: require shared secret from server-side callers
+  const internalSecret = Deno.env.get('INTERNAL_SECRET');
+  const callerSecret = req.headers.get('x-internal-secret');
+  if (!internalSecret || callerSecret !== internalSecret) {
+    return new Response('Unauthorized', { status: 401, headers: securityHeaders });
+  }
+
+
   const rateLimitId = getRateLimitIdentifier(req);
   const rateResult = await checkRateLimit(rateLimitId, RATE_LIMITS.ADMIN);
   if (!rateResult.allowed) {

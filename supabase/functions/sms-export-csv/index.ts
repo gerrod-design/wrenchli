@@ -21,7 +21,15 @@ function toCSV(headers: string[], rows: string[][]): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Internal-only: prevent external access to PII (VIN, vehicle, symptoms, costs)
+  const internalSecret = Deno.env.get('INTERNAL_SECRET');
+  const callerSecret = req.headers.get('x-internal-secret');
+  if (!internalSecret || callerSecret !== internalSecret) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+  }
+
   try {
+
     const { session_id, format = "generic" }: ExportRequest = await req.json();
     if (!session_id) {
       return new Response(JSON.stringify({ error: "session_id required" }), {
