@@ -55,9 +55,11 @@ Deno.serve(async (req) => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${serviceRoleKey}`,
+        "x-internal-secret": internalSecret,
       },
       body: JSON.stringify({}),
     });
+
 
     const drainResult = await drainRes.json();
 
