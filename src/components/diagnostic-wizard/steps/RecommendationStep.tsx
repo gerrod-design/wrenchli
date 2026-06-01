@@ -9,6 +9,7 @@ import AffiliateDisclosure from "@/components/AffiliateDisclosure";
 import DIYOutcomePrompt from "./DIYOutcomePrompt";
 import SaveAssessmentPrompt from "@/components/diagnosis/SaveAssessmentPrompt";
 import RecallEmailCapture from "@/components/diagnosis/RecallEmailCapture";
+import AssessmentDisclaimer from "@/components/diagnosis/AssessmentDisclaimer";
 
 interface Props {
   recommendation: RecommendationResult;
@@ -248,6 +249,8 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
       {/* Deferred Account Creation */}
       <SaveAssessmentPrompt />
 
+      <AssessmentDisclaimer />
+
       {/* Restart */}
       <button
         onClick={onRestart}
@@ -258,5 +261,6 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
         Start New Assessment
       </button>
     </div>
+
   );
 }

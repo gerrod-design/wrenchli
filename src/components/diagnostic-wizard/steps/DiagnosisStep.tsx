@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Loader2, ArrowRight, ArrowLeft, AlertTriangle, CheckCircle2, Clock, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
+import AssessmentDisclaimer from "@/components/diagnosis/AssessmentDisclaimer";
+
 
 interface Props {
   diagnosis: DiagnosisResult;
@@ -165,6 +167,9 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
           )}
         </button>
       </div>
+
+      <AssessmentDisclaimer />
     </div>
   );
+
 }
