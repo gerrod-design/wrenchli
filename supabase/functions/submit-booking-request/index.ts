@@ -38,13 +38,13 @@ Deno.serve(async (req) => {
   }
 
   const rateLimitId = getRateLimitIdentifier(req);
-  const rateResult = await checkRateLimit(rateLimitId, RATE_LIMITS.PUBLIC);
+  const rateResult = await checkRateLimit(rateLimitId, RATE_LIMITS.STRICT);
   if (!rateResult.allowed) {
     return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
       status: 429,
       headers: {
         ...securityHeaders,
-        ...getRateLimitHeaders(RATE_LIMITS.PUBLIC.maxRequests, rateResult.remaining, rateResult.resetTime),
+        ...getRateLimitHeaders(RATE_LIMITS.STRICT.maxRequests, rateResult.remaining, rateResult.resetTime),
         "Content-Type": "application/json",
       },
     });
