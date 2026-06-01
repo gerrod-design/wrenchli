@@ -149,25 +149,32 @@ function buildPrintContent(props: DownloadReportProps) {
     background: #F9FAFB;
     border: 1px solid #E5E7EB;
     border-radius: 8px;
-    font-size: 8.5pt;
-    color: #6B7280;
-    line-height: 1.5;
+    font-size: 9pt;
+    color: #374151;
+    line-height: 1.55;
     page-break-inside: avoid;
   }
-  .footer {
-    margin-top: 16px;
+  /* Repeating per-page footer (tfoot inside a full-page table repeats on each printed page in Chrome). */
+  .page-table { width: 100%; border-collapse: collapse; }
+  .page-table tfoot { display: table-footer-group; }
+  .page-footer-cell {
     padding-top: 10px;
     border-top: 1px solid #e5e7eb;
-    font-size: 8pt;
-    color: #9CA3AF;
+    font-size: 7.5pt;
+    color: #6B7280;
+    line-height: 1.45;
     text-align: center;
   }
+  .page-footer-brand { font-size: 7.5pt; color: #9CA3AF; margin-top: 4px; }
   @media print {
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
 <body>
+  <table class="page-table">
+    <tbody><tr><td>
+
   <div class="header">
     <div>
       <div class="brand">Wrenchli</div>
