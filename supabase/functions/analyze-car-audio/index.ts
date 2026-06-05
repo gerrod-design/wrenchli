@@ -1,7 +1,6 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const GEMINI_NATIVE = "https://ai.gateway.lovable.dev/v1beta/models/gemini-2.5-flash:generateContent";
 
 // Round 14.6 — COPY CHECK-compliant v2 prompt.
 // Source: /mnt/documents/analyze-car-audio-prompt-v2.md
@@ -63,50 +62,37 @@ Deno.serve(async (req: Request) => {
     const base64Audio = btoa(binary);
     const mimeType = (audioFile.type || "audio/wav").toLowerCase();
 
-    // Map actual recorded mime → Gemini-supported format token.
-    // Gemini multimodal audio supports: wav, mp3, aiff, aac, ogg, flac, webm, mp4.
-    // iOS Safari typically records audio/mp4; desktop Chrome/Android records audio/webm;codecs=opus.
+    // The OpenAI-compatible audio shape only reliably accepts wav/mp3.
+    // The client converts MediaRecorder output to WAV before upload.
     let format: string;
     if (mimeType.includes("wav")) format = "wav";
-    else if (mimeType.includes("webm")) format = "webm";
-    else if (mimeType.includes("ogg")) format = "ogg";
-    else if (mimeType.includes("mp4") || mimeType.includes("m4a") || mimeType.includes("aac")) format = "mp4";
-    else if (mimeType.includes("flac")) format = "flac";
     else if (mimeType.includes("mpeg") || mimeType.includes("mp3")) format = "mp3";
-    else format = "webm"; // safe default for MediaRecorder output
-
-    // Map actual recorded mime to a Gemini-native inline_data mime type.
-    // Gemini native accepts: audio/wav, audio/mp3, audio/aiff, audio/aac, audio/ogg, audio/flac, audio/webm, audio/mp4.
-    let geminiMime: string;
-    if (mimeType.includes("wav")) geminiMime = "audio/wav";
-    else if (mimeType.includes("webm")) geminiMime = "audio/webm";
-    else if (mimeType.includes("ogg")) geminiMime = "audio/ogg";
-    else if (mimeType.includes("mp4") || mimeType.includes("m4a")) geminiMime = "audio/mp4";
-    else if (mimeType.includes("aac")) geminiMime = "audio/aac";
-    else if (mimeType.includes("flac")) geminiMime = "audio/flac";
-    else if (mimeType.includes("mpeg") || mimeType.includes("mp3")) geminiMime = "audio/mp3";
-    else geminiMime = "audio/webm";
+    else {
+      console.error("Unsupported audio format after client conversion:", mimeType);
+      return new Response(JSON.stringify({ error: "This recording format could not be converted. Please try recording again." }), {
+        status: 415,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const promptText = `The customer recorded this audio clip of a noise their car is making.${vehicleContext ? ` Vehicle: ${vehicleContext}.` : ""} Please listen and tell them what's likely going on with their vehicle.`;
 
-    console.log("[analyze-car-audio] sending to gemini native:", { mimeType, geminiMime, sizeKB: Math.round(bytes.length / 1024) });
+    console.log("[analyze-car-audio] sending supported audio:", { mimeType, format, sizeKB: Math.round(bytes.length / 1024) });
 
-    const response = await fetch(GEMINI_NATIVE, {
+    const response = await fetch(AI_GATEWAY, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { inline_data: { mime_type: geminiMime, data: base64Audio } },
-              { text: promptText },
-            ],
-          },
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: [
+            { type: "input_audio", input_audio: { data: base64Audio, format } },
+            { type: "text", text: promptText },
+          ] },
         ],
       }),
     });
@@ -136,7 +122,7 @@ Deno.serve(async (req: Request) => {
 
 
     const result = await response.json();
-    const analysis = result.candidates?.[0]?.content?.parts?.map((p: any) => p.text).filter(Boolean).join("\n") ||
+    const analysis = result.choices?.[0]?.message?.content ||
       "I couldn't make out a clear noise from that recording. Could you try recording again, a bit closer to where the sound is coming from?";
 
     return new Response(JSON.stringify({ analysis }), {
