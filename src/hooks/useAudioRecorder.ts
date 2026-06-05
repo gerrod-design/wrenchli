@@ -66,6 +66,16 @@ async function convertRecordingToWav(blob: Blob): Promise<Blob> {
   }
 }
 
+function getRecordingMimeType() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const preferredTypes = isIOS
+    ? ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"]
+    : ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
+
+  return preferredTypes.find((type) => MediaRecorder.isTypeSupported(type));
+}
+
 export function useAudioRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -86,13 +96,9 @@ export function useAudioRecorder() {
   const startRecording = useCallback(async (): Promise<boolean> => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/webm")
-          ? "audio/webm"
-          : "audio/mp4";
+      const mimeType = getRecordingMimeType();
 
-      const recorder = new MediaRecorder(stream, { mimeType });
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
       chunksRef.current = [];
       setAudioBlob(null);
 
@@ -103,7 +109,7 @@ export function useAudioRecorder() {
       recorder.onstop = () => {
         cleanup();
         stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(chunksRef.current, { type: mimeType });
+        const blob = new Blob(chunksRef.current, { type: mimeType || chunksRef.current[0]?.type || "audio/webm" });
         void convertRecordingToWav(blob)
           .then(setAudioBlob)
           .catch(() => setAudioBlob(blob))
