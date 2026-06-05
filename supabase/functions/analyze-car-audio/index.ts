@@ -62,13 +62,17 @@ Deno.serve(async (req: Request) => {
     const base64Audio = btoa(binary);
     const mimeType = (audioFile.type || "audio/wav").toLowerCase();
 
-    // The OpenAI-compatible audio shape only reliably accepts wav/mp3.
-    // The client converts MediaRecorder output to WAV before upload.
+    // Prefer client-produced WAV, but pass through native mobile formats with the
+    // correct token instead of mislabeled audio or a hard 415.
     let format: string;
     if (mimeType.includes("wav")) format = "wav";
     else if (mimeType.includes("mpeg") || mimeType.includes("mp3")) format = "mp3";
+    else if (mimeType.includes("webm")) format = "webm";
+    else if (mimeType.includes("ogg")) format = "ogg";
+    else if (mimeType.includes("mp4") || mimeType.includes("m4a") || mimeType.includes("aac")) format = "mp4";
+    else if (mimeType.includes("flac")) format = "flac";
     else {
-      console.error("Unsupported audio format after client conversion:", mimeType);
+      console.error("Unsupported audio format:", mimeType);
       return new Response(JSON.stringify({ error: "This recording format could not be converted. Please try recording again." }), {
         status: 415,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

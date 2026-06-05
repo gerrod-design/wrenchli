@@ -46,7 +46,16 @@ const AudioRecordButton = memo(function AudioRecordButton({
     setAnalyzing(true);
     try {
       const formData = new FormData();
-      const extension = audioBlob.type.toLowerCase().includes("wav") ? "wav" : "webm";
+      const audioType = audioBlob.type.toLowerCase();
+      const extension = audioType.includes("wav")
+        ? "wav"
+        : audioType.includes("mp4") || audioType.includes("mpeg")
+          ? "mp4"
+          : audioType.includes("ogg")
+            ? "ogg"
+            : audioType.includes("flac")
+              ? "flac"
+              : "webm";
       formData.append("audio", audioBlob, `car-noise.${extension}`);
       if (vehicleContext) formData.append("vehicle_context", vehicleContext);
 
