@@ -18,7 +18,13 @@ export function isValidVin(vin: string): boolean {
 }
 
 export function sanitizeVin(input: string): string {
-  return input.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/gi, "").slice(0, 17);
+  // Strip iOS smart quotes, curly apostrophes, em/en dashes, and any non-ASCII first
+  const cleaned = input
+    .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'")   // curly single quotes → straight
+    .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')   // curly double quotes → straight
+    .replace(/[\u2013\u2014\u2015]/g, "-")                       // em/en dashes → hyphen
+    .replace(/[\u00A0\u2000-\u200F\u2028\u2029\uFEFF]/g, "");   // various whitespace/control chars
+  return cleaned.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/gi, "").slice(0, 17);
 }
 
 export async function decodeVin(vin: string): Promise<DecodedVehicle> {
