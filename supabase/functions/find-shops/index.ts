@@ -164,43 +164,31 @@ function resolveLocation(location: string): { city: string | null; state: string
   return { city: null, state: null };
 }
 
-/* ── Query providers from database ── */
-async function findServiceProviders(
-  supabase: ReturnType<typeof createClient>,
-  params: { location: string; service_type: string; price_range?: string | null; vehicle_make?: string | null },
-) {
-  const { city, state } = resolveLocation(params.location);
+/* ── Haversine distance between two coords (miles) ── */
+function distanceMiles(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 3958.8;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const lat1 = toRad(a.lat);
+  const lat2 = toRad(b.lat);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
 
-  if (!city && !state) {
-    return { providers: [], city: null };
-  }
+function citiesWithinRadius(centerCity: string, radiusMiles: number): string[] {
+  const center = cityCoords[centerCity];
+  if (!center) return [centerCity];
+  return Object.entries(cityCoords)
+    .filter(([, coords]) => distanceMiles(center, coords) <= radiusMiles)
+    .map(([city]) => city);
+}
 
-  // Build query
-  let query = supabase
-    .from("service_providers")
-    .select("*")
-    .eq("is_active", true);
-
-  if (city) {
-    query = query.eq("city", city);
-  } else if (state) {
-    query = query.eq("state", state);
-  }
-
-  if (params.price_range) {
-    query = query.eq("price_tier", params.price_range);
-  }
-
-  const { data: providers, error } = await query.limit(50);
-
-  if (error) {
-    console.error("DB query error:", error);
-    return { providers: [], city };
-  }
-
+function filterAndSort(
+  providers: any[],
+  params: { service_type: string; vehicle_make?: string | null },
+): any[] {
   let results = providers || [];
-
-  // Filter by service type
   if (params.service_type && params.service_type !== "general") {
     results = results.filter(
       (p: any) =>
@@ -208,8 +196,6 @@ async function findServiceProviders(
         (p.specialties || []).includes("general"),
     );
   }
-
-  // Sort: luxury vehicle → prioritize european/luxury specialists
   if (params.vehicle_make && LUXURY_BRANDS.includes(params.vehicle_make)) {
     results.sort((a: any, b: any) => {
       const aSpec = (a.specialties || []).includes("european") || (a.specialties || []).includes("luxury");
@@ -221,8 +207,56 @@ async function findServiceProviders(
   } else {
     results.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
   }
+  return results;
+}
 
-  return { providers: results.slice(0, 10), city };
+/* ── Query providers from database ── */
+async function findServiceProviders(
+  supabase: ReturnType<typeof createClient>,
+  params: { location: string; service_type: string; price_range?: string | null; vehicle_make?: string | null },
+) {
+  const { city, state } = resolveLocation(params.location);
+
+  if (!city && !state) {
+    return { providers: [], city: null, expandedRadiusMiles: 0 };
+  }
+
+  const runQuery = async (cities: string[] | null) => {
+    let query = supabase.from("service_providers").select("*").eq("is_active", true);
+    if (cities && cities.length > 0) {
+      query = query.in("city", cities);
+    } else if (state) {
+      query = query.eq("state", state);
+    }
+    if (params.price_range) {
+      query = query.eq("price_tier", params.price_range);
+    }
+    const { data, error } = await query.limit(100);
+    if (error) {
+      console.error("DB query error:", error);
+      return [];
+    }
+    return data || [];
+  };
+
+  // 1. Exact city match
+  let providers = city ? await runQuery([city]) : await runQuery(null);
+  let filtered = filterAndSort(providers, params);
+  let expandedRadiusMiles = 0;
+
+  // 2. Auto-expand to 15-mile radius when no results
+  if (filtered.length === 0 && city) {
+    const nearby = citiesWithinRadius(city, 15);
+    if (nearby.length > 1) {
+      providers = await runQuery(nearby);
+      filtered = filterAndSort(providers, params);
+      if (filtered.length > 0) {
+        expandedRadiusMiles = 15;
+      }
+    }
+  }
+
+  return { providers: filtered.slice(0, 10), city, expandedRadiusMiles };
 }
 
 serve(async (req) => {
@@ -258,7 +292,7 @@ serve(async (req) => {
     );
 
     const resolved = resolveLocation(location);
-    const { providers, city } = await findServiceProviders(supabase, { location, service_type, price_range, vehicle_make });
+    const { providers, city, expandedRadiusMiles } = await findServiceProviders(supabase, { location, service_type, price_range, vehicle_make });
 
     // Derive state from ZIP prefix for logging
     const zip = location.replace(/\D/g, "").slice(0, 5);
@@ -305,6 +339,7 @@ serve(async (req) => {
         results_count: providersWithCoords.length,
         location,
         city: city || "Service Area",
+        expanded_radius_miles: expandedRadiusMiles || 0,
       }),
       { headers: { ...securityHeaders, "Content-Type": "application/json" } },
     );

@@ -12,6 +12,8 @@ import { type ShopFilter } from "@/components/shops/ShopList";
 import { type Shop } from "@/components/shops/ShopCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import WaitlistForm from "@/components/WaitlistForm";
+import { BellRing } from "lucide-react";
 
 const SERVICE_TYPES = [
   { value: "general", label: "All Services" },
@@ -58,6 +60,8 @@ export default function FindShops() {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [shopFilter, setShopFilter] = useState<ShopFilter>("all");
+  const [expandedRadius, setExpandedRadius] = useState(0);
+  const [resolvedCity, setResolvedCity] = useState<string>("");
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
@@ -123,11 +127,20 @@ export default function FindShops() {
 
       setShops(providers);
       if (data.center) setMapCenter(data.center);
-      toast.success(`Found ${providers.length} shops near ${zip} (${data.city || "Metro Area"})`);
+      setExpandedRadius(data.expanded_radius_miles || 0);
+      setResolvedCity(data.city || "");
+      if (providers.length === 0) {
+        toast.info(`No partner shops yet near ${zip}. Join the waitlist to be notified.`);
+      } else if (data.expanded_radius_miles) {
+        toast.success(`Showing ${providers.length} shops within ${data.expanded_radius_miles} miles of ${zip}`);
+      } else {
+        toast.success(`Found ${providers.length} shops near ${zip} (${data.city || "Metro Area"})`);
+      }
     } catch (error) {
       console.error("Search error:", error);
       toast.error("Failed to search shops. Please try again.");
       setShops([]);
+      setExpandedRadius(0);
     } finally {
       setLoading(false);
     }
@@ -267,20 +280,44 @@ export default function FindShops() {
                 </div>
               </SectionReveal>
             </div>
-          ) : (
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-              <SectionReveal delay={0}>
-                <div className="sticky top-20">
-                  <h2 className="font-heading text-xl font-semibold mb-4">Map View</h2>
-                  <div className="h-[500px] lg:h-[600px]">
-                    <ShopMap shops={shops} center={mapCenter} selectedShop={selectedShop} onShopClick={setSelectedShop} />
+          ) : !loading && shops.length === 0 ? (
+            <div className="max-w-2xl mx-auto py-8">
+              <SectionReveal>
+                <div className="bg-card border border-border rounded-lg p-8 text-center">
+                  <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center">
+                    <BellRing className="h-7 w-7 text-accent" />
                   </div>
+                  <h2 className="font-heading text-2xl font-semibold mb-3">
+                    We're expanding in {resolvedCity && resolvedCity !== "Service Area" ? `${resolvedCity}'s metro` : "Metro Detroit"}
+                  </h2>
+                  <p className="text-muted-foreground mb-6">
+                    Enter your ZIP to get notified when partner shops launch near you.
+                  </p>
+                  <WaitlistForm source={`find-shops-${zipCode || "unknown"}`} className="max-w-md mx-auto" />
                 </div>
               </SectionReveal>
-              <SectionReveal delay={100}>
-                <ShopList shops={shops} loading={loading} onShopSelect={setSelectedShop} searchedZip={searched ? zipCode : undefined} filter={shopFilter} onFilterChange={setShopFilter} />
-              </SectionReveal>
             </div>
+          ) : (
+            <>
+              {expandedRadius > 0 && (
+                <div className="mb-4 text-sm text-muted-foreground bg-muted/50 border border-border rounded-md px-4 py-2 text-center">
+                  No partner shops in that exact ZIP. Showing trusted shops within {expandedRadius} miles.
+                </div>
+              )}
+              <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+                <SectionReveal delay={0}>
+                  <div className="sticky top-20">
+                    <h2 className="font-heading text-xl font-semibold mb-4">Map View</h2>
+                    <div className="h-[500px] lg:h-[600px]">
+                      <ShopMap shops={shops} center={mapCenter} selectedShop={selectedShop} onShopClick={setSelectedShop} />
+                    </div>
+                  </div>
+                </SectionReveal>
+                <SectionReveal delay={100}>
+                  <ShopList shops={shops} loading={loading} onShopSelect={setSelectedShop} searchedZip={searched ? zipCode : undefined} filter={shopFilter} onFilterChange={setShopFilter} />
+                </SectionReveal>
+              </div>
+            </>
           )}
         </div>
       </section>
