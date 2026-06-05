@@ -126,17 +126,17 @@ export function useAudioRecorder() {
     if (maxTimerRef.current) { clearTimeout(maxTimerRef.current); maxTimerRef.current = null; }
   }, []);
 
-  const cleanupAudioGraph = useCallback(() => {
+  const cleanupAudioGraph = useCallback((stopStream = true) => {
     processorRef.current?.disconnect();
     sourceRef.current?.disconnect();
     silentGainRef.current?.disconnect();
     void audioContextRef.current?.close();
-    streamRef.current?.getTracks().forEach((track) => track.stop());
+    if (stopStream) streamRef.current?.getTracks().forEach((track) => track.stop());
     processorRef.current = null;
     sourceRef.current = null;
     silentGainRef.current = null;
     audioContextRef.current = null;
-    streamRef.current = null;
+    if (stopStream) streamRef.current = null;
   }, []);
 
   const armTimers = useCallback((onMaxDuration: () => void) => {
@@ -175,7 +175,7 @@ export function useAudioRecorder() {
       const AudioContextCtor = getAudioContextCtor();
       if (AudioContextCtor) {
         try {
-          const audioContext = new AudioContextCtor({ sampleRate: TARGET_SAMPLE_RATE });
+          const audioContext = new AudioContextCtor();
           await audioContext.resume();
           const source = audioContext.createMediaStreamSource(stream);
           const processor = audioContext.createScriptProcessor(4096, Math.max(1, source.channelCount || 1), 1);
@@ -207,7 +207,7 @@ export function useAudioRecorder() {
           armTimers(() => finishWebAudioRecording());
           return true;
         } catch {
-          cleanupAudioGraph();
+          cleanupAudioGraph(false);
         }
       }
 
