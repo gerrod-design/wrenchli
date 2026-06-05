@@ -339,6 +339,7 @@ serve(async (req) => {
         results_count: providersWithCoords.length,
         location,
         city: city || "Service Area",
+        expanded_radius_miles: expandedRadiusMiles || 0,
       }),
       { headers: { ...securityHeaders, "Content-Type": "application/json" } },
     );
