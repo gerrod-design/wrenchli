@@ -12,6 +12,8 @@ import { type ShopFilter } from "@/components/shops/ShopList";
 import { type Shop } from "@/components/shops/ShopCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import WaitlistForm from "@/components/WaitlistForm";
+import { BellRing } from "lucide-react";
 
 const SERVICE_TYPES = [
   { value: "general", label: "All Services" },
