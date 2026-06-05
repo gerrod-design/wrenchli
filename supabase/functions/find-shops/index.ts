@@ -292,7 +292,7 @@ serve(async (req) => {
     );
 
     const resolved = resolveLocation(location);
-    const { providers, city } = await findServiceProviders(supabase, { location, service_type, price_range, vehicle_make });
+    const { providers, city, expandedRadiusMiles } = await findServiceProviders(supabase, { location, service_type, price_range, vehicle_make });
 
     // Derive state from ZIP prefix for logging
     const zip = location.replace(/\D/g, "").slice(0, 5);
