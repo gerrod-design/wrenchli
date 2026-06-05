@@ -30,6 +30,12 @@ Deno.serve(async (req: Request) => {
     const audioFile = formData.get("audio") as File | null;
     const vehicleContext = formData.get("vehicle_context") as string | null;
 
+    console.log("[analyze-car-audio] diagnostic:", {
+      contentType: req.headers.get("content-type"),
+      audioType: audioFile?.type,
+      audioSize: audioFile?.size,
+    });
+
     if (!audioFile) {
       return new Response(JSON.stringify({ error: "No audio file provided" }), {
         status: 400,
