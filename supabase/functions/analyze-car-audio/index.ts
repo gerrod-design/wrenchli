@@ -45,9 +45,15 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Convert audio to base64
+    // Convert audio to base64 (chunked to avoid call-stack overflow on large mobile recordings)
     const audioBytes = await audioFile.arrayBuffer();
-    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBytes)));
+    const bytes = new Uint8Array(audioBytes);
+    let binary = "";
+    const CHUNK = 0x8000; // 32KB chunks
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK) as unknown as number[]);
+    }
+    const base64Audio = btoa(binary);
     const mimeType = audioFile.type || "audio/wav";
 
     const userContent: any[] = [
@@ -109,8 +115,9 @@ Deno.serve(async (req: Request) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error("analyze-car-audio error:", err);
-    return new Response(JSON.stringify({ error: "Internal error processing audio" }), {
+    const detail = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    console.error("analyze-car-audio error:", detail, err instanceof Error ? err.stack : "");
+    return new Response(JSON.stringify({ error: "Internal error processing audio", detail }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
