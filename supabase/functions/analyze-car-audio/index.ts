@@ -26,12 +26,15 @@ Deno.serve(async (req: Request) => {
   if (optionsResp) return optionsResp;
 
   try {
+    const incomingContentType = req.headers.get("content-type");
+    console.log("[analyze-car-audio] incoming request:", { contentType: incomingContentType });
+
     const formData = await req.formData();
     const audioFile = formData.get("audio") as File | null;
     const vehicleContext = formData.get("vehicle_context") as string | null;
 
     console.log("[analyze-car-audio] diagnostic:", {
-      contentType: req.headers.get("content-type"),
+      contentType: incomingContentType,
       audioType: audioFile?.type,
       audioSize: audioFile?.size,
     });
