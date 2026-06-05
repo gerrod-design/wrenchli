@@ -71,6 +71,11 @@ export default function VinInput({ onDecoded }: Props) {
             }}
             className="h-12 text-base font-mono uppercase flex-1"
             maxLength={17}
+            autoCorrect="off"
+            autoCapitalize="characters"
+            spellCheck="false"
+            enterKeyHint="done"
+            inputMode="text"
           />
           <Button
             type="button"
