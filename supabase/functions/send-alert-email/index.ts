@@ -36,6 +36,25 @@ interface BookingEmailData {
 
 type AlertEmailData = MaintenanceEmailData | MarketValueEmailData | BookingEmailData;
 
+function esc(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  return String(v)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function escapeAlertData<T extends Record<string, unknown>>(data: T): T {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(data)) {
+    out[k] = typeof v === "string" ? esc(v) : v;
+  }
+  return out as T;
+}
+
+
 function buildBookingEmail(data: BookingEmailData): { subject: string; html: string } {
   return {
     subject: `New booking request — ${data.customerName} (${data.vehicle})`,
@@ -189,10 +208,11 @@ Deno.serve(async (req) => {
 
     const { subject, html } =
       alertData.type === "maintenance"
-        ? buildMaintenanceEmail(alertData as MaintenanceEmailData)
+        ? buildMaintenanceEmail(escapeAlertData(alertData as MaintenanceEmailData))
         : alertData.type === "booking"
-        ? buildBookingEmail(alertData as BookingEmailData)
-        : buildMarketValueEmail(alertData as MarketValueEmailData);
+        ? buildBookingEmail(escapeAlertData(alertData as BookingEmailData))
+        : buildMarketValueEmail(escapeAlertData(alertData as MarketValueEmailData));
+
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

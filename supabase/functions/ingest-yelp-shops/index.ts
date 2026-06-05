@@ -1,10 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
 const YELP_API_BASE = "https://api.yelp.com/v3";
 
@@ -59,8 +54,17 @@ function specialtiesFromCategories(
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const optResp = handleCorsOptions(req);
+  if (optResp) return optResp;
+
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getCorsHeaders(origin);
+
+  // Internal-only: cron/function-to-function callers must present INTERNAL_SECRET
+  const internalSecret = Deno.env.get('INTERNAL_SECRET');
+  const callerSecret = req.headers.get('x-internal-secret');
+  if (!internalSecret || callerSecret !== internalSecret) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
   }
 
   try {
@@ -83,9 +87,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Build Yelp search — search by location string
     const location = zip_code || state;
-    const searchLimit = Math.min(limit, 50); // Yelp max is 50
+    const searchLimit = Math.min(limit, 50);
     const categories = "autorepair,transmissionrepair,auto_detailing,tires,oilchange";
 
     const url = `${YELP_API_BASE}/businesses/search?location=${encodeURIComponent(location)}&categories=${categories}&limit=${searchLimit}&sort_by=rating`;
@@ -102,7 +105,6 @@ Deno.serve(async (req) => {
     const yelpData = await yelpRes.json();
     const businesses: YelpBusiness[] = yelpData.businesses || [];
 
-    // Filter: require phone + address + rating (minimum data quality)
     const qualified = businesses.filter(
       (b) =>
         b.phone &&
@@ -111,7 +113,6 @@ Deno.serve(async (req) => {
         b.rating >= 3.0
     );
 
-    // Map to service_providers rows
     const rows = qualified.map((b) => ({
       name: b.name,
       address: b.location.address1,
@@ -147,7 +148,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Upsert — skip duplicates by (data_source, data_source_id)
     const { data, error } = await supabase
       .from("service_providers")
       .upsert(rows, {
@@ -170,11 +170,13 @@ Deno.serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
+
   } catch (err) {
-    console.error("Yelp ingestion error:", err);
-    return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    console.error("ingest-yelp-shops error:", msg);
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

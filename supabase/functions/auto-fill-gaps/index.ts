@@ -1,17 +1,22 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+  const optResp = handleCorsOptions(req);
+  if (optResp) return optResp;
+
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getCorsHeaders(origin);
+
+  // Internal-only: cron/function-to-function callers must present INTERNAL_SECRET
+  const internalSecret = Deno.env.get('INTERNAL_SECRET');
+  const callerSecret = req.headers.get('x-internal-secret');
+  if (!internalSecret || callerSecret !== internalSecret) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
   }
 
   try {
+
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const YELP_API_KEY = Deno.env.get("YELP_API_KEY");
@@ -63,9 +68,11 @@ Deno.serve(async (req) => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+            "x-internal-secret": internalSecret,
           },
           body: JSON.stringify({ zip_code: zip }),
         });
+
 
         const data = await res.json();
         results.push({
