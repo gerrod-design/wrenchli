@@ -1,6 +1,7 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const GEMINI_NATIVE = "https://ai.gateway.lovable.dev/v1beta/models/gemini-2.5-flash:generateContent";
 
 // Round 14.6 — COPY CHECK-compliant v2 prompt.
 // Source: /mnt/documents/analyze-car-audio-prompt-v2.md
