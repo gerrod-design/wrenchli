@@ -60,6 +60,8 @@ export default function FindShops() {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [shopFilter, setShopFilter] = useState<ShopFilter>("all");
+  const [expandedRadius, setExpandedRadius] = useState(0);
+  const [resolvedCity, setResolvedCity] = useState<string>("");
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
