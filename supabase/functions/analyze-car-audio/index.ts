@@ -75,32 +75,38 @@ Deno.serve(async (req: Request) => {
     else if (mimeType.includes("mpeg") || mimeType.includes("mp3")) format = "mp3";
     else format = "webm"; // safe default for MediaRecorder output
 
-    console.log("[analyze-car-audio] sending to gemini:", { mimeType, format, sizeKB: Math.round(bytes.length / 1024) });
-
-    const userContent: any[] = [
-      {
-        type: "input_audio",
-        input_audio: {
-          data: base64Audio,
-          format,
-        },
-      },
-    ];
+    // Map actual recorded mime to a Gemini-native inline_data mime type.
+    // Gemini native accepts: audio/wav, audio/mp3, audio/aiff, audio/aac, audio/ogg, audio/flac, audio/webm, audio/mp4.
+    let geminiMime: string;
+    if (mimeType.includes("wav")) geminiMime = "audio/wav";
+    else if (mimeType.includes("webm")) geminiMime = "audio/webm";
+    else if (mimeType.includes("ogg")) geminiMime = "audio/ogg";
+    else if (mimeType.includes("mp4") || mimeType.includes("m4a")) geminiMime = "audio/mp4";
+    else if (mimeType.includes("aac")) geminiMime = "audio/aac";
+    else if (mimeType.includes("flac")) geminiMime = "audio/flac";
+    else if (mimeType.includes("mpeg") || mimeType.includes("mp3")) geminiMime = "audio/mp3";
+    else geminiMime = "audio/webm";
 
     const promptText = `The customer recorded this audio clip of a noise their car is making.${vehicleContext ? ` Vehicle: ${vehicleContext}.` : ""} Please listen and tell them what's likely going on with their vehicle.`;
-    userContent.push({ type: "text", text: promptText });
 
-    const response = await fetch(AI_GATEWAY, {
+    console.log("[analyze-car-audio] sending to gemini native:", { mimeType, geminiMime, sizeKB: Math.round(bytes.length / 1024) });
+
+    const response = await fetch(GEMINI_NATIVE, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userContent },
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { inline_data: { mime_type: geminiMime, data: base64Audio } },
+              { text: promptText },
+            ],
+          },
         ],
       }),
     });
@@ -122,11 +128,12 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      return new Response(JSON.stringify({ error: "Failed to analyze audio" }), {
+      return new Response(JSON.stringify({ error: "Failed to analyze audio", detail: errText.slice(0, 500) }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     const result = await response.json();
     const analysis = result.choices?.[0]?.message?.content ||
