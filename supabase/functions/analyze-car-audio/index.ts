@@ -45,9 +45,15 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Convert audio to base64
+    // Convert audio to base64 (chunked to avoid call-stack overflow on large mobile recordings)
     const audioBytes = await audioFile.arrayBuffer();
-    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBytes)));
+    const bytes = new Uint8Array(audioBytes);
+    let binary = "";
+    const CHUNK = 0x8000; // 32KB chunks
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK) as unknown as number[]);
+    }
+    const base64Audio = btoa(binary);
     const mimeType = audioFile.type || "audio/wav";
 
     const userContent: any[] = [
