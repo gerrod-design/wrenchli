@@ -8,6 +8,7 @@ export interface AudioRecorderState {
 
 const MAX_DURATION_MS = 30_000; // 30 seconds max
 const WAV_MIME_TYPE = "audio/wav";
+const TARGET_SAMPLE_RATE = 24_000;
 
 type BrowserAudioContext = typeof AudioContext;
 
@@ -18,8 +19,9 @@ function writeAscii(view: DataView, offset: number, value: string) {
 }
 
 function encodeWav(buffer: AudioBuffer): Blob {
-  const channelCount = Math.min(buffer.numberOfChannels, 2);
-  const sampleCount = buffer.length;
+  const channelCount = 1;
+  const sampleRate = Math.min(buffer.sampleRate, TARGET_SAMPLE_RATE);
+  const sampleCount = Math.ceil(buffer.duration * sampleRate);
   const bytesPerSample = 2;
   const blockAlign = channelCount * bytesPerSample;
   const wavBuffer = new ArrayBuffer(44 + sampleCount * blockAlign);
@@ -32,21 +34,26 @@ function encodeWav(buffer: AudioBuffer): Blob {
   view.setUint32(16, 16, true);
   view.setUint16(20, 1, true);
   view.setUint16(22, channelCount, true);
-  view.setUint32(24, buffer.sampleRate, true);
-  view.setUint32(28, buffer.sampleRate * blockAlign, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
   view.setUint16(32, blockAlign, true);
   view.setUint16(34, 16, true);
   writeAscii(view, 36, "data");
   view.setUint32(40, sampleCount * blockAlign, true);
 
-  const channels = Array.from({ length: channelCount }, (_, i) => buffer.getChannelData(i));
+  const sourceChannels = Array.from({ length: buffer.numberOfChannels }, (_, i) => buffer.getChannelData(i));
   let offset = 44;
   for (let i = 0; i < sampleCount; i += 1) {
-    for (let channel = 0; channel < channelCount; channel += 1) {
-      const sample = Math.max(-1, Math.min(1, channels[channel][i]));
-      view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
-      offset += bytesPerSample;
-    }
+    const sourceIndex = i * (buffer.sampleRate / sampleRate);
+    const lower = Math.floor(sourceIndex);
+    const upper = Math.min(lower + 1, buffer.length - 1);
+    const mix = sourceChannels.reduce((sum, channel) => {
+      const interpolated = channel[lower] + (channel[upper] - channel[lower]) * (sourceIndex - lower);
+      return sum + interpolated;
+    }, 0) / sourceChannels.length;
+    const sample = Math.max(-1, Math.min(1, mix));
+    view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+    offset += bytesPerSample;
   }
 
   return new Blob([wavBuffer], { type: WAV_MIME_TYPE });
