@@ -136,7 +136,7 @@ Deno.serve(async (req: Request) => {
 
 
     const result = await response.json();
-    const analysis = result.choices?.[0]?.message?.content ||
+    const analysis = result.candidates?.[0]?.content?.parts?.map((p: any) => p.text).filter(Boolean).join("\n") ||
       "I couldn't make out a clear noise from that recording. Could you try recording again, a bit closer to where the sound is coming from?";
 
     return new Response(JSON.stringify({ analysis }), {
