@@ -1,23 +1,27 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
-const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+// Native Gemini API — required because Lovable AI Gateway's OpenAI-compatible
+// /chat/completions endpoint silently drops Gemini's `inlineData` audio parts,
+// which caused Mike to hallucinate generic "ticking → valve train" answers
+// regardless of what the user actually recorded.
+const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-// Round 14.6 — COPY CHECK-compliant v2 prompt.
-// Source: /mnt/documents/analyze-car-audio-prompt-v2.md
-const SYSTEM_PROMPT = `You are Mike, a knowledgeable vehicle advisor at Wrenchli. You've just listened to an audio recording of a car noise that a customer recorded. The audio file is attached to the user's message.
+const SYSTEM_PROMPT = `You are Mike, a knowledgeable vehicle advisor at Wrenchli. A customer recorded an audio clip of a noise their car is making. The audio is attached as inline data in the user message.
 
-Wrenchli does symptom assessment, not diagnosis. NEVER use the words "diagnose," "diagnosis," "diagnoses," "diagnosing," or "diagnosed" in your response. Use language like "what's likely going on," "likely causes," "what we're hearing," and "assessment results" instead. This is a brand and legal discipline — Wrenchli is not a licensed mechanic, and the language must reflect that.
+Wrenchli does symptom assessment, not diagnosis. NEVER use the words "diagnose," "diagnosis," "diagnoses," "diagnosing," or "diagnosed." Use "what's likely going on," "likely causes," "what we're hearing," "assessment results."
 
-Listen to the attached audio and tell the customer:
+CRITICAL ANTI-HALLUCINATION RULES — read carefully:
 
-1. What the noise likely is (be specific about the type of sound — clicking, grinding, squealing, knocking, etc.)
-2. The most probable causes (2-3 possibilities ranked by likelihood)
-3. Urgency level (drive immediately to a shop, schedule soon, or monitor)
-4. Whether this is something they can investigate themselves
+1. Begin your response with ONE sentence describing the literal acoustic features you actually hear in this specific clip: pitch (low / mid / high), rhythm (steady, intermittent, random, rises with RPM), texture (metallic, dull, hissing, scraping, whining, grinding, squealing, knocking, clicking), and whether it changes across the clip.
 
-Keep your response SHORT — 2-3 sentences max. Sound conversational, like you're talking to a friend. End with a follow-up question.
+2. If the clip is silent, mostly background noise, too short, too distorted, or you cannot identify a distinct mechanical sound — say so honestly in one sentence, ask the user to re-record closer to the source with the engine running, and STOP. Do NOT speculate on causes. Do NOT name valve train, oil, timing chain, exhaust, transfer case, or any other component when you cannot hear the noise clearly.
 
-If the recording is mostly silence or unintelligible, say so honestly and suggest they try recording closer to the source of the noise.`;
+3. Only AFTER an honest acoustic description, if (and only if) you heard a distinct mechanical sound, name 2–3 likely causes ranked by likelihood, an urgency level (drive immediately to a shop / schedule soon / monitor), and whether the customer can investigate it themselves.
+
+4. Keep the whole response short and conversational — like talking to a friend. End with one follow-up question only when you gave a real assessment.
+
+Refusing to guess is the correct answer when the audio is unclear. Do not pad with generic causes.`;
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
@@ -46,50 +50,61 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      return new Response(JSON.stringify({ error: "AI service not configured" }), {
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      return new Response(JSON.stringify({ error: "Audio analysis not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Convert audio to base64 (chunked to avoid call-stack overflow on large mobile recordings)
+    // Base64-encode the audio in 32KB chunks to avoid call-stack overflow on large mobile recordings.
     const audioBytes = await audioFile.arrayBuffer();
     const bytes = new Uint8Array(audioBytes);
     let binary = "";
-    const CHUNK = 0x8000; // 32KB chunks
+    const CHUNK = 0x8000;
     for (let i = 0; i < bytes.length; i += CHUNK) {
       binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK) as unknown as number[]);
     }
     const base64Audio = btoa(binary);
-    const mimeType = audioFile.type || "audio/wav";
 
-    const promptText = `The customer recorded this audio clip of a noise their car is making.${vehicleContext ? ` Vehicle: ${vehicleContext}.` : ""} Please listen and tell them what's likely going on with their vehicle.`;
+    // Gemini wants the base mime type, not a codec-qualified one.
+    // e.g. "audio/webm;codecs=opus" -> "audio/webm"
+    const rawMime = audioFile.type || "audio/webm";
+    const mimeType = rawMime.split(";")[0].trim() || "audio/webm";
 
-    console.log("[analyze-car-audio] sending audio inline:", { mimeType, sizeKB: Math.round(bytes.length / 1024) });
+    const promptText = `The customer recorded this audio clip of a noise their car is making.${vehicleContext ? ` Vehicle: ${vehicleContext}.` : ""} Follow the acoustic-description rules in your system instruction. If you cannot clearly hear a distinct mechanical sound, refuse and ask them to re-record — do not list generic causes.`;
 
-    const response = await fetch(AI_GATEWAY, {
+    console.log("[analyze-car-audio] calling Gemini native:", {
+      model: GEMINI_MODEL,
+      mimeType,
+      sizeKB: Math.round(bytes.length / 1024),
+    });
+
+    const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: [
-            { inlineData: { mimeType, data: base64Audio } },
-            { type: "text", text: promptText },
-          ] },
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { inline_data: { mime_type: mimeType, data: base64Audio } },
+              { text: promptText },
+            ],
+          },
         ],
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: 600,
+        },
       }),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("AI gateway error:", response.status, errText);
+      console.error("Gemini API error:", response.status, errText);
 
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited. Please try again in a moment." }), {
@@ -97,8 +112,8 @@ Deno.serve(async (req: Request) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds." }), {
+      if (response.status === 402 || response.status === 403) {
+        return new Response(JSON.stringify({ error: "Audio analysis temporarily unavailable." }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -110,10 +125,14 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-
     const result = await response.json();
-    const analysis = result.choices?.[0]?.message?.content ||
-      "I couldn't make out a clear noise from that recording. Could you try recording again, a bit closer to where the sound is coming from?";
+    const analysis = result?.candidates?.[0]?.content?.parts
+      ?.map((p: { text?: string }) => p?.text ?? "")
+      .join("")
+      .trim() ||
+      "I couldn't make out a clear noise from that recording. Could you try recording again, a bit closer to where the sound is coming from, with the engine running?";
+
+    console.log("[analyze-car-audio] success:", { chars: analysis.length });
 
     return new Response(JSON.stringify({ analysis }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
