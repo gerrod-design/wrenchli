@@ -46,7 +46,8 @@ const AudioRecordButton = memo(function AudioRecordButton({
     setAnalyzing(true);
     try {
       const formData = new FormData();
-      formData.append("audio", audioBlob, "car-noise.webm");
+      const extension = audioBlob.type.toLowerCase().includes("wav") ? "wav" : "webm";
+      formData.append("audio", audioBlob, `car-noise.${extension}`);
       if (vehicleContext) formData.append("vehicle_context", vehicleContext);
 
       const response = await fetch(ANALYZE_URL, {
