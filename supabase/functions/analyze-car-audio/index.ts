@@ -67,17 +67,30 @@ Deno.serve(async (req: Request) => {
     // Base64-encode the audio in 32KB chunks to avoid call-stack overflow on large mobile recordings.
     const audioBytes = await audioFile.arrayBuffer();
     const bytes = new Uint8Array(audioBytes);
+
+    // Gemini wants the base mime type, not a codec-qualified one.
+    // e.g. "audio/webm;codecs=opus" -> "audio/webm"
+    const rawMime = audioFile.type || "audio/webm";
+    const mimeType = rawMime.split(";")[0].trim() || "audio/webm";
+
+    // Deterministic silence gate for PCM WAV input. Browser webm/opus recordings
+    // skip this and flow through to Gemini — they always contain real mic input.
+    if (mimeType === "audio/wav" || mimeType === "audio/wave" || mimeType === "audio/x-wav") {
+      const rmsDbfs = computeWavRmsDbfs(bytes);
+      console.log("[analyze-car-audio] wav rms dBFS:", rmsDbfs);
+      if (rmsDbfs !== null && rmsDbfs < -50) {
+        return new Response(JSON.stringify({
+          analysis: "I couldn't pick up any sound in that recording. Could you try again, holding the phone closer to where the noise is coming from, with the engine running and the sound active?",
+        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     let binary = "";
     const CHUNK = 0x8000;
     for (let i = 0; i < bytes.length; i += CHUNK) {
       binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK) as unknown as number[]);
     }
     const base64Audio = btoa(binary);
-
-    // Gemini wants the base mime type, not a codec-qualified one.
-    // e.g. "audio/webm;codecs=opus" -> "audio/webm"
-    const rawMime = audioFile.type || "audio/webm";
-    const mimeType = rawMime.split(";")[0].trim() || "audio/webm";
 
     const promptText = `The customer recorded this audio clip of a noise their car is making.${vehicleContext ? ` Vehicle: ${vehicleContext}.` : ""} Follow the acoustic-description rules in your system instruction. If you cannot clearly hear a distinct mechanical sound, refuse and ask them to re-record — do not list generic causes.`;
 
