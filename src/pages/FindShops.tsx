@@ -127,11 +127,20 @@ export default function FindShops() {
 
       setShops(providers);
       if (data.center) setMapCenter(data.center);
-      toast.success(`Found ${providers.length} shops near ${zip} (${data.city || "Metro Area"})`);
+      setExpandedRadius(data.expanded_radius_miles || 0);
+      setResolvedCity(data.city || "");
+      if (providers.length === 0) {
+        toast.info(`No partner shops yet near ${zip}. Join the waitlist to be notified.`);
+      } else if (data.expanded_radius_miles) {
+        toast.success(`Showing ${providers.length} shops within ${data.expanded_radius_miles} miles of ${zip}`);
+      } else {
+        toast.success(`Found ${providers.length} shops near ${zip} (${data.city || "Metro Area"})`);
+      }
     } catch (error) {
       console.error("Search error:", error);
       toast.error("Failed to search shops. Please try again.");
       setShops([]);
+      setExpandedRadius(0);
     } finally {
       setLoading(false);
     }
