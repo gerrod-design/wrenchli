@@ -60,28 +60,11 @@ Deno.serve(async (req: Request) => {
       binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK) as unknown as number[]);
     }
     const base64Audio = btoa(binary);
-    const mimeType = (audioFile.type || "audio/wav").toLowerCase();
-
-    // Prefer client-produced WAV, but pass through native mobile formats with the
-    // correct token instead of mislabeled audio or a hard 415.
-    let format: string;
-    if (mimeType.includes("wav")) format = "wav";
-    else if (mimeType.includes("mpeg") || mimeType.includes("mp3")) format = "mp3";
-    else if (mimeType.includes("webm")) format = "webm";
-    else if (mimeType.includes("ogg")) format = "ogg";
-    else if (mimeType.includes("mp4") || mimeType.includes("m4a") || mimeType.includes("aac")) format = "mp4";
-    else if (mimeType.includes("flac")) format = "flac";
-    else {
-      console.error("Unsupported audio format:", mimeType);
-      return new Response(JSON.stringify({ error: "This recording format could not be converted. Please try recording again." }), {
-        status: 415,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const mimeType = audioFile.type || "audio/wav";
 
     const promptText = `The customer recorded this audio clip of a noise their car is making.${vehicleContext ? ` Vehicle: ${vehicleContext}.` : ""} Please listen and tell them what's likely going on with their vehicle.`;
 
-    console.log("[analyze-car-audio] sending supported audio:", { mimeType, format, sizeKB: Math.round(bytes.length / 1024) });
+    console.log("[analyze-car-audio] sending audio inline:", { mimeType, sizeKB: Math.round(bytes.length / 1024) });
 
     const response = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -94,7 +77,7 @@ Deno.serve(async (req: Request) => {
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: [
-            { type: "input_audio", input_audio: { data: base64Audio, format } },
+            { inlineData: { mimeType, data: base64Audio } },
             { type: "text", text: promptText },
           ] },
         ],
