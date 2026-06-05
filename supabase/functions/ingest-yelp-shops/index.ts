@@ -129,26 +129,48 @@ Deno.serve(async (req) => {
       is_dealer: false,
       is_partnered: false,
       is_franchise: isFranchise(b.name),
+      wrenchli_verified: false,
+      data_source: "yelp",
+      data_source_id: b.id,
+      external_id: b.id,
+      is_active: true,
     }));
 
-    let inserted = 0;
-    if (rows.length > 0) {
-      const { error: insertErr, count } = await supabase
-        .from("service_providers")
-        .upsert(rows, { onConflict: "name,address,zip_code", count: "exact" });
-      if (insertErr) throw new Error(`Insert failed: ${insertErr.message}`);
-      inserted = count ?? rows.length;
+    if (rows.length === 0) {
+      return new Response(
+        JSON.stringify({
+          message: "No qualifying shops found",
+          total_from_yelp: businesses.length,
+          filtered_out: businesses.length,
+          inserted: 0,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("service_providers")
+      .upsert(rows, {
+        onConflict: "data_source,data_source_id",
+        ignoreDuplicates: false,
+      })
+      .select("id, name, zip_code");
+
+    if (error) {
+      throw new Error(`Supabase upsert error: ${error.message}`);
     }
 
     return new Response(
       JSON.stringify({
-        success: true,
-        fetched: businesses.length,
+        message: `Ingested ${data?.length || 0} shops from Yelp`,
+        total_from_yelp: businesses.length,
         qualified: qualified.length,
-        inserted,
+        upserted: data?.length || 0,
+        shops: data,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
+
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     console.error("ingest-yelp-shops error:", msg);
