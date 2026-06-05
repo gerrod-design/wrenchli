@@ -166,3 +166,44 @@ Deno.serve(async (req: Request) => {
     });
   }
 });
+
+/**
+ * Compute RMS amplitude in dBFS for a 16-bit PCM WAV byte stream.
+ * Returns null if the buffer isn't a parseable PCM16 WAV.
+ */
+function computeWavRmsDbfs(bytes: Uint8Array): number | null {
+  if (bytes.length < 44) return null;
+  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  // "RIFF" .. "WAVE"
+  if (dv.getUint32(0, false) !== 0x52494646 || dv.getUint32(8, false) !== 0x57415645) return null;
+
+  // Walk chunks to find "fmt " and "data"
+  let offset = 12;
+  let bitsPerSample = 0;
+  let dataOffset = -1;
+  let dataSize = 0;
+  while (offset + 8 <= bytes.length) {
+    const id = dv.getUint32(offset, false);
+    const size = dv.getUint32(offset + 4, true);
+    if (id === 0x666d7420) { // "fmt "
+      bitsPerSample = dv.getUint16(offset + 8 + 14, true);
+    } else if (id === 0x64617461) { // "data"
+      dataOffset = offset + 8;
+      dataSize = size;
+      break;
+    }
+    offset += 8 + size + (size % 2);
+  }
+  if (bitsPerSample !== 16 || dataOffset < 0 || dataSize <= 0) return null;
+
+  const sampleCount = Math.min(dataSize, bytes.length - dataOffset) / 2;
+  if (sampleCount < 1) return null;
+  let sumSq = 0;
+  for (let i = 0; i < sampleCount; i++) {
+    const s = dv.getInt16(dataOffset + i * 2, true) / 0x8000;
+    sumSq += s * s;
+  }
+  const rms = Math.sqrt(sumSq / sampleCount);
+  if (rms <= 0) return -Infinity;
+  return 20 * Math.log10(rms);
+}
