@@ -17,7 +17,7 @@ Listen to the attached audio and tell the customer:
 
 Keep your response SHORT — 2-3 sentences max. Sound conversational, like you're talking to a friend. End with a follow-up question.
 
-If the transcription is mostly silence or unintelligible, say so honestly and suggest they try recording closer to the source of the noise.`;
+If the recording is mostly silence or unintelligible, say so honestly and suggest they try recording closer to the source of the noise.`;
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
