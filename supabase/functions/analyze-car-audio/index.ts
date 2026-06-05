@@ -60,14 +60,28 @@ Deno.serve(async (req: Request) => {
       binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK) as unknown as number[]);
     }
     const base64Audio = btoa(binary);
-    const mimeType = audioFile.type || "audio/wav";
+    const mimeType = (audioFile.type || "audio/wav").toLowerCase();
+
+    // Map actual recorded mime → Gemini-supported format token.
+    // Gemini multimodal audio supports: wav, mp3, aiff, aac, ogg, flac, webm, mp4.
+    // iOS Safari typically records audio/mp4; desktop Chrome/Android records audio/webm;codecs=opus.
+    let format: string;
+    if (mimeType.includes("wav")) format = "wav";
+    else if (mimeType.includes("webm")) format = "webm";
+    else if (mimeType.includes("ogg")) format = "ogg";
+    else if (mimeType.includes("mp4") || mimeType.includes("m4a") || mimeType.includes("aac")) format = "mp4";
+    else if (mimeType.includes("flac")) format = "flac";
+    else if (mimeType.includes("mpeg") || mimeType.includes("mp3")) format = "mp3";
+    else format = "webm"; // safe default for MediaRecorder output
+
+    console.log("[analyze-car-audio] sending to gemini:", { mimeType, format, sizeKB: Math.round(bytes.length / 1024) });
 
     const userContent: any[] = [
       {
         type: "input_audio",
         input_audio: {
           data: base64Audio,
-          format: mimeType.includes("wav") ? "wav" : "mp3",
+          format,
         },
       },
     ];
