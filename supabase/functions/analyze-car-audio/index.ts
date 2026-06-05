@@ -67,17 +67,30 @@ Deno.serve(async (req: Request) => {
     // Base64-encode the audio in 32KB chunks to avoid call-stack overflow on large mobile recordings.
     const audioBytes = await audioFile.arrayBuffer();
     const bytes = new Uint8Array(audioBytes);
+
+    // Gemini wants the base mime type, not a codec-qualified one.
+    // e.g. "audio/webm;codecs=opus" -> "audio/webm"
+    const rawMime = audioFile.type || "audio/webm";
+    const mimeType = rawMime.split(";")[0].trim() || "audio/webm";
+
+    // Deterministic silence gate for PCM WAV input. Browser webm/opus recordings
+    // skip this and flow through to Gemini — they always contain real mic input.
+    if (mimeType === "audio/wav" || mimeType === "audio/wave" || mimeType === "audio/x-wav") {
+      const rmsDbfs = computeWavRmsDbfs(bytes);
+      console.log("[analyze-car-audio] wav rms dBFS:", rmsDbfs);
+      if (rmsDbfs !== null && rmsDbfs < -50) {
+        return new Response(JSON.stringify({
+          analysis: "I couldn't pick up any sound in that recording. Could you try again, holding the phone closer to where the noise is coming from, with the engine running and the sound active?",
+        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     let binary = "";
     const CHUNK = 0x8000;
     for (let i = 0; i < bytes.length; i += CHUNK) {
       binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK) as unknown as number[]);
     }
     const base64Audio = btoa(binary);
-
-    // Gemini wants the base mime type, not a codec-qualified one.
-    // e.g. "audio/webm;codecs=opus" -> "audio/webm"
-    const rawMime = audioFile.type || "audio/webm";
-    const mimeType = rawMime.split(";")[0].trim() || "audio/webm";
 
     const promptText = `The customer recorded this audio clip of a noise their car is making.${vehicleContext ? ` Vehicle: ${vehicleContext}.` : ""} Follow the acoustic-description rules in your system instruction. If you cannot clearly hear a distinct mechanical sound, refuse and ask them to re-record — do not list generic causes.`;
 
@@ -153,3 +166,44 @@ Deno.serve(async (req: Request) => {
     });
   }
 });
+
+/**
+ * Compute RMS amplitude in dBFS for a 16-bit PCM WAV byte stream.
+ * Returns null if the buffer isn't a parseable PCM16 WAV.
+ */
+function computeWavRmsDbfs(bytes: Uint8Array): number | null {
+  if (bytes.length < 44) return null;
+  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  // "RIFF" .. "WAVE"
+  if (dv.getUint32(0, false) !== 0x52494646 || dv.getUint32(8, false) !== 0x57415645) return null;
+
+  // Walk chunks to find "fmt " and "data"
+  let offset = 12;
+  let bitsPerSample = 0;
+  let dataOffset = -1;
+  let dataSize = 0;
+  while (offset + 8 <= bytes.length) {
+    const id = dv.getUint32(offset, false);
+    const size = dv.getUint32(offset + 4, true);
+    if (id === 0x666d7420) { // "fmt "
+      bitsPerSample = dv.getUint16(offset + 8 + 14, true);
+    } else if (id === 0x64617461) { // "data"
+      dataOffset = offset + 8;
+      dataSize = size;
+      break;
+    }
+    offset += 8 + size + (size % 2);
+  }
+  if (bitsPerSample !== 16 || dataOffset < 0 || dataSize <= 0) return null;
+
+  const sampleCount = Math.min(dataSize, bytes.length - dataOffset) / 2;
+  if (sampleCount < 1) return null;
+  let sumSq = 0;
+  for (let i = 0; i < sampleCount; i++) {
+    const s = dv.getInt16(dataOffset + i * 2, true) / 0x8000;
+    sumSq += s * s;
+  }
+  const rms = Math.sqrt(sumSq / sampleCount);
+  if (rms <= 0) return -Infinity;
+  return 20 * Math.log10(rms);
+}
