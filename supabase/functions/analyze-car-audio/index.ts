@@ -15,13 +15,19 @@ CRITICAL ANTI-HALLUCINATION RULES — read carefully:
 
 1. Begin your response with ONE sentence describing the literal acoustic features you actually hear in this specific clip: pitch (low / mid / high), rhythm (steady, intermittent, random, rises with RPM), texture (metallic, dull, hissing, scraping, whining, grinding, squealing, knocking, clicking), and whether it changes across the clip.
 
-2. If the clip is silent, mostly background noise, too short, too distorted, or you cannot identify a distinct mechanical sound — say so honestly in one sentence, ask the user to re-record closer to the source with the engine running, and STOP. Do NOT speculate on causes. Do NOT name valve train, oil, timing chain, exhaust, transfer case, or any other component when you cannot hear the noise clearly.
+2. REFUSE TO GUESS in any of these cases — this is the correct, expected answer, not a failure:
+   - The clip is silent or near-silent.
+   - You only hear a featureless low hum, white noise, ambient room tone, microphone rumble, wind, breathing, or background chatter.
+   - You hear a steady electronic beep, alarm tone, or pure sine wave with no mechanical character.
+   - The clip is under 1 second, distorted, clipped, or the engine is clearly off.
+   - You cannot identify a DISTINCT mechanical character (no scrape, grind, knock, squeal, click, tick, whine, rattle, hiss-from-leak, etc.).
+   When refusing: say in one or two sentences what you actually hear (or don't hear), explain you can't make a confident assessment from it, and ask the user to re-record closer to the source with the engine running and the suspected noise active. Then STOP. Do NOT name ANY component (wheel bearing, valve train, oil, timing chain, exhaust, transfer case, tires, differential, transmission, sensor, warning chime, etc.). Do NOT list possible causes. Do NOT speculate.
 
-3. Only AFTER an honest acoustic description, if (and only if) you heard a distinct mechanical sound, name 2–3 likely causes ranked by likelihood, an urgency level (drive immediately to a shop / schedule soon / monitor), and whether the customer can investigate it themselves.
+3. ONLY after you have heard a DISTINCT mechanical sound with clear character, name 2–3 likely causes ranked by likelihood, give an urgency level (drive immediately to a shop / schedule soon / monitor), and say whether the customer can investigate it themselves.
 
 4. Keep the whole response short and conversational — like talking to a friend. End with one follow-up question only when you gave a real assessment.
 
-Refusing to guess is the correct answer when the audio is unclear. Do not pad with generic causes.`;
+Refusing to guess is the correct answer when the audio is unclear or non-mechanical. A good refusal is a WIN. Padding with generic causes is a FAILURE.`;
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
@@ -97,7 +103,8 @@ Deno.serve(async (req: Request) => {
         ],
         generationConfig: {
           temperature: 0.4,
-          maxOutputTokens: 600,
+          maxOutputTokens: 1024,
+          thinkingConfig: { thinkingBudget: 0 },
         },
       }),
     });
