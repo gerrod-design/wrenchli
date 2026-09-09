@@ -54,9 +54,10 @@ serve(async (req) => {
       status: 200,
       headers: { ...securityHeaders, 'Content-Type': 'application/json' },
     });
-  } catch {
-    return new Response(JSON.stringify({ valid: false }), {
-      status: 400,
+  } catch (e) {
+    console.error('verify-site-password error', e);
+    return new Response(JSON.stringify({ valid: false, error: 'Unexpected error' }), {
+      status: 200,
       headers: { ...securityHeaders, 'Content-Type': 'application/json' },
     });
   }
