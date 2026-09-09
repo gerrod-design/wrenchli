@@ -21,11 +21,20 @@ serve(async (req) => {
   }
 
   try {
-    const { password } = await req.json();
+    let password: unknown = null;
+    try {
+      const raw = await req.text();
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        password = parsed?.password;
+      }
+    } catch (e) {
+      console.error('Failed to parse request body', e);
+    }
 
     if (!password || typeof password !== 'string') {
-      return new Response(JSON.stringify({ valid: false }), {
-        status: 400,
+      return new Response(JSON.stringify({ valid: false, error: 'Missing password' }), {
+        status: 200,
         headers: { ...securityHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -45,9 +54,10 @@ serve(async (req) => {
       status: 200,
       headers: { ...securityHeaders, 'Content-Type': 'application/json' },
     });
-  } catch {
-    return new Response(JSON.stringify({ valid: false }), {
-      status: 400,
+  } catch (e) {
+    console.error('verify-site-password error', e);
+    return new Response(JSON.stringify({ valid: false, error: 'Unexpected error' }), {
+      status: 200,
       headers: { ...securityHeaders, 'Content-Type': 'application/json' },
     });
   }
