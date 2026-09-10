@@ -8,9 +8,8 @@ import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 const STORAGE_KEY = "wrenchli_site_access_v4";
 
 export default function SitePasswordGate({ children }: { children: React.ReactNode }) {
-  const [unlocked, setUnlocked] = useState(
-    () => typeof window !== "undefined" && sessionStorage.getItem(STORAGE_KEY) === "granted"
-  );
+  // Passcode gate disabled — site is open to all visitors.
+  const [unlocked, setUnlocked] = useState(true);
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
