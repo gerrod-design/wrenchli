@@ -30,18 +30,15 @@ export function useCloudVehicles() {
       setLoading(false);
       return;
     }
-    console.log("[useCloudVehicles] fetching for", user.id);
     try {
       const { data, error } = await supabase
         .from("user_vehicles")
         .select("id, user_id, year, make, model, trim, nickname, current_mileage, is_active, is_primary, photo_url, created_at, updated_at")
         .eq("is_active", true)
         .order("updated_at", { ascending: false });
-      console.log("[useCloudVehicles] result", JSON.stringify({ error, count: data?.length }));
       if (error) throw error;
       setVehicles((data as CloudVehicle[]) || []);
     } catch (err) {
-      console.error("[useCloudVehicles] error:", err);
     } finally {
       setLoading(false);
     }
@@ -65,7 +62,6 @@ export function useCloudVehicles() {
       .update({ is_active: false })
       .eq("id", vehicleId);
     if (error) {
-      console.error("[useCloudVehicles] delete error:", error);
       return false;
     }
     setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
@@ -78,7 +74,6 @@ export function useCloudVehicles() {
       .update(updates)
       .eq("id", vehicleId);
     if (error) {
-      console.error("[useCloudVehicles] update error:", error);
       return false;
     }
     setVehicles((prev) =>
