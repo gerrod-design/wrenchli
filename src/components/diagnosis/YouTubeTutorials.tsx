@@ -1,5 +1,6 @@
 import { ExternalLink, Play, Search, Loader2, Sparkles } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
+import { isSafetyCriticalCause } from "@/lib/diyVisibility";
 import type { YouTubeQuery } from "@/hooks/useSmartRepairIntel";
 
 interface YouTubeTutorialsProps {
@@ -21,7 +22,25 @@ const angleLabel: Record<string, string> = {
   troubleshooting: "Troubleshooting",
 };
 
-function buildSearchVariations(title: string, vehicle: string) {
+function joinTerms(...terms: (string | undefined)[]) {
+  return terms.filter((t) => t && t.trim()).join(" ").replace(/\s+/g, " ").trim();
+}
+
+function buildSearchVariations(title: string, vehicle: string, safetyCritical: boolean) {
+  // Safety-critical systems are never framed as DIY instruction.
+  if (safetyCritical) {
+    return [
+      {
+        label: joinTerms(title, vehicle, "symptoms and causes"),
+        query: joinTerms(title, vehicle, "symptoms and causes"),
+      },
+      {
+        label: joinTerms(vehicle, title, "troubleshooting"),
+        query: joinTerms(vehicle, title, "troubleshooting"),
+      },
+    ];
+  }
+
   const actionMap: Record<string, string> = {
     "worn brake pads": "replace brake pads",
     "check engine light": "troubleshoot check engine light",
@@ -46,9 +65,9 @@ function buildSearchVariations(title: string, vehicle: string) {
   }
 
   return [
-    { label: `${title} ${vehicle} DIY tutorial`, query: `${title} ${vehicle} DIY tutorial` },
-    { label: `How to ${actionVerb} ${vehicle}`, query: `how to ${actionVerb} ${vehicle}` },
-    { label: `${vehicle} ${title} step by step`, query: `${vehicle} ${title} step by step` },
+    { label: joinTerms(title, vehicle, "DIY tutorial"), query: joinTerms(title, vehicle, "DIY tutorial") },
+    { label: `How to ${actionVerb} ${vehicle}`.trim(), query: `how to ${actionVerb} ${vehicle}`.trim() },
+    { label: joinTerms(vehicle, title, "step by step"), query: joinTerms(vehicle, title, "step by step") },
   ];
 }
 
@@ -57,15 +76,23 @@ function buildYouTubeUrl(query: string) {
 }
 
 export default function YouTubeTutorials({ diagnosisTitle, vehicle, smartQueries, loading }: YouTubeTutorialsProps) {
-  const useSmartQueries = smartQueries && smartQueries.length > 0;
-  const fallbackVariations = buildSearchVariations(diagnosisTitle, vehicle);
-  const generalQuery = `${diagnosisTitle} ${vehicle} DIY`;
+  const safetyCritical = isSafetyCriticalCause(diagnosisTitle);
+
+  // Drop the Step-by-Step / DIY-tutorial angle for brakes, steering, airbags, and fuel.
+  const smartQueriesToShow = (smartQueries ?? []).filter(
+    (q) => !(safetyCritical && q.angle === "technique")
+  );
+  const useSmartQueries = smartQueriesToShow.length > 0;
+  const fallbackVariations = buildSearchVariations(diagnosisTitle, vehicle, safetyCritical);
+  const generalQuery = safetyCritical
+    ? joinTerms(diagnosisTitle, vehicle, "repair explained")
+    : joinTerms(diagnosisTitle, vehicle, "DIY");
 
   return (
     <div className="rounded-xl border bg-card p-4 md:p-5 space-y-4" style={{ borderColor: "hsl(0 0% 91%)" }}>
       <h4 className="font-heading text-base font-bold text-wrenchli-teal flex items-center gap-2">
         <Play className="h-4 w-4" />
-        DIY Tutorials for {diagnosisTitle}
+        {safetyCritical ? "See what's involved" : `DIY Tutorials for ${diagnosisTitle}`}
         {vehicle && <span className="font-normal text-muted-foreground text-sm">on {vehicle}</span>}
         {useSmartQueries && (
           <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-wrenchli-teal/10 px-2 py-0.5 text-[10px] font-medium text-wrenchli-teal">
@@ -74,15 +101,22 @@ export default function YouTubeTutorials({ diagnosisTitle, vehicle, smartQueries
         )}
       </h4>
 
+      {safetyCritical && (
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          These videos explain the repair and what it involves, so you can ask your mechanic informed questions.
+          This work should be done by a professional.
+        </p>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Finding the best tutorials for your vehicle…
+          {safetyCritical ? "Finding videos that explain this repair…" : "Finding the best tutorials for your vehicle…"}
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-3">
           {useSmartQueries
-            ? smartQueries.map((v, i) => (
+            ? smartQueriesToShow.map((v, i) => (
                 <a
                   key={i}
                   href={buildYouTubeUrl(v.query)}
