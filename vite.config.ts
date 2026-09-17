@@ -14,19 +14,18 @@ const prerenderRoutes: {
 }[] = [
   {
     path: "/",
-    title: "Free Vehicle Symptom Assessment | Wrenchli — Michigan & Ohio",
+    title: "Free Vehicle Symptom Assessment | Wrenchli",
     description:
-      "Describe your car symptom in plain English — get a free instant assessment of likely causes and repair costs. Serving Michigan and Ohio drivers.",
+      "Describe your car symptom in plain English — get a free instant assessment of likely causes and repair costs. Free, no account required.",
     content: `
       <h1>Vehicle Repair Finally Fixed</h1>
-      <p>Affordable vehicle repair — transparent pricing, trusted shops.</p>
-      <p>Assessment always free · DIY tutorials · Shop quotes · No account required</p>
+      <p>Affordable vehicle repair — transparent pricing, honest guidance.</p>
+      <p>Assessment always free · DIY tutorials · No account required</p>
       <a href="/#quote">Get Your Free Assessment</a>
       <p>This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.</p>
       <h2>Check your vehicle for open safety recalls</h2>
       <p>Enter your VIN — free, instant, no account required.</p>
       <h2>Transparent Pricing</h2><p>See real prices upfront. No surprises, no hidden fees.</p>
-      <h2>Find Trusted Shops</h2><p>Find trusted local shops and know exactly what questions to ask before you walk in.</p>
     `,
   },
   {
