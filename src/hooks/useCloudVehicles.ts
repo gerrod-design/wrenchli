@@ -30,6 +30,7 @@ export function useCloudVehicles() {
       setLoading(false);
       return;
     }
+    console.log("[useCloudVehicles] fetching for", user.id);
     try {
       const { data, error } = await supabase
         .from("user_vehicles")
