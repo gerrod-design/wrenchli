@@ -96,7 +96,12 @@ Rules:
 - Cost ranges are for parts + labor at an average US shop
 - urgency "immediate" = do not drive; "soon" = within 1 week; "schedule" = within 1 month; "monitor" = watch it
 - explanation should be something a non-mechanic can understand and act on
-- If symptom information is thin, lower confidence accordingly`;
+- If symptom information is thin, lower confidence accordingly
+- Any cause involving brakes, steering, airbags, or the fuel system MUST have diy_difficulty "professional_only" — these systems are never DIY-eligible`;
+
+// ── Deterministic safety override ────────────────────────────
+
+const SAFETY_CRITICAL_PATTERNS = [/\bbrak/i, /\bsteer/i, /\bair\s?bags?/i, /\bfuel/i];
 
 // ── Main Handler ─────────────────────────────────────────────
 
@@ -192,6 +197,15 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
     }
     if (!Array.isArray(diagnosis.possible_causes) || diagnosis.possible_causes.length === 0) {
       throw new Error("AI response missing possible_causes");
+    }
+
+    // ── 4d. Deterministic safety override ─────────────────
+    for (const cause of diagnosis.possible_causes) {
+      const haystack = `${cause.name ?? ""} ${cause.notes ?? ""}`;
+      if (SAFETY_CRITICAL_PATTERNS.some((p) => p.test(haystack))) {
+        cause.diy_difficulty = "professional_only";
+        (cause as any).difficulty = "professional_only";
+      }
     }
 
     // ── 5. Persist to Supabase ─────────────────────────────
