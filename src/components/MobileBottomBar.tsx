@@ -1,5 +1,5 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Stethoscope, CarFront, Bookmark, Wrench } from "lucide-react";
+import { Stethoscope, CarFront, Bookmark } from "lucide-react";
 
 export default function MobileBottomBar() {
   const { pathname } = useLocation();
@@ -7,10 +7,6 @@ export default function MobileBottomBar() {
   const isInsightsPage = pathname === "/vehicle-insights";
   const isFindShopsPage = pathname === "/find-shops";
 
-  // Build quote link — quote flow is paused, so this now directs to reference-only shop listings.
-  const buildQuoteLink = () => {
-    return "/find-shops";
-  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[60px] items-center justify-around border-t border-border bg-background/95 backdrop-blur-md md:hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
