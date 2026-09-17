@@ -23,7 +23,7 @@ describe("YouTubeTutorials safety-critical handling", () => {
     expect(screen.getByText("Troubleshooting")).toBeInTheDocument();
     expect(screen.queryByText("Replace pads procedure")).not.toBeInTheDocument();
     const more = screen.getByRole("link", { name: /Search YouTube for more videos/ });
-    expect(more.getAttribute("href")).toContain("repair+explained");
+    expect(more.getAttribute("href")).toContain("repair%20explained");
     expect(more.getAttribute("href")).not.toContain("DIY");
   });
 
