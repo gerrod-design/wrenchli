@@ -45,7 +45,7 @@ export default function About() {
                 On the other side, independent repair shops — the backbone of the industry — compete for customers in a market where brand recognition and marketing budgets matter as much as quality of work. The best shops in America are running lean, skilled operations. They just don't have the consumer acquisition tools that the big players do.
               </p>
               <p>
-                We built the platform that fixes both sides. Transparent pricing and trusted shops for consumers. Pre-qualified customers and zero intake friction for shops. And repair financing on the way — so cost never stands between a vehicle owner and the repair they need.
+                We started with the consumer side: transparent pricing and honest symptom assessments for drivers, and repair financing on the way — so cost never stands between a vehicle owner and the repair they need. Our shop partner program is paused while we get the consumer experience right.
               </p>
               <p className="text-foreground font-medium">
                 Based in Michigan — the heart of America's automotive industry — Wrenchli is where technology meets the trades.

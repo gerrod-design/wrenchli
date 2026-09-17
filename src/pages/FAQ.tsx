@@ -9,16 +9,16 @@ const consumerFaqs = [
   { q: "Is Wrenchli free for vehicle owners?", a: "Yes, completely free. We charge shops a small transaction fee — not you. The price you see is the price you pay." },
   { q: "How do you vet the shops?", a: "Every shop on Wrenchli must be licensed, insured, and meet our quality standards. We verify credentials and monitor reviews continuously." },
   { q: "Can I finance my repair?", a: "Yes — we're building in point-of-sale financing through multiple lending partners. You'll be able to apply at checkout and get approved in minutes. This feature is coming soon." },
-  { q: "When is Wrenchli launching?", a: "The symptom assessment is live now and free for any U.S. vehicle owner. Our trusted shop network is rolling out in Michigan and Ohio first — join the waitlist for shop matching in your area." },
+  { q: "When is Wrenchli launching?", a: "The symptom assessment is live now and free for any U.S. vehicle owner. Shop matching is currently paused while we focus on the assessment — join the waitlist and we'll notify you when it goes live in your area." },
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program. Details will be announced before launch." },
 ];
 
 const shopFaqs = [
-  { q: "How much does Wrenchli cost for shops?", a: "$299/month per location for the full platform — marketplace listing, SaaS tools, payment processing, and customer management." },
-  { q: "How do I get customers through Wrenchli?", a: "Customers search for repairs on Wrenchli and receive quotes from shops in their area. You set your own prices and respond to requests that match your services." },
-  { q: "What SaaS tools are included?", a: "Smart scheduling, digital inspections (photo/video reports), integrated payments, customer CRM, automated reminders, and your own professional shop profile page." },
-  { q: "Do I have to change my workflow?", a: "Wrenchli is designed to fit into how you already work. Our onboarding team will help you get set up and trained." },
-  { q: "How do I apply?", a: "Visit our For Shop Owners page and fill out the early access application. We're onboarding shops in Michigan and Ohio now." },
+  // Shop track paused 2026-09-17: no partner shops, no pilot, no pricing.
+  { q: "Can my shop join Wrenchli?", a: "Our shop partner program is currently paused while we focus on the free consumer symptom assessment. We're not onboarding shops right now." },
+  { q: "How much does Wrenchli cost for shops?", a: "There is no shop pricing at this time — the shop program is paused." },
+  { q: "How do I get customers through Wrenchli?", a: "Shop matching is paused, so we're not sending customers to shops right now." },
+  { q: "Will you offer shop software or integrations?", a: "Not at this time. When the shop track reopens, we'll announce what integrations are actually available." },
 ];
 
 export default function FAQ() {

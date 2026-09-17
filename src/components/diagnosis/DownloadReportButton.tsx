@@ -13,9 +13,15 @@ interface DownloadReportProps {
 }
 
 const urgencyLabel: Record<string, { text: string; cls: string }> = {
+  // Canonical urgency terms (registry §1.8): immediate / soon / schedule / monitor
+  immediate: { text: "Immediate — Do not drive. Address as soon as possible; continuing to drive may cause additional damage or safety risk.", cls: "urgency-high" },
+  soon: { text: "Soon — This should be addressed promptly to prevent further damage.", cls: "urgency-high" },
+  schedule: { text: "Schedule — This should be addressed within the next few weeks to prevent further damage.", cls: "urgency-medium" },
+  monitor: { text: "Monitor — No immediate action needed. Keep an eye on this issue and note any changes.", cls: "urgency-low" },
+  // Legacy fallbacks (do not use for new content)
   low: { text: "Monitor — No immediate action needed. Keep an eye on this issue and note any changes.", cls: "urgency-low" },
-  medium: { text: "Schedule Soon — This should be addressed within the next few weeks to prevent further damage.", cls: "urgency-medium" },
-  high: { text: "Urgent — Address as soon as possible. Continuing to drive may cause additional damage or safety risk.", cls: "urgency-high" },
+  medium: { text: "Schedule — This should be addressed within the next few weeks to prevent further damage.", cls: "urgency-medium" },
+  high: { text: "Immediate — Do not drive. Address as soon as possible; continuing to drive may cause additional damage or safety risk.", cls: "urgency-high" },
 };
 
 const MECHANIC_QUESTIONS = [
@@ -35,8 +41,8 @@ function buildPrintContent(props: DownloadReportProps) {
     day: "numeric",
   });
 
-  const topUrgency = top3[0]?.urgency ?? "low";
-  const u = urgencyLabel[topUrgency] ?? urgencyLabel.low;
+  const topUrgency = top3[0]?.urgency ?? "schedule";
+  const u = urgencyLabel[topUrgency] ?? urgencyLabel.schedule;
 
   // Compute overall cost range from top 3
   const allDiyCosts = top3.map(d => d.diy_cost).filter(Boolean);

@@ -68,7 +68,7 @@ export default function Investors() {
             </div>
             <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                Wrenchli integrates three pillars into one platform: a <span className="font-semibold text-foreground">consumer marketplace</span> for transparent price comparison, <span className="font-semibold text-foreground">shop management SaaS</span> ($299/mo) for modern operations, and <span className="font-semibold text-foreground">embedded financing</span> that increases repair approval rates.
+                Wrenchli starts with a free national consumer symptom assessment: drivers describe what's wrong and get likely causes, urgency, and a fair cost range. Shop matching, shop software, and repair financing are paused — the assessment is the product today, and the trust layer (verified repair outcomes) is what we're building toward.
               </p>
               <p>
                 We make money when shops make money — aligning incentives across the entire ecosystem.

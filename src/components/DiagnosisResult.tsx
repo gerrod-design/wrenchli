@@ -94,7 +94,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
     if (!symptom) return [];
     return matchSymptoms(symptom);
   }, [symptom]);
-  // Save diagnosis to garage history when results arrive
+  // Save assessment to garage history when results arrive
   useEffect(() => {
     if (diagnoses.length === 0 || savedToHistory.current || !garageVehicle) return;
     savedToHistory.current = true;
@@ -125,7 +125,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
 
       if (!resp.ok) {
         const data = await resp.json().catch(() => ({}));
-        const msg = data.error || "Failed to get diagnosis";
+        const msg = data.error || "Failed to get assessment";
         if (resp.status === 429) toast.error("Rate limit exceeded. Please try again shortly.");
         else if (resp.status === 402) toast.error("AI service temporarily unavailable.");
         else toast.error(msg);
@@ -149,7 +149,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
       setDiagnoses(enriched);
     } catch (e) {
       console.error("Diagnosis error:", e);
-      setError("Failed to connect to diagnosis service. Please try again.");
+      setError("Failed to connect to the assessment service. Please try again.");
       toast.error("Failed to connect. Please try again.");
     } finally {
       setIsLoading(false);
@@ -169,7 +169,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
   return (
     <section id="diagnosis-results" className="section-padding bg-secondary">
       <div className="container-wrenchli max-w-3xl">
-        {/* Instant symptom matches (shown before AI diagnosis) */}
+        {/* Instant symptom matches (shown before AI assessment) */}
         {showInstantMatches && (
           <>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">
@@ -177,8 +177,8 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
             </h2>
             <p className="mt-3 mb-8 text-center text-muted-foreground">
               {symptomMatches.length > 0
-                ? "Based on common symptom patterns — run AI diagnosis for a more detailed analysis."
-                : `Get an AI-powered diagnosis${vehicleStr ? ` for your ${vehicleStr}` : ""}`}
+                ? "Based on common symptom patterns — run an AI assessment for a more detailed analysis."
+                : `Get an AI-powered assessment${vehicleStr ? ` for your ${vehicleStr}` : ""}`}
             </p>
 
             {symptomMatches.length > 0 && (
@@ -231,7 +231,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
           <>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Ready to Assess</h2>
             <p className="mt-3 mb-8 text-center text-muted-foreground">
-              Get an AI-powered diagnosis{vehicleStr ? ` for your ${vehicleStr}` : ""}
+              Get an AI-powered assessment{vehicleStr ? ` for your ${vehicleStr}` : ""}
             </p>
             <div className="text-center">
               <Button
@@ -281,7 +281,7 @@ export default function DiagnosisResult({ codes, symptom, year, make, model, onS
           </div>
         )}
 
-        {/* AI diagnosis results */}
+        {/* AI assessment results */}
         {diagnoses.length > 0 && !isLoading && (
           <div className="space-y-6">
             {!showInstantMatches && (

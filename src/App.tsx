@@ -37,7 +37,6 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Garage from "./pages/Garage";
 import Investors from "./pages/Investors";
-import GetQuote from "./pages/GetQuote";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminAudit from "./pages/AdminAudit";
@@ -60,9 +59,6 @@ import ResetPassword from "./pages/ResetPassword";
 import RepairGuide, { RepairGuidesIndex } from "./pages/RepairGuide";
 import ReferralPackage from "./pages/ReferralPackage";
 import FindNearbyShops from "./pages/FindNearbyShops";
-import AgentDiagnosisFlow from "./pages/AgentDiagnosisFlow";
-import ShopLogin from "./pages/ShopLogin";
-import ShopPortal from "./pages/ShopPortal";
 import DesignPreview from "./pages/DesignPreview";
 import ForShopsPreview from "./pages/ForShopsPreview";
 import ShopOnboardingPreview from "./pages/ShopOnboardingPreview";
@@ -115,7 +111,8 @@ function AnimatedRoutes() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/garage" element={<Garage />} />
           <Route path="/investors" element={<Investors />} />
-          <Route path="/get-quote" element={<GetQuote />} />
+          {/* Paused 2026-09-17: shop quote requests imply partner shops that don't exist — not offered */}
+          <Route path="/get-quote" element={<Navigate to="/" replace />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/developers" element={<Developers />} />
           <Route path="/developers/gpt-actions" element={<CustomGPTGuide />} />
@@ -137,10 +134,12 @@ function AnimatedRoutes() {
           <Route path="/repairs/:slug" element={<RepairGuide />} />
           <Route path="/referral/:token" element={<ReferralPackage />} />
           <Route path="/find-nearby-shops" element={<FindNearbyShops />} />
-          <Route path="/agent-diagnosis" element={<AgentDiagnosisFlow />} />
-          <Route path="/shop-login" element={<ShopLogin />} />
-          <Route path="/shop-portal" element={<ShopPortal />} />
-          <Route path="/for-shops/onboarding" element={<ShopOnboardingPreview />} />
+          {/* Paused 2026-09-17: experimental agent booking flow with shop selection — not offered */}
+          <Route path="/agent-diagnosis" element={<Navigate to="/" replace />} />
+          {/* Shop track paused 2026-09-17: onboarding/login/portal redirect to the paused notice */}
+          <Route path="/for-shops/onboarding" element={<Navigate to="/for-shops" replace />} />
+          <Route path="/shop-login" element={<Navigate to="/for-shops" replace />} />
+          <Route path="/shop-portal" element={<Navigate to="/for-shops" replace />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/warranty-guide" element={<WarrantyGuide />} />

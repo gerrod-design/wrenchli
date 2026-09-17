@@ -99,7 +99,7 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1024,
-        system: `You are Wrenchli's automotive repair cost estimator. You provide transparent, realistic repair cost estimates based on the diagnosis, vehicle, and customer's geographic area (ZIP code). Your estimates should reflect real-world pricing including parts and labor for that region. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate.`,
+        system: `You are Wrenchli's automotive repair cost estimator. You provide transparent, realistic repair cost estimates based on the assessment, vehicle, and customer's geographic area (ZIP code). Your estimates should reflect real-world pricing including parts and labor for that region. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate. ARITHMETIC RULE: cost_low must equal the low end of parts_estimate plus the low end of labor_estimate; cost_high must equal the high ends added together. Double-check your addition before responding.`,
         messages: [{ role: "user", content: userPrompt }],
         tools: [
           {
@@ -157,6 +157,22 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
     }
 
     const estimate = toolUse.input;
+
+    // Reconcile totals deterministically: the cost range MUST equal parts + labor.
+    // The model sometimes returns ranges that don't add up; correct server-side (2026-09-17).
+    const parseRange = (s: unknown): [number, number] | null => {
+      if (typeof s !== "string") return null;
+      const nums = s.replace(/,/g, "").match(/\d+(\.\d+)?/g)?.map(Number) ?? [];
+      if (nums.length === 0) return null;
+      if (nums.length === 1) return [nums[0], nums[0]];
+      return [Math.min(nums[0], nums[1]), Math.max(nums[0], nums[1])];
+    };
+    const partsRange = parseRange((estimate as any).parts_estimate);
+    const laborRange = parseRange((estimate as any).labor_estimate);
+    if (partsRange && laborRange) {
+      (estimate as any).cost_low = Math.round(partsRange[0] + laborRange[0]);
+      (estimate as any).cost_high = Math.round(partsRange[1] + laborRange[1]);
+    }
 
     // Log request (fire and forget)
     supabase.from("api_request_logs").insert({

@@ -141,7 +141,7 @@ export default function Index() {
               Be the First to Know
             </h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Our trusted shop network is rolling out in {userLocation.region}. Join the early access list and we'll notify you when shop matching goes live in your area.
+              Shop matching is currently paused while we focus on the free symptom assessment. Join the early access list and we'll notify you when it goes live in your area.
             </p>
             <div className="mt-8">
               <WaitlistForm source="home-waitlist" />

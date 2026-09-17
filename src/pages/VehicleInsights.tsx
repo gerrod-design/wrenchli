@@ -215,8 +215,8 @@ export default function VehicleInsights() {
                               className="text-xs bg-accent text-accent-foreground hover:bg-accent/90"
                               asChild
                             >
-                              <Link to={`/get-quote?code=${d.code}&vehicle=${encodeURIComponent([selectedYear, selectedMake, selectedModel].filter(Boolean).join(" "))}`}>
-                                Get Shop Quotes for This Code <ArrowRight className="ml-1 h-3 w-3" />
+                              <Link to="/find-shops">
+                                Find Shops for This Code <ArrowRight className="ml-1 h-3 w-3" />
                               </Link>
                             </Button>
                           </div>

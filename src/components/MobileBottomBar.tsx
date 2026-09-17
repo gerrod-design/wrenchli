@@ -1,5 +1,5 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Stethoscope, CarFront, CreditCard, Bookmark, Wrench } from "lucide-react";
+import { Stethoscope, CarFront, Bookmark, Wrench } from "lucide-react";
 
 export default function MobileBottomBar() {
   const { pathname } = useLocation();
@@ -7,26 +7,9 @@ export default function MobileBottomBar() {
   const isInsightsPage = pathname === "/vehicle-insights";
   const isFindShopsPage = pathname === "/find-shops";
 
-  // Build quote link with current diagnosis context from URL params
+  // Build quote link — quote flow is paused, so this now directs to reference-only shop listings.
   const buildQuoteLink = () => {
-    const params = new URLSearchParams();
-    const year = searchParams.get("year");
-    const make = searchParams.get("make");
-    const model = searchParams.get("model");
-    const code = searchParams.get("code");
-    const symptom = searchParams.get("symptom");
-
-    if (year) params.set("year", year);
-    if (make) params.set("make", make);
-    if (model) params.set("model", model);
-    if (code) params.set("code", code);
-
-    // Use code or symptom as diagnosis title fallback
-    const diagnosisTitle = code || symptom || "Vehicle Assessment";
-    params.set("diagnosis", diagnosisTitle);
-    params.set("vehicle", [year, make, model].filter(Boolean).join(" "));
-
-    return `/get-quote?${params.toString()}`;
+    return "/find-shops";
   };
 
   return (
@@ -37,8 +20,8 @@ export default function MobileBottomBar() {
             to={buildQuoteLink()}
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
-            <CreditCard className="h-4 w-4" />
-            Get a Quote
+            <Wrench className="h-4 w-4" />
+            Find Shops
           </Link>
           <Link
             to="/garage"

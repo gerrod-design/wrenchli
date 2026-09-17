@@ -123,7 +123,7 @@ const ProductImageDisplay = ({
         )}
       </div>
       <p className="text-[10px] text-muted-foreground mt-1">
-        Some links on this page are affiliate links. Wrenchli may earn a small commission at no additional cost to you.
+        Some links on this page are affiliate links. If you purchase through them, Wrenchli may earn a small commission at no additional cost to you.
       </p>
     </>
   );

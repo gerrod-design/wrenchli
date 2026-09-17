@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Video, ShoppingCart, Wrench, ArrowRight, CheckCircle, AlertTriangle, XCircle, Star, ChevronDown, HardHat, ShoppingBag, Share2 } from "lucide-react";
 import ShareWithShopButton from "@/components/ShareWithShopButton";
-import BookAtShopButton from "./BookAtShopButton";
 import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import UrgencyBadge from "./UrgencyBadge";
 import YouTubeTutorials from "./YouTubeTutorials";
 import OrderParts from "./OrderParts";
@@ -274,7 +272,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
 
           {diagnosis.diy_feasibility === "moderate" && (
             <p className="text-xs text-muted-foreground mb-4 italic">
-              Not comfortable? That's okay — <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&code=${encodeURIComponent(diagnosis.code || "")}&vehicle=${encodeURIComponent(vehicle)}&urgency=${diagnosis.urgency}&diy=${diagnosis.diy_feasibility}`} className="text-wrenchli-teal font-semibold hover:underline">get a professional quote instead →</Link>
+              Not comfortable? That's okay — take it to a qualified repair shop instead.
             </p>
           )}
 
@@ -393,23 +391,6 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               <span>Guaranteed pricing</span>
             </li>
           </ul>
-
-          <Button
-            size="sm"
-            variant="outline"
-            className="w-full text-xs font-semibold mt-auto"
-            asChild
-          >
-            <Link to={`/get-quote?diagnosis=${encodeURIComponent(diagnosis.title)}&code=${encodeURIComponent(diagnosis.code || "")}&vehicle=${encodeURIComponent(vehicle)}&urgency=${diagnosis.urgency}&diy=${diagnosis.diy_feasibility}`}>
-              <Wrench className="mr-1.5 h-3.5 w-3.5" /> Get Shop Quotes <ArrowRight className="ml-1.5 h-3 w-3" />
-            </Link>
-          </Button>
-
-          <BookAtShopButton
-            diagnosisTitle={diagnosis.title}
-            vehicle={vehicle}
-            className="mt-2"
-          />
 
           <ShareWithShopButton
             diagnosisTitle={diagnosis.title}

@@ -20,21 +20,21 @@ const FAQ_ITEMS: FaqItem[] = [
     ),
   },
   {
-    q: "Is the diagnosis really free?",
-    a: "Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse DIY tutorials without paying a thing. You only pay if you choose to book a repair through a partner shop.",
+    q: "Is the assessment really free?",
+    a: "Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse DIY tutorials without paying a thing. If you take your vehicle to a shop for repair, you pay the shop directly — Wrenchli never takes a cut.",
     richAnswer: (
-      <>Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link> without paying a thing. You only pay if you choose to book a repair through a partner shop.</>
+      <>Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link> without paying a thing. If you take your vehicle to a shop for repair, you pay the shop directly — Wrenchli never takes a cut.</>
     ),
   },
   {
     q: "What areas does Wrenchli serve?",
-    a: "The symptom assessment is free for any U.S. vehicle owner. Our trusted shop network is currently in Michigan and Ohio — if you're elsewhere, you can still complete your assessment, save it, and share it with whichever shop you trust.",
+    a: "The symptom assessment is free for any U.S. vehicle owner. You can complete your assessment, save it, and share it with whichever qualified shop you trust.",
   },
   {
     q: "How accurate are the repair cost estimates?",
-    a: "Our estimates are based on real shop pricing data, labor rates, and OEM/aftermarket parts costs for your specific vehicle. They typically fall within 10–15% of the actual quote you'll receive from a shop.",
+    a: "Our estimates are informational ranges based on typical parts and labor costs for your vehicle — not quotes. Actual prices vary by shop, region, and what the technician finds on inspection. Always confirm with a qualified shop before authorizing work.",
     richAnswer: (
-      <>Our estimates are based on real shop pricing data, labor rates, and OEM/aftermarket parts costs for your specific vehicle. They typically fall within 10–15% of the actual quote you'll receive. Browse our <Link to="/repairs" className="text-primary underline hover:text-primary/80">repair cost guides</Link> or <Link to="/get-quote" className="text-primary underline hover:text-primary/80">get a personalized quote</Link>.</>
+      <>Our estimates are informational ranges based on typical parts and labor costs for your vehicle — not quotes. Actual prices vary by shop and region. Browse our <Link to="/repairs" className="text-primary underline hover:text-primary/80">repair cost guides</Link> to learn more.</>
     ),
   },
   {

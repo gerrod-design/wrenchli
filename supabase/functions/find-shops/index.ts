@@ -310,26 +310,31 @@ serve(async (req) => {
     }).then(() => {});
 
     const coords = city ? cityCoords[city] : cityCoords["Detroit"];
-    const providersWithCoords = providers.map((p: any, i: number) => ({
+    // NOTE (2026-09-17): Never fabricate shop data. Distance is computed from
+    // real coordinates only; partnered defaults to false; no synthetic coords.
+    const providersWithCoords = providers.map((p: any) => ({
       id: p.id,
       name: p.name,
       rating: p.rating,
       review_count: p.review_count,
       address: p.address,
       phone: p.phone,
-      distance_miles: 0,
+      distance_miles:
+        p.lat != null && p.lng != null && coords
+          ? Math.round(distanceMiles({ lat: p.lat, lng: p.lng }, coords) * 10) / 10
+          : null,
       specialties: p.specialties || [],
       price_tier: p.price_tier,
       response_time: p.response_time,
       availability: p.availability,
-      wrenchli_verified: p.wrenchli_verified,
-      quote_url: p.quote_url || `https://wrenchli.net/find-shops`,
-      booking_url: p.booking_url,
+      wrenchli_verified: p.wrenchli_verified ?? false,
+      quote_url: p.quote_url || null,
+      booking_url: p.booking_url || null,
       is_dealer: p.is_dealer || false,
       dealer_brands: p.dealer_brands || [],
-      is_partnered: p.is_partnered ?? true,
-      lat: p.lat ?? (coords ? coords.lat + (i * 0.008 - 0.02) * (i % 2 === 0 ? 1 : -1) : undefined),
-      lng: p.lng ?? (coords ? coords.lng + (i * 0.006 - 0.015) * (i % 2 === 0 ? -1 : 1) : undefined),
+      is_partnered: p.is_partnered ?? false,
+      lat: p.lat ?? undefined,
+      lng: p.lng ?? undefined,
     }));
 
     return new Response(

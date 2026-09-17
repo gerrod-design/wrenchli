@@ -301,7 +301,7 @@ export default function FindShops() {
             <>
               {expandedRadius > 0 && (
                 <div className="mb-4 text-sm text-muted-foreground bg-muted/50 border border-border rounded-md px-4 py-2 text-center">
-                  No partner shops in that exact ZIP. Showing trusted shops within {expandedRadius} miles.
+                  No partner shops in that exact ZIP. Showing shops within {expandedRadius} miles for reference only — shop matching is paused.
                 </div>
               )}
               <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">

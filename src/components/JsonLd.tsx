@@ -41,10 +41,10 @@ export function HomeJsonLd() {
     {
       "@context": "https://schema.org",
       "@type": "Service",
-      serviceType: "Vehicle Repair Diagnosis & Quoting",
-      name: "Wrenchli Free Vehicle Diagnosis",
+      serviceType: "Vehicle Symptom Assessment",
+      name: "Wrenchli Free Vehicle Symptom Assessment",
       description:
-        "Get a free AI-powered diagnosis for your vehicle issue, compare repair costs from local shops, and explore DIY options — all in one place.",
+        "Get a free AI-powered symptom assessment for your vehicle issue, with likely causes, urgency guidance, cost ranges, and DIY options — all in one place.",
       provider: {
         "@type": "Organization",
         name: "Wrenchli",
@@ -68,18 +68,9 @@ export function HomeJsonLd() {
             "@type": "Offer",
             itemOffered: {
               "@type": "Service",
-              name: "AI Vehicle Diagnosis",
+              name: "AI Vehicle Symptom Assessment",
               description:
-                "Describe symptoms or enter a DTC code to get an instant diagnosis with cost estimates.",
-            },
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Shop Quote Comparison",
-              description:
-                "Compare repair quotes from vetted local shops side by side.",
+                "Describe symptoms or enter a DTC code to get an instant symptom assessment with likely causes and cost ranges.",
             },
           },
           {
@@ -89,15 +80,6 @@ export function HomeJsonLd() {
               name: "DIY Repair Guides",
               description:
                 "Step-by-step video tutorials and parts links for repairs you can do yourself.",
-            },
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Repair Financing",
-              description:
-                "Flexible payment plans for vehicle repairs. All credit types welcome.",
             },
           },
         ],
