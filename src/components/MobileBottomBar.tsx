@@ -17,11 +17,11 @@ export default function MobileBottomBar() {
       {isInsightsPage ? (
         <>
           <Link
-            to={buildQuoteLink()}
+            to="/#quote"
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
-            <Wrench className="h-4 w-4" />
-            Find Shops
+            <Stethoscope className="h-4 w-4" />
+            Free Assessment
           </Link>
           <Link
             to="/garage"
@@ -38,7 +38,7 @@ export default function MobileBottomBar() {
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
             <Stethoscope className="h-4 w-4" />
-            Get a Assessment
+            Free Assessment
           </Link>
           <Link
             to="/garage"
@@ -58,11 +58,11 @@ export default function MobileBottomBar() {
             Assessment
           </Link>
           <Link
-            to="/find-shops"
+            to="/garage"
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-1 rounded-lg border border-border bg-card font-semibold text-sm text-foreground"
           >
-            <Wrench className="h-4 w-4" />
-            Find Shops
+            <Bookmark className="h-4 w-4" />
+            My Garage
           </Link>
           <Link
             to="/vehicle-insights"
