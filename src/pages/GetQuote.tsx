@@ -403,7 +403,7 @@ export default function GetQuote() {
               <FinancePrescreen
                 repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
                 vehicleData={{ year, make, model, trim }}
-                onFinanceSelected={async (option) => {
+                onFinanceSelected={async (option: any) => {
                   toast.success(`Selected ${option.provider} — $${Math.round(option.monthlyPayment)}/month`);
                   try {
                     await supabase.from("finance_selections" as any).insert({
