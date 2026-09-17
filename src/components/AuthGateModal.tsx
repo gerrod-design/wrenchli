@@ -52,7 +52,7 @@ export default function AuthGateModal({ open, onClose, onAuthenticated }: Props)
             {mode === "login" ? "Sign In" : "Create Account"}
           </DialogTitle>
           <DialogDescription style={{ color: "#6B7280" }}>
-            Create a free account to activate Wrenchli Pro.
+            Create a free account to save vehicles to your garage.
           </DialogDescription>
         </DialogHeader>
 

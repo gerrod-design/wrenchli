@@ -2,20 +2,17 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Car, Plus, MoreHorizontal, Trash2, Edit2, AlertTriangle,
-  Search, Crown, Shield, Check, Lock, Eye, EyeOff, Gauge, Settings,
+  Search, Shield, Eye, EyeOff, Gauge,
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCloudVehicles, type CloudVehicle } from "@/hooks/useCloudVehicles";
 import { useVehicleRecalls, type RecallAlert } from "@/hooks/useVehicleRecalls";
-import { useProSubscription } from "@/hooks/useProSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import ProUpgradeModal from "@/components/ProUpgradeModal";
 import AuthGateModal from "@/components/AuthGateModal";
-import ManageSubscriptionModal from "@/components/ManageSubscriptionModal";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -38,7 +35,6 @@ import InteractiveVehicleCard from "@/components/garage/InteractiveVehicleCard";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
-const FREE_VEHICLE_LIMIT = 2;
 
 const POPULAR_MAKES = [
   "Acura", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler",
@@ -336,60 +332,6 @@ function RecallAlertCard({
   );
 }
 
-// ─── Free vs Pro Comparison ─────────────────────────────────────
-function FreeVsProComparison({ onUpgrade }: { onUpgrade: () => void }) {
-  const features = [
-    { label: "Saved vehicles", free: "2", pro: "Unlimited" },
-    { label: "Recall alerts", free: true, pro: true },
-    { label: "Assessment history", free: true, pro: true },
-  ];
-
-  return (
-    <div className="rounded-xl border border-border bg-white overflow-hidden">
-      <div className="grid grid-cols-3 text-center border-b border-border">
-        <div className="p-3 text-xs font-semibold text-muted-foreground">Feature</div>
-        <div className="p-3 text-xs font-semibold border-l border-border">FREE</div>
-        <div className="p-3 text-xs font-semibold border-l border-accent/30 bg-accent/5 text-accent">
-          <Crown className="h-3 w-3 inline mr-1" />
-          PRO $2.99/mo
-        </div>
-      </div>
-      {features.map((f) => (
-        <div key={f.label} className="grid grid-cols-3 text-center border-b border-border last:border-b-0">
-          <div className="p-3 text-xs text-left text-muted-foreground">{f.label}</div>
-          <div className="p-3 text-xs border-l border-border flex items-center justify-center">
-            {f.free === true ? (
-              <Check className="h-3.5 w-3.5 text-green-600" />
-            ) : f.free === false ? (
-              <Lock className="h-3.5 w-3.5 text-muted-foreground/40" />
-            ) : (
-              <span className="font-mono text-muted-foreground">{f.free}</span>
-            )}
-          </div>
-          <div className="p-3 text-xs border-l border-accent/30 bg-accent/5 flex items-center justify-center">
-            {f.pro === true ? (
-              <Check className="h-3.5 w-3.5 text-accent" />
-            ) : typeof f.pro === "string" && f.pro !== "Coming soon" ? (
-              <span className="font-mono font-semibold text-accent">{f.pro}</span>
-            ) : (
-              <span className="text-muted-foreground italic text-[10px]">{f.pro}</span>
-            )}
-          </div>
-        </div>
-      ))}
-      <div className="p-4 bg-accent/5 border-t border-accent/20">
-        <Button
-          className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
-          onClick={onUpgrade}
-        >
-          <Crown className="mr-2 h-4 w-4" />
-          Upgrade to Wrenchli Pro — $2.99/month
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 // ─── Edit Vehicle Dialog ────────────────────────────────────────
 function EditVehicleDialog({
   vehicle,
@@ -476,7 +418,6 @@ export default function Garage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { vehicles, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
-  const { isPro, loading: proLoading, subscription, refetch: refetchPro } = useProSubscription();
 
   const vehicleIds = useMemo(() => vehicles.map((v) => v.id), [vehicles]);
   const { recalls, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
@@ -488,9 +429,7 @@ export default function Garage() {
 
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<CloudVehicle | null>(null);
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
-  const [showManageSub, setShowManageSub] = useState(false);
 
   // Auto-open add dialog if URL has prefill params
   useEffect(() => {
@@ -499,9 +438,7 @@ export default function Garage() {
     }
   }, [prefillYear, prefillMake, prefillModel, user]);
 
-  const isLoading = vehiclesLoading || proLoading;
-
-  const isLapsed = !!subscription && (subscription.status === "canceled" || subscription.status === "past_due");
+  const isLoading = vehiclesLoading;
 
   // Group unread recalls by vehicle
   const unreadRecallsByVehicle = useMemo(() => {
@@ -527,46 +464,26 @@ export default function Garage() {
       toast.error("Please sign in to save vehicles to your garage.");
       return;
     }
-    if (!isPro && vehicles.length >= FREE_VEHICLE_LIMIT) {
-      setShowUpgrade(true);
-      return;
-    }
     setShowAddVehicle(true);
-  };
-
-  const handleUpgradeClick = () => {
-    if (!user) {
-      setShowAuthGate(true);
-    } else {
-      setShowUpgrade(true);
-    }
   };
 
   const handleAuthSuccess = () => {
     setShowAuthGate(false);
-    // Small delay for auth state to propagate
-    setTimeout(() => setShowUpgrade(true), 500);
-  };
-
-  const handleUpgradeSuccess = () => {
-    refetchPro();
   };
 
   if (!user) {
     return (
       <main className="pb-[60px] md:pb-0">
-        <SEO title="My Vehicle Garage | Wrenchli" description="Save your vehicles, track assessments, and get safety recall alerts. Free for up to 2 vehicles. Pro unlocks unlimited vehicles for $2.99/month." path="/garage" />
+        <SEO title="My Vehicle Garage | Wrenchli" description="Save unlimited vehicles, track assessments, and get safety recall alerts — free with your Wrenchli account." path="/garage" />
         <section className="section-padding" style={{ backgroundColor: "#F8F8F6" }}>
           <div className="container-wrenchli max-w-2xl text-center">
             <div className="flex items-center justify-center gap-3 mb-6">
               <Car className="h-6 w-6 text-accent" />
               <h1 className="font-heading text-2xl font-bold md:text-3xl">My Garage</h1>
             </div>
-
-            <div className="rounded-xl border border-border bg-card p-8">
-              <h2 className="font-heading text-lg font-semibold mb-2">Your vehicles live here</h2>
-              <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                Sign in to save your vehicles, get safety recall alerts, and track your assessment history. Free for up to 2 vehicles.
+            <div className="rounded-xl border border-border bg-white p-8">
+              <p className="text-sm text-muted-foreground mb-6">
+                Sign in to save your vehicles, get safety recall alerts, and track your assessment history — all free.
               </p>
               <Button onClick={() => setShowAuthGate(true)} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 Sign In
@@ -574,66 +491,27 @@ export default function Garage() {
             </div>
           </div>
         </section>
+        <AuthGateModal
+          open={showAuthGate}
+          onClose={() => setShowAuthGate(false)}
+          onAuthenticated={handleAuthSuccess}
+        />
       </main>
     );
   }
 
   return (
     <main className="pb-[60px] md:pb-0">
-      <SEO title="My Vehicle Garage | Wrenchli" description="Save your vehicles, track assessments, and get safety recall alerts. Free for up to 2 vehicles. Pro unlocks unlimited vehicles for $2.99/month." path="/garage" />
+      <SEO title="My Vehicle Garage | Wrenchli" description="Save unlimited vehicles, track assessments, and get safety recall alerts — free with your Wrenchli account." path="/garage" />
 
       <section className="section-padding" style={{ backgroundColor: "#F8F8F6" }}>
         <div className="container-wrenchli max-w-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Car className="h-6 w-6 text-accent" />
-              <h1 className="font-heading text-2xl font-bold md:text-3xl">My Garage</h1>
-              {isPro && (
-                <Badge className="bg-accent text-accent-foreground text-[10px] px-2 py-0.5">
-                  <Crown className="h-3 w-3 mr-1" /> Pro
-                </Badge>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              {isPro && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-8 text-xs"
-                  onClick={() => setShowManageSub(true)}
-                >
-                  <Settings className="h-3 w-3 mr-1.5" /> Manage
-                </Button>
-              )}
-              {!isPro && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-8 text-xs border-accent text-accent hover:bg-accent/10"
-                  onClick={handleUpgradeClick}
-                >
-                  <Crown className="h-3 w-3 mr-1.5" /> Upgrade to Pro — $2.99/mo
-                </Button>
-              )}
-            </div>
+          <div className="flex items-center gap-3 mb-6">
+            <Car className="h-6 w-6 text-accent" />
+            <h1 className="font-heading text-2xl font-bold md:text-3xl">My Garage</h1>
           </div>
 
-          {/* Lapsed subscription banner */}
-          {isLapsed && (
-            <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <p className="text-sm text-muted-foreground">
-                Your Wrenchli Pro subscription has ended. Upgrade again to restore unlimited access.
-              </p>
-              <Button
-                size="sm"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 shrink-0"
-                onClick={handleUpgradeClick}
-              >
-                Reactivate
-              </Button>
-            </div>
-          )}
 
           {isLoading ? (
             <div className="space-y-3">
@@ -676,10 +554,7 @@ export default function Garage() {
                 onClick={handleAddClick}
               >
                 <Plus className="mr-2 h-4 w-4" />
-                {!isPro && vehicles.length >= FREE_VEHICLE_LIMIT
-                  ? <>Add Vehicle <Lock className="ml-1 h-3 w-3 text-muted-foreground" /> (Pro)</>
-                  : "Add Another Vehicle"
-                }
+                Add Another Vehicle
               </Button>
 
               {/* Recall Alerts Section */}
@@ -704,12 +579,6 @@ export default function Garage() {
             </div>
           )}
 
-          {/* Free vs Pro Comparison (only for free users) */}
-          {!isPro && !isLoading && (
-            <div id="pro-comparison" className="mt-8">
-              <FreeVsProComparison onUpgrade={handleUpgradeClick} />
-            </div>
-          )}
         </div>
       </section>
 
@@ -740,17 +609,6 @@ export default function Garage() {
         open={showAuthGate}
         onClose={() => setShowAuthGate(false)}
         onAuthenticated={handleAuthSuccess}
-      />
-      <ProUpgradeModal
-        open={showUpgrade}
-        onClose={() => setShowUpgrade(false)}
-        onSuccess={handleUpgradeSuccess}
-      />
-      <ManageSubscriptionModal
-        open={showManageSub}
-        onClose={() => setShowManageSub(false)}
-        subscription={subscription}
-        onUpdated={refetchPro}
       />
     </main>
   );

@@ -5,8 +5,7 @@
  *  1. Happy path — anonymous user completes vehicle → symptoms → results
  *  2. Missing-field validation on the Vehicle step
  *  3. Invalid VIN graceful fallback
- *  4. Pro upgrade button triggers Stripe checkout modal
- *  5. Shop selection after results
+ *  4. Shop selection after results
  */
 
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
@@ -14,7 +13,6 @@ import { render, screen, fireEvent, waitFor, within } from "@testing-library/rea
 import { MemoryRouter } from "react-router-dom";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
 import ShopList from "@/components/shops/ShopList";
-import ProUpgradeModal from "@/components/ProUpgradeModal";
 import type { Shop } from "@/components/shops/ShopCard";
 
 /* ------------------------------------------------------------------ */
@@ -56,7 +54,7 @@ vi.mock("@/lib/anonSession", () => ({
   getAnonSessionId: vi.fn(() => "test-anon-session-id"),
 }));
 
-// Mock AuthContext for ProUpgradeModal
+// Mock AuthContext
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: vi.fn(() => ({
     user: { id: "test-user-id", email: "test@wrenchli.net" },
@@ -325,62 +323,7 @@ describe("Assessment Flow — Invalid VIN", () => {
 });
 
 /* ================================================================== */
-/* TEST 4: Pro Upgrade Modal                                           */
-/* ================================================================== */
-
-describe("Pro Upgrade — Stripe Checkout Trigger", () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it("opens modal and invokes create-pro-subscription", async () => {
-    (supabase.functions.invoke as Mock).mockResolvedValue({
-      data: { client_secret: "pi_test_secret" },
-      error: null,
-    });
-
-    const onClose = vi.fn();
-    const onSuccess = vi.fn();
-
-    render(
-      <MemoryRouter>
-        <ProUpgradeModal open={true} onClose={onClose} onSuccess={onSuccess} />
-      </MemoryRouter>,
-    );
-
-    // Modal title should be visible
-    expect(screen.getByText("Upgrade to Wrenchli Pro")).toBeInTheDocument();
-    expect(screen.getByText(/\$2\.99\/month/)).toBeInTheDocument();
-
-    // Should have called the edge function
-    await waitFor(() => {
-      expect(supabase.functions.invoke).toHaveBeenCalledWith(
-        "create-pro-subscription",
-        expect.objectContaining({
-          body: { user_id: "test-user-id", email: "test@wrenchli.net" },
-        }),
-      );
-    });
-  });
-
-  it("displays error when subscription creation fails", async () => {
-    (supabase.functions.invoke as Mock).mockResolvedValue({
-      data: { error: "Payment method required" },
-      error: null,
-    });
-
-    render(
-      <MemoryRouter>
-        <ProUpgradeModal open={true} onClose={vi.fn()} onSuccess={vi.fn()} />
-      </MemoryRouter>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText("Payment method required")).toBeInTheDocument();
-    });
-  });
-});
-
-/* ================================================================== */
-/* TEST 5: Shop Selection After Results                                */
+/* TEST 4: Shop Selection After Results                                */
 /* ================================================================== */
 
 describe("Shop Selection", () => {

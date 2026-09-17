@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, Car, Crown, Settings } from "lucide-react";
+import { Menu, X, ChevronDown, Car } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import { Button } from "@/components/ui/button";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
@@ -9,9 +9,7 @@ import GarageBadge from "@/components/vehicle/GarageBadge";
 import { useGarage } from "@/hooks/useGarage";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadRecallCount } from "@/hooks/useUnreadRecallCount";
-import { useProSubscription } from "@/hooks/useProSubscription";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
-import ManageSubscriptionModal from "@/components/ManageSubscriptionModal";
 
 interface DropdownItem {
   label: string;
@@ -116,12 +114,10 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [recommendOpen, setRecommendOpen] = useState(false);
-  const [manageSubOpen, setManageSubOpen] = useState(false);
   const location = useLocation();
   const { vehicles } = useGarage();
   const { user } = useAuth();
   const unreadRecalls = useUnreadRecallCount();
-  const { subscription, isPro } = useProSubscription();
 
   useEffect(() => {
     setOpen(false);
@@ -178,14 +174,6 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-          )}
-          {user && isPro && (
-            <button
-              onClick={() => setManageSubOpen(true)}
-              className="text-sm font-medium text-primary-foreground/80 transition-colors hover:text-accent flex items-center gap-1"
-            >
-              <Settings className="h-3.5 w-3.5" />
-            </button>
           )}
           <NotificationBell />
           <GarageDropdown />
@@ -278,17 +266,6 @@ export default function Navbar() {
               </Link>
             </div>
           )}
-          {user && isPro && (
-            <div className="border-b border-primary-foreground/10">
-              <button
-                onClick={() => { setOpen(false); setManageSubOpen(true); }}
-                className="flex items-center gap-2 py-4 text-lg font-medium text-primary-foreground/80 w-full text-left"
-              >
-                <Settings className="h-5 w-5" />
-                Manage Subscription
-              </button>
-            </div>
-          )}
 
           {/* Trust items */}
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-primary-foreground/50">
@@ -312,12 +289,6 @@ export default function Navbar() {
         </div>
       )}
       <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
-      <ManageSubscriptionModal
-        open={manageSubOpen}
-        onClose={() => setManageSubOpen(false)}
-        subscription={subscription}
-        onUpdated={() => {}}
-      />
     </nav>
   );
 }
