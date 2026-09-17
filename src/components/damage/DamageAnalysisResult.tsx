@@ -149,12 +149,7 @@ export default function DamageAnalysisResult({ diagnosis, imageUrls, vehicleInfo
       />
       <div className="flex flex-col sm:flex-row gap-3">
         <Button asChild className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
-          <Link to={`/get-quote?${quoteParams.toString()}`}>
-            Get a Professional Quote <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="flex-1">
-          <Link to="/find-shops">Find Nearby Shops</Link>
+          <Link to="/find-shops">Find Nearby Shops <ArrowRight className="ml-2 h-4 w-4" /></Link>
         </Button>
       </div>
     </div>

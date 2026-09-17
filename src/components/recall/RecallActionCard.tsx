@@ -78,7 +78,7 @@ export default function RecallActionCard({
         </Button>
       </div>
 
-      {/* Partner shop path — only for non-dealer-only recalls */}
+      {/* Independent shop path — only for non-dealer-only recalls */}
       {!dealerOnly && (
         <div className="border-t border-white/10 pt-3 mt-1 space-y-1.5">
           <p className="text-xs text-white/50">
@@ -94,7 +94,7 @@ export default function RecallActionCard({
               to={`/find-shops?recall=${encodeURIComponent(campaignNumber)}&component=${encodeURIComponent(component)}`}
             >
               <Wrench className="mr-1.5 h-3.5 w-3.5" />
-              Ask a partner shop about this recall
+              Ask a qualified shop about this recall
             </Link>
           </Button>
         </div>

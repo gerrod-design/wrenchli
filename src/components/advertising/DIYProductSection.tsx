@@ -96,15 +96,6 @@ const DIYProductSection = ({
         <div className="flex flex-col sm:flex-row gap-2">
           <Button variant="outline" size="sm" className="border-ad-info-border text-ad-info-text hover:bg-ad-info-bg" asChild>
             <a
-              href={`https://www.autozone.com/searchresult?searchtext=${encodeURIComponent(vehicleStr + " auto repair parts")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackAdClick({ ...trackCtx, click_type: "browse_parts", destination: "autozone" })}
-            >
-            </a>
-          </Button>
-          <Button variant="outline" size="sm" className="border-ad-info-border text-ad-info-text hover:bg-ad-info-bg" asChild>
-            <a
               href={`https://www.oreillyauto.com/search?q=${encodeURIComponent(vehicleStr + " auto repair parts")}`}
               target="_blank"
               rel="noopener noreferrer"

@@ -11,7 +11,7 @@ const AGENTS = [
   { id: "shopPersona", name: "Shop Owner Persona", icon: "◉", color: "#1D9E75", bg: "#E1F5EE", description: "Independent shop owner deciding whether to join" },
   { id: "consumerJourney", name: "Consumer Journey Tester", icon: "◎", color: "#378ADD", bg: "#E6F1FB", description: "Vehicle owner completing the full assessment flow" },
   { id: "dealerPersona", name: "Auto Dealer Evaluator", icon: "◆", color: "#D85A30", bg: "#FAECE7", description: "Independent dealer with service dept assessing fit" },
-  { id: "trustCompliance", name: "Trust & Compliance Auditor", icon: "◇", color: "#7F77DD", bg: "#EEEDFE", description: "FTC disclosures, legal exposure, Tekmetric readiness" },
+  { id: "trustCompliance", name: "Trust & Compliance Auditor", icon: "◇", color: "#7F77DD", bg: "#EEEDFE", description: "FTC disclosures, legal exposure, integration readiness" },
   { id: "featureGap", name: "Shop Adoption Strategist", icon: "◐", color: "#BA7517", bg: "#FAEEDA", description: "Feature gaps blocking 50+ shop partner scale" },
 ];
 

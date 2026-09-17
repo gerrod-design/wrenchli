@@ -447,10 +447,10 @@ export const desktopShopScreens = [
           <div className="max-w-sm mx-auto text-center space-y-3">
             <CheckCircle className="h-10 w-10 text-wrenchli-green mx-auto" />
             <p className="text-lg font-bold text-foreground">You're All Set!</p>
-            <p className="text-xs text-muted-foreground">A trusted shop in your area will reach out soon with a final quote.</p>
+            <p className="text-xs text-muted-foreground">Your assessment is saved. Take it to any qualified shop for a final quote.</p>
             <div className="rounded-lg bg-accent/5 border border-accent/20 p-3 text-left space-y-1.5">
               <p className="text-xs font-semibold text-foreground">What happens next:</p>
-              {["A trusted shop will review your assessment", "They'll contact you within 24 hours", "No obligation — you decide if the price is right"].map((item, i) => (
+              {["Review your likely causes and cost range", "Save the assessment to your Garage", "Share it with a qualified shop you trust"].map((item, i) => (
                 <div key={i} className="flex items-start gap-1.5">
                   <CheckCircle className="h-3 w-3 text-accent shrink-0 mt-0.5" />
                   <span className="text-[10px] text-muted-foreground">{item}</span>

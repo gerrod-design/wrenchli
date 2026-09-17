@@ -127,11 +127,11 @@ export function NoMatchFallback({ vehicle }: NoMatchFallbackProps) {
         <div className="space-y-2">
           <h4 className="text-sm font-semibold">Option 2: Get a Professional Inspection</h4>
           <p className="text-sm text-muted-foreground">
-            Get quotes from trusted local shops who can perform a hands-on inspection.
+            Take your vehicle to a qualified local shop for a hands-on inspection.
           </p>
           <Button className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-            <Link to={`/get-quote?type=inspection&vehicle=${encodeURIComponent(vehicle)}`}>
-              Get a Professional Inspection Quote <ArrowRight className="ml-2 h-4 w-4" />
+            <Link to="/find-shops">
+              Find Nearby Shops <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>

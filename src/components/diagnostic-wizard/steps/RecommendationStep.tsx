@@ -102,14 +102,14 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
         </div>
       )}
 
-      {/* Book This Repair CTA — urgency-gated */}
+      {/* Get This Fixed CTA — urgency-gated */}
       {(diagnosis.urgency === "immediate" || diagnosis.urgency === "soon") && (
         <div className="rounded-lg p-4 space-y-3" style={{ background: "#E07B3910", border: "1px solid #E07B39" }}>
           <h4 className="text-sm font-heading font-bold" style={{ color: "#F5F5F5" }}>
             Ready to get this fixed?
           </h4>
           <p className="text-xs leading-relaxed" style={{ color: "#9CA3AF" }}>
-            Connect with a Wrenchli partner shop in Metro Detroit. They'll receive your assessment before you arrive.
+            Take your Wrenchli assessment to a qualified repair shop. You'll walk in knowing what's likely wrong and what it should cost — no sticker shock.
           </p>
           <a
             href="/find-shops"
@@ -117,14 +117,14 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
             style={{ background: "#E07B39", color: "#0F1117" }}
           >
             <MapPin className="h-4 w-4" />
-            Find a Partner Shop Near Me
+            Find a Shop Near Me
           </a>
         </div>
       )}
       {diagnosis.urgency === "schedule" && (
         <div className="rounded-lg p-3" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
           <p className="text-xs leading-relaxed" style={{ color: "#9CA3AF" }}>
-            When you're ready, a partner shop can see your assessment before you arrive.{" "}
+            When you're ready, bring your assessment to a qualified shop.{" "}
             <a href="/find-shops" className="underline font-medium" style={{ color: "#E07B39" }}>
               Find a Shop
             </a>
@@ -227,9 +227,9 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
 
       {/* Shop Transparency */}
       <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
-        <h4 className="text-xs font-mono mb-2" style={{ color: "#E07B39" }}>HOW WE CHOOSE PARTNER SHOPS</h4>
+        <h4 className="text-xs font-mono mb-2" style={{ color: "#E07B39" }}>ABOUT SHOP MATCHING</h4>
         <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>
-          Shops don't pay to appear in your results. Every partner shop earns a Verified Score based on three things: how often their repairs matched our assessment, how their pricing compares to the local market, and ratings from real customers. Higher scores appear first.
+          Shop matching is currently paused — Wrenchli has no partner shops. When the shop track reopens, partner shops will earn placement through verified repair outcomes, not paid placement.
         </p>
       </div>
 

@@ -14,8 +14,8 @@ interface Props {
 }
 
 const urgencyConfig: Record<string, { label: string; color: string; bg: string; icon: typeof AlertTriangle }> = {
-  immediate: { label: "DO NOT DRIVE", color: "#EF4444", bg: "#EF444420", icon: AlertTriangle },
-  soon: { label: "FIX SOON", color: "#F59E0B", bg: "#F59E0B20", icon: AlertTriangle },
+  immediate: { label: "IMMEDIATE — DO NOT DRIVE", color: "#EF4444", bg: "#EF444420", icon: AlertTriangle },
+  soon: { label: "SOON", color: "#F59E0B", bg: "#F59E0B20", icon: AlertTriangle },
   schedule: { label: "SCHEDULE", color: "#E07B39", bg: "#E07B3920", icon: Clock },
   monitor: { label: "MONITOR", color: "#22C55E", bg: "#22C55E20", icon: Eye },
 };

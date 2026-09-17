@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   Search, Wrench, Car, ShieldCheck,
   ScanLine, CheckCircle, ArrowRight, RotateCcw,
-  Play, Star, Calendar, CreditCard,
+  Play, Star,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
@@ -58,7 +58,7 @@ const sharedScreens = [
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-3 px-4">
           <div className="w-full rounded-lg border border-border bg-card p-2">
-            <p className="text-[9px] text-muted-foreground mb-1.5">Or enter a diagnostic code:</p>
+            <p className="text-[9px] text-muted-foreground mb-1.5">Or enter an OBD-II code:</p>
             <div className="flex items-center gap-1 rounded bg-muted px-2 py-1.5">
               <span className="text-[9px] font-mono font-bold text-foreground">P0420</span>
               <span className="ml-auto rounded-full bg-accent/20 px-1.5 py-0.5 text-[7px] font-semibold text-accent">OBD-II Detected</span>
@@ -348,37 +348,27 @@ const shopScreens = [
     render: () => (
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
-          <span className="text-[10px] font-bold text-primary-foreground">Financing & Booking</span>
+          <span className="text-[10px] font-bold text-primary-foreground">Your Estimate</span>
         </div>
         <div className="flex-1 px-3 py-3 space-y-2">
           <div className="rounded-lg border border-border bg-card p-2.5 shadow-sm">
-            <p className="text-[10px] font-bold text-foreground mb-1">Mike's Auto — $195</p>
-            <div className="space-y-1">
-              <div className="rounded bg-muted px-2 py-1 flex justify-between">
-                <span className="text-[8px] text-muted-foreground">Pay in full</span>
-                <span className="text-[8px] font-bold text-foreground">$195</span>
-              </div>
-              <div className="rounded bg-accent/10 px-2 py-1 flex justify-between border border-accent/30">
-                <span className="text-[8px] text-accent font-medium">3 × monthly</span>
-                <span className="text-[8px] font-bold text-accent">$65/mo</span>
-              </div>
+            <p className="text-[10px] font-bold text-foreground mb-1">Brake pads — likely cause</p>
+            <div className="rounded bg-muted px-2 py-1 flex justify-between">
+              <span className="text-[8px] text-muted-foreground">Typical shop range</span>
+              <span className="text-[8px] font-bold text-foreground">$150–$350</span>
             </div>
-            <div className="mt-1.5 rounded-full bg-wrenchli-green/10 px-2 py-0.5 text-center">
-              <span className="text-[7px] font-bold text-wrenchli-green">✅ Pre-Approved!</span>
+            <div className="mt-1.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-center">
+              <span className="text-[7px] font-bold text-amber-600">Urgency: Soon — fix promptly</span>
             </div>
           </div>
           <div className="rounded-lg border border-border bg-card p-2">
             <p className="text-[8px] font-bold text-foreground mb-1">
-              <Calendar className="inline h-3 w-3 mr-1" />Pick a time:
+              DIY or shop?
             </p>
-            <div className="flex gap-1">
-              {["Tue 9am", "Wed 2pm", "Thu 10am"].map((t) => (
-                <span key={t} className="rounded bg-muted px-1.5 py-0.5 text-[7px] text-foreground">{t}</span>
-              ))}
-            </div>
+            <p className="text-[7px] text-muted-foreground">Moderate difficulty — video guide available, or take the assessment to any qualified shop.</p>
           </div>
           <div className="rounded bg-accent px-2 py-1.5 text-center text-[8px] font-bold text-accent-foreground">
-            📅 Book Appointment
+            💾 Save to My Garage
           </div>
         </div>
       </div>

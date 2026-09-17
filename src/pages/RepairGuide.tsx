@@ -68,7 +68,6 @@ const REPAIRS: Record<string, RepairData> = {
     relatedLinks: [
       { label: "Browse DIY tutorials", to: "/diy" },
       { label: "Find a shop near you", to: "/find-shops" },
-      { label: "Get a repair quote", to: "/get-quote" },
       { label: "Explore financing options", to: "/financing-options" },
     ],
     faqs: [
@@ -124,7 +123,6 @@ const REPAIRS: Record<string, RepairData> = {
     relatedLinks: [
       { label: "Find a shop near you", to: "/find-shops" },
       { label: "Explore financing options", to: "/financing-options" },
-      { label: "Get a repair quote", to: "/get-quote" },
     ],
     faqs: [
       {
@@ -180,7 +178,6 @@ const REPAIRS: Record<string, RepairData> = {
     relatedLinks: [
       { label: "DIY brake pad tutorial", to: "/diy" },
       { label: "Find a shop near you", to: "/find-shops" },
-      { label: "Get a repair quote", to: "/get-quote" },
       { label: "Explore financing options", to: "/financing-options" },
     ],
     faqs: [
@@ -235,7 +232,6 @@ const REPAIRS: Record<string, RepairData> = {
     relatedLinks: [
       { label: "DIY oil change tutorial", to: "/diy" },
       { label: "Find a shop near you", to: "/find-shops" },
-      { label: "Get a repair quote", to: "/get-quote" },
     ],
     faqs: [
       {
@@ -291,7 +287,6 @@ const REPAIRS: Record<string, RepairData> = {
     chatPrompt: "My transmission is having problems",
     relatedLinks: [
       { label: "Find a transmission shop", to: "/find-shops" },
-      { label: "Get a repair quote", to: "/get-quote" },
       { label: "Explore financing options", to: "/financing-options" },
       { label: "Browse DIY tutorials", to: "/diy" },
     ],
@@ -325,7 +320,7 @@ const REPAIRS: Record<string, RepairData> = {
     urgencyLabel: "Battery will die — fix soon",
     description: [
       "The alternator charges your battery and powers electrical systems while the engine is running. When it fails, your battery drains quickly, and you'll eventually be stranded with a vehicle that won't start.",
-      <>A failing alternator is often confused with a bad battery. If you've replaced the battery recently and it keeps dying, the alternator is likely the culprit. Get a <Link to="/get-quote" className="text-primary underline hover:text-primary/80">free assessment</Link> to confirm before spending money on the wrong fix.</>,
+      <>A failing alternator is often confused with a bad battery. If you've replaced the battery recently and it keeps dying, the alternator is likely the culprit. Get a <Link to="/" className="text-primary underline hover:text-primary/80">free assessment</Link> to confirm before spending money on the wrong fix.</>,
     ],
     symptoms: [
       "Dimming or flickering headlights",
@@ -349,7 +344,6 @@ const REPAIRS: Record<string, RepairData> = {
     relatedLinks: [
       { label: "Browse DIY tutorials", to: "/diy" },
       { label: "Find a shop near you", to: "/find-shops" },
-      { label: "Get a repair quote", to: "/get-quote" },
       { label: "Explore financing options", to: "/financing-options" },
     ],
     faqs: [

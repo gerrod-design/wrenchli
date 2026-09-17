@@ -35,7 +35,7 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
           No Shops Found{searchedZip ? ` Near ${searchedZip}` : ""}
         </h3>
         <p className="text-muted-foreground max-w-md mx-auto mb-6">
-          Wrenchli's trusted shop network is currently in Michigan and Ohio. If you're outside those states, we'll show you what to ask any qualified mechanic — and you can save your assessment to share with whichever shop you trust.
+          Shop matching is currently paused — Wrenchli has no partner shops right now. The listings above are reference-only. Save your assessment to share with whichever qualified mechanic you trust.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
@@ -77,7 +77,7 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
     <div className="space-y-4">
       {/* FTC Material Connection Disclosure */}
       <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-        Wrenchli has a business relationship with the shops shown below. Partner shops have agreed to Wrenchli's transparency standards. This does not affect the content of your symptom assessment.
+        Shop matching is currently paused and Wrenchli has no partner shops. Any shops shown are for reference only — Wrenchli has no business relationship with them, and this does not affect the content of your symptom assessment.
       </p>
       
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">

@@ -1,6 +1,5 @@
 import { MapPin, Phone, Star, Clock, Shield, Building2, Heart, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -54,7 +53,7 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
   };
 
   const isDealer = shop.is_dealer === true;
-  const isPartnered = shop.is_partnered !== false; // default true for backward compat
+  const isPartnered = shop.is_partnered === true; // default false: no partner shops (program paused)
 
   const handleInterestClick = async () => {
     setLoggingInterest(true);
@@ -135,7 +134,7 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
                 <Shield className="h-4 w-4 text-wrenchli-teal flex-shrink-0" />
               </span>
             )}
-            {shop.pilot_status === "pilot_partner" && (
+            {isPartnered && shop.pilot_status === "pilot_partner" && (
               <span
                 className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                 style={{ background: "#E07B3920", color: "#E07B39", border: "1px solid #E07B3940" }}
@@ -143,7 +142,7 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
                 Pilot Partner
               </span>
             )}
-            {shop.pilot_status === "new_partner" && (
+            {isPartnered && shop.pilot_status === "new_partner" && (
               <span
                 className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                 style={{ background: "#E07B3910", color: "#E07B39", border: "1px solid #E07B3930" }}
@@ -206,19 +205,14 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
       <div className="flex gap-2">
         {isPartnered ? (
           <>
-            <Button variant="outline" size="sm" className="flex-1 gap-2" onClick={handleCall}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 gap-2"
+              onClick={handleCall}
+            >
               <Phone className="h-4 w-4" />
               Call
-            </Button>
-            <Button
-              asChild
-              variant="default"
-              size="sm"
-              className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90"
-            >
-              <Link to={isDealer ? "/get-quote" : `/get-quote?shop=${shop.id}`}>
-                {isDealer ? "Get Trade-In Value" : "Get Quote"}
-              </Link>
             </Button>
           </>
         ) : (

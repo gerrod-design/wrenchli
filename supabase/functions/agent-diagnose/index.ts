@@ -21,7 +21,7 @@ serve(async (req) => {
       });
     }
 
-    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const vehicleStr = [year, make, model, trim].filter(Boolean).join(" ");
@@ -30,7 +30,7 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    let historicalData = { totalCases: 0, similarSymptoms: 0, mostCommonDiagnosis: "", successRate: 0 };
+    let historicalData = { totalCases: 0, similarSymptoms: 0, mostCommonDiagnosis: "", successRate: null as number | null };
     try {
       const histResp = await fetch(
         `${SUPABASE_URL}/rest/v1/repair_outcomes?select=diagnosis_match,diagnosis_record_id(primary_diagnosis,symptoms)&limit=500`,
@@ -40,25 +40,30 @@ serve(async (req) => {
         const outcomes = await histResp.json();
         historicalData.totalCases = outcomes.length;
         const matchCount = outcomes.filter((o: any) => o.diagnosis_match === true).length;
-        historicalData.successRate = historicalData.totalCases > 0 
-          ? Math.round((matchCount / historicalData.totalCases) * 100) 
-          : 88;
+        if (historicalData.totalCases > 0) {
+          historicalData.successRate = Math.round((matchCount / historicalData.totalCases) * 100);
+        }
       }
     } catch { /* non-critical, proceed with defaults */ }
 
-    const systemPrompt = `You are Wrenchli's AI diagnostic engine. You analyze vehicle symptoms and provide transparent, data-driven diagnoses.
+    const historicalLine = historicalData.totalCases > 0 && historicalData.successRate !== null
+      ? `Historical network data: ${historicalData.totalCases} total repair cases tracked, ${historicalData.successRate}% assessment match rate.`
+      : `No historical outcome data available yet — do not cite any accuracy rate, match percentage, or success statistic.`;
+
+    const systemPrompt = `You are Wrenchli's AI assessment engine. You analyze vehicle symptoms and provide transparent, data-driven symptom assessments. This is an informational assessment only, not a diagnosis.
 
 CRITICAL RULES:
-- Provide exactly 2-3 possible diagnoses ranked by probability
-- Each diagnosis MUST have a confidence score (0-100)
+- Provide exactly 2-3 likely causes ranked by probability
+- Each likely cause MUST have a confidence score (0-100)
 - Confidence scores must sum to approximately 95-100 (leaving room for "other")
-- Provide specific, actionable rationale for each diagnosis
+- Provide specific, actionable rationale for each likely cause
 - Include realistic cost ranges based on the vehicle
 - Be honest about uncertainty - if confidence is below 70% on the primary, say so
 - Cross-reference with common issues for the specific make/model/year
+- NEVER use the words "diagnosis", "diagnose", or "diagnostic" in your output — always say "assessment" and "likely causes"
 
 Vehicle: ${vehicleStr || "Not specified"}
-Historical network data: ${historicalData.totalCases} total repair cases tracked, ${historicalData.successRate}% diagnostic accuracy rate.`;
+${historicalLine}`;
 
     const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",

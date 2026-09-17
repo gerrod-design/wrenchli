@@ -34,7 +34,7 @@ const faqs = [
   { q: "Is Wrenchli really free for vehicle owners?", a: "Yes, 100% free. We charge shops a small transaction fee when you book through the platform — you never pay extra. The price you see from each shop is the price you pay." },
   { q: "How do you verify the shops?", a: "Every shop on Wrenchli must be licensed, insured, and meet our quality standards. We verify credentials, check business history, and continuously monitor customer satisfaction ratings." },
   { q: "How accurate are the quotes?", a: "Quotes are binding once you accept them. Shops provide itemized breakdowns of parts, labor, and fees based on your vehicle and repair description. If additional work is discovered, the shop must get your approval before proceeding." },
-  { q: "What financing options are available?", a: "We're partnering with multiple lenders to offer financing for all credit profiles — good, fair, and rebuilding. You'll be able to apply at checkout and see your options in minutes. This feature is launching soon." },
+  { q: "What financing options are available?", a: "Repair financing is on the way. We'll announce payment options as soon as they're available." },
   { q: "What about the DIY assessment tool?", a: "Vehicle Insights is our upcoming AI-powered assessment feature. Enter a trouble code or describe symptoms to get plain-English explanations, estimated repair costs, and maintenance schedules. It's currently in development." },
   { q: "Do you use affiliate links for parts?", a: "In the future, we may offer links to purchase parts directly. If we do, we'll always disclose any affiliate relationships transparently. Your trust comes first." },
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program that will include dispute resolution and quality assurance. Details will be announced before launch." },
@@ -159,7 +159,7 @@ export default function ForCarOwners() {
             </h1>
             <p className="mt-3 text-base font-semibold tracking-wide text-primary-foreground/90 md:text-lg">Mobility for All.</p>
             <p className="mt-3 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              Finding an honest mechanic shouldn't feel like a gamble. Wrenchli gives you transparent pricing, trusted shops, and the confidence to say yes to the right repair at the right price.
+              Finding an honest mechanic shouldn't feel like a gamble. Wrenchli gives you transparent pricing and the confidence to say yes to the right repair at the right price.
             </p>
             <Button asChild size="lg" className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
               <Link to="/#quote">
