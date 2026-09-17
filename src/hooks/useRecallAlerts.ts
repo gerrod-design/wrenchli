@@ -57,16 +57,10 @@ export function useRecallAlerts() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchAlerts();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      fetchAlerts();
-    });
-
-    return () => subscription.unsubscribe();
   }, [fetchAlerts]);
 
   const markAsRead = useCallback(async (alertId: string) => {
