@@ -16,13 +16,13 @@ export interface RecallAlert {
 }
 
 export function useRecallAlerts() {
+  const { user } = useAuth();
   const [alerts, setAlerts] = useState<RecallAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const unreadCount = alerts.filter((a) => !a.is_read).length;
 
   const fetchAlerts = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         setAlerts([]);
         setLoading(false);
