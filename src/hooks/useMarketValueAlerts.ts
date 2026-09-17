@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface MarketValueAlert {
   id: string;
@@ -14,13 +15,13 @@ export interface MarketValueAlert {
 }
 
 export function useMarketValueAlerts() {
+  const { user } = useAuth();
   const [alerts, setAlerts] = useState<MarketValueAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const unreadCount = alerts.filter((a) => !a.is_read).length;
 
   const fetchAlerts = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setAlerts([]); setLoading(false); return; }
 
       // Check preferences
@@ -47,12 +48,10 @@ export function useMarketValueAlerts() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchAlerts();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => fetchAlerts());
-    return () => subscription.unsubscribe();
   }, [fetchAlerts]);
 
   const markAsRead = useCallback(async (alertId: string) => {

@@ -51,60 +51,39 @@ export default function Index() {
 
       {/* Pricing Clarity */}
       <section className="section-padding bg-background">
-        <div className="container-wrenchli max-w-4xl">
+        <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl mb-10">
-              What's free. What's Pro.
+              Everything's free.
             </h2>
           </SectionReveal>
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Free column */}
-            <SectionReveal delay={0}>
-              <div className="h-full rounded-xl border border-border bg-muted/30 p-6 md:p-8">
-                <span className="inline-block text-sm font-bold text-accent mb-4">Assessment always free</span>
-                <h3 className="font-heading text-xl font-bold mb-1">Free</h3>
-                <p className="text-xs text-muted-foreground mb-6">No credit card required</p>
-                <ul className="space-y-3">
-                  {[
-                    "Unlimited symptom assessments",
-                    "Likely causes with probability scores",
-                    "Fair cost ranges",
-                    "Questions to ask your mechanic",
-                    "2 saved vehicles in your garage",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-foreground">
-                      <Check className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </SectionReveal>
-            {/* Pro column */}
-            <SectionReveal delay={120}>
-              <div className="h-full rounded-xl border-2 border-accent/40 bg-muted/30 p-6 md:p-8">
-                <span className="inline-block text-sm font-bold text-foreground mb-4">$2.99/month</span>
-                <h3 className="font-heading text-xl font-bold mb-1">Pro</h3>
-                <p className="text-xs text-muted-foreground mb-6">Cancel anytime</p>
-                <ul className="space-y-3">
-                  {[
-                    "Unlimited saved vehicles",
-                    "Safety recall alerts for every vehicle",
-                    "Full assessment history",
-                    "PDF report export",
-                    "Cancel anytime",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-foreground">
-                      <Check className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </SectionReveal>
-          </div>
+          <SectionReveal delay={0}>
+            <div className="rounded-xl border border-border bg-muted/30 p-6 md:p-8">
+              <span className="inline-block text-sm font-bold text-accent mb-4">Always free</span>
+              <h3 className="font-heading text-xl font-bold mb-1">Free</h3>
+              <p className="text-xs text-muted-foreground mb-6">No credit card required</p>
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {[
+                  "Unlimited symptom assessments",
+                  "Likely causes with probability scores",
+                  "Fair cost ranges",
+                  "Questions to ask your mechanic",
+                  "Unlimited saved vehicles in your garage",
+                  "Safety recall alerts for every vehicle",
+                  "Full assessment history",
+                  "PDF report export",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-foreground">
+                    <Check className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </SectionReveal>
         </div>
       </section>
+
 
       <InlineChatWidget />
 
