@@ -1,5 +1,5 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { Stethoscope, CarFront, Bookmark, Wrench } from "lucide-react";
+import { Stethoscope, CarFront, Bookmark } from "lucide-react";
 
 export default function MobileBottomBar() {
   const { pathname } = useLocation();
@@ -7,21 +7,17 @@ export default function MobileBottomBar() {
   const isInsightsPage = pathname === "/vehicle-insights";
   const isFindShopsPage = pathname === "/find-shops";
 
-  // Build quote link — quote flow is paused, so this now directs to reference-only shop listings.
-  const buildQuoteLink = () => {
-    return "/find-shops";
-  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[60px] items-center justify-around border-t border-border bg-background/95 backdrop-blur-md md:hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
       {isInsightsPage ? (
         <>
           <Link
-            to={buildQuoteLink()}
+            to="/#quote"
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
-            <Wrench className="h-4 w-4" />
-            Find Shops
+            <Stethoscope className="h-4 w-4" />
+            Free Assessment
           </Link>
           <Link
             to="/garage"
@@ -38,7 +34,7 @@ export default function MobileBottomBar() {
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
             <Stethoscope className="h-4 w-4" />
-            Get a Assessment
+            Free Assessment
           </Link>
           <Link
             to="/garage"
@@ -58,11 +54,11 @@ export default function MobileBottomBar() {
             Assessment
           </Link>
           <Link
-            to="/find-shops"
+            to="/garage"
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-1 rounded-lg border border-border bg-card font-semibold text-sm text-foreground"
           >
-            <Wrench className="h-4 w-4" />
-            Find Shops
+            <Bookmark className="h-4 w-4" />
+            My Garage
           </Link>
           <Link
             to="/vehicle-insights"

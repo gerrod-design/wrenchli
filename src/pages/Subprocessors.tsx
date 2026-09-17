@@ -27,7 +27,7 @@ const subprocessors = [
   },
   {
     name: "Stripe Inc.",
-    purpose: "Payment processing (Pro subscriptions)",
+    purpose: "Payment processing",
     dataSent: "Payment card data",
     notes: "PCI DSS compliant, Wrenchli never stores card data",
   },

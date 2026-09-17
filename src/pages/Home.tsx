@@ -67,7 +67,7 @@ export default function Home() {
               Mobility for All.
             </p>
             <p className="mt-2 text-primary-foreground/60 md:text-lg">
-              Now available in Michigan &amp; Ohio.
+              Free symptom assessment, available across the United States.
             </p>
           </SectionReveal>
         </div>
