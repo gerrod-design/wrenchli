@@ -199,6 +199,15 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
       throw new Error("AI response missing possible_causes");
     }
 
+    // ── 4d. Deterministic safety override ─────────────────
+    for (const cause of diagnosis.possible_causes) {
+      const haystack = `${cause.name ?? ""} ${cause.notes ?? ""}`;
+      if (SAFETY_CRITICAL_PATTERNS.some((p) => p.test(haystack))) {
+        cause.diy_difficulty = "professional_only";
+        (cause as any).difficulty = "professional_only";
+      }
+    }
+
     // ── 5. Persist to Supabase ─────────────────────────────
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
