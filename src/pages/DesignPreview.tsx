@@ -270,30 +270,30 @@ export default function DesignPreview() {
               For Repair Shops
             </div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-4" style={{ color: "#1A1D27" }}>
-              Every customer arrives<br />
-              <span style={{ color: "#E07B39" }}>already knowing what's wrong.</span>
+              Shop partner program<br />
+              <span style={{ color: "#E07B39" }}>currently paused.</span>
             </h2>
             <p className="text-lg max-w-2xl mx-auto leading-relaxed mb-12" style={{ color: "#6B7280" }}>
-              Your customers come pre-assessed, cost-educated, and ready to approve the work.
-              No more 20-minute intake calls. No more sticker shock at the counter.
+              Wrenchli is focused on the national symptom assessment.
+              Shop onboarding and partner referrals are not available at this time.
             </p>
 
             <div className="grid sm:grid-cols-3 gap-6 text-left">
               {[
                 {
                   icon: Users,
-                  title: "Pre-Qualified Leads",
-                  desc: "Customers arrive with a structured assessment, vehicle details, and cost expectations. They're not shopping — they're booking.",
+                  title: "Program Status",
+                  desc: "The shop partner program is paused. Wrenchli is not onboarding repair shops at this time.",
                 },
                 {
                   icon: ClipboardCheck,
-                  title: "Zero Intake Friction",
-                  desc: "The repair likelihood report is the intake form. VIN, symptoms, confidence scores — all captured before they walk in.",
+                  title: "Assessment Reports",
+                  desc: "Drivers can bring their structured report, vehicle details, and cost expectations to any qualified mechanic.",
                 },
                 {
                   icon: DollarSign,
-                  title: "Higher Approval Rates",
-                  desc: "Customers who understand the repair approve bigger jobs. They walk in ready to book, not negotiate.",
+                  title: "Future Updates",
+                  desc: "Program details will be shared when shop partnerships reopen.",
                 },
               ].map((b) => (
                 <div key={b.title} className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
@@ -306,9 +306,9 @@ export default function DesignPreview() {
               ))}
             </div>
 
-            {/* What a Wrenchli lead looks like */}
+            {/* What a Wrenchli assessment includes */}
             <div className="mt-12 rounded-xl p-6 text-left" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
-              <div className="text-xs mb-4" style={{ fontFamily: MONO, color: "#E07B39" }}>WHAT A WRENCHLI LEAD LOOKS LIKE</div>
+              <div className="text-xs mb-4" style={{ fontFamily: MONO, color: "#E07B39" }}>WHAT A WRENCHLI ASSESSMENT INCLUDES</div>
               <div className="grid sm:grid-cols-4 gap-4">
                 {[
                   { label: "Vehicle", value: "2019 Honda Civic LX" },
