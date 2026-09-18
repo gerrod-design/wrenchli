@@ -152,7 +152,7 @@ export default function RelatedVideos({
     return (
       <div>
         <h2 className="font-heading text-xl font-bold mb-4 flex items-center gap-2">
-          <Youtube className="h-5 w-5 text-destructive" /> Related Videos
+          <Youtube className="h-5 w-5 text-destructive" /> {sectionTitle}
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {[1, 2, 3, 4].map((i) => (
@@ -167,7 +167,7 @@ export default function RelatedVideos({
     return (
       <div>
         <h2 className="font-heading text-xl font-bold mb-4 flex items-center gap-2">
-          <Youtube className="h-5 w-5 text-destructive" /> Related Videos
+          <Youtube className="h-5 w-5 text-destructive" /> {sectionTitle}
         </h2>
         <a
           href={fallbackUrl}
@@ -204,7 +204,7 @@ export default function RelatedVideos({
   return (
     <div>
       <h2 className="font-heading text-xl font-bold mb-4 flex items-center gap-2">
-        <Youtube className="h-5 w-5 text-destructive" /> Related Videos
+        <Youtube className="h-5 w-5 text-destructive" /> {sectionTitle}
       </h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {videos.map((v) => (
