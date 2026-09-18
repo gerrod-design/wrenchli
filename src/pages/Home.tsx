@@ -24,8 +24,8 @@ const userPaths = [
     title: "Repair Shops",
     subtitle: "Want more customers?",
     description:
-      "Shop matching is currently paused. Join the early access list and we'll notify you when it goes live.",
-    href: "/shops",
+      "Our shop partner program is currently paused. Learn what we're building toward.",
+    href: "/for-shops",
     tokenBg: "bg-wrenchli-trust-blue/10",
     tokenBorder: "border-wrenchli-trust-blue/20 hover:border-wrenchli-trust-blue/40",
     tokenIcon: "text-wrenchli-trust-blue",

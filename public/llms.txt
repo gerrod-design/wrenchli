@@ -14,6 +14,7 @@ Wrenchli is not a licensed mechanic and does not provide professional diagnostic
 - [About Wrenchli](https://wrenchli.net/about): Company background, founder, mission, and the information asymmetry problem Wrenchli addresses.
 - [For repair shops](https://wrenchli.net/for-shops): Wrenchli's shop program is currently on pause.
 - [Garage](https://wrenchli.net/garage): Free vehicle garage with saved assessments, recall alerts, and vehicle history.
+- [Detroit repair shops](https://wrenchli.net/shops): Hand-verified independent shop listings in Detroit, Michigan. Listings are labeled "Independent listing — not a Wrenchli partner yet" unless the shop is an active Wrenchli partner.
 
 ## Safety policy
 
@@ -46,6 +47,12 @@ Symptom assessment: Wrenchli's core service. An AI-driven analysis of vehicle sy
 Urgency levels: Wrenchli classifies repair urgency as immediate (safety risk, do not drive), soon (address within 1 to 2 weeks), schedule (plan a shop visit), or monitor (watch for changes).
 
 Shop Required: Wrenchli's designation for repairs that must be performed by a qualified professional. DIY guidance is never provided for these repairs, including all brake, steering, airbag, and fuel system work.
+## Detroit shop directory
+
+- [Detroit repair shops](https://wrenchli.net/shops): Hand-verified independent auto repair shop listings in Detroit, Michigan. Every listing is labeled "Independent listing — not a Wrenchli partner yet" unless the shop is an active Wrenchli partner. No shop data is scraped or invented; unverifiable fields are left blank.
+- Ratings shown on listings are Google ratings with attribution (e.g. "4.6 on Google · 312 reviews"). They are not Wrenchli ratings.
+- Shops can claim their listing ("Is this your shop? Claim it") to keep information current and add their certified technicians.
+- Technician profiles (in development): Wrenchli is building individual technician profiles showing ASE certifications and Michigan state certification numbers, with ratings tied only to Wrenchli-verified completed repair outcomes. No technician ratings exist yet. Technician ratings will never be scraped or invented.
 
 ## Geographic coverage
 

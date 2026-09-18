@@ -2796,6 +2796,175 @@ export type Database = {
         }
         Relationships: []
       }
+      spotlight_shops: {
+        Row: {
+          address_line1: string | null
+          city: string
+          created_at: string
+          description: string | null
+          google_rating: number | null
+          google_review_count: number | null
+          hours_json: Json | null
+          id: string
+          listing_status: string
+          name: string
+          notes: string | null
+          phone: string | null
+          slug: string
+          specialties: string[]
+          state: string
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+          website_url: string | null
+          zip: string | null
+        }
+        Insert: {
+          address_line1?: string | null
+          city?: string
+          created_at?: string
+          description?: string | null
+          google_rating?: number | null
+          google_review_count?: number | null
+          hours_json?: Json | null
+          id?: string
+          listing_status?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          slug: string
+          specialties?: string[]
+          state?: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          website_url?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address_line1?: string | null
+          city?: string
+          created_at?: string
+          description?: string | null
+          google_rating?: number | null
+          google_review_count?: number | null
+          hours_json?: Json | null
+          id?: string
+          listing_status?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          slug?: string
+          specialties?: string[]
+          state?: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          website_url?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
+      spotlight_technician_endorsements: {
+        Row: {
+          comment: string | null
+          consumer_ref: string
+          created_at: string
+          id: string
+          job_reference: string | null
+          rating: number
+          technician_id: string
+        }
+        Insert: {
+          comment?: string | null
+          consumer_ref: string
+          created_at?: string
+          id?: string
+          job_reference?: string | null
+          rating: number
+          technician_id: string
+        }
+        Update: {
+          comment?: string | null
+          consumer_ref?: string
+          created_at?: string
+          id?: string
+          job_reference?: string | null
+          rating?: number
+          technician_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spotlight_technician_endorsements_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "spotlight_technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spotlight_technicians: {
+        Row: {
+          ase_certifications: string[]
+          bio: string | null
+          created_at: string
+          full_name: string
+          id: string
+          mi_cert_number: string | null
+          mi_cert_verified: boolean
+          photo_url: string | null
+          shop_id: string
+          specialties: string[]
+          status: string
+          updated_at: string
+          wrenchli_job_count: number | null
+          wrenchli_rating_avg: number | null
+          years_experience: number | null
+        }
+        Insert: {
+          ase_certifications?: string[]
+          bio?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          mi_cert_number?: string | null
+          mi_cert_verified?: boolean
+          photo_url?: string | null
+          shop_id: string
+          specialties?: string[]
+          status?: string
+          updated_at?: string
+          wrenchli_job_count?: number | null
+          wrenchli_rating_avg?: number | null
+          years_experience?: number | null
+        }
+        Update: {
+          ase_certifications?: string[]
+          bio?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          mi_cert_number?: string | null
+          mi_cert_verified?: boolean
+          photo_url?: string | null
+          shop_id?: string
+          specialties?: string[]
+          status?: string
+          updated_at?: string
+          wrenchli_job_count?: number | null
+          wrenchli_rating_avg?: number | null
+          years_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spotlight_technicians_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "spotlight_shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       symptom_reports: {
         Row: {
           created_at: string | null

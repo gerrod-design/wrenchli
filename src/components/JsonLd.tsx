@@ -119,3 +119,91 @@ export function FaqJsonLd({ faqs }: { faqs: { q: string; a: string }[] }) {
     </Helmet>
   );
 }
+
+interface SpotlightShopLd {
+  name: string;
+  slug: string;
+  address_line1: string | null;
+  city: string;
+  state: string;
+  zip: string | null;
+  phone: string | null;
+  website_url: string | null;
+  description: string | null;
+  google_rating: number | null;
+  google_review_count: number | null;
+  hours_json: Record<string, string> | null;
+}
+
+interface SpotlightTechLd {
+  full_name: string;
+  bio: string | null;
+  specialties: string[];
+  ase_certifications: string[];
+  wrenchli_rating_avg: number | null;
+  wrenchli_job_count: number | null;
+}
+
+/**
+ * AutoRepair structured data for a spotlight shop detail page.
+ * Only includes data actually displayed on the page. Google ratings are
+ * attributed in visible copy; technician Person entities appear only for
+ * real, shop-supplied technicians.
+ */
+export function ShopJsonLd({
+  shop,
+  technicians,
+}: {
+  shop: SpotlightShopLd;
+  technicians: SpotlightTechLd[];
+}) {
+  const data: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "AutoRepair",
+    name: shop.name,
+    url: `${SITE}/shops/${shop.slug}`,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: shop.address_line1 ?? undefined,
+      addressLocality: shop.city,
+      addressRegion: shop.state,
+      postalCode: shop.zip ?? undefined,
+    },
+    telephone: shop.phone ?? undefined,
+    description: shop.description ?? undefined,
+  };
+
+  if (shop.google_rating != null) {
+    data.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: shop.google_rating,
+      reviewCount: shop.google_review_count ?? 1,
+      // Third-party rating, attributed in visible page copy.
+    };
+  }
+
+  if (technicians.length > 0) {
+    data.employee = technicians.map((t) => {
+      const person: Record<string, unknown> = {
+        "@type": "Person",
+        name: t.full_name,
+        description: t.bio ?? undefined,
+        knowsAbout: t.specialties.length > 0 ? t.specialties : undefined,
+      };
+      if (t.ase_certifications.length > 0) {
+        person.hasCredential = t.ase_certifications.map((c) => ({
+          "@type": "EducationalOccupationalCredential",
+          credentialCategory: "certification",
+          name: c,
+        }));
+      }
+      return person;
+    });
+  }
+
+  return (
+    <Helmet>
+      <script type="application/ld+json">{JSON.stringify(data)}</script>
+    </Helmet>
+  );
+}

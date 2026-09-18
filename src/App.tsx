@@ -27,6 +27,8 @@ import CookieConsent from "@/components/CookieConsent";
 import Home from "./pages/Home";
 import Owners from "./pages/Owners";
 import Shops from "./pages/Shops";
+import ShopDetail from "./pages/ShopDetail";
+import DemoTechProfile from "./pages/DemoTechProfile";
 import ForCarOwners from "./pages/ForCarOwners";
 import ForShops from "./pages/ForShops";
 import ForDealers from "./pages/ForDealers";
@@ -102,6 +104,8 @@ function AnimatedRoutes() {
           <Route path="/home" element={<Home />} />
           <Route path="/owners" element={<Owners />} />
           <Route path="/shops" element={<Shops />} />
+          <Route path="/shops/demo-tech-profile" element={<DemoTechProfile />} />
+          <Route path="/shops/:slug" element={<ShopDetail />} />
           <Route path="/for-car-owners" element={<ForCarOwners />} />
           <Route path="/for-shops" element={<ForShops />} />
           <Route path="/for-dealers" element={<ForDealers />} />

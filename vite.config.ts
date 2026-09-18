@@ -136,6 +136,18 @@ const prerenderRoutes: {
       <p>Questions about data processing? Email privacy@wrenchli.net</p>
     `,
   },
+  {
+    path: "/shops",
+    title: "Detroit Auto Repair Shops — Independent Listings | Wrenchli",
+    description:
+      "Hand-verified independent auto repair shops in Detroit, Michigan. Independent listings — not Wrenchli partners yet.",
+    content: `
+      <h1>Detroit Auto Repair Shops</h1>
+      <p>Hand-verified independent repair shops across Detroit. These are independent listings — not Wrenchli partners yet.</p>
+      <p>Ratings shown are Google ratings with attribution, not Wrenchli ratings. Shops can claim their page to add certified technician profiles.</p>
+      <a href="/shops">Browse Detroit shops</a>
+    `,
+  },
 ];
 
 /**
