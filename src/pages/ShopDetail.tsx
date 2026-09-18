@@ -237,11 +237,16 @@ export default function ShopDetail() {
         {shop.verified_at && (
           <p className="mt-8 text-xs text-muted-foreground text-center">
             Listing hand-verified on{" "}
-            {new Date(shop.verified_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {(() => {
+              // verified_at is a date-only value; parse it as a local date so
+              // UTC-midnight timestamps don't render as the previous day.
+              const [y, m, d] = shop.verified_at.slice(0, 10).split("-").map(Number);
+              return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+            })()}
             . Ratings shown are Google ratings, not Wrenchli ratings.
           </p>
         )}
