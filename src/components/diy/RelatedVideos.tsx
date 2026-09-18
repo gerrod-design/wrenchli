@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Youtube } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
+import { isSafetyCriticalCause } from "@/lib/diyVisibility";
 
 interface Video {
   video_id: string;
@@ -131,9 +132,12 @@ export default function RelatedVideos({
   tutorialTitle: string;
   vehicleTypes?: string[] | null;
 }) {
-  const searchQuery = vehicleTypes?.length
-    ? `${tutorialTitle} ${vehicleTypes[0]} DIY tutorial`
-    : `${tutorialTitle} car DIY tutorial`;
+  const safetyCritical = isSafetyCriticalCause(tutorialTitle);
+  const vehicleTerm = vehicleTypes?.length ? vehicleTypes[0] : "car";
+  const searchQuery = safetyCritical
+    ? `${tutorialTitle} ${vehicleTerm} symptoms and causes`
+    : `${tutorialTitle} ${vehicleTerm} DIY tutorial`;
+  const sectionTitle = safetyCritical ? "See what's involved" : "Related Videos";
 
   const { data: videos, isLoading, isError } = useQuery({
     queryKey: ["youtube-search", searchQuery],
