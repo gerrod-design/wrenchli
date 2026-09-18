@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Youtube } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
+import { isSafetyCriticalCause } from "@/lib/diyVisibility";
 
 interface Video {
   video_id: string;
@@ -131,9 +132,12 @@ export default function RelatedVideos({
   tutorialTitle: string;
   vehicleTypes?: string[] | null;
 }) {
-  const searchQuery = vehicleTypes?.length
-    ? `${tutorialTitle} ${vehicleTypes[0]} DIY tutorial`
-    : `${tutorialTitle} car DIY tutorial`;
+  const safetyCritical = isSafetyCriticalCause(tutorialTitle);
+  const vehicleTerm = vehicleTypes?.length ? vehicleTypes[0] : "car";
+  const searchQuery = safetyCritical
+    ? `${tutorialTitle} ${vehicleTerm} symptoms and causes`
+    : `${tutorialTitle} ${vehicleTerm} DIY tutorial`;
+  const sectionTitle = safetyCritical ? "See what's involved" : "Related Videos";
 
   const { data: videos, isLoading, isError } = useQuery({
     queryKey: ["youtube-search", searchQuery],
@@ -148,7 +152,7 @@ export default function RelatedVideos({
     return (
       <div>
         <h2 className="font-heading text-xl font-bold mb-4 flex items-center gap-2">
-          <Youtube className="h-5 w-5 text-destructive" /> Related Videos
+          <Youtube className="h-5 w-5 text-destructive" /> {sectionTitle}
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {[1, 2, 3, 4].map((i) => (
@@ -163,7 +167,7 @@ export default function RelatedVideos({
     return (
       <div>
         <h2 className="font-heading text-xl font-bold mb-4 flex items-center gap-2">
-          <Youtube className="h-5 w-5 text-destructive" /> Related Videos
+          <Youtube className="h-5 w-5 text-destructive" /> {sectionTitle}
         </h2>
         <a
           href={fallbackUrl}
@@ -189,7 +193,9 @@ export default function RelatedVideos({
               Search YouTube for "{tutorialTitle}"
             </p>
             <p className="text-xs text-muted-foreground">
-              Find step-by-step video tutorials on YouTube
+              {safetyCritical
+                ? "See what this repair involves before visiting a mechanic"
+                : "Find step-by-step video tutorials on YouTube"}
             </p>
           </div>
         </a>
@@ -200,7 +206,7 @@ export default function RelatedVideos({
   return (
     <div>
       <h2 className="font-heading text-xl font-bold mb-4 flex items-center gap-2">
-        <Youtube className="h-5 w-5 text-destructive" /> Related Videos
+        <Youtube className="h-5 w-5 text-destructive" /> {sectionTitle}
       </h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {videos.map((v) => (
