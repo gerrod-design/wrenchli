@@ -193,7 +193,9 @@ export default function RelatedVideos({
               Search YouTube for "{tutorialTitle}"
             </p>
             <p className="text-xs text-muted-foreground">
-              Find step-by-step video tutorials on YouTube
+              {safetyCritical
+                ? "See what this repair involves before visiting a mechanic"
+                : "Find step-by-step video tutorials on YouTube"}
             </p>
           </div>
         </a>
