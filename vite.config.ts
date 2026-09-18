@@ -1,7 +1,6 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 import fs from "fs";
 
 /** Static content to bake into prerendered HTML for each route. */
@@ -210,7 +209,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === "development" && componentTagger(),
     mode === "production" && prerenderPlugin(),
   ].filter(Boolean),
   esbuild: {
