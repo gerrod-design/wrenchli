@@ -236,7 +236,7 @@ export default function ShopDetail() {
 
         {shop.verified_at && (
           <p className="mt-8 text-xs text-muted-foreground text-center">
-            Listing hand-verified on{" "}
+            {"Listing hand-verified on "}
             {(() => {
               // verified_at is a date-only value; parse it as a local date so
               // UTC-midnight timestamps don't render as the previous day.
@@ -247,7 +247,7 @@ export default function ShopDetail() {
                 day: "numeric",
               });
             })()}
-            . Ratings shown are Google ratings, not Wrenchli ratings.
+            {". Ratings shown are Google ratings, not Wrenchli ratings."}
           </p>
         )}
       </div>
