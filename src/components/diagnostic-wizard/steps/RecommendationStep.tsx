@@ -162,7 +162,7 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
       {/* DIY vs. Shop cost comparison — backend-provided, side-by-side */}
       {showComparison && (
         <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
-          <div className="text-xs font-mono mb-3" style={{ color: "#E07B39" }}>DIY VS. SHOP</div>
+          <div className="text-xs font-mono mb-3" style={{ color: "#E07B39" }}>{showDiyColumn ? "DIY VS. SHOP" : "SHOP COST"}</div>
           <div className={`grid gap-3 ${showDiyColumn ? "grid-cols-2" : "grid-cols-1"}`}>
             {showDiyColumn && (
               <div className="rounded-lg p-3" style={{ background: "#22C55E10", border: "1px solid #22C55E40" }}>
