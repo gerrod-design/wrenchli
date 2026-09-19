@@ -156,7 +156,7 @@ Generate a repair recommendation for this owner.`.trim();
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1000,
+        max_tokens: 4000,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
       }),
@@ -172,12 +172,29 @@ Generate a repair recommendation for this owner.`.trim();
     const rawText = aiData.content?.[0]?.text ?? "";
 
     // ── 4. Parse & validate ────────────────────────────────
+    // Claude sometimes wraps JSON in markdown fences; strip them before parsing.
+    const cleanedText = String(rawText)
+      .replace(/^\s*```(?:json)?\s*\n?/i, "")
+      .replace(/\n?```\s*$/i, "")
+      .trim();
+
     let recommendation: RepairRecommendation;
     try {
-      recommendation = JSON.parse(rawText);
+      recommendation = JSON.parse(cleanedText);
     } catch {
-      console.error("Failed to parse AI response:", rawText);
-      throw new Error("AI returned invalid JSON");
+      // Fallback: extract the outermost JSON object if extra prose slipped in.
+      const start = cleanedText.indexOf("{");
+      const end = cleanedText.lastIndexOf("}");
+      if (start === -1 || end <= start) {
+        console.error("Failed to parse AI response:", rawText);
+        throw new Error("AI returned invalid JSON");
+      }
+      try {
+        recommendation = JSON.parse(cleanedText.slice(start, end + 1));
+      } catch {
+        console.error("Failed to parse AI response:", rawText);
+        throw new Error("AI returned invalid JSON");
+      }
     }
 
     if (!recommendation.action || !Array.isArray(recommendation.next_steps)) {

@@ -174,7 +174,7 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1000,
+        max_tokens: 4000,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
       }),
