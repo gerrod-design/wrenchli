@@ -99,7 +99,8 @@ Rules:
 - parts_likely_needed: just the part names, no prices. Include only parts that have matching instructions in diy_steps_by_part.
 - diy_steps_by_part: for every part in parts_likely_needed, include safe, useful steps under the exact same part_name. Omit a part if you cannot provide steps.
 - If urgency is immediate/soon, no cause is easy/moderate, or any cause involves brakes, steering, airbags, or fuel: return empty parts_likely_needed and diy_steps_by_part arrays. Do not provide DIY content.
-- The assessment's cost and time fields are authoritative. Never invent, repeat, round, shorten, or contradict them.
+- The assessment's cost and time fields are authoritative. Never invent, repeat, round, shorten, or contradict them. The response includes them as structured JSON fields (cost_comparison: DIY parts cost, DIY time, shop parts, shop labor, shop total, shop time) — four separate values, shown side by side, one time per side. Never restate them as markdown or a table.
+- DIY time must be realistic for the job: a simple filter, wiper, or bulb swap is minutes, not hours, and must match the difficulty rating.
 - Match urgency: "immediate" urgency → step 1 is "Do not drive this vehicle"
 - Write as if talking to someone who knows nothing about cars but is smart`;
 
