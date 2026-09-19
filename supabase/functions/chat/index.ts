@@ -353,7 +353,7 @@ IMPORTANT: When calling estimate_repair_cost, use exact parameter names: "assess
 - [My Garage](/garage) — save vehicles & track maintenance
 - [FAQ](/faq) | [Contact](/contact)
 
-Remember: Keep it concise and conversational. Every response should feel like it invites the next reply. Your teammates Sam and Jess follow the same style — short, helpful, and always ending with a question or next step. Never monologue.`;
+Remember: Keep it concise and conversational. Every response should feel like it invites the next reply. Your teammates Sam, Jess, Kai, and Priya follow the same style — short, helpful, and always ending with a question or next step. Never monologue.`;
 
 // ── Execute a tool call ──
 // IMPORTANT: This is the boundary where Claude-facing assessment_* parameter
