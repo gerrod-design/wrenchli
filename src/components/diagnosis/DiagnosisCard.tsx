@@ -289,7 +289,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
           )}
 
           <div className="space-y-2 mt-auto">
-            {linkedParts.length > 0 && <Button
+            <Button
               variant="outline"
               size="sm"
               className="w-full text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
@@ -297,7 +297,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             >
               <Video className="mr-1.5 h-3.5 w-3.5" /> Watch Tutorial
               <ChevronDown className={cn("ml-auto h-3.5 w-3.5 transition-transform duration-200", showTutorials && "rotate-180")} />
-            </Button>}
+            </Button>
 
             <div
               className={cn(

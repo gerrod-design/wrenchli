@@ -45,6 +45,9 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
   const u = urgencyConfig[diagnosis.urgency] ?? urgencyConfig.schedule;
   const c = confidenceConfig[diagnosis.confidence] ?? confidenceConfig.medium;
   const diyEligible = showDIY(diagnosis.urgency, diagnosis.possible_causes);
+  const topDIYCause = diyEligible
+    ? diagnosis.possible_causes.find((cause) => cause.diy_difficulty === "easy" || cause.diy_difficulty === "moderate")
+    : null;
 
   const handleGetRecommendation = async () => {
     setLoading(true);
@@ -98,10 +101,11 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
       {/* Plain-English Summary Card */}
       {diagnosis.possible_causes.length > 0 && (() => {
         const top = diagnosis.possible_causes[0];
+        const routineMaintenance = /\b(filter|wiper|bulb)s?\b/i.test(top.name);
         const urgencyText: Record<string, string> = {
           immediate: "This is urgent — do not drive.",
           soon: "This should be fixed soon.",
-          schedule: "Schedule a repair when you can.",
+          schedule: routineMaintenance ? "Plan this maintenance when you can." : "Schedule a repair when you can.",
           monitor: "You can monitor this for now.",
         };
         return (
@@ -119,8 +123,8 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
         );
       })()}
 
-      {diyEligible && diagnosis.possible_causes[0] && (() => {
-        const top = diagnosis.possible_causes[0];
+      {diyEligible && topDIYCause && (() => {
+        const top = topDIYCause;
         return (
           <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #2A2D37" }}>
             <div className="px-4 py-2 text-xs font-mono" style={{ background: "#141720", color: "#E07B39" }}>DIY VS. SHOP</div>

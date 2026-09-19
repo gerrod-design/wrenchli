@@ -199,7 +199,7 @@ describe("Assessment Flow — Happy Path", () => {
     expect(screen.getByText("Worn Brake Pads")).toBeInTheDocument();
     expect(screen.getByText("Warped Brake Rotors")).toBeInTheDocument();
     expect(screen.getByText(/85% likely/)).toBeInTheDocument();
-    expect(screen.getByText(/\$150–\$350/)).toBeInTheDocument();
+    expect(screen.getByText(/Shop total: \$150–\$350/)).toBeInTheDocument();
 
     // ── Step 4: Get Repair Plan ──
     (supabase.functions.invoke as Mock).mockResolvedValueOnce({
