@@ -30,6 +30,15 @@ interface PossibleCause {
   estimated_cost_low: number;
   estimated_cost_high: number;
   diy_difficulty: string;
+  diy_parts_cost_low?: number | null;
+  diy_parts_cost_high?: number | null;
+  diy_time?: string | null;
+  shop_parts_cost_low?: number;
+  shop_parts_cost_high?: number;
+  shop_labor_cost_low?: number;
+  shop_labor_cost_high?: number;
+  shop_time?: string;
+  notes?: string;
 }
 
 interface Diagnosis {
@@ -44,6 +53,7 @@ interface RepairRecommendation {
   next_steps: string[];
   questions_to_ask_mechanic: string[];
   parts_likely_needed: string[];
+  diy_steps_by_part: { part_name: string; steps: string[] }[];
 }
 
 // ── System Prompt ────────────────────────────────────────────
@@ -69,6 +79,12 @@ Return ONLY valid JSON matching this exact schema. No explanation, no markdown, 
   "parts_likely_needed": [
     "Part name 1",
     "Part name 2"
+  ],
+  "diy_steps_by_part": [
+    {
+      "part_name": "Exact matching part name",
+      "steps": ["Specific step 1", "Specific step 2"]
+    }
   ]
 }
 
@@ -76,7 +92,12 @@ Rules:
 - action: direct, specific, no fluff. E.g. "Schedule a brake inspection within the next week."
 - next_steps: 3-5 ordered steps. Practical, specific, actionable.
 - questions_to_ask_mechanic: exactly 5 questions. These empower the owner to not get taken advantage of. Include questions about diagnosis confirmation, cost breakdown, timeline, and whether other related items should be inspected.
-- parts_likely_needed: just the part names, no prices. 1-4 items. Empty array if unclear.
+- Do not mention any cost or time in action or next_steps. The app shows the authoritative comparison separately.
+- For filters, wipers, and bulbs, say "replace," "check," or "handle this maintenance"; never say "schedule a repair."
+- parts_likely_needed: just the part names, no prices. Include only parts that have matching instructions in diy_steps_by_part.
+- diy_steps_by_part: for every part in parts_likely_needed, include safe, useful steps under the exact same part_name. Omit a part if you cannot provide steps.
+- If urgency is immediate/soon, any cause is professional_only, or any cause involves brakes, steering, airbags, or fuel: return empty parts_likely_needed and diy_steps_by_part arrays. Do not provide DIY content.
+- The assessment's cost and time fields are authoritative. Never invent, repeat, round, shorten, or contradict them.
 - Match urgency: "immediate" urgency → step 1 is "Do not drive this vehicle"
 - Write as if talking to someone who knows nothing about cars but is smart`;
 
@@ -108,7 +129,7 @@ serve(async (req) => {
       .slice(0, 3)
       .map(
         (c) =>
-          `- ${c.name} (${Math.round(c.probability * 100)}% likely, $${c.estimated_cost_low}–$${c.estimated_cost_high}, ${c.diy_difficulty})`
+          `- ${c.name} (${Math.round(c.probability * 100)}% likely, ${c.diy_difficulty})\n  DIY parts: ${c.diy_parts_cost_low == null || c.diy_parts_cost_high == null ? "not available" : `$${c.diy_parts_cost_low}–$${c.diy_parts_cost_high}`}\n  DIY time: ${c.diy_time ?? "not available"}\n  Shop parts: $${c.shop_parts_cost_low ?? 0}–$${c.shop_parts_cost_high ?? 0}\n  Shop labor: $${c.shop_labor_cost_low ?? 0}–$${c.shop_labor_cost_high ?? 0}\n  Shop total: $${c.estimated_cost_low}–$${c.estimated_cost_high}\n  Shop time: ${c.shop_time ?? "not available"}`
       )
       .join("\n");
 
@@ -165,6 +186,33 @@ Generate a repair recommendation for this owner.`.trim();
 
     recommendation.questions_to_ask_mechanic ??= [];
     recommendation.parts_likely_needed ??= [];
+    recommendation.diy_steps_by_part ??= [];
+
+    const safetyCritical = diagnosis.possible_causes.some((cause) => {
+      const text = `${cause.name ?? ""} ${cause.notes ?? ""}`;
+      return /\bbrak/i.test(text) || /\bsteer/i.test(text) || /\bair\s?bags?/i.test(text) || /\bfuel/i.test(text);
+    });
+    const diyAllowed = (diagnosis.urgency === "monitor" || diagnosis.urgency === "schedule")
+      && !safetyCritical
+      && diagnosis.possible_causes.some((cause) => cause.diy_difficulty === "easy" || cause.diy_difficulty === "moderate")
+      && !diagnosis.possible_causes.some((cause) => cause.diy_difficulty === "professional_only");
+
+    if (!diyAllowed) {
+      recommendation.parts_likely_needed = [];
+      recommendation.diy_steps_by_part = [];
+    } else {
+      const stepsByPart = new Map(
+        recommendation.diy_steps_by_part
+          .filter((item) => item && typeof item.part_name === "string" && Array.isArray(item.steps) && item.steps.length > 0)
+          .map((item) => [item.part_name.trim().toLowerCase(), item])
+      );
+      recommendation.parts_likely_needed = recommendation.parts_likely_needed.filter((part) =>
+        stepsByPart.has(part.trim().toLowerCase())
+      );
+      recommendation.diy_steps_by_part = recommendation.parts_likely_needed
+        .map((part) => stepsByPart.get(part.trim().toLowerCase()))
+        .filter((item): item is { part_name: string; steps: string[] } => Boolean(item));
+    }
 
     // ── 5. Persist to Supabase ─────────────────────────────
     const supabase = createClient(

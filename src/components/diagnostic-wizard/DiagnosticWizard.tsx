@@ -30,6 +30,14 @@ export interface PossibleCause {
   probability: number;
   estimated_cost_low: number;
   estimated_cost_high: number;
+  diy_parts_cost_low: number | null;
+  diy_parts_cost_high: number | null;
+  diy_time: string | null;
+  shop_parts_cost_low: number;
+  shop_parts_cost_high: number;
+  shop_labor_cost_low: number;
+  shop_labor_cost_high: number;
+  shop_time: string;
   diy_difficulty: "easy" | "moderate" | "professional_only";
   notes?: string;
 }
@@ -48,6 +56,7 @@ export interface RecommendationResult {
   next_steps: string[];
   questions_to_ask_mechanic: string[];
   parts_likely_needed: string[];
+  diy_steps_by_part: { part_name: string; steps: string[] }[];
 }
 
 export default function DiagnosticWizard() {

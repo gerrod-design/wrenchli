@@ -39,6 +39,14 @@ interface PossibleCause {
   probability: number;
   estimated_cost_low: number;
   estimated_cost_high: number;
+  diy_parts_cost_low: number | null;
+  diy_parts_cost_high: number | null;
+  diy_time: string | null;
+  shop_parts_cost_low: number;
+  shop_parts_cost_high: number;
+  shop_labor_cost_low: number;
+  shop_labor_cost_high: number;
+  shop_time: string;
   diy_difficulty: "easy" | "moderate" | "professional_only";
   notes?: string;
 }
@@ -84,6 +92,14 @@ If the vehicle IS valid, return ONLY valid JSON matching this exact schema:
       "probability": 0.0 to 1.0,
       "estimated_cost_low": integer USD,
       "estimated_cost_high": integer USD,
+       "diy_parts_cost_low": integer USD or null,
+       "diy_parts_cost_high": integer USD or null,
+       "diy_time": "One realistic hands-on time range" or null,
+       "shop_parts_cost_low": integer USD,
+       "shop_parts_cost_high": integer USD,
+       "shop_labor_cost_low": integer USD,
+       "shop_labor_cost_high": integer USD,
+       "shop_time": "One realistic total shop visit or service time range",
       "diy_difficulty": "easy" | "moderate" | "professional_only",
       "notes": "Optional brief note"
     }
@@ -93,10 +109,16 @@ If the vehicle IS valid, return ONLY valid JSON matching this exact schema:
 Rules:
 - List 2-5 possible causes, ordered by probability descending
 - Probabilities across all causes should sum to roughly 1.0
-- Cost ranges are for parts + labor at an average US shop
+- estimated_cost_low/high are the SHOP TOTAL and MUST equal shop_parts_cost_low/high plus shop_labor_cost_low/high respectively
+- For every easy or moderate cause, always provide FOUR distinct, clearly scoped estimates: DIY parts cost, DIY hands-on time, shop parts and labor as separate ranges plus their total, and shop time
+- Never copy or reuse one range for two meanings. DIY parts may resemble shop parts, but shop total must include non-zero labor and must not equal the DIY parts range
+- Use one internally consistent DIY time and one shop time per cause. Do not put competing time estimates in explanation or notes
+- DIY time means hands-on owner time. Shop time means expected appointment/service duration, not labor hours
+- For professional_only causes, set diy_parts_cost_low, diy_parts_cost_high, and diy_time to null
 - urgency "immediate" = do not drive; "soon" = within 1 week; "schedule" = within 1 month; "monitor" = watch it
 - explanation should be something a non-mechanic can understand and act on
 - If symptom information is thin, lower confidence accordingly
+- Filters, wipers, and bulbs are routine maintenance. Describe replacing or checking them; never say "schedule a repair"
 - Any cause involving brakes, steering, airbags, or the fuel system MUST have diy_difficulty "professional_only" — these systems are never DIY-eligible`;
 
 // ── Deterministic safety override ────────────────────────────
@@ -205,7 +227,21 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
       if (SAFETY_CRITICAL_PATTERNS.some((p) => p.test(haystack))) {
         cause.diy_difficulty = "professional_only";
         (cause as any).difficulty = "professional_only";
+        cause.diy_parts_cost_low = null;
+        cause.diy_parts_cost_high = null;
+        cause.diy_time = null;
       }
+
+      const shopPartsLow = Math.max(0, Math.round(Number(cause.shop_parts_cost_low) || 0));
+      const shopPartsHigh = Math.max(shopPartsLow, Math.round(Number(cause.shop_parts_cost_high) || shopPartsLow));
+      const shopLaborLow = Math.max(0, Math.round(Number(cause.shop_labor_cost_low) || 0));
+      const shopLaborHigh = Math.max(shopLaborLow, Math.round(Number(cause.shop_labor_cost_high) || shopLaborLow));
+      cause.shop_parts_cost_low = shopPartsLow;
+      cause.shop_parts_cost_high = shopPartsHigh;
+      cause.shop_labor_cost_low = shopLaborLow;
+      cause.shop_labor_cost_high = shopLaborHigh;
+      cause.estimated_cost_low = shopPartsLow + shopLaborLow;
+      cause.estimated_cost_high = shopPartsHigh + shopLaborHigh;
     }
 
     // ── 5. Persist to Supabase ─────────────────────────────
