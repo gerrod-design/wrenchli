@@ -96,7 +96,7 @@ Rules:
 - For filters, wipers, and bulbs, say "replace," "check," or "handle this maintenance"; never say "schedule a repair."
 - parts_likely_needed: just the part names, no prices. Include only parts that have matching instructions in diy_steps_by_part.
 - diy_steps_by_part: for every part in parts_likely_needed, include safe, useful steps under the exact same part_name. Omit a part if you cannot provide steps.
-- If urgency is immediate/soon, any cause is professional_only, or any cause involves brakes, steering, airbags, or fuel: return empty parts_likely_needed and diy_steps_by_part arrays. Do not provide DIY content.
+- If urgency is immediate/soon, no cause is easy/moderate, or any cause involves brakes, steering, airbags, or fuel: return empty parts_likely_needed and diy_steps_by_part arrays. Do not provide DIY content.
 - The assessment's cost and time fields are authoritative. Never invent, repeat, round, shorten, or contradict them.
 - Match urgency: "immediate" urgency → step 1 is "Do not drive this vehicle"
 - Write as if talking to someone who knows nothing about cars but is smart`;
@@ -194,8 +194,7 @@ Generate a repair recommendation for this owner.`.trim();
     });
     const diyAllowed = (diagnosis.urgency === "monitor" || diagnosis.urgency === "schedule")
       && !safetyCritical
-      && diagnosis.possible_causes.some((cause) => cause.diy_difficulty === "easy" || cause.diy_difficulty === "moderate")
-      && !diagnosis.possible_causes.some((cause) => cause.diy_difficulty === "professional_only");
+      && diagnosis.possible_causes.some((cause) => cause.diy_difficulty === "easy" || cause.diy_difficulty === "moderate");
 
     if (!diyAllowed) {
       recommendation.parts_likely_needed = [];
@@ -212,6 +211,16 @@ Generate a repair recommendation for this owner.`.trim();
       recommendation.diy_steps_by_part = recommendation.parts_likely_needed
         .map((part) => stepsByPart.get(part.trim().toLowerCase()))
         .filter((item): item is { part_name: string; steps: string[] } => Boolean(item));
+    }
+
+    const routineMaintenance = diagnosis.possible_causes.some((cause) =>
+      /\b(filter|wiper|bulb)s?\b/i.test(cause.name)
+    );
+    if (routineMaintenance) {
+      const replaceRepairPhrase = (text: string) =>
+        text.replace(/schedule (?:a |the )?repair/gi, "handle this maintenance");
+      recommendation.action = replaceRepairPhrase(recommendation.action);
+      recommendation.next_steps = recommendation.next_steps.map(replaceRepairPhrase);
     }
 
     // ── 5. Persist to Supabase ─────────────────────────────

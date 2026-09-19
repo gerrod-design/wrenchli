@@ -60,7 +60,13 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
   const diy = diyConfig[diagnosis.diy_feasibility];
   const DiyIcon = diy.icon;
   const isAdvanced = diagnosis.diy_feasibility === "advanced";
-  const diyAllowed = !isAdvanced && !isSafetyCriticalCause(`${diagnosis.title} ${diagnosis.common_causes.join(" ")}`);
+  const hasCompleteComparison = Boolean(
+    diagnosis.diy_cost && diagnosis.diy_time && diagnosis.shop_parts_cost
+    && diagnosis.shop_labor_cost && diagnosis.shop_cost && diagnosis.shop_time
+  );
+  const diyAllowed = !isAdvanced
+    && !isSafetyCriticalCause(`${diagnosis.title} ${diagnosis.common_causes.join(" ")}`)
+    && hasCompleteComparison;
   const linkedParts = (diagnosis.diy_parts ?? []).filter((part) =>
     diagnosis.diy_steps_by_part?.some(
       (guide) => guide.part_name.trim().toLowerCase() === part.trim().toLowerCase() && guide.steps.length > 0
@@ -308,7 +314,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
                 />
               </div>
             </div>
-            <Button
+            {linkedParts.length > 0 && <Button
               variant="outline"
               size="sm"
               className="w-full text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
@@ -316,9 +322,9 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             >
               <ShoppingCart className="mr-1.5 h-3.5 w-3.5" /> Order Parts
               <ChevronDown className={cn("ml-auto h-3.5 w-3.5 transition-transform duration-200", showParts && "rotate-180")} />
-            </Button>
+            </Button>}
 
-            <div
+            {linkedParts.length > 0 && <div
               className={cn(
                 "overflow-hidden transition-all duration-300 ease-in-out",
                 showParts ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"
@@ -327,7 +333,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               <div className="pt-2">
                 <OrderParts diagnosisTitle={diagnosis.title} vehicle={vehicle} allowedParts={linkedParts} diySteps={diagnosis.diy_steps_by_part ?? []} />
               </div>
-            </div>
+            </div>}
 
             {/* Buy All Parts Button (#2) */}
             {linkedParts.length > 0 && <Button

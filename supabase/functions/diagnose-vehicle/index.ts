@@ -234,7 +234,8 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
 
       const shopPartsLow = Math.max(0, Math.round(Number(cause.shop_parts_cost_low) || 0));
       const shopPartsHigh = Math.max(shopPartsLow, Math.round(Number(cause.shop_parts_cost_high) || shopPartsLow));
-      const shopLaborLow = Math.max(0, Math.round(Number(cause.shop_labor_cost_low) || 0));
+      const isDiyEligible = cause.diy_difficulty === "easy" || cause.diy_difficulty === "moderate";
+      const shopLaborLow = Math.max(isDiyEligible ? 1 : 0, Math.round(Number(cause.shop_labor_cost_low) || 0));
       const shopLaborHigh = Math.max(shopLaborLow, Math.round(Number(cause.shop_labor_cost_high) || shopLaborLow));
       cause.shop_parts_cost_low = shopPartsLow;
       cause.shop_parts_cost_high = shopPartsHigh;
