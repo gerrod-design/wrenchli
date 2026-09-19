@@ -158,6 +158,9 @@ Generate a repair recommendation for this owner.`.trim();
           "x-api-key": Deno.env.get("ANTHROPIC_API_KEY") ?? "",
           "anthropic-version": "2023-06-01",
         },
+        // NOTE: this model rejects assistant-message prefill — the conversation
+        // must end with a user message. JSON shape is enforced by the prompt
+        // contract plus the defensive parsing below.
         body: JSON.stringify({
           model: MODEL,
           max_tokens: 4000,
@@ -166,11 +169,9 @@ Generate a repair recommendation for this owner.`.trim();
             {
               role: "user",
               content: strict
-                ? `${userMessage}\n\nYour previous answer was not valid JSON. Return ONLY the JSON object for the schema. No markdown fences, no commentary, no trailing commas.`
+                ? `${userMessage}\n\nYour previous answer was not valid JSON. Return ONLY the JSON object for the schema, starting with { and ending with }. No markdown fences, no commentary, no trailing commas.`
                 : userMessage,
             },
-            // Prefill forces the model to continue a JSON object instead of prose/markdown.
-            { role: "assistant", content: "{" },
           ],
         }),
       });
@@ -182,9 +183,11 @@ Generate a repair recommendation for this owner.`.trim();
       }
 
       const aiData = await aiResponse.json();
-      const text = String(aiData.content?.[0]?.text ?? "");
-      // Prefill is not echoed back, so re-attach the opening brace when needed.
-      return text.trimStart().startsWith("{") ? text : `{${text}`;
+      const text = aiData.content
+        ?.filter((block: { type?: string }) => block?.type === "text")
+        ?.map((block: { text?: string }) => String(block.text ?? ""))
+        ?.join("") ?? "";
+      return text;
     };
 
     // ── 4. Parse & validate ────────────────────────────────
