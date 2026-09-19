@@ -1,16 +1,37 @@
+# Consistent DIY vs. Shop Comparison
+
 ## Goal
-Confirm the rotated `GEMINI_API_KEY` unblocks `analyze-car-audio` and the hardened prompt prevents hallucination.
+Make every DIY-eligible assessment and repair plan show one clear comparison with distinct DIY and shop costs and one consistent job time.
 
-## Steps
-1. Generate two test WAV clips in `/tmp`:
-   - `silent.wav` — 2s of silence
-   - `squeal.wav` — 2s 2kHz sine (high-pitched continuous tone)
-2. Base64-encode each and POST to the deployed `analyze-car-audio` edge function via `supabase--curl_edge_functions`.
-3. Validate responses:
-   - **Silent clip** → Mike refuses ("I can't make out a clear noise, please re-record…"), no fabricated cause.
-   - **Squeal clip** → described as "high-pitched continuous tone" (not "ticking"), with 2–3 plausible causes (e.g. belt, bearing), no generic filler.
-4. Report both raw responses back so you can see hallucination is gone.
-5. If either response still hallucinates, tighten the system prompt further and redeploy. If 403 persists, the new key was also flagged — fall back to Lovable AI Gateway path.
+## Changes
+1. **Strengthen assessment outputs**
+   - Update both assessment prompts to return separate DIY parts cost, DIY time, shop parts cost, shop labor cost, shop total cost, and shop time.
+   - Explicitly prohibit reusing a cost range for multiple meanings.
+   - Keep the existing brakes, steering, airbags, and fuel hard block unchanged.
+   - Treat filters, wipers, and bulbs as routine maintenance, never “schedule a repair.”
+   - Add deterministic response checks so shop totals reconcile with parts plus labor and safety-critical causes remain shop-only.
 
-## No code changes expected
-This is a verification run only. The edge function and hardened prompt are already deployed.
+2. **Keep the repair plan consistent**
+   - Pass the assessment’s structured costs and times into the repair-plan prompt as authoritative values.
+   - Instruct the plan not to invent or restate conflicting cost or time estimates in summaries or next steps.
+   - Generate DIY steps for each linked part; remove purchase links for any part without steps.
+
+3. **Present one glanceable comparison**
+   - Replace scattered DIY/shop cost and time lines with one paired comparison in each assessment result and repair plan.
+   - Show DIY parts and time beside shop parts, labor, total, and time.
+   - Remove duplicate cost/time displays that could disagree.
+
+4. **Preserve required protections**
+   - Keep safety-critical results at “Shop Required” with zero DIY instructions or parts links.
+   - Keep the affiliate disclosure and “not a licensed mechanic” disclaimer unchanged.
+
+5. **Verify and deploy**
+   - Add focused tests for distinct costs, consistent time, maintenance wording, parts-link eligibility, and safety blocking.
+   - Run the relevant test suite and type checks.
+   - Redeploy `diagnose-vehicle`, `generate-recommendation`, `diagnose`, and any additional function whose prompt changes.
+   - Report each deployment result and quote any errors verbatim.
+
+## Technical notes
+- Extend the existing diagnosis and recommendation response types rather than deriving conflicting estimates in the browser.
+- Preserve current database compatibility; the comparison data can travel with the active assessment response without altering existing saved columns.
+- Normalize malformed AI ranges before returning them so the shop total always equals shop parts plus shop labor.
