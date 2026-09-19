@@ -39,6 +39,8 @@ function detectAgent(content: unknown): AgentType {
   const text = typeof content === "string" ? content : "";
   if (/\[Agent:\s*Sam\]/i.test(text)) return "sam";
   if (/\[Agent:\s*Jess\]/i.test(text)) return "jess";
+  if (/\[Agent:\s*Kai\]/i.test(text)) return "kai";
+  if (/\[Agent:\s*Priya\]/i.test(text)) return "priya";
   return "mike";
 }
 
@@ -302,7 +304,7 @@ export default function ChatBot() {
           }
           // Auto-follow-up when an agent announces a handoff to another specialist
           const finalText = assistantSoFar;
-          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Sam|Jess)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll)\s+(?:going to\s+)?(?:bring|connect|hand|let|get)|(?:let|pass(?:ing)?\s+(?:it|this)\s+to)\s+(?:Sam|Jess)\b/i.test(finalText);
+          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Sam|Jess|Kai|Priya)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll)\s+(?:going to\s+)?(?:bring|connect|hand|let|get)|(?:let|pass(?:ing)?\s+(?:it|this)\s+to)\s+(?:Sam|Jess|Kai|Priya)\b/i.test(finalText);
           if (announcesHandoff) {
             if (canSpeak) {
               // Wait for TTS to finish the full message before triggering the handoff
