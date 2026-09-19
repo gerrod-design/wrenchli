@@ -91,6 +91,14 @@ const mockDiagnosisResponse = {
       probability: 0.85,
       estimated_cost_low: 150,
       estimated_cost_high: 350,
+      diy_parts_cost_low: null,
+      diy_parts_cost_high: null,
+      diy_time: null,
+      shop_parts_cost_low: 50,
+      shop_parts_cost_high: 150,
+      shop_labor_cost_low: 100,
+      shop_labor_cost_high: 200,
+      shop_time: "1–2 hours",
       diy_difficulty: "moderate" as const,
       notes: "Brake pads typically need replacement every 30,000-70,000 miles.",
     },
@@ -99,6 +107,14 @@ const mockDiagnosisResponse = {
       probability: 0.45,
       estimated_cost_low: 250,
       estimated_cost_high: 500,
+      diy_parts_cost_low: null,
+      diy_parts_cost_high: null,
+      diy_time: null,
+      shop_parts_cost_low: 100,
+      shop_parts_cost_high: 250,
+      shop_labor_cost_low: 150,
+      shop_labor_cost_high: 250,
+      shop_time: "2–3 hours",
       diy_difficulty: "professional_only" as const,
       notes: "Rotors may need resurfacing or replacement.",
     },
@@ -111,6 +127,7 @@ const mockRecommendationResponse = {
   next_steps: ["Inspect brake pads for wear indicators", "Check rotor surface for scoring"],
   questions_to_ask_mechanic: ["Can the rotors be resurfaced or do they need replacement?"],
   parts_likely_needed: ["Brake Pads", "Brake Rotors"],
+  diy_steps_by_part: [],
 };
 
 function renderWizard() {
@@ -182,7 +199,8 @@ describe("Assessment Flow — Happy Path", () => {
     expect(screen.getByText("Worn Brake Pads")).toBeInTheDocument();
     expect(screen.getByText("Warped Brake Rotors")).toBeInTheDocument();
     expect(screen.getByText(/85% likely/)).toBeInTheDocument();
-    expect(screen.getByText(/\$150–\$350/)).toBeInTheDocument();
+    expect(screen.getByText("Shop total: $150–$350")).toBeInTheDocument();
+    expect(screen.queryByText("DIY VS. SHOP")).not.toBeInTheDocument();
 
     // ── Step 4: Get Repair Plan ──
     (supabase.functions.invoke as Mock).mockResolvedValueOnce({

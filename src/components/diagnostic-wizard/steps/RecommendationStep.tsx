@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle, MapPin } from "lucide-react";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
 import { showDIY } from "@/lib/diyVisibility";
-import { getRepairTimeEstimate } from "@/lib/repairTimeEstimate";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
 import { trackAdClick } from "@/lib/adClickTracker";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
@@ -28,7 +27,15 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
     : null;
 
   const vehicleStr = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-  const timeEstimate = topDIYCause ? getRepairTimeEstimate(topDIYCause.diy_difficulty) : null;
+  const timeEstimate = topDIYCause?.diy_time ?? null;
+  const diyPartsWithSteps = recommendation.parts_likely_needed
+    .map((part) => ({
+      part,
+      guide: recommendation.diy_steps_by_part?.find(
+        (item) => item.part_name.trim().toLowerCase() === part.trim().toLowerCase()
+      ),
+    }))
+    .filter((item) => item.guide && item.guide.steps.length > 0);
 
   // Check if outcome prompt should show (session older than 3 days)
   const [showOutcome, setShowOutcome] = useState(false);
@@ -65,6 +72,26 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
           {vehicle.year} {vehicle.make} {vehicle.model}
         </h3>
       </div>
+
+      {diyEligible && topDIYCause && (
+        <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #2A2D37" }}>
+          <div className="px-4 py-2 text-xs font-mono" style={{ background: "#141720", color: "#E07B39" }}>DIY VS. SHOP</div>
+          <div className="grid grid-cols-2 divide-x" style={{ borderColor: "#2A2D37" }}>
+            <div className="p-4 space-y-2">
+              <p className="text-sm font-semibold" style={{ color: "#22C55E" }}>DIY</p>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>${topDIYCause.diy_parts_cost_low}–${topDIYCause.diy_parts_cost_high}</span></p>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{topDIYCause.diy_time}</span></p>
+            </div>
+            <div className="p-4 space-y-2">
+              <p className="text-sm font-semibold" style={{ color: "#E07B39" }}>SHOP</p>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>${topDIYCause.shop_parts_cost_low}–${topDIYCause.shop_parts_cost_high}</span></p>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>Labor: <span style={{ color: "#F5F5F5" }}>${topDIYCause.shop_labor_cost_low}–${topDIYCause.shop_labor_cost_high}</span></p>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>Total: <span style={{ color: "#F5F5F5" }}>${topDIYCause.estimated_cost_low}–${topDIYCause.estimated_cost_high}</span></p>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{topDIYCause.shop_time}</span></p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Primary action */}
       <div className="rounded-lg p-4 flex items-start gap-3" style={{ background: "#E07B3915", border: "1px solid #E07B39" }}>
@@ -183,30 +210,23 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
           </div>
 
           {/* Parts links */}
-          {recommendation.parts_likely_needed.length > 0 && (
+          {diyPartsWithSteps.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-xs font-mono" style={{ color: "#E07B39" }}>ORDER PARTS</p>
-              {recommendation.parts_likely_needed.map((part, i) => {
+              {diyPartsWithSteps.map(({ part, guide }, i) => {
                 const amazonUrl = buildAmazonSearchLink(part, vehicleStr);
                 const rockautoUrl = `https://www.rockauto.com/en/catalog/${vehicle.make.toLowerCase()},${vehicle.model.toLowerCase()},${vehicle.year}`;
                 return (
-                  <div key={i} className="flex items-center gap-2 text-xs">
-                    <ShoppingCart className="h-3 w-3 shrink-0" style={{ color: "#E07B39" }} />
-                    <span style={{ color: "#F5F5F5" }}>{part}</span>
-                    <button
-                      onClick={() => handlePartsClick(part, "amazon", amazonUrl)}
-                      className="underline ml-auto"
-                      style={{ color: "#F59E0B" }}
-                    >
-                      Amazon
-                    </button>
-                    <button
-                      onClick={() => handlePartsClick(part, "rockauto", rockautoUrl)}
-                      className="underline"
-                      style={{ color: "#3B82F6" }}
-                    >
-                      RockAuto
-                    </button>
+                  <div key={i} className="space-y-2 rounded p-2" style={{ background: "#141720" }}>
+                    <div className="flex items-center gap-2 text-xs">
+                      <ShoppingCart className="h-3 w-3 shrink-0" style={{ color: "#E07B39" }} />
+                      <span style={{ color: "#F5F5F5" }}>{part}</span>
+                      <button onClick={() => handlePartsClick(part, "amazon", amazonUrl)} className="underline ml-auto" style={{ color: "#F59E0B" }}>Amazon</button>
+                      <button onClick={() => handlePartsClick(part, "rockauto", rockautoUrl)} className="underline" style={{ color: "#3B82F6" }}>RockAuto</button>
+                    </div>
+                    <ol className="space-y-1 pl-5 list-decimal text-[11px]" style={{ color: "#9CA3AF" }}>
+                      {guide?.steps.map((step, stepIndex) => <li key={stepIndex}>{step}</li>)}
+                    </ol>
                   </div>
                 );
               })}

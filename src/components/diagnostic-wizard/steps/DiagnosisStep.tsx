@@ -3,6 +3,7 @@ import { Loader2, ArrowRight, ArrowLeft, AlertTriangle, CheckCircle2, Clock, Eye
 import { supabase } from "@/integrations/supabase/client";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
 import AssessmentDisclaimer from "@/components/diagnosis/AssessmentDisclaimer";
+import { isSafetyCriticalCause, showDIY } from "@/lib/diyVisibility";
 
 
 interface Props {
@@ -43,6 +44,10 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
 
   const u = urgencyConfig[diagnosis.urgency] ?? urgencyConfig.schedule;
   const c = confidenceConfig[diagnosis.confidence] ?? confidenceConfig.medium;
+  const diyEligible = showDIY(diagnosis.urgency, diagnosis.possible_causes);
+  const topDIYCause = diyEligible
+    ? diagnosis.possible_causes.find((cause) => cause.diy_difficulty === "easy" || cause.diy_difficulty === "moderate")
+    : null;
 
   const handleGetRecommendation = async () => {
     setLoading(true);
@@ -96,10 +101,11 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
       {/* Plain-English Summary Card */}
       {diagnosis.possible_causes.length > 0 && (() => {
         const top = diagnosis.possible_causes[0];
+        const routineMaintenance = /\b(filter|wiper|bulb)s?\b/i.test(top.name);
         const urgencyText: Record<string, string> = {
           immediate: "This is urgent — do not drive.",
           soon: "This should be fixed soon.",
-          schedule: "Schedule a repair when you can.",
+          schedule: routineMaintenance ? "Plan this maintenance when you can." : "Schedule a repair when you can.",
           monitor: "You can monitor this for now.",
         };
         return (
@@ -110,10 +116,32 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
             <p className="text-sm leading-relaxed" style={{ color: "#F5F5F5" }}>
               <span className="font-bold">Most likely your issue is {top.name.toLowerCase()}</span>
               {diagnosis.explanation ? `, based on the symptoms you described` : ""}.{" "}
-              {urgencyText[diagnosis.urgency] ?? ""}{" "}
-              Budget <span className="font-semibold" style={{ color: "#E07B39" }}>${top.estimated_cost_low}–${top.estimated_cost_high}</span> at a local shop.
+              {urgencyText[diagnosis.urgency] ?? ""}
             </p>
             <p className="text-[11px] mt-2" style={{ color: "#6B7280" }}>📱 Screenshot this to share with your mechanic</p>
+          </div>
+        );
+      })()}
+
+      {diyEligible && topDIYCause && (() => {
+        const top = topDIYCause;
+        return (
+          <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #2A2D37" }}>
+            <div className="px-4 py-2 text-xs font-mono" style={{ background: "#141720", color: "#E07B39" }}>DIY VS. SHOP</div>
+            <div className="grid grid-cols-2 divide-x" style={{ borderColor: "#2A2D37" }}>
+              <div className="p-4 space-y-2">
+                <p className="text-sm font-semibold" style={{ color: "#22C55E" }}>DIY</p>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>${top.diy_parts_cost_low}–${top.diy_parts_cost_high}</span></p>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{top.diy_time}</span></p>
+              </div>
+              <div className="p-4 space-y-2">
+                <p className="text-sm font-semibold" style={{ color: "#E07B39" }}>SHOP</p>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>${top.shop_parts_cost_low}–${top.shop_parts_cost_high}</span></p>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>Labor: <span style={{ color: "#F5F5F5" }}>${top.shop_labor_cost_low}–${top.shop_labor_cost_high}</span></p>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>Total: <span style={{ color: "#F5F5F5" }}>${top.estimated_cost_low}–${top.estimated_cost_high}</span></p>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{top.shop_time}</span></p>
+              </div>
+            </div>
           </div>
         );
       })()}
@@ -138,7 +166,7 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
             </div>
             <div className="flex justify-between text-xs" style={{ color: "#6B7280" }}>
               <span>{Math.round(cause.probability * 100)}% likely</span>
-              <span>${cause.estimated_cost_low}–${cause.estimated_cost_high}</span>
+              <span>{cause.diy_difficulty === "professional_only" || isSafetyCriticalCause(`${cause.name} ${cause.notes ?? ""}`) ? `Shop total: $${cause.estimated_cost_low}–$${cause.estimated_cost_high}` : "See comparison above"}</span>
             </div>
           </div>
         ))}

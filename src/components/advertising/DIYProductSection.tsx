@@ -1,20 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Wrench, Clock, DollarSign, ExternalLink, MapPin } from "lucide-react";
+import { Wrench, ExternalLink, MapPin } from "lucide-react";
 import { trackAdClick } from "@/lib/adClickTracker";
 import { buildAmazonSearchLink, type ProductRecommendation } from "@/data/adRecommendations";
 import DIYProductCard from "./DIYProductCard";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
-import { getRepairTimeEstimate } from "@/lib/repairTimeEstimate";
 import type { TrackingContext } from "./types";
 
 const DIYProductSection = ({
   products,
-  diyEstimate,
   source,
   vehicleInfo,
   trackCtx,
-  diyDifficulty,
 }: {
   products: ProductRecommendation[];
   diyEstimate?: { timeRange: string; totalPartsRange: string };
@@ -24,7 +21,6 @@ const DIYProductSection = ({
   diyDifficulty?: string;
 }) => {
   const vehicleStr = [vehicleInfo?.year, vehicleInfo?.make, vehicleInfo?.model].filter(Boolean).join(" ");
-  const timeEstimate = diyDifficulty ? getRepairTimeEstimate(diyDifficulty) : diyEstimate?.timeRange;
 
   const handleProductClick = (p: ProductRecommendation) =>
     trackAdClick({
@@ -49,9 +45,6 @@ const DIYProductSection = ({
         <div>
           <h3 id="diy-section-heading" className="font-heading text-lg font-bold text-ad-info-heading">DIY Repair Option</h3>
           <p className="text-sm text-ad-info-text">Save money by fixing it yourself with these parts</p>
-          {timeEstimate && (
-            <p className="text-xs text-muted-foreground mt-0.5">Estimated time: {timeEstimate}</p>
-          )}
         </div>
         <Badge className="ml-auto bg-ad-badge-savings text-ad-badge-savings-text border-ad-badge-savings-border" aria-label="Potential savings: 60 to 70 percent">Save 60-70%</Badge>
       </div>
@@ -62,21 +55,6 @@ const DIYProductSection = ({
           </div>
         ))}
       </div>
-      {diyEstimate && (
-        <div className="mt-4 pt-4 border-t border-ad-info-border flex items-center justify-between text-sm" aria-label="DIY estimate details">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1 text-ad-info-text">
-              <Clock className="h-4 w-4 text-ad-info-icon" aria-hidden="true" />
-              <span aria-label={`Estimated time: ${diyEstimate.timeRange}`}>{diyEstimate.timeRange}</span>
-            </span>
-            <span className="flex items-center gap-1 text-ad-success-text">
-              <DollarSign className="h-4 w-4 text-ad-success-icon" aria-hidden="true" />
-              <span aria-label={`Total parts cost: ${diyEstimate.totalPartsRange}`}>Total parts: {diyEstimate.totalPartsRange}</span>
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* Parts ordering section */}
       <div className="mt-4 pt-4 border-t border-ad-info-border space-y-3">
         <p className="text-xs font-semibold text-ad-info-heading">Get the parts you need:</p>

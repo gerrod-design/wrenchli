@@ -32,7 +32,7 @@ Analyze this repair scenario and provide:
 1. Three precise YouTube search queries optimized to find the BEST tutorial video for this EXACT vehicle and repair. Each query should target a different angle (model-specific tutorial, general technique, troubleshooting).
 2. Whether this is a commonly known issue for this specific vehicle make/model/year. If yes, explain why (e.g., "The ${vehicleStr} is known for premature brake wear due to undersized rotors").
 3. An estimated DIY success rate percentage (realistic, based on difficulty) and the approximate number of steps.
-4. A one-line motivational message for the DIYer (e.g., "Most owners complete this in under 2 hours").`;
+4. A one-line motivational message for the DIYer. Do not mention any duration, cost, price, or savings because the assessment's comparison is authoritative.`;
 
     const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
@@ -69,7 +69,7 @@ Analyze this repair scenario and provide:
                 common_issue_reason: { type: "string", description: "Why this is a common issue, or empty if not" },
                 diy_success_rate: { type: "number", description: "Estimated success rate for DIY repair (0-100)" },
                 estimated_steps: { type: "number", description: "Approximate number of steps to complete the repair" },
-                confidence_message: { type: "string", description: "One-line motivational message for the DIYer" },
+                 confidence_message: { type: "string", description: "One-line motivational message with no cost or time estimate" },
               },
               required: ["youtube_queries", "is_common_issue", "common_issue_reason", "diy_success_rate", "estimated_steps", "confidence_message"],
             },
