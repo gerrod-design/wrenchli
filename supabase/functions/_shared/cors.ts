@@ -17,6 +17,8 @@ function isAllowedOrigin(origin: string): boolean {
   if (allowed.includes(origin)) return true;
   // Allow Lovable preview/published domains
   if (origin.endsWith(".lovableproject.com") || origin.endsWith(".lovable.app")) return true;
+  // Allow Vercel deployments (branch previews + production) — buildathon migration
+  if (origin.endsWith(".vercel.app")) return true;
   return false;
 }
 
