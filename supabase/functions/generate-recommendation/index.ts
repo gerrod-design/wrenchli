@@ -148,55 +148,84 @@ ${topCauses}
 
 Generate a repair recommendation for this owner.`.trim();
 
-    // ── 3. Call Claude API ─────────────────────────────────
-    const aiResponse = await fetch(ANTHROPIC_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": Deno.env.get("ANTHROPIC_API_KEY") ?? "",
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 4000,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userMessage }],
-      }),
-    });
+    // ── 3. Call Claude API (with one retry on unparseable JSON) ──
+    const callModel = async (strict: boolean): Promise<string> => {
+      const aiResponse = await fetch(ANTHROPIC_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": Deno.env.get("ANTHROPIC_API_KEY") ?? "",
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 4000,
+          system: SYSTEM_PROMPT,
+          messages: [
+            {
+              role: "user",
+              content: strict
+                ? `${userMessage}\n\nYour previous answer was not valid JSON. Return ONLY the JSON object for the schema. No markdown fences, no commentary, no trailing commas.`
+                : userMessage,
+            },
+            // Prefill forces the model to continue a JSON object instead of prose/markdown.
+            { role: "assistant", content: "{" },
+          ],
+        }),
+      });
 
-    if (!aiResponse.ok) {
-      const err = await aiResponse.text();
-      console.error("Anthropic API error:", err);
-      throw new Error(`AI service error: ${aiResponse.status}`);
-    }
+      if (!aiResponse.ok) {
+        const err = await aiResponse.text();
+        console.error("Anthropic API error:", err);
+        throw new Error(`AI service error: ${aiResponse.status}`);
+      }
 
-    const aiData = await aiResponse.json();
-    const rawText = aiData.content?.[0]?.text ?? "";
+      const aiData = await aiResponse.json();
+      const text = String(aiData.content?.[0]?.text ?? "");
+      // Prefill is not echoed back, so re-attach the opening brace when needed.
+      return text.trimStart().startsWith("{") ? text : `{${text}`;
+    };
 
     // ── 4. Parse & validate ────────────────────────────────
-    // Claude sometimes wraps JSON in markdown fences; strip them before parsing.
-    const cleanedText = String(rawText)
-      .replace(/^\s*```(?:json)?\s*\n?/i, "")
-      .replace(/\n?```\s*$/i, "")
-      .trim();
+    const parseRecommendation = (rawText: string): RepairRecommendation | null => {
+      // Claude sometimes wraps JSON in markdown fences; strip them before parsing.
+      const cleanedText = String(rawText)
+        .replace(/^\s*```(?:json)?\s*\n?/i, "")
+        .replace(/\n?```\s*$/i, "")
+        .trim();
 
-    let recommendation: RepairRecommendation;
-    try {
-      recommendation = JSON.parse(cleanedText);
-    } catch {
-      // Fallback: extract the outermost JSON object if extra prose slipped in.
-      const start = cleanedText.indexOf("{");
-      const end = cleanedText.lastIndexOf("}");
-      if (start === -1 || end <= start) {
-        console.error("Failed to parse AI response:", rawText);
-        throw new Error("AI returned invalid JSON");
-      }
       try {
-        recommendation = JSON.parse(cleanedText.slice(start, end + 1));
+        return JSON.parse(cleanedText);
       } catch {
-        console.error("Failed to parse AI response:", rawText);
-        throw new Error("AI returned invalid JSON");
+        // Fallback: extract the outermost JSON object if extra prose slipped in.
+        const start = cleanedText.indexOf("{");
+        const end = cleanedText.lastIndexOf("}");
+        if (start === -1 || end <= start) return null;
+        try {
+          return JSON.parse(cleanedText.slice(start, end + 1));
+        } catch {
+          // Last resort: drop trailing commas before closing braces/brackets.
+          try {
+            return JSON.parse(cleanedText.slice(start, end + 1).replace(/,(\s*[}\]])/g, "$1"));
+          } catch {
+            return null;
+          }
+        }
       }
+    };
+
+    let rawText = await callModel(false);
+    let recommendation = parseRecommendation(rawText);
+
+    if (!recommendation) {
+      console.error("Failed to parse AI response, retrying once:", rawText);
+      rawText = await callModel(true);
+      recommendation = parseRecommendation(rawText);
+    }
+
+    if (!recommendation) {
+      console.error("Failed to parse AI response after retry:", rawText);
+      throw new Error("AI returned invalid JSON");
     }
 
     if (!recommendation.action || !Array.isArray(recommendation.next_steps)) {
