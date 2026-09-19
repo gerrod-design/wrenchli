@@ -99,7 +99,8 @@ Rules:
 - parts_likely_needed: just the part names, no prices. Include only parts that have matching instructions in diy_steps_by_part.
 - diy_steps_by_part: for every part in parts_likely_needed, include safe, useful steps under the exact same part_name. Omit a part if you cannot provide steps.
 - If urgency is immediate/soon, no cause is easy/moderate, or any cause involves brakes, steering, airbags, or fuel: return empty parts_likely_needed and diy_steps_by_part arrays. Do not provide DIY content.
-- The assessment's cost and time fields are authoritative. Never invent, repeat, round, shorten, or contradict them.
+- The assessment's cost and time fields are authoritative. Never invent, repeat, round, shorten, or contradict them. The response includes them as structured JSON fields (cost_comparison: DIY parts cost, DIY time, shop parts, shop labor, shop total, shop time) — four separate values, shown side by side, one time per side. Never restate them as markdown or a table.
+- DIY time must be realistic for the job: a simple filter, wiper, or bulb swap is minutes, not hours, and must match the difficulty rating.
 - Match urgency: "immediate" urgency → step 1 is "Do not drive this vehicle"
 - Write as if talking to someone who knows nothing about cars but is smart`;
 
@@ -271,6 +272,83 @@ Generate a repair recommendation for this owner.`.trim();
       recommendation.next_steps = recommendation.next_steps.map(replaceRepairPhrase);
     }
 
+    // ── 4b. Build the authoritative DIY vs. shop comparison ─
+    // Numbers come from the assessment (never the model) so the four values
+    // are always distinct and never reused for two different meanings.
+    const comparisonCause = diyAllowed
+      ? diagnosis.possible_causes.find((c) => c.diy_difficulty === "easy" || c.diy_difficulty === "moderate")
+        ?? diagnosis.possible_causes[0]
+      : diagnosis.possible_causes[0];
+
+    // Realistic DIY times for simple, well-known jobs — prevents inflated ranges
+    // that contradict an "easy" difficulty badge.
+    const REALISTIC_DIY_TIME: { pattern: RegExp; time: string }[] = [
+      { pattern: /\bengine air filter\b|\bair filter\b/i, time: "5–15 minutes" },
+      { pattern: /\bcabin (air )?filter\b/i, time: "10–20 minutes" },
+      { pattern: /\bwiper\b/i, time: "5–10 minutes" },
+      { pattern: /\b(head|tail|brake|turn signal)?\s?(light )?bulb\b/i, time: "10–20 minutes" },
+      { pattern: /\bkey fob battery\b/i, time: "5 minutes" },
+      { pattern: /\bwasher fluid\b/i, time: "5 minutes" },
+      { pattern: /\bengine (oil|air)\b.*\bcap\b/i, time: "5 minutes" },
+    ];
+
+    const realisticDiyTime = (causeName: string, provided?: string | null): string | null => {
+      const match = REALISTIC_DIY_TIME.find((entry) => entry.pattern.test(causeName ?? ""));
+      if (match) return match.time;
+      return provided ?? null;
+    };
+
+    const diyTime = diyAllowed && comparisonCause
+      ? realisticDiyTime(comparisonCause.name, comparisonCause.diy_time)
+      : null;
+
+    const num = (value: unknown): number | null =>
+      typeof value === "number" && Number.isFinite(value) ? Math.round(value) : null;
+
+    const costComparison = comparisonCause
+      ? {
+          cause_name: comparisonCause.name,
+          diy_available: Boolean(diyAllowed && diyTime),
+          diy: {
+            parts_cost_low: diyAllowed ? num(comparisonCause.diy_parts_cost_low) : null,
+            parts_cost_high: diyAllowed ? num(comparisonCause.diy_parts_cost_high) : null,
+            time: diyTime,
+          },
+          shop: {
+            parts_cost_low: num(comparisonCause.shop_parts_cost_low),
+            parts_cost_high: num(comparisonCause.shop_parts_cost_high),
+            labor_cost_low: num(comparisonCause.shop_labor_cost_low),
+            labor_cost_high: num(comparisonCause.shop_labor_cost_high),
+            total_cost_low: num(comparisonCause.estimated_cost_low),
+            total_cost_high: num(comparisonCause.estimated_cost_high),
+            time: comparisonCause.shop_time ?? null,
+          },
+        }
+      : null;
+
+    const range = (low: number | null, high: number | null) =>
+      low == null || high == null ? null : `$${low}–$${high}`;
+
+    const comparisonLines = costComparison
+      ? {
+          diy: costComparison.diy_available
+            ? [
+                `Parts: ${range(costComparison.diy.parts_cost_low, costComparison.diy.parts_cost_high) ?? "not available"}`,
+                `Time: ${costComparison.diy.time ?? "not available"}`,
+              ]
+            : [],
+          shop: [
+            `Parts: ${range(costComparison.shop.parts_cost_low, costComparison.shop.parts_cost_high) ?? "not available"}`,
+            `Labor: ${range(costComparison.shop.labor_cost_low, costComparison.shop.labor_cost_high) ?? "not available"}`,
+            `Total: ${range(costComparison.shop.total_cost_low, costComparison.shop.total_cost_high) ?? "not available"}`,
+            `Time: ${costComparison.shop.time ?? "not available"}`,
+          ],
+        }
+      : { diy: [], shop: [] };
+
+    const shopMatchingNote =
+      "Shop matching is currently paused — Wrenchli has no partner shops. When the shop track reopens, partner shops will earn placement through verified repair outcomes, not paid placement.";
+
     // ── 5. Persist to Supabase ─────────────────────────────
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -301,6 +379,11 @@ Generate a repair recommendation for this owner.`.trim();
       JSON.stringify({
         recommendation_id: recRecord.id,
         ...recommendation,
+        diy_time: diyTime,
+        shop_time: costComparison?.shop.time ?? null,
+        cost_comparison: costComparison,
+        comparison_lines: comparisonLines,
+        shop_matching_note: shopMatchingNote,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
