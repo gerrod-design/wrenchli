@@ -3,7 +3,7 @@ import { Loader2, ArrowRight, ArrowLeft, AlertTriangle, CheckCircle2, Clock, Eye
 import { supabase } from "@/integrations/supabase/client";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
 import AssessmentDisclaimer from "@/components/diagnosis/AssessmentDisclaimer";
-import { showDIY } from "@/lib/diyVisibility";
+import { isSafetyCriticalCause, showDIY } from "@/lib/diyVisibility";
 
 
 interface Props {
@@ -166,7 +166,7 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
             </div>
             <div className="flex justify-between text-xs" style={{ color: "#6B7280" }}>
               <span>{Math.round(cause.probability * 100)}% likely</span>
-              <span>{cause.diy_difficulty === "professional_only" ? `Shop total: $${cause.estimated_cost_low}–$${cause.estimated_cost_high}` : "See comparison above"}</span>
+              <span>{cause.diy_difficulty === "professional_only" || isSafetyCriticalCause(`${cause.name} ${cause.notes ?? ""}`) ? `Shop total: $${cause.estimated_cost_low}–$${cause.estimated_cost_high}` : "See comparison above"}</span>
             </div>
           </div>
         ))}
