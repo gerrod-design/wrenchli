@@ -42,12 +42,43 @@ export interface DiagnosisResult {
   possible_causes: PossibleCause[];
 }
 
+export interface CostComparison {
+  diy_available: boolean;
+  cause_name?: string | null;
+  diy?: {
+    parts_cost_low?: number | null;
+    parts_cost_high?: number | null;
+    time?: string | null;
+  } | null;
+  shop?: {
+    parts_cost_low?: number | null;
+    parts_cost_high?: number | null;
+    labor_cost_low?: number | null;
+    labor_cost_high?: number | null;
+    total_cost_low?: number | null;
+    total_cost_high?: number | null;
+    time?: string | null;
+  } | null;
+  comparison_lines?: {
+    diy?: string[] | string | null;
+    shop?: string[] | string | null;
+  } | null;
+}
+
 export interface RecommendationResult {
   recommendation_id: string;
   action: string;
   next_steps: string[];
   questions_to_ask_mechanic: string[];
   parts_likely_needed: string[];
+  cost_comparison?: CostComparison | null;
+  comparison_lines?: {
+    diy?: string[] | string | null;
+    shop?: string[] | string | null;
+  } | null;
+  diy_time?: string | null;
+  shop_time?: string | null;
+  shop_matching_note?: string | null;
 }
 
 export default function DiagnosticWizard() {

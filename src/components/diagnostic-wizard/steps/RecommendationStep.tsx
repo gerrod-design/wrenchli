@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle, MapPin } from "lucide-react";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
 import { showDIY } from "@/lib/diyVisibility";
-import { getRepairTimeEstimate } from "@/lib/repairTimeEstimate";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
 import { trackAdClick } from "@/lib/adClickTracker";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
@@ -28,7 +27,20 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
     : null;
 
   const vehicleStr = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-  const timeEstimate = topDIYCause ? getRepairTimeEstimate(topDIYCause.diy_difficulty) : null;
+
+  // Backend-provided DIY vs. shop cost comparison (generate-recommendation).
+  // comparison_lines may arrive nested under cost_comparison or top-level;
+  // each side may be a string array or a newline-separated string.
+  const toLines = (v: string[] | string | null | undefined): string[] =>
+    Array.isArray(v) ? v : typeof v === "string" ? v.split("\n").map((s) => s.trim()).filter(Boolean) : [];
+  const costComparison = recommendation.cost_comparison ?? null;
+  const rawLines = costComparison?.comparison_lines ?? recommendation.comparison_lines ?? null;
+  const diyLines = toLines(rawLines?.diy);
+  const shopLines = toLines(rawLines?.shop);
+  const showDiyColumn = !!costComparison?.diy_available && diyLines.length > 0;
+  const showComparison = !!costComparison && (diyLines.length > 0 || shopLines.length > 0);
+  // Authoritative DIY time from the backend — replaces the old locally derived estimate.
+  const diyTime = recommendation.diy_time ?? null;
 
   // Check if outcome prompt should show (session older than 3 days)
   const [showOutcome, setShowOutcome] = useState(false);
@@ -147,6 +159,35 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
         </div>
       )}
 
+      {/* DIY vs. Shop cost comparison — backend-provided, side-by-side */}
+      {showComparison && (
+        <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
+          <div className="text-xs font-mono mb-3" style={{ color: "#E07B39" }}>DIY VS. SHOP</div>
+          <div className={`grid gap-3 ${showDiyColumn ? "grid-cols-2" : "grid-cols-1"}`}>
+            {showDiyColumn && (
+              <div className="rounded-lg p-3" style={{ background: "#22C55E10", border: "1px solid #22C55E40" }}>
+                <div className="text-xs font-bold mb-2" style={{ color: "#22C55E" }}>DO IT YOURSELF</div>
+                <ul className="space-y-1">
+                  {diyLines.map((line, i) => (
+                    <li key={i} className="text-xs" style={{ color: "#F5F5F5" }}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {shopLines.length > 0 && (
+              <div className="rounded-lg p-3" style={{ background: "#E07B3910", border: "1px solid #E07B3940" }}>
+                <div className="text-xs font-bold mb-2" style={{ color: "#E07B39" }}>LOCAL SHOP</div>
+                <ul className="space-y-1">
+                  {shopLines.map((line, i) => (
+                    <li key={i} className="text-xs" style={{ color: "#F5F5F5" }}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* DIY Option Card — only when eligible */}
       {diyEligible && topDIYCause && (
         <div className="rounded-lg p-4 space-y-3" style={{ background: "#0F1117", border: "1px solid #22C55E40" }}>
@@ -174,10 +215,10 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
             >
               {topDIYCause.diy_difficulty === "easy" ? "Easy" : "Moderate"}
             </span>
-            {timeEstimate && (
+            {diyTime && (
               <span className="flex items-center gap-1 text-xs" style={{ color: "#9CA3AF" }}>
                 <Clock className="h-3 w-3" />
-                {timeEstimate}
+                {diyTime}
               </span>
             )}
           </div>
@@ -229,7 +270,7 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
       <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
         <h4 className="text-xs font-mono mb-2" style={{ color: "#E07B39" }}>ABOUT SHOP MATCHING</h4>
         <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>
-          Shop matching is currently paused — Wrenchli has no partner shops. When the shop track reopens, partner shops will earn placement through verified repair outcomes, not paid placement.
+          {recommendation.shop_matching_note ?? "Shop matching is currently paused — Wrenchli has no partner shops. When the shop track reopens, partner shops will earn placement through verified repair outcomes, not paid placement."}
         </p>
       </div>
 
