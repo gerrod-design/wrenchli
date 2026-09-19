@@ -378,6 +378,11 @@ Generate a repair recommendation for this owner.`.trim();
       JSON.stringify({
         recommendation_id: recRecord.id,
         ...recommendation,
+        diy_time: diyTime,
+        shop_time: costComparison?.shop.time ?? null,
+        cost_comparison: costComparison,
+        comparison_lines: comparisonLines,
+        shop_matching_note: shopMatchingNote,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
