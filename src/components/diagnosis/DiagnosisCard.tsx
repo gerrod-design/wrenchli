@@ -13,6 +13,7 @@ import type { Diagnosis } from "./types";
 import { cn } from "@/lib/utils";
 import { useSmartRepairIntel } from "@/hooks/useSmartRepairIntel";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
+import { isSafetyCriticalCause } from "@/lib/diyVisibility";
 
 /** Extract numeric value from cost string like "$120–$250" → 120 */
 function parseCost(cost: string): number | null {
@@ -59,6 +60,12 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
   const diy = diyConfig[diagnosis.diy_feasibility];
   const DiyIcon = diy.icon;
   const isAdvanced = diagnosis.diy_feasibility === "advanced";
+  const diyAllowed = !isAdvanced && !isSafetyCriticalCause(`${diagnosis.title} ${diagnosis.common_causes.join(" ")}`);
+  const linkedParts = (diagnosis.diy_parts ?? []).filter((part) =>
+    diagnosis.diy_steps_by_part?.some(
+      (guide) => guide.part_name.trim().toLowerCase() === part.trim().toLowerCase() && guide.steps.length > 0
+    )
+  );
   const [showTutorials, setShowTutorials] = useState(false);
   const [showParts, setShowParts] = useState(false);
   const [showTools, setShowTools] = useState(false);
@@ -130,7 +137,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
         </div>
       )}
 
-      {/* Body - 2x2 grid */}
+      {/* Body */}
       <div className="grid gap-4 p-5 md:p-6 sm:grid-cols-2">
         <div className="space-y-1.5">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">What's Happening</h4>
@@ -158,26 +165,29 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
           <p className="text-xs text-muted-foreground">{diy.subtitle}</p>
         </div>
 
-        <div className="space-y-1.5">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Estimated Cost Range</h4>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">DIY (parts only):</span>
-              <span className="font-semibold">{diagnosis.diy_cost}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Professional Repair:</span>
-              <span className="font-semibold">{diagnosis.shop_cost}</span>
-            </div>
-          </div>
-          <p className="text-[11px] text-muted-foreground italic">Costs vary by location and vehicle</p>
-        </div>
       </div>
 
-      {/* Savings Callout (#3) */}
-      <div className="px-5 md:px-6 pb-2" ref={savingsRef}>
-        <SavingsCallout diyCost={diagnosis.diy_cost} shopCost={diagnosis.shop_cost} />
-      </div>
+      {diyAllowed && (
+        <div className="px-5 md:px-6 pb-4" ref={savingsRef}>
+          <div className="overflow-hidden rounded-lg border border-border">
+            <div className="grid grid-cols-2 divide-x divide-border">
+              <div className="p-3 space-y-1.5">
+                <p className="text-sm font-bold text-wrenchli-green">DIY</p>
+                <p className="text-xs text-muted-foreground">Parts: <span className="font-semibold text-foreground">{diagnosis.diy_cost}</span></p>
+                <p className="text-xs text-muted-foreground">Time: <span className="font-semibold text-foreground">{diagnosis.diy_time}</span></p>
+              </div>
+              <div className="p-3 space-y-1.5">
+                <p className="text-sm font-bold text-wrenchli-teal">Shop</p>
+                <p className="text-xs text-muted-foreground">Parts: <span className="font-semibold text-foreground">{diagnosis.shop_parts_cost}</span></p>
+                <p className="text-xs text-muted-foreground">Labor: <span className="font-semibold text-foreground">{diagnosis.shop_labor_cost}</span></p>
+                <p className="text-xs text-muted-foreground">Total: <span className="font-semibold text-foreground">{diagnosis.shop_cost}</span></p>
+                <p className="text-xs text-muted-foreground">Time: <span className="font-semibold text-foreground">{diagnosis.shop_time}</span></p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-2"><SavingsCallout diyCost={diagnosis.diy_cost} shopCost={diagnosis.shop_cost} /></div>
+        </div>
+      )}
 
       {/* YOUR OPTIONS divider */}
       <div className="flex items-center gap-4 px-5 md:px-6 pt-2 pb-4">
@@ -187,9 +197,9 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
       </div>
 
       {/* Dual-path cards */}
-      <div className="grid gap-4 px-5 md:px-6 pb-5 md:pb-6 sm:grid-cols-2">
+      <div className={cn("grid gap-4 px-5 md:px-6 pb-5 md:pb-6", diyAllowed && "sm:grid-cols-2")}>
         {/* DIY Path */}
-        <div
+        {diyAllowed && <div
           className="rounded-xl border p-5 flex flex-col"
           style={{ backgroundColor: diy.cardBg, borderColor: diy.cardBorder }}
         >
@@ -212,10 +222,6 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
           )}
 
           <div className="space-y-2 text-sm mb-4">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Estimated cost:</span>
-              <span className="font-semibold">{diagnosis.diy_cost}</span>
-            </div>
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">Difficulty:</span>
               <span className="font-semibold">{diy.badge}</span>
@@ -277,7 +283,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
           )}
 
           <div className="space-y-2 mt-auto">
-            <Button
+            {linkedParts.length > 0 && <Button
               variant="outline"
               size="sm"
               className="w-full text-xs border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10"
@@ -285,7 +291,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             >
               <Video className="mr-1.5 h-3.5 w-3.5" /> Watch Tutorial
               <ChevronDown className={cn("ml-auto h-3.5 w-3.5 transition-transform duration-200", showTutorials && "rotate-180")} />
-            </Button>
+            </Button>}
 
             <div
               className={cn(
@@ -319,12 +325,12 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               )}
             >
               <div className="pt-2">
-                <OrderParts diagnosisTitle={diagnosis.title} vehicle={vehicle} />
+                <OrderParts diagnosisTitle={diagnosis.title} vehicle={vehicle} allowedParts={linkedParts} diySteps={diagnosis.diy_steps_by_part ?? []} />
               </div>
             </div>
 
             {/* Buy All Parts Button (#2) */}
-            <Button
+            {linkedParts.length > 0 && <Button
               size="sm"
               className="w-full text-xs font-semibold bg-wrenchli-teal text-white hover:bg-wrenchli-teal/90"
               asChild
@@ -337,7 +343,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               >
                 <ShoppingBag className="mr-1.5 h-3.5 w-3.5" /> Buy All Parts on Amazon
               </a>
-            </Button>
+            </Button>}
 
             <Button
               size="sm"
@@ -351,7 +357,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
               Start DIY Guide <ArrowRight className="ml-1.5 h-3 w-3" />
             </Button>
           </div>
-        </div>
+        </div>}
 
         {/* Professional Path */}
         <div
@@ -370,12 +376,12 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             </h4>
           </div>
 
-          <div className="space-y-2 text-sm mb-4">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Estimated cost:</span>
-              <span className="font-semibold">{diagnosis.shop_cost}</span>
-            </div>
-          </div>
+          {!diyAllowed && <div className="space-y-1 text-sm mb-4">
+            <p><span className="text-muted-foreground">Parts:</span> <span className="font-semibold">{diagnosis.shop_parts_cost}</span></p>
+            <p><span className="text-muted-foreground">Labor:</span> <span className="font-semibold">{diagnosis.shop_labor_cost}</span></p>
+            <p><span className="text-muted-foreground">Total:</span> <span className="font-semibold">{diagnosis.shop_cost}</span></p>
+            <p><span className="text-muted-foreground">Shop time:</span> <span className="font-semibold">{diagnosis.shop_time}</span></p>
+          </div>}
 
           <ul className="space-y-2 text-sm mb-4 flex-1">
             <li className="flex items-center gap-2">

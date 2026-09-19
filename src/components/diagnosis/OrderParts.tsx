@@ -26,29 +26,19 @@ const pickupRetailers: { id: string; label: string; subLabel: string; bg: string
 interface OrderPartsProps {
   diagnosisTitle: string;
   vehicle: string;
+  allowedParts: string[];
+  diySteps: { part_name: string; steps: string[] }[];
 }
 
-export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps) {
+export default function OrderParts({ diagnosisTitle, vehicle, allowedParts, diySteps }: OrderPartsProps) {
   const info = getPartsForDiagnosis(diagnosisTitle);
   const [showTools, setShowTools] = useState(false);
 
-  if (!info) {
-    return (
-      <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-        <p className="text-sm text-muted-foreground">
-          Parts data isn't available for this specific issue yet. Try searching directly:
-        </p>
-        <a
-          href={buildRetailerUrl("amazon", diagnosisTitle.replace(/\s+/g, "+"), vehicle)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-wrenchli-teal hover:underline"
-        >
-          Search Amazon <ExternalLink className="h-3 w-3" />
-        </a>
-      </div>
-    );
-  }
+  if (!info || allowedParts.length === 0) return null;
+
+  const normalizedAllowed = new Set(allowedParts.map((part) => part.trim().toLowerCase()));
+  const parts = info.parts.filter((part) => normalizedAllowed.has(part.name.trim().toLowerCase()));
+  if (parts.length === 0) return null;
 
   return (
     <div className="space-y-3">
@@ -59,7 +49,7 @@ export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps)
 
       {/* Parts list */}
       <div className="space-y-2.5">
-        {info.parts.map((part, i) => (
+        {parts.map((part, i) => (
           <div key={i} className="rounded-lg border border-border bg-card p-3 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div>
@@ -78,6 +68,12 @@ export default function OrderParts({ diagnosisTitle, vehicle }: OrderPartsProps)
             {part.note && (
               <p className="text-[11px] text-muted-foreground italic">💡 {part.note}</p>
             )}
+
+            <ol className="list-decimal pl-5 space-y-1 text-[11px] text-muted-foreground">
+              {diySteps.find((guide) => guide.part_name.trim().toLowerCase() === part.name.trim().toLowerCase())?.steps.map((step, stepIndex) => (
+                <li key={stepIndex}>{step}</li>
+              ))}
+            </ol>
 
             {/* Retailer buttons */}
             <div className="space-y-1.5">

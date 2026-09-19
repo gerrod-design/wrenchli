@@ -78,7 +78,13 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1500,
-        system: `You are Wrenchli's expert automotive diagnostics AI. Given a DTC code or symptom description, return one or more structured diagnoses using the provide_diagnoses tool. Each diagnosis should be specific to the vehicle when provided. Be honest about when a professional is needed. Provide realistic cost ranges. If the input could indicate multiple issues, return multiple diagnoses (up to 3).`,
+        system: `You are Wrenchli's expert automotive diagnostics AI. Given a DTC code or symptom description, return one or more structured diagnoses using the provide_diagnoses tool. Each diagnosis should be specific to the vehicle when provided. Be honest about when a professional is needed. If the input could indicate multiple issues, return multiple diagnoses (up to 3).
+
+For every easy or moderate DIY result, provide one internally consistent comparison with four distinct estimates: DIY parts cost, DIY hands-on time, shop parts and labor separately plus shop total, and shop appointment/service time. Never reuse one range for two meanings. Shop total must equal shop parts plus shop labor at both ends and must not equal the DIY parts range. Use the exact same time estimates everywhere in the result and do not add competing times to explanatory text.
+
+For every part in diy_parts, provide matching safe instructions in diy_steps_by_part using the exact same part_name. Omit any part that lacks instructions. Filters, wipers, and bulbs are routine maintenance: say replace, check, or handle this maintenance; never say "schedule a repair."
+
+SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel must use diy_feasibility "advanced", return empty diy_parts and diy_steps_by_part arrays, and contain no DIY guidance.`,
         messages: [{ role: "user", content: userPrompt }],
         tools: [
           {
@@ -103,9 +109,25 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
                       },
                       diy_feasibility: { type: "string", enum: ["easy", "moderate", "advanced"], description: "DIY difficulty rating" },
                       diy_cost: { type: "string", description: "DIY parts-only cost range, e.g. '$25–$60'" },
-                      shop_cost: { type: "string", description: "Professional repair cost range, e.g. '$150–$350'" },
+                      diy_time: { type: "string", description: "DIY hands-on time range; empty for advanced results" },
+                      shop_parts_cost: { type: "string", description: "Shop parts cost range only" },
+                      shop_labor_cost: { type: "string", description: "Shop labor cost range only" },
+                      shop_cost: { type: "string", description: "Shop total range equal to shop parts plus shop labor" },
+                      shop_time: { type: "string", description: "Expected shop appointment or service time range" },
+                      diy_parts: { type: "array", items: { type: "string" }, description: "Parts with matching DIY instructions; empty for advanced results" },
+                      diy_steps_by_part: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            part_name: { type: "string" },
+                            steps: { type: "array", items: { type: "string" } },
+                          },
+                          required: ["part_name", "steps"],
+                        },
+                      },
                     },
-                    required: ["title", "code", "urgency", "whats_happening", "common_causes", "diy_feasibility", "diy_cost", "shop_cost"],
+                    required: ["title", "code", "urgency", "whats_happening", "common_causes", "diy_feasibility", "diy_cost", "diy_time", "shop_parts_cost", "shop_labor_cost", "shop_cost", "shop_time", "diy_parts", "diy_steps_by_part"],
                   },
                 },
               },
@@ -147,7 +169,31 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
       );
     }
 
-    return new Response(JSON.stringify(toolUse.input), {
+    const diagnoses = Array.isArray(toolUse.input?.diagnoses) ? toolUse.input.diagnoses : [];
+    for (const diagnosis of diagnoses) {
+      const text = `${diagnosis.title ?? ""} ${(diagnosis.common_causes ?? []).join(" ")} ${diagnosis.whats_happening ?? ""}`;
+      const safetyCritical = /\bbrak/i.test(text) || /\bsteer/i.test(text) || /\bair\s?bags?/i.test(text) || /\bfuel/i.test(text);
+      if (safetyCritical) {
+        diagnosis.diy_feasibility = "advanced";
+        diagnosis.diy_cost = "Not available — shop required";
+        diagnosis.diy_time = "Not available — shop required";
+        diagnosis.diy_parts = [];
+        diagnosis.diy_steps_by_part = [];
+      } else {
+        const steps = new Map(
+          (Array.isArray(diagnosis.diy_steps_by_part) ? diagnosis.diy_steps_by_part : [])
+            .filter((item: any) => typeof item?.part_name === "string" && Array.isArray(item.steps) && item.steps.length > 0)
+            .map((item: any) => [item.part_name.trim().toLowerCase(), item])
+        );
+        diagnosis.diy_parts = (Array.isArray(diagnosis.diy_parts) ? diagnosis.diy_parts : [])
+          .filter((part: string) => steps.has(part.trim().toLowerCase()));
+        diagnosis.diy_steps_by_part = diagnosis.diy_parts
+          .map((part: string) => steps.get(part.trim().toLowerCase()))
+          .filter(Boolean);
+      }
+    }
+
+    return new Response(JSON.stringify({ ...toolUse.input, diagnoses }), {
       headers: { ...securityHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

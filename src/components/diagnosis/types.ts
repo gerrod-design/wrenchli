@@ -9,7 +9,13 @@ export interface Diagnosis {
   common_causes: string[];
   diy_feasibility: "easy" | "moderate" | "advanced";
   diy_cost: string;
+  diy_time: string;
+  shop_parts_cost: string;
+  shop_labor_cost: string;
   shop_cost: string;
+  shop_time: string;
+  diy_parts?: string[];
+  diy_steps_by_part?: { part_name: string; steps: string[] }[];
   category?: DtcCategory;
   tools_required?: ToolItem[];
 }
