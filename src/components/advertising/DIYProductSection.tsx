@@ -9,11 +9,9 @@ import type { TrackingContext } from "./types";
 
 const DIYProductSection = ({
   products,
-  diyEstimate,
   source,
   vehicleInfo,
   trackCtx,
-  diyDifficulty,
 }: {
   products: ProductRecommendation[];
   diyEstimate?: { timeRange: string; totalPartsRange: string };
