@@ -13,6 +13,10 @@ export interface ExtractionProgress {
 
 /**
  * Load a video element from a File and wait for metadata.
+ *
+ * iOS Safari quirk: a <video> that is not attached to the DOM never fires
+ * loadedmetadata for a blob URL, so the load hangs until the timeout.
+ * The element is kept visually hidden but attached while frames extract.
  */
 function loadVideo(file: File): Promise<HTMLVideoElement> {
   return new Promise((resolve, reject) => {
@@ -20,21 +24,43 @@ function loadVideo(file: File): Promise<HTMLVideoElement> {
     video.preload = "auto";
     video.muted = true;
     video.playsInline = true;
+    video.style.cssText =
+      "position:fixed;top:0;left:0;width:2px;height:2px;opacity:0.01;pointer-events:none;";
+    document.body.appendChild(video);
 
     const url = URL.createObjectURL(file);
-    video.src = url;
-
-    video.onloadedmetadata = () => resolve(video);
-    video.onerror = () => {
+    let settled = false;
+    const cleanup = () => {
+      video.remove();
       URL.revokeObjectURL(url);
+    };
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error("Video loading timed out."));
+    }, 15_000);
+
+    video.onloadedmetadata = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      // NOTE: element stays in the DOM for frame extraction;
+      // extractVideoFrames removes it when done.
+      resolve(video);
+    };
+    video.onerror = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      cleanup();
       reject(new Error("Failed to load video. Format may not be supported."));
     };
 
-    // Timeout after 15s
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Video loading timed out."));
-    }, 15_000);
+    video.src = url;
+    // Explicit load(): with preload="auto" this is implicit on desktop,
+    // but iOS Safari needs the nudge for detached-then-attached elements.
+    video.load();
   });
 }
 
@@ -105,10 +131,14 @@ export async function extractVideoFrames(
 ): Promise<File[]> {
   const count = Math.min(numFrames, MAX_FRAMES);
   const video = await loadVideo(file);
+  const cleanupVideo = () => {
+    video.remove();
+    URL.revokeObjectURL(video.src);
+  };
   const duration = video.duration;
 
   if (!duration || duration < 0.5) {
-    URL.revokeObjectURL(video.src);
+    cleanupVideo();
     throw new Error("Video is too short to extract frames.");
   }
 
@@ -133,7 +163,7 @@ export async function extractVideoFrames(
     frames.push(frame);
   }
 
-  URL.revokeObjectURL(video.src);
+  cleanupVideo();
   return frames;
 }
 
