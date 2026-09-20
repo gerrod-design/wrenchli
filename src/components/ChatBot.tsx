@@ -812,7 +812,7 @@ export default function ChatBot() {
                   <button type="button" onClick={() => fileInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
                     className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Upload photo">
                     <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><ImagePlus className="h-4 w-4" /></span>
-                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Upload Photo</span>
+                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Upload Photo / Video</span>
                   </button>
                   <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={loading || uploading || pendingPhotos.length >= 5}
                     className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Take photo">
