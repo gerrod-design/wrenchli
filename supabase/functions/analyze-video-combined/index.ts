@@ -147,7 +147,11 @@ Deno.serve(async (req: Request) => {
     const analysis = result.choices?.[0]?.message?.content ||
       "I couldn't make out enough from that video. Could you try uploading again with clearer footage of the area you're concerned about?";
 
-    return new Response(JSON.stringify({ analysis }), {
+    return new Response(JSON.stringify({
+      analysis,
+      has_audio: !!audioFile,
+      frame_count: frameEntries.length,
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
