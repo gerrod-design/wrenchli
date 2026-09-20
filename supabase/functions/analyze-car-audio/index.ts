@@ -4,7 +4,7 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 // /chat/completions endpoint silently drops Gemini's `inlineData` audio parts,
 // which caused Mike to hallucinate generic "ticking → valve train" answers
 // regardless of what the user actually recorded.
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.6-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const SYSTEM_PROMPT = `You are Mike, a knowledgeable vehicle advisor at Wrenchli. A customer recorded an audio clip of a noise their car is making. The audio is attached as inline data in the user message.
