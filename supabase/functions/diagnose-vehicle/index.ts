@@ -116,7 +116,13 @@ Rules:
 - Never copy or reuse one range for two meanings. DIY parts may resemble shop parts, but shop total must include non-zero labor and must not equal the DIY parts range
 - Use one internally consistent DIY time and one shop time per cause. Do not put competing time estimates in explanation or notes
 - DIY time means hands-on owner time. Shop time means expected appointment/service duration, not labor hours
-- For professional_only causes, set diy_parts_cost_low, diy_parts_cost_high, and diy_time to null
+- For professional_only causes, set diy_parts_cost_low, diy_parts_cost_high, and diy_time to null, and omit diy_steps entirely
+- For every easy or moderate cause, include diy_steps: an ordered array of plain-language steps in the order the job is actually done
+- Each step is one or two sentences. Easy jobs: 4-8 steps. Moderate jobs: 6-12 steps. Do not pad
+- Make steps specific to this vehicle where it matters (engine layout, bulb type, access quirks, fastener types)
+- Include inline safety warnings as their own steps where relevant: disconnect the battery, let the engine cool, HID/ballast high voltage, support the vehicle on jack stands — never work under a car held only by a jack
+- SAFETY HARD RULE, non-negotiable: NEVER produce diy_steps for a professional_only cause, including any brake, steering, airbag, or fuel-system cause, under any circumstance
+- If you are unsure whether a repair is safe for a non-professional, mark it professional_only with no steps
 - urgency "immediate" = do not drive; "soon" = within 1 week; "schedule" = within 1 month; "monitor" = watch it
 - explanation should be something a non-mechanic can understand and act on
 - If symptom information is thin, lower confidence accordingly
@@ -232,6 +238,18 @@ Diagnose this vehicle issue and return the JSON schema.`.trim();
         cause.diy_parts_cost_low = null;
         cause.diy_parts_cost_high = null;
         cause.diy_time = null;
+        cause.diy_steps = null;
+      }
+
+      if (cause.diy_difficulty === "professional_only") {
+        cause.diy_steps = null;
+      } else if (Array.isArray(cause.diy_steps)) {
+        cause.diy_steps = cause.diy_steps
+          .filter((s: unknown) => typeof s === "string" && s.trim().length > 0)
+          .map((s: string) => s.trim());
+        if (cause.diy_steps.length === 0) cause.diy_steps = null;
+      } else {
+        cause.diy_steps = null;
       }
 
       const shopPartsLow = Math.max(0, Math.round(Number(cause.shop_parts_cost_low) || 0));
