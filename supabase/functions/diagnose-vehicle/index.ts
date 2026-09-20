@@ -48,6 +48,7 @@ interface PossibleCause {
   shop_labor_cost_high: number;
   shop_time: string;
   diy_difficulty: "easy" | "moderate" | "professional_only";
+  diy_steps?: string[] | null;
   notes?: string;
 }
 
