@@ -101,6 +101,7 @@ If the vehicle IS valid, return ONLY valid JSON matching this exact schema:
        "shop_labor_cost_high": integer USD,
        "shop_time": "One realistic total shop visit or service time range",
       "diy_difficulty": "easy" | "moderate" | "professional_only",
+      "diy_steps": ["One concise step", "..."] or omitted for professional_only,
       "notes": "Optional brief note"
     }
   ]
