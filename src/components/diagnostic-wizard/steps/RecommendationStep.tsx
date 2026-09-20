@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle, MapPin } from "lucide-react";
+import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle, MapPin, ArrowLeft } from "lucide-react";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
 import { showDIY, isDIYEligibleCause } from "@/lib/diyVisibility";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
@@ -16,9 +16,10 @@ interface Props {
   vehicle: VehicleData;
   sessionId: string;
   onRestart: () => void;
+  onBack: () => void;
 }
 
-export default function RecommendationStep({ recommendation, diagnosis, vehicle, sessionId, onRestart }: Props) {
+export default function RecommendationStep({ recommendation, diagnosis, vehicle, sessionId, onRestart, onBack }: Props) {
   const diyEligible = showDIY(diagnosis.urgency, diagnosis.possible_causes);
   // Never spotlight a safety-critical cause in the DIY card, even if the
   // backend mislabels its difficulty — same predicate as showDIY.
@@ -71,11 +72,21 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
 
   return (
     <div className="space-y-4">
-      <div>
-        <div className="text-xs font-mono mb-1" style={{ color: "#E07B39" }}>STEP 4 — YOUR PLAN</div>
-        <h3 className="text-lg font-semibold" style={{ color: "#F5F5F5" }}>
-          {vehicle.year} {vehicle.make} {vehicle.model}
-        </h3>
+      <div className="flex items-start gap-3">
+        <button
+          onClick={onBack}
+          aria-label="Back to symptoms"
+          className="px-3 py-3 rounded-lg text-sm font-medium shrink-0"
+          style={{ background: "#0F1117", border: "1px solid #2A2D37", color: "#9CA3AF" }}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <div>
+          <div className="text-xs font-mono mb-1" style={{ color: "#E07B39" }}>STEP 4 — YOUR PLAN</div>
+          <h3 className="text-lg font-semibold" style={{ color: "#F5F5F5" }}>
+            {vehicle.year} {vehicle.make} {vehicle.model}
+          </h3>
+        </div>
       </div>
 
       {/* Primary action */}
@@ -222,6 +233,23 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
               </span>
             )}
           </div>
+
+          {/* Step-by-step instructions (populated by diagnose-vehicle for easy/moderate causes) */}
+          {topDIYCause.diy_steps && topDIYCause.diy_steps.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-mono" style={{ color: "#22C55E" }}>HOW TO DO IT</p>
+              <ol className="space-y-1.5">
+                {topDIYCause.diy_steps.map((step, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "#D1D5DB" }}>
+                    <span className="flex items-center justify-center h-4 w-4 rounded-full text-[10px] font-bold shrink-0 mt-0.5" style={{ background: "#22C55E20", color: "#22C55E" }}>
+                      {i + 1}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
 
           {/* Parts links */}
           {recommendation.parts_likely_needed.length > 0 && (

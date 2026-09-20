@@ -32,6 +32,7 @@ export interface PossibleCause {
   estimated_cost_high: number;
   diy_difficulty: "easy" | "moderate" | "professional_only";
   notes?: string;
+  diy_steps?: string[];
 }
 
 export interface DiagnosisResult {
@@ -223,6 +224,7 @@ export default function DiagnosticWizard() {
               setRecommendation(null);
               setSessionId(null);
             }}
+            onBack={() => setStep("symptoms")}
           />
         )}
       </div>
