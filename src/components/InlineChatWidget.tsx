@@ -150,7 +150,12 @@ export default function InlineChatWidget() {
 
           const vehicleStr = sessionStorage.getItem("wrenchli_vehicle") || "";
           const formData = new FormData();
-          formData.append("frame_urls", JSON.stringify(uploaded));
+          // The analyze-video-combined edge function reads frame FILES
+          // (field name "frame"). It ignores the old "frame_urls" string field,
+          // which is why frames were silently dropped.
+          for (const frame of frames) {
+            formData.append("frame", frame, frame.name);
+          }
           if (vehicleStr) formData.append("vehicle_context", vehicleStr);
           if (audioBlob) {
             formData.append("audio", new File([audioBlob], "video-audio.wav", { type: "audio/wav" }));
@@ -162,12 +167,22 @@ export default function InlineChatWidget() {
             headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
             body: formData,
           })
-            .then((r) => r.json())
+            .then(async (r) => {
+              const data = await r.json().catch(() => ({}));
+              // Surface backend errors instead of failing silently.
+              if (!r.ok || !data.analysis) {
+                throw new Error(data.error || `Video analysis failed (${r.status})`);
+              }
+              return data;
+            })
             .then((data) => {
               if (data.analysis) {
+                // Backend now returns frame_count and has_audio; fall back to
+                // local values while an older backend may still be serving.
+                const frameCount = data.frame_count ?? frames.length;
                 const label = data.has_audio
-                  ? `🎬🔊 [Analyzed video: ${data.frame_count} frames + audio]`
-                  : `🎬 [Analyzed video: ${data.frame_count} frames, no audio detected]`;
+                  ? `🎬🔊 [Analyzed video: ${frameCount} frames + audio]`
+                  : `🎬 [Analyzed video: ${frameCount} frames, no audio detected]`;
                 const userMsg: Msg = { role: "user", content: label, image_urls: uploaded };
                 const assistantMsg: Msg = { role: "assistant", content: data.analysis };
                 setMessages((prev) => [...prev, userMsg, assistantMsg]);
