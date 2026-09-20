@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle, MapPin } from "lucide-react";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
-import { showDIY } from "@/lib/diyVisibility";
+import { showDIY, isDIYEligibleCause } from "@/lib/diyVisibility";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
 import { trackAdClick } from "@/lib/adClickTracker";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
@@ -20,10 +20,10 @@ interface Props {
 
 export default function RecommendationStep({ recommendation, diagnosis, vehicle, sessionId, onRestart }: Props) {
   const diyEligible = showDIY(diagnosis.urgency, diagnosis.possible_causes);
+  // Never spotlight a safety-critical cause in the DIY card, even if the
+  // backend mislabels its difficulty — same predicate as showDIY.
   const topDIYCause = diyEligible
-    ? diagnosis.possible_causes.find(
-        (c) => c.diy_difficulty === "easy" || c.diy_difficulty === "moderate"
-      )
+    ? diagnosis.possible_causes.find(isDIYEligibleCause)
     : null;
 
   const vehicleStr = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
