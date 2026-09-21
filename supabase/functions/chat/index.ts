@@ -670,11 +670,53 @@ function validateMessages(
   return messages;
 }
 
+// ── Deterministic agent attribution (code-level, never prompt-level) ──
+const SAM_MARKER = "[Agent: Sam] ";
+const SAM_TOOLS = new Set(["estimate_repair_cost", "estimate_vehicle_value"]);
+
+/** True when text already carries any [Agent: X] marker in its first line. */
+function hasAgentMarker(text: string): boolean {
+  const firstLine = text.split("\n", 1)[0] ?? "";
+  return /\[Agent:\s*[^\]]+\]/i.test(firstLine);
+}
+
+/**
+ * Decide the expected agent for this turn.
+ * - Sam when Turn 1 called a Sam tool (cost / value handoff).
+ * - Sam when the latest assistant message already spoke as Sam (continuity).
+ */
+function detectExpectedAgent(
+  history: Array<{ role: string; content: string }>,
+  toolNames: string[] = [],
+): "sam" | null {
+  if (toolNames.some((n) => SAM_TOOLS.has(n))) return "sam";
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    const msg = history[i];
+    if (msg.role !== "assistant") continue;
+    const text = typeof msg.content === "string" ? msg.content : "";
+    return /^\s*\[Agent:\s*Sam\]/i.test(text) ? "sam" : null;
+  }
+  return null;
+}
+
+/** Prepend the Sam marker unless the text already carries an agent marker. */
+function applyAgentMarker(text: string, expectedAgent: "sam" | null): string {
+  if (expectedAgent !== "sam") return text;
+  if (hasAgentMarker(text)) return text;
+  return SAM_MARKER + text;
+}
+
 // ── Convert Anthropic SSE stream to OpenAI-compatible SSE format ──
-function convertAnthropicStreamToOpenAI(anthropicStream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+function convertAnthropicStreamToOpenAI(
+  anthropicStream: ReadableStream<Uint8Array>,
+  expectedAgent: "sam" | null = null,
+): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let buffer = "";
+  let firstTextDeltaSent = false;
+
 
   return new ReadableStream({
     async start(controller) {
