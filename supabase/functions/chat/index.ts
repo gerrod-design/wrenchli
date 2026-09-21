@@ -890,7 +890,7 @@ Deno.serve(async (req) => {
           { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
         );
       }
-      return new Response(convertAnthropicStreamToOpenAI(fallbackResp.body), {
+      return new Response(convertAnthropicStreamToOpenAI(fallbackResp.body, continuityAgent), {
         headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
       });
     }
