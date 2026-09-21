@@ -993,7 +993,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    return new Response(convertAnthropicStreamToOpenAI(turn2Resp.body), {
+    return new Response(convertAnthropicStreamToOpenAI(turn2Resp.body, expectedAgent), {
       headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
