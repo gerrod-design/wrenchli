@@ -46,26 +46,6 @@ const steps = [
   { num: "5", title: "Get Paid", desc: "We handle financing for customers who need it. You get paid in full." },
 ];
 
-const testimonials = [
-  {
-    quote: "Wrenchli sends us customers who already know what they need. Our close rate went from 40% to 78%.",
-    name: "Marcus T.",
-    shop: "Detroit Auto Works",
-    rating: 5,
-  },
-  {
-    quote: "No more chasing leads or paying for ads that don't convert. This is how shop marketing should work.",
-    name: "Sarah K.",
-    shop: "Precision Auto Care, Ann Arbor",
-    rating: 5,
-  },
-  {
-    quote: "The financing option means customers say yes to bigger repairs. Our average ticket went up 35%.",
-    name: "James R.",
-    shop: "J&R Automotive, Toledo",
-    rating: 5,
-  },
-];
 
 export default function Shops() {
   return (
@@ -206,43 +186,6 @@ export default function Shops() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="section-padding bg-secondary">
-        <div className="container-wrenchli">
-          <SectionReveal>
-            <h2 className="font-heading text-2xl font-bold text-center md:text-4xl mb-10">
-              What Shop Owners Say
-            </h2>
-          </SectionReveal>
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((t, i) => (
-              <SectionReveal key={t.name} delay={i * 120}>
-                <Card className="h-full">
-                  <CardContent className="p-6">
-                    <div className="flex gap-0.5 mb-3">
-                      {Array.from({ length: t.rating }).map((_, j) => (
-                        <Star
-                          key={j}
-                          className="h-4 w-4 fill-accent text-accent"
-                        />
-                      ))}
-                    </div>
-                    <p className="text-sm leading-relaxed text-muted-foreground italic">
-                      "{t.quote}"
-                    </p>
-                    <div className="mt-4 border-t border-border pt-3">
-                      <p className="font-semibold text-sm">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t.shop}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       <section className="section-padding bg-wrenchli-trust-blue text-accent-foreground">
@@ -256,15 +199,10 @@ export default function Shops() {
               Join the Wrenchli network and start receiving pre-qualified
               customers today.
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg"
-            >
-              <Link to="/for-shops">
-                Apply Now <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+            <p className="mt-8 mx-auto max-w-xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
+              Shop partner program currently paused — Wrenchli is not
+              onboarding repair shops at this time.
+            </p>
           </SectionReveal>
         </div>
       </section>
