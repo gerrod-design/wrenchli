@@ -755,11 +755,20 @@ function convertAnthropicStreamToOpenAI(
               const event = JSON.parse(json);
 
               if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
-                const openAIChunk = JSON.stringify({
-                  choices: [{ delta: { role: "assistant", content: event.delta.text } }],
-                });
-                controller.enqueue(encoder.encode(`data: ${openAIChunk}\n\n`));
+                const text: string = event.delta.text ?? "";
+                if (firstTextDeltaSent) {
+                  emit(text);
+                } else if (expectedAgent !== "sam") {
+                  firstTextDeltaSent = true;
+                  emit(text);
+                } else {
+                  // Buffer just enough of the opening to see whether the model
+                  // emitted its own [Agent: ...] marker before injecting ours.
+                  pendingText += text;
+                  if (pendingText.length >= 32 || pendingText.includes("\n")) flushPending();
+                }
               } else if (event.type === "message_stop") {
+                flushPending();
                 controller.enqueue(encoder.encode("data: [DONE]\n\n"));
               }
             } catch {
