@@ -716,11 +716,26 @@ function convertAnthropicStreamToOpenAI(
   const encoder = new TextEncoder();
   let buffer = "";
   let firstTextDeltaSent = false;
-
+  let pendingText = "";
 
   return new ReadableStream({
     async start(controller) {
       const reader = anthropicStream.getReader();
+      const emit = (text: string) => {
+        if (!text) return;
+        const chunk = JSON.stringify({
+          choices: [{ delta: { role: "assistant", content: text } }],
+        });
+        controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
+      };
+      // Flush the buffered opening text, prepending the marker if the model dropped it.
+      const flushPending = () => {
+        if (firstTextDeltaSent) return;
+        firstTextDeltaSent = true;
+        const opening = applyAgentMarker(pendingText, expectedAgent);
+        pendingText = "";
+        emit(opening);
+      };
       try {
         while (true) {
           const { done, value } = await reader.read();
