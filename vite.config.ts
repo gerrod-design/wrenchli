@@ -148,6 +148,21 @@ const prerenderRoutes: {
       <a href="/shops">Browse Detroit shops</a>
     `,
   },
+  {
+    path: "/videos",
+    title: "Wrenchli Commercials — Mobility for All",
+    description:
+      "Watch all 16 Wrenchli spots: The Handoff, Right Job Right Place, and Seller & Buyer Garage — in standard and alternate casts, 15 and 30 seconds.",
+    content: `
+      <h1>See the mission in motion</h1>
+      <p>Sixteen spots. Four concepts. Two casts. One promise: transparency for the people a surprise repair hits hardest.</p>
+      <h2>Standard Cast</h2>
+      <p>The Handoff, Right Job Right Place, and Seller & Buyer Garage — 15 and 30 second spots.</p>
+      <h2>Alternate Cast</h2>
+      <p>The same stories through Detroit's eyes — a cast that reflects the city Wrenchli calls home.</p>
+      <p>Wrenchli: Mobility for All.</p>
+    `,
+  },
 ];
 
 /**

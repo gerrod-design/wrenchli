@@ -39,6 +39,7 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Garage from "./pages/Garage";
 import Investors from "./pages/Investors";
+import Videos from "./pages/Videos";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminAudit from "./pages/AdminAudit";
@@ -115,6 +116,7 @@ function AnimatedRoutes() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/garage" element={<Garage />} />
           <Route path="/investors" element={<Investors />} />
+          <Route path="/videos" element={<Videos />} />
           {/* Paused 2026-09-17: shop quote requests imply partner shops that don't exist — not offered */}
           <Route path="/get-quote" element={<Navigate to="/" replace />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />
