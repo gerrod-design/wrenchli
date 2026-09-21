@@ -670,15 +670,72 @@ function validateMessages(
   return messages;
 }
 
+// ── Deterministic agent attribution (code-level, never prompt-level) ──
+const SAM_MARKER = "[Agent: Sam] ";
+const SAM_TOOLS = new Set(["estimate_repair_cost", "estimate_vehicle_value"]);
+
+/** True when text already carries any [Agent: X] marker in its first line. */
+function hasAgentMarker(text: string): boolean {
+  const firstLine = text.split("\n", 1)[0] ?? "";
+  return /\[Agent:\s*[^\]]+\]/i.test(firstLine);
+}
+
+/**
+ * Decide the expected agent for this turn.
+ * - Sam when Turn 1 called a Sam tool (cost / value handoff).
+ * - Sam when the latest assistant message already spoke as Sam (continuity).
+ */
+function detectExpectedAgent(
+  history: Array<{ role: string; content: string }>,
+  toolNames: string[] = [],
+): "sam" | null {
+  if (toolNames.some((n) => SAM_TOOLS.has(n))) return "sam";
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    const msg = history[i];
+    if (msg.role !== "assistant") continue;
+    const text = typeof msg.content === "string" ? msg.content : "";
+    return /^\s*\[Agent:\s*Sam\]/i.test(text) ? "sam" : null;
+  }
+  return null;
+}
+
+/** Prepend the Sam marker unless the text already carries an agent marker. */
+function applyAgentMarker(text: string, expectedAgent: "sam" | null): string {
+  if (expectedAgent !== "sam") return text;
+  if (hasAgentMarker(text)) return text;
+  return SAM_MARKER + text;
+}
+
 // ── Convert Anthropic SSE stream to OpenAI-compatible SSE format ──
-function convertAnthropicStreamToOpenAI(anthropicStream: ReadableStream<Uint8Array>): ReadableStream<Uint8Array> {
+function convertAnthropicStreamToOpenAI(
+  anthropicStream: ReadableStream<Uint8Array>,
+  expectedAgent: "sam" | null = null,
+): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let buffer = "";
+  let firstTextDeltaSent = false;
+  let pendingText = "";
 
   return new ReadableStream({
     async start(controller) {
       const reader = anthropicStream.getReader();
+      const emit = (text: string) => {
+        if (!text) return;
+        const chunk = JSON.stringify({
+          choices: [{ delta: { role: "assistant", content: text } }],
+        });
+        controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
+      };
+      // Flush the buffered opening text, prepending the marker if the model dropped it.
+      const flushPending = () => {
+        if (firstTextDeltaSent) return;
+        firstTextDeltaSent = true;
+        const opening = applyAgentMarker(pendingText, expectedAgent);
+        pendingText = "";
+        emit(opening);
+      };
       try {
         while (true) {
           const { done, value } = await reader.read();
@@ -698,11 +755,20 @@ function convertAnthropicStreamToOpenAI(anthropicStream: ReadableStream<Uint8Arr
               const event = JSON.parse(json);
 
               if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
-                const openAIChunk = JSON.stringify({
-                  choices: [{ delta: { role: "assistant", content: event.delta.text } }],
-                });
-                controller.enqueue(encoder.encode(`data: ${openAIChunk}\n\n`));
+                const text: string = event.delta.text ?? "";
+                if (firstTextDeltaSent) {
+                  emit(text);
+                } else if (expectedAgent !== "sam") {
+                  firstTextDeltaSent = true;
+                  emit(text);
+                } else {
+                  // Buffer just enough of the opening to see whether the model
+                  // emitted its own [Agent: ...] marker before injecting ours.
+                  pendingText += text;
+                  if (pendingText.length >= 32 || pendingText.includes("\n")) flushPending();
+                }
               } else if (event.type === "message_stop") {
+                flushPending();
                 controller.enqueue(encoder.encode("data: [DONE]\n\n"));
               }
             } catch {
@@ -710,6 +776,7 @@ function convertAnthropicStreamToOpenAI(anthropicStream: ReadableStream<Uint8Arr
             }
           }
         }
+        flushPending();
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       } catch (err) {
@@ -774,6 +841,8 @@ Deno.serve(async (req) => {
     const vehicleContextStr = buildVehicleContext(vehicleContext);
     const systemContent = SYSTEM_PROMPT + vehicleContextStr;
     const anthropicMessages = buildAnthropicMessages(messages);
+    // Sam-continuity, known before any tool call is made.
+    const continuityAgent = detectExpectedAgent(messages);
 
     // ── Turn 1: Non-streaming request (may produce tool calls) ──
     const turn1Controller = new AbortController();
@@ -821,7 +890,7 @@ Deno.serve(async (req) => {
           { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
         );
       }
-      return new Response(convertAnthropicStreamToOpenAI(fallbackResp.body), {
+      return new Response(convertAnthropicStreamToOpenAI(fallbackResp.body, continuityAgent), {
         headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
       });
     }
@@ -859,8 +928,9 @@ Deno.serve(async (req) => {
     const textBlocks = contentBlocks.filter((b: { type: string }) => b.type === "text");
 
     if (toolUseBlocks.length === 0) {
-      const content = textBlocks.map((b: { text: string }) => b.text).join("") ||
+      const rawContent = textBlocks.map((b: { text: string }) => b.text).join("") ||
         "I'm sorry, I couldn't generate a response. Please try again.";
+      const content = applyAgentMarker(rawContent, continuityAgent);
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         start(controller) {
@@ -877,7 +947,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log("Tool calls:", JSON.stringify(toolUseBlocks.map((tc: { name: string }) => tc.name)));
+    const toolNames = toolUseBlocks.map((tc: { name: string }) => tc.name);
+    console.log("Tool calls:", JSON.stringify(toolNames));
+    const expectedAgent = detectExpectedAgent(messages, toolNames);
 
     const toolResults = await Promise.all(
       toolUseBlocks.map(async (tc: { id: string; name: string; input: Record<string, unknown> }) => {
@@ -921,7 +993,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    return new Response(convertAnthropicStreamToOpenAI(turn2Resp.body), {
+    return new Response(convertAnthropicStreamToOpenAI(turn2Resp.body, expectedAgent), {
       headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
