@@ -841,6 +841,8 @@ Deno.serve(async (req) => {
     const vehicleContextStr = buildVehicleContext(vehicleContext);
     const systemContent = SYSTEM_PROMPT + vehicleContextStr;
     const anthropicMessages = buildAnthropicMessages(messages);
+    // Sam-continuity, known before any tool call is made.
+    const continuityAgent = detectExpectedAgent(messages);
 
     // ── Turn 1: Non-streaming request (may produce tool calls) ──
     const turn1Controller = new AbortController();
