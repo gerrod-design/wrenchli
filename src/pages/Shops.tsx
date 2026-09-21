@@ -84,18 +84,12 @@ export default function Shops() {
               Grow Your Shop with Wrenchli
             </h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-accent-foreground/80 leading-relaxed md:text-xl">
-              Pre-qualified leads. Free tools. No upfront fees. Join 300+
-              shops already winning with Wrenchli.
+              Pre-qualified leads. Free tools. No upfront fees.
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg"
-            >
-              <Link to="/for-shops">
-                Apply Now <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+            <p className="mt-8 mx-auto max-w-2xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
+              Shop partner program currently paused — Wrenchli is not
+              onboarding repair shops at this time.
+            </p>
           </SectionReveal>
         </div>
       </section>
@@ -104,7 +98,6 @@ export default function Shops() {
       <section className="bg-wrenchli-trust-blue text-accent-foreground py-16 md:py-20">
         <div className="container-wrenchli">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <StatCounter end={300} suffix="+" label="Partner Shops" />
             <StatCounter end={78} suffix="%" label="Lead Close Rate" />
             <StatCounter end={35} suffix="%" label="Avg Ticket Increase" />
           </div>
