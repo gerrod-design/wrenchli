@@ -146,11 +146,15 @@ const sharedScreens = [
             <div className="flex items-center gap-1.5 mb-1">
               <div className="rounded bg-wrenchli-teal/10 px-1.5 py-0.5 text-[7px] text-wrenchli-teal">▶ Watch Tutorial</div>
               <div className="rounded bg-wrenchli-teal/10 px-1.5 py-0.5 text-[7px] text-wrenchli-teal">🛒 Order Parts</div>
+              <span className="rounded bg-muted px-1.5 py-0.5 text-[7px] font-medium text-muted-foreground">Preview</span>
             </div>
           </div>
           <div className="rounded-lg border-2 border-accent bg-accent/5 p-2.5">
             <p className="text-[9px] font-bold text-accent mb-1">👨‍🔧 Get It Fixed Professionally</p>
-            <div className="rounded bg-accent/10 px-1.5 py-0.5 text-[7px] text-accent w-fit">Get Shop Quotes</div>
+            <div className="flex items-center gap-1.5">
+              <div className="rounded bg-accent/10 px-1.5 py-0.5 text-[7px] text-accent w-fit">Get Shop Quotes</div>
+              <span className="rounded bg-muted px-1.5 py-0.5 text-[7px] font-medium text-muted-foreground">Preview</span>
+            </div>
           </div>
         </div>
       </div>
@@ -212,7 +216,8 @@ const diyScreens = [
             <p className="text-[7px] text-wrenchli-teal mt-0.5">💡 Pro Tip: Auto parts stores offer free loaner tools</p>
           </div>
           <div className="rounded bg-accent px-2 py-1.5 text-center text-[8px] font-bold text-accent-foreground">
-            🛒 Add to Cart — $61.48
+            🛒 Add to Cart — $61.48{" "}
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[7px] font-medium text-muted-foreground">Preview</span>
           </div>
         </div>
       </div>
@@ -283,6 +288,7 @@ const shopScreens = [
       <div className="flex h-full flex-col bg-background">
         <div className="flex items-center gap-2 bg-primary px-3 py-2">
           <span className="text-[10px] font-bold text-primary-foreground">Shop Quotes</span>
+          <span className="rounded bg-muted px-1.5 py-0.5 text-[7px] font-medium text-muted-foreground">Preview</span>
         </div>
         <div className="flex-1 px-3 py-3 space-y-2">
           {[
@@ -336,7 +342,8 @@ const shopScreens = [
             <p className="text-[7px] text-muted-foreground italic">"Great brake work, fair price, done same day." ★★★★★</p>
           </div>
           <div className="rounded bg-accent px-2 py-1.5 text-center text-[8px] font-bold text-accent-foreground">
-            Finance This Repair
+            Finance This Repair{" "}
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[7px] font-medium text-muted-foreground">Preview</span>
           </div>
         </div>
       </div>
@@ -681,7 +688,9 @@ export default function PhoneMockup({
                 >
                   <p className={cn(isMobile ? "text-lg mb-1" : "text-2xl mb-2")}>👨‍🔧</p>
                   <p className={cn("font-bold text-white", isMobile ? "text-[10px] mb-0.5" : "text-sm mb-1")}>WATCH THE SHOP PATH</p>
-                  <p className={cn("text-white/80 leading-snug", isMobile ? "text-[8px]" : "text-xs")}>Get quotes from trusted local shops with financing</p>
+                  <p className={cn("text-white/80 leading-snug", isMobile ? "text-[8px]" : "text-xs")}>Get quotes from trusted local shops with financing{" "}
+                    <span className="rounded bg-muted px-1.5 py-0.5 text-[7px] font-medium text-muted-foreground">Preview</span>
+                  </p>
                   <p className={cn("text-white/50 mt-1", isMobile ? "text-[7px]" : "text-[10px]")}>~35 seconds</p>
                 </button>
               </div>

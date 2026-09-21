@@ -70,10 +70,10 @@ function CarOwnersWalkthrough() {
       <div className="container-wrenchli">
         <SectionReveal>
           <p className="text-center text-xs font-semibold uppercase tracking-[3px] text-muted-foreground">
-            See How It Works
+            Concept Walkthrough
           </p>
           <h2 className="mt-2 text-center font-heading text-2xl font-bold text-foreground md:text-4xl">
-            Watch a real assessment from start to finish.
+            See how it works.
           </h2>
         </SectionReveal>
 
@@ -105,8 +105,8 @@ function CarOwnersWalkthrough() {
 
         <p className="mt-3 text-center text-xs text-muted-foreground">
           {activeTab === "diy"
-            ? "See the full DIY experience — assess, learn, order parts, and fix it yourself."
-            : "See the full shop experience — assess, compare quotes, finance, and book."}
+            ? "The assessment and DIY steps are live. Parts ordering shown here is a preview."
+            : "The assessment is live. Shop quotes, booking, and financing are on our roadmap."}
         </p>
 
         <div className="mt-6 mx-auto max-w-[800px]">
