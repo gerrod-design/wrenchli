@@ -46,6 +46,7 @@ const navItems: NavItem[] = [
       { label: "💬 Recommend a Shop", to: "__recommend__" },
     ],
   },
+  { label: "Detroit Spotlight", to: "/shops" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
