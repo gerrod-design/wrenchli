@@ -928,8 +928,9 @@ Deno.serve(async (req) => {
     const textBlocks = contentBlocks.filter((b: { type: string }) => b.type === "text");
 
     if (toolUseBlocks.length === 0) {
-      const content = textBlocks.map((b: { text: string }) => b.text).join("") ||
+      const rawContent = textBlocks.map((b: { text: string }) => b.text).join("") ||
         "I'm sorry, I couldn't generate a response. Please try again.";
+      const content = applyAgentMarker(rawContent, continuityAgent);
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         start(controller) {
