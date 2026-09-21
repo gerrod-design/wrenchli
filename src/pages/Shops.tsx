@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import SectionReveal from "@/components/SectionReveal";
-import StatCounter from "@/components/StatCounter";
 import WaitlistForm from "@/components/WaitlistForm";
 
 const valueProps = [
@@ -39,7 +38,11 @@ const valueProps = [
 ];
 
 const steps = [
-  { num: "1", title: "Apply to Join", desc: "Fill out a quick form. We verify your shop and credentials." },
+  {
+    num: "1",
+    title: "Program Paused",
+    desc: "Wrenchli is not onboarding repair shops right now. The steps below describe how the program would work when it is open.",
+  },
   { num: "2", title: "Set Up Your Profile", desc: "Add services, pricing, photos, and availability." },
   { num: "3", title: "Receive Leads", desc: "Pre-qualified customers in your area request quotes." },
   { num: "4", title: "Win the Job", desc: "Compete on price, reviews, and availability — not ad spend." },
@@ -52,7 +55,7 @@ export default function Shops() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="For Repair Shops — Wrenchli"
-        description="Grow your auto repair shop with pre-qualified leads, free digital tools, and no upfront fees. Join the Wrenchli network today."
+        description="Wrenchli's shop partner program is currently paused — no repair shops are being onboarded at this time. When open, the program offers pre-qualified leads, free digital tools, and no upfront fees."
         path="/shops"
       />
 
@@ -71,16 +74,6 @@ export default function Shops() {
               onboarding repair shops at this time.
             </p>
           </SectionReveal>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="bg-wrenchli-trust-blue text-accent-foreground py-16 md:py-20">
-        <div className="container-wrenchli">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <StatCounter end={78} suffix="%" label="Lead Close Rate" />
-            <StatCounter end={35} suffix="%" label="Avg Ticket Increase" />
-          </div>
         </div>
       </section>
 
@@ -196,8 +189,7 @@ export default function Shops() {
               Ready to Grow Your Shop?
             </h2>
             <p className="mt-4 text-lg text-accent-foreground/70">
-              Join the Wrenchli network and start receiving pre-qualified
-              customers today.
+              Wrenchli is focused on the free driver assessment right now.
             </p>
             <p className="mt-8 mx-auto max-w-xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
               Shop partner program currently paused — Wrenchli is not
