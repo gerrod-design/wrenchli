@@ -46,7 +46,7 @@ const steps = [
   { num: "2", title: "Set Up Your Profile", desc: "Add services, pricing, photos, and availability." },
   { num: "3", title: "Receive Leads", desc: "Pre-qualified customers in your area request quotes." },
   { num: "4", title: "Win the Job", desc: "Compete on price, reviews, and availability — not ad spend." },
-  { num: "5", title: "Get Paid", desc: "We handle financing for customers who need it. You get paid in full." },
+  { num: "5", title: "Get Paid", desc: "Financing isn't available yet — it's coming soon." },
 ];
 
 
