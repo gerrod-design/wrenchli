@@ -947,7 +947,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log("Tool calls:", JSON.stringify(toolUseBlocks.map((tc: { name: string }) => tc.name)));
+    const toolNames = toolUseBlocks.map((tc: { name: string }) => tc.name);
+    console.log("Tool calls:", JSON.stringify(toolNames));
+    const expectedAgent = detectExpectedAgent(messages, toolNames);
 
     const toolResults = await Promise.all(
       toolUseBlocks.map(async (tc: { id: string; name: string; input: Record<string, unknown> }) => {
