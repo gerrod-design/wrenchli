@@ -106,7 +106,8 @@ export default function ForShops() {
               {terms.map((term) => (
                 <li key={term} className="flex gap-3 items-start">
                   <span
-                    aria-hidden className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-accent"
+                    aria-hidden
+                    className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-accent"
                   />
                   <p className="leading-relaxed">{term}</p>
                 </li>
