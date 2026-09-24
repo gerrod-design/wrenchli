@@ -125,16 +125,61 @@ export default function FindShops() {
         availability: p.availability as Shop["availability"],
       }));
 
-      setShops(providers);
+      // Merge in hand-verified Detroit Spotlight shops. They live in a
+      // separate table that the find-shops function doesn't read, so a ZIP
+      // search would otherwise never surface them.
+      let merged: Shop[] = providers;
+      try {
+        const city = (data.city || "").trim();
+        if (city) {
+          const { data: spotlightRows } = await supabase
+            .from("spotlight_shops")
+            .select("id,name,address_line1,city,state,zip,phone,google_rating,google_review_count,specialties,website_url")
+            .ilike("city", city);
+          const want = serviceType === "general" ? null : serviceType.replace(/_/g, " ");
+          const spotlightShops: Shop[] = (spotlightRows || [])
+            .filter(
+              (s: any) =>
+                want === null ||
+                (s.specialties || []).some((sp: string) => sp.toLowerCase().includes(want)),
+            )
+            .map((s: any) => ({
+              id: `spotlight-${s.id}`,
+              name: s.name,
+              rating: s.google_rating ?? null,
+              review_count: s.google_review_count ?? 0,
+              address: [s.address_line1, s.city, s.state, s.zip].filter(Boolean).join(", "),
+              phone: s.phone ?? "",
+              distance_miles: null,
+              specialties: s.specialties ?? [],
+              price_tier: "mid" as Shop["price_tier"],
+              response_time: "",
+              availability: "within_week" as Shop["availability"],
+              wrenchli_verified: true,
+              quote_url: s.website_url ?? "",
+              is_partnered: false,
+            }));
+          const seen = new Set(merged.map((p) => p.name.trim().toLowerCase()));
+          const fresh = spotlightShops.filter((s) => !seen.has(s.name.trim().toLowerCase()));
+          merged = [...fresh, ...merged].sort((a, b) => {
+            if (!!a.wrenchli_verified !== !!b.wrenchli_verified) return a.wrenchli_verified ? -1 : 1;
+            return (b.rating || 0) - (a.rating || 0);
+          });
+        }
+      } catch (e) {
+        console.error("Spotlight merge error:", e);
+      }
+
+      setShops(merged);
       if (data.center) setMapCenter(data.center);
       setExpandedRadius(data.expanded_radius_miles || 0);
       setResolvedCity(data.city || "");
-      if (providers.length === 0) {
+      if (merged.length === 0) {
         toast.info(`No partner shops yet near ${zip}. Join the waitlist to be notified.`);
       } else if (data.expanded_radius_miles) {
-        toast.success(`Showing ${providers.length} shops within ${data.expanded_radius_miles} miles of ${zip}`);
+        toast.success(`Showing ${merged.length} shops within ${data.expanded_radius_miles} miles of ${zip}`);
       } else {
-        toast.success(`Found ${providers.length} shops near ${zip} (${data.city || "Metro Area"})`);
+        toast.success(`Found ${merged.length} shops near ${zip} (${data.city || "Metro Area"})`);
       }
     } catch (error) {
       console.error("Search error:", error);

@@ -84,9 +84,8 @@ export default function ShopMap({ shops, center, selectedShop, onShopClick }: Sh
           <p style="margin:0 0 4px;font-size:12px;color:#64748b">${shop.address}</p>
           <div style="display:flex;align-items:center;gap:4px;font-size:12px">
             <span style="color:#f59e0b">★</span>
-            <span>${shop.rating.toFixed(1)}</span>
-            <span style="color:#94a3b8">•</span>
-            <span style="color:#64748b">${shop.distance_miles.toFixed(1)} mi</span>
+            <span>${shop.rating != null ? shop.rating.toFixed(1) : "—"}</span>
+            ${shop.distance_miles != null ? `<span style="color:#94a3b8">•</span><span style="color:#64748b">${shop.distance_miles.toFixed(1)} mi</span>` : ""}
           </div>
         </div>
       `);

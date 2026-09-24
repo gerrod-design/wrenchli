@@ -7,11 +7,11 @@ import { toast } from "sonner";
 export interface Shop {
   id: string;
   name: string;
-  rating: number;
+  rating: number | null;
   review_count: number;
   address: string;
   phone: string;
-  distance_miles: number;
+  distance_miles: number | null;
   specialties: string[];
   price_tier: "budget" | "mid" | "premium";
   response_time: string;
@@ -154,15 +154,23 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
           <div className="flex items-center gap-2 text-sm">
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="font-medium">{shop.rating.toFixed(1)}</span>
-              <span className="text-muted-foreground">({shop.review_count.toLocaleString()})</span>
+              {shop.rating != null ? (
+                <>
+                  <span className="font-medium">{shop.rating.toFixed(1)}</span>
+                  <span className="text-muted-foreground">({shop.review_count.toLocaleString()})</span>
+                </>
+              ) : (
+                <span className="text-muted-foreground">No ratings yet</span>
+              )}
             </div>
             <span className="text-muted-foreground">•</span>
             <span className="text-accent font-medium">{priceTierLabels[shop.price_tier]}</span>
           </div>
         </div>
         <div className="text-right flex-shrink-0">
-          <div className="text-sm font-medium text-card-foreground">{shop.distance_miles.toFixed(1)} mi</div>
+          {shop.distance_miles != null && (
+            <div className="text-sm font-medium text-card-foreground">{shop.distance_miles.toFixed(1)} mi</div>
+          )}
           <div className="text-xs text-muted-foreground">{availabilityLabels[shop.availability]}</div>
         </div>
       </div>
