@@ -30,33 +30,33 @@ const prerenderRoutes: {
   },
   {
     path: "/for-shops",
-    title: "Free Pilot Program for Independent Repair Shops | Wrenchli",
+    title: "Free Referral Pilot for Independent Detroit Shops | Wrenchli",
     description:
-      "Get pre-assessed leads with symptom details, likely causes, and fair cost ranges before customers walk in. Free 90-day pilot, no fees, no commission.",
+      "Free 90-day referral pilot for independent Detroit auto repair shops. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range.",
     content: `
-      <h1>Customers Arrive Pre-Assessed</h1>
-      <p>Vehicle details, likely causes, and a fair cost range — before they walk in. Free 90-day pilot for independent shops.</p>
-      <h2>What happens when a customer chooses your shop</h2>
+      <h1>Free Referral Pilot for Independent Detroit Shops</h1>
+      <h2>Customers arrive pre-assessed</h2>
+      <p>Vehicle details, symptom description, likely causes, and a fair cost range — before they walk in. Free 90-day pilot for independent shops.</p>
+      <h2>How it works</h2>
       <ol>
-        <li><strong>Customer describes their symptoms</strong> — A vehicle owner in Metro Detroit describes their car problem on Wrenchli.</li>
-        <li><strong>Your shop appears in their results</strong> — If your shop is in our partner network and near their location, your shop appears with your Verified Score.</li>
-        <li><strong>You receive an alert</strong> — You get a notification with the customer's vehicle details, symptoms, top 3 likely causes, and a fair cost range.</li>
-        <li><strong>The customer arrives prepared</strong> — No 20-minute intake conversation. No sticker shock. You can focus on the repair.</li>
-        <li><strong>Confirm the outcome</strong> — This updates your Verified Score and increases how often Wrenchli recommends your shop.</li>
+        <li><strong>Customer describes their symptoms</strong> — A driver in Metro Detroit describes their car problem on Wrenchli and gets a free symptom assessment.</li>
+        <li><strong>We refer them to your shop</strong> — Partner shops receive the referral with the vehicle details, symptom description, likely causes, and a fair cost range attached.</li>
+        <li><strong>The customer arrives prepared</strong> — No 20-minute intake conversation decoding "it makes a noise." Your advisor starts halfway done.</li>
+        <li><strong>You confirm the outcome</strong> — A 2-minute report: what you found, what was done, what it cost. This is the price of admission — and it's what makes every referral smarter.</li>
       </ol>
-      <a href="/pilot">Join the Free Pilot</a>
-      <h2>Your Verified Score is yours to earn</h2>
-      <p>Your Verified Score is calculated from three things: how often our assessment matched what you actually found, how your pricing compares to the local market average, and ratings from customers who visited through Wrenchli.</p>
-      <p>We require a minimum of 5 confirmed outcomes before displaying a score publicly.</p>
-      <h2>No surprises after 90 days</h2>
-      <p>When your 90-day pilot ends, nothing happens automatically. We schedule a call to review your results. There is no auto-billing, no contract renewal, and no pressure.</p>
-      <p>If you decide to leave at any time: your shop listing is removed within 48 hours. No customer data is retained under your shop profile after you leave.</p>
-      <h2>Founding partner shops in Metro Detroit</h2>
-      <p><strong>Curt's Service</strong> — Oak Park, MI — Founding pilot partner, Tekmetric user</p>
-      <p><strong>McInerney Auto Center</strong> — Troy, MI (multiple locations) — Founding pilot partner, Tekmetric user</p>
-      <p>Founding partner spots are limited to the first 50 shops in Michigan and Ohio. Founding partners receive priority placement in consumer results during the pilot period.</p>
+      <h2>Pilot terms</h2>
+      <ul>
+        <li>90 days. Free referrals. No exclusivity, no volume commitments.</li>
+        <li>Outcome report within 7 days for each referral you accept.</li>
+        <li>Either party can end participation at any time.</li>
+      </ul>
+      <h2>After 90 days</h2>
+      <p>Nothing happens automatically. No auto-billing, no contract renewal. We schedule a call to review your results — and pilot shops get founding terms on paid partner tiers before public pricing.</p>
+      <a href="/contact">Join the free pilot</a>
+      <p><em>Wrenchli never charges consumers. The assessment is always free.</em></p>
     `,
   },
+
   {
     path: "/for-dealers",
     title: "Wrenchli for Auto Dealers | Free Service Department Partner Program — Michigan & Ohio",
