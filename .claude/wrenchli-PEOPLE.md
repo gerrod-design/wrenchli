@@ -472,6 +472,10 @@ When an agent's function is no longer needed, or when the agent is replaced by a
 4. The agent roster is updated
 5. INSTALLED_SKILLS.md change log entry records the retirement
 
+### Emergency Suspension (Kill Switch)
+
+Retirement is a planned process. Suspension is immediate. If an agent exhibits any rogue-behavior tripwire — unapproved external contact, production modification attempts, credential/data access outside its charter, veto circumvention, self-modification attempts, deceptive outputs, successful prompt injection, or coordinated control bypass — the founder, Rhett Holloway, or Sloane Ashford suspends it at once: halt all work, pause scheduled runs, quarantine recent outputs. Rhett documents; Sloane determines compromise vs. malfunction vs. drift; the founder decides remediate/reactivate, retire, or rebuild. No silent reactivations — every suspension is logged and briefed. Full protocol: `wrenchli-INITIATIVE.md` Part 3.
+
 ### Agent Quality and Accuracy Accountability
 
 Agent outputs are not automatically correct. They are governed by wrenchli-ACCURACY.md (Imani Whitfield) and the domain skill files. When an agent produces an output that turns out to be incorrect or that creates a problem:
