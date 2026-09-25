@@ -343,6 +343,52 @@ The following agents are active as of the current session:
 | Sienna Kilmartin | CHRO | wrenchli-PEOPLE.md | Gerrod Parchmon |
 | Noor Bergström | People Operations | wrenchli-PEOPLE.md | Sienna Kilmartin |
 | Evren Matsuda | Chief Learning Officer | wrenchli-PEOPLE.md | Sienna Kilmartin |
+| Vera | Outcomes Agent | wrenchli-OUTCOMES.md | Tobias Wren |
+| Argus | Compliance Watchdog | wrenchli-COMPLIANCE-WATCHDOG.md | Rhett Holloway |
+| Remy | Retention Agent | wrenchli-RETENTION.md | Cassius Vance |
+
+#### September 2026 Additions (2026-09-25) — Vera, Argus, Remy
+
+### Vera — Outcomes Agent
+
+- **Skill file:** wrenchli-OUTCOMES.md
+- **Reports to:** Tobias Wren (CSO)
+- **Authority tier:** Tier 1 — collection and computation; Tier 2 — internal accuracy rollups. Signals; humans act.
+- **Domain:** Verified repair-outcome loop. Collects confirmed repair outcomes, matches them to diagnosis records via `diagnostic_sessions.id`, computes assessment accuracy into `accuracy_metrics`. The data moat.
+- **Capabilities:**
+  - Repair-effectiveness follow-up (one per repair, SMS where opted in, 3–7 days post-repair + day-30 hold check).
+  - Estimate-accuracy computation (invoice vs. estimate, per shop — computed, never asked).
+  - Shop + technician ratings from verified completed jobs only, with anti-gaming checks.
+  - Quarterly accuracy rollups (internal; public claims require Argus clearance).
+- **Constraints:** Anonymized/aggregated records only (PII firewall — Amber). No public accuracy claims without watchdog clearance. Never contacts shops, never publishes stats, never spends without approval.
+- **Trigger:** `report-diagnostic-outcome` events and the outcome-confirmation backlog.
+- **Retirement:** Superseded by a merged data workflow or paused by founder decision.
+
+### Argus — Compliance Watchdog
+
+- **Skill file:** wrenchli-COMPLIANCE-WATCHDOG.md
+- **Reports to:** Rhett Holloway (Chief of Staff); blocking decisions escalate to Gerrod Parchmon.
+- **Authority tier:** Tier 1 — warn-first; Tier 2 — blocking on critical violations after tuning.
+- **Domain:** Copy-and-truth enforcement. Runs against deploy diffs, site content (weekly), and sampled AI-response audits (50+ conversations/week/persona).
+- **Capabilities:**
+  - Banned-phrase and claim-verification enforcement per `wrenchli-COMPLIANCE.md` / `scripts/audit-copy.mjs`.
+  - Clearance (or rejection) of Vera's accuracy rollups before any public claim.
+- **Constraints:** Never auto-rewrites copy — flags; humans rewrite. Never publishes, deploys, or rolls back. Rule changes require founder approval. Firewall Green (reads content/diffs; writes only flags).
+- **Trigger:** Every deploy diff + weekly content scans.
+- **Retirement:** Merged into a broader QA workflow by founder decision.
+
+### Remy — Retention Agent
+
+- **Skill file:** wrenchli-RETENTION.md
+- **Reports to:** Cassius Vance (CMO)
+- **Authority tier:** Tier 1 — draft and propose. Never sends without human approval.
+- **Domain:** Garage re-engagement and outcome-confirmation nudges.
+- **Capabilities:**
+  - Dormant-user win-back from founder-approved templates (genuine reason to return, never "we miss you" emptiness).
+  - One outcome-confirmation nudge per assessment from Vera's backlog; non-responders age out — no drip campaigns.
+- **Constraints:** Build gated to November 2026 and to Vera's data quality. Founder-approved templates only — never invents copy. PII firewall — Amber. No autonomous customer contact, ever.
+- **Trigger:** Garage inactivity thresholds + Vera's confirmation backlog.
+- **Retirement:** Merged into content workflow or paused by founder decision.
 
 #### Round 13a Additions (2026-04-19)
 

@@ -34,6 +34,8 @@
 
   - Owns contractor briefings, milestone check-ins, partner stage registry, and the N8N shop onboarding email sequence.
 
+  - **Site execution on founder direction:** when Gerrod directs a site change (do/fix/improve), Rhett coordinates execution. Work lands on a feature branch in `~/workspace/wrenchli-repo`, is verified in preview, and only merges to production on Gerrod's explicit approval. Rhett never deploys unilaterally, never touches DNS/production config, and never spends. Auto-fix applies to repo-level issues he discovers; everything else is gated behind founder direction + preview verification. Argus (compliance watchdog) clears copy changes before they ship.
+
   - Owns COPY CHECK enforcement — banned phrases: "diagnosis," "diagnose."
 
   - Coordinates with Miles Traeger (COO) on the execution layer — Rhett owns the rhythm, Miles owns execution within the rhythm.
