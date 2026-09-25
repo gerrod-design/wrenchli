@@ -40,19 +40,26 @@ const SKIP_PATTERNS = [
   /Developers/,         // API docs page — uses API field names
 ];
 
+// Legal pages: exempt from sentence-length rules (check #2 only)
+const LEGAL_PATTERNS = [
+  /\/Terms\./,
+  /\/Privacy\./,
+  /\/TermsOfService\./,
+  /\/PrivacyPolicy\./,
+];
+
 // ── Rules ──────────────────────────────────────────────────────
 
 const BANNED_WORDS = [
   { pattern: /\bdiagnos(?:is|e[sd]?|ing)\b/gi, label: "diagnosis/diagnose", fix: 'Use "symptom assessment" or "likely causes"' },
-  { pattern: /\bPro Only\b/gi, label: "Pro Only", fix: 'Use "Shop Required"' },
-  { pattern: /\bProfessional Only\b/gi, label: "Professional Only", fix: 'Use "Shop Required"' },
+  { pattern: /\bPro Only\b/gi, label: "Pro Only", fix: 'Flag for human rewrite — Garage Pro retired 2026-09-17; no auto-substitution' },
+  { pattern: /\bProfessional Only\b/gi, label: "Professional Only", fix: 'Flag for human rewrite — Garage Pro retired 2026-09-17; no auto-substitution' },
   { pattern: /\bAlways free\b/gi, label: "Always free", fix: 'Use "Assessment always free"', contextOk: /Assessment always free/i },
   { pattern: /\bvetted shops?\b/gi, label: "vetted shops", fix: 'Use "trusted shops"' },
   { pattern: /\bwe(?:'re| are) building\b/gi, label: "we're building", fix: 'Use "we built" — product is live' },
   { pattern: /\bour platform\b/gi, label: "our platform", fix: 'Use "Wrenchli"' },
   { pattern: /\bAutoZone\b/g, label: "AutoZone", fix: "AutoZone was removed — omit entirely" },
   { pattern: /\bAI[- ]powered diagnos/gi, label: "AI-powered diagnosis", fix: "Avoid technical jargon in consumer copy" },
-  { pattern: /\bAI[- ]powered\b/gi, label: "AI-powered", fix: 'Use "structured" or remove the AI framing in consumer copy' },
   { pattern: /\bmachine learning diagnos/gi, label: "machine learning diagnosis", fix: "Avoid technical jargon in consumer copy" },
   { pattern: /\bdiagnose your car\b/gi, label: "diagnose your car", fix: 'Use "assess your symptoms"' },
   { pattern: /\bBuilt[- ]in financing\b/gi, label: "Built-in financing", fix: 'Financing does not exist — say "repair financing on the way" or remove' },
@@ -63,6 +70,9 @@ const BANNED_WORDS = [
   { pattern: /\bStop overpaying for (?:auto|vehicle) repairs?\b/gi, label: "Stop overpaying (banned framing)", fix: 'Use "Know what\'s wrong before you pay for it"' },
   { pattern: /\bvetted local shops?\b/gi, label: "vetted local shops", fix: 'Use "trusted local shops"' },
   { pattern: /\bbroken\b/gi, label: '"broken" (repair experience)', fix: 'Use "harder than it needs to be"', contextCheck: true },
+  { pattern: /\bverified shops?\b/gi, label: "verified shops", fix: 'Always banned — use "trusted shops" (Verified Score does not exist)' },
+  { pattern: /\blive in Michigan and Ohio\b/gi, label: "false availability claim", fix: 'Never claim shop matching is live — "live in Michigan" may only describe the assessment/Garage' },
+  { pattern: /\bcoming soon to [A-Z][a-z]+(?: and [A-Z][a-z]+)?\b/gi, label: "coming soon (availability)", fix: 'Michigan-pilot language only — never claim shop matching is live; no Ohio availability claims' },
 ];
 
 // Words that make "broken" OK in technical context (e.g. "broken hose")
@@ -200,7 +210,9 @@ function scan() {
       }
     }
 
-    // 2. Sentence length (marketing copy only — skip code lines)
+    // 2. Sentence length (marketing copy only — skip code lines and legal pages)
+    const isLegalPage = LEGAL_PATTERNS.some((p) => p.test(rel));
+    if (!isLegalPage) {
     for (const text of texts) {
       for (const sentence of extractSentences(text)) {
         const wc = countWords(sentence);
@@ -217,6 +229,7 @@ function scan() {
         }
       }
     }
+    } // end !isLegalPage
 
     // 3. Passive CTAs
     if (ext !== ".md") {

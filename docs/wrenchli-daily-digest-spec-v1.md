@@ -175,7 +175,7 @@ Format per agent: **trigger criteria** → **bullet content** → **data source*
 ### V2 expansion contributors (3 added — total 9 of 12)
 
 **Tobias Wren (CSO)** — strategic / competitive intel
-- *Triggers:* (a) Theo Ashworth's competitor watchlist flags an event; (b) Ingrid Halvorsen's market signal aggregation crosses threshold; (c) significant external news in auto-repair / consumer-tech / regulatory space.
+- *Triggers:* (a) the strategy/sensing workflow's competitor watchlist flags an event; (b) its market signal aggregation crosses threshold; (c) significant external news in auto-repair / consumer-tech / regulatory space.
 - *Bullets:* competitor event summary, market signal, news with single-link citation.
 - *Data source:* external news monitoring (V2 — needs N8N workflow), competitor watchlist (V2).
 - *Status:* **V2** — needs market intel plumbing built.

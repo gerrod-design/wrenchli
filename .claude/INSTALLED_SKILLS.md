@@ -52,6 +52,8 @@ Current: claude-sonnet-4-6 (via ANTHROPIC_MODEL Supabase secret)
 
 ## Change Log
 
+- 2026-09-25: Agent consolidation — retired the five Round 13c strategy specialists (Ingrid Halvorsen, Rafael Moreau, Wells Kincaid, Theo Ashworth, Saskia Lindqvist) per the consolidation plan. Definitions archived to `.claude/ARCHIVED-strategy-specialists-2026-09-25.md` (names not to be reused before 2027-09-25); live-duty references in wrenchli-ACCURACY.md, wrenchli-COMMERCIAL.md, wrenchli-CONSUMER_ADVISORS.md, wrenchli-DECISIONS.md, and wrenchli-STRATEGY.md replaced with the consolidated strategy/sensing workflow owned by Tobias Wren. Praxis sketch docs (`Praxis_Discovery.md`, `Praxis_SENSING_Integration_Sketch.md`) moved to `.claude/ARCHIVED/` per kill list (TASKS.md retained). Copy-rulebook decisions applied: Michigan-only availability claims (no Ohio), "verified shops" always banned, "Pro Only" detector kept without auto-substitution, "AI-powered" ban narrowed to AI-powered diagnosis per COMPLIANCE.md, sentence-length rules scoped to marketing copy (legal pages exempt) in `scripts/audit-copy.mjs` and `.claude/wrenchli-COMPLIANCE.md`. Spec 09 corrected: Kai is ACTIVE as explainer-only in the live chat; financing products remain parked. Authorized by Gerrod Parchmon 2026-09-25.
+
 - 2026-04-14: Model upgraded from claude-sonnet-4-20250514 to claude-sonnet-4-6
 
 - 2026-04-18: Added wrenchli-STRATEGY.md and wrenchli-OPERATIONS.md

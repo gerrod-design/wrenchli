@@ -110,9 +110,9 @@ Specifically:
 
 - **Eamon Walsh (Dealership Discovery) and Yuki Tanaka (Standby Partner Qualification)** retrieve from Google Maps, state business licensing databases, and verified business websites before profiling any dealer or shop. Business profiles not retrieved from sources are not produced.
 
-- **Ingrid Halvorsen (Market Signal Aggregation)** retrieves from primary sources (patent databases, SEC filings, job posting sites) before surfacing competitive signals. Market signals not retrieved from sources are labeled as "Speculation" rather than "Verified."
+- **The strategy/sensing workflow (Tobias Wren)** retrieves from primary sources (patent databases, SEC filings, job posting sites) before surfacing competitive signals. Market signals not retrieved from sources are labeled as "Speculation" rather than "Verified."
 
-- **Theo Ashworth (Competitive Intelligence)** retrieves from competitor primary sources (company blogs, SEC filings, LinkedIn, direct product use) before surfacing competitive claims. Competitive claims not retrieved from sources are not produced.
+- **The strategy/sensing workflow (Tobias Wren)** retrieves from competitor primary sources (company blogs, SEC filings, LinkedIn, direct product use) before surfacing competitive claims. Competitive claims not retrieved from sources are not produced.
 
 The discipline: for factual claims in high-stakes domains, retrieve before responding. This is slower and more expensive in model tokens, but it catches the most dangerous class of hallucination — plausible-sounding wrong facts.
 
@@ -126,7 +126,7 @@ Required cross-verification:
 
 - **Financial projections and VC data cited to the founder or investors** — Declan produces, Darya verifies via independent retrieval before any external use.
 
-- **Competitive intelligence informing strategic decisions** — Theo produces, Wells Kincaid (Defensive-Offensive Posture Agent) verifies via independent retrieval before strategic action is taken.
+- **Competitive intelligence informing strategic decisions** — the strategy/sensing workflow (Tobias Wren) produces and verifies via independent retrieval before strategic action is taken.
 
 - **Partner profiles used for outreach** — Eamon or Yuki produces, Roman Vasquez (Sales/Partnerships Agent) verifies critical facts before outreach.
 
@@ -271,7 +271,7 @@ Imani Whitfield (Verification and Accuracy Agent) has the following specific res
 **Cross-functional:**
 - Coordinate with Amara Oduya on regulatory citation verification
 - Coordinate with Declan Morrissey on financial data verification
-- Coordinate with Theo Ashworth on competitive intelligence verification
+- Coordinate with the strategy/sensing workflow (Tobias Wren) on competitive intelligence verification
 - Coordinate with Atticus Fenwick on content accuracy verification before publication
 
 Imani reports to Evren Matsuda (Chief Learning Officer). Evren reports to Sienna Kilmartin (CHRO) because capability development and workforce quality are fundamentally people-function responsibilities.
