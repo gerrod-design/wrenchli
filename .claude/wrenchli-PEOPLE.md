@@ -328,24 +328,29 @@ Wrenchli operates an AI agent team alongside its human team. The agents execute 
 
 ### Current Agent Roster
 
-The following agents are active as of the current session:
+The following agents are chartered as of the current session. Status is honest by rule (see "No fake agents" in `agent-runtime-design-spec.md`): **RUNNING** = deployed software producing observable output; **CHARTERED** = named and governed, not yet deployed; **PARKED** = deliberately not scheduled for build.
 
-| Agent | Primary Function | Skill File Authority | Reports To |
-|---|---|---|---|
-| Tobias Wren | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon |
-| Sloane Ashford | Security | wrenchli-SECURITY.md | Gerrod Parchmon |
-| Amara Oduya | Regulatory | wrenchli-REGULATORY.md | Evelyn Marchetti |
-| Imani Whitfield | Accuracy | wrenchli-ACCURACY.md | Darya Nazari |
-| Evelyn Marchetti | General Counsel | wrenchli-LEGAL.md | Gerrod Parchmon |
-| Darya Nazari | CFO | wrenchli-FINANCE.md | Gerrod Parchmon |
-| Declan Morrissey | VC Intelligence | Reports to Darya Nazari | Darya Nazari |
-| Rhett Holloway | Chief of Staff | wrenchli-OPERATIONS.md | Gerrod Parchmon |
-| Sienna Kilmartin | CHRO | wrenchli-PEOPLE.md | Gerrod Parchmon |
-| Noor Bergström | People Operations | wrenchli-PEOPLE.md | Sienna Kilmartin |
-| Evren Matsuda | Chief Learning Officer | wrenchli-PEOPLE.md | Sienna Kilmartin |
-| Vera | Outcomes Agent | wrenchli-OUTCOMES.md | Tobias Wren |
-| Argus | Compliance Watchdog | wrenchli-COMPLIANCE-WATCHDOG.md | Rhett Holloway |
-| Remy | Retention Agent | wrenchli-RETENTION.md | Cassius Vance |
+| Agent | Primary Function | Skill File Authority | Reports To | Status |
+|---|---|---|---|---|
+| Mike | Customer advisor (chat) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Sam | Customer advisor (chat) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Jess | Customer advisor (chat) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Kai | Customer advisor (chat, explainer-only) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Priya | Customer advisor (chat) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Tobias Wren | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon | RUNNING (v1: weekly sensing worker) |
+| Sloane Ashford | Security | wrenchli-SECURITY.md | Gerrod Parchmon | CHARTERED |
+| Amara Oduya | Regulatory | wrenchli-REGULATORY.md | Evelyn Marchetti | CHARTERED |
+| Imani Whitfield | Accuracy | wrenchli-ACCURACY.md | Darya Nazari | CHARTERED |
+| Evelyn Marchetti | General Counsel | wrenchli-LEGAL.md | Gerrod Parchmon | CHARTERED |
+| Darya Nazari | CFO | wrenchli-FINANCE.md | Gerrod Parchmon | CHARTERED |
+| Declan Morrissey | VC Intelligence | Reports to Darya Nazari | Darya Nazari | PARKED |
+| Rhett Holloway | Chief of Staff | wrenchli-OPERATIONS.md | Gerrod Parchmon | RUNNING (v1: briefing workers) |
+| Sienna Kilmartin | CHRO | wrenchli-PEOPLE.md | Gerrod Parchmon | CHARTERED (dormant) |
+| Noor Bergström | People Operations | wrenchli-PEOPLE.md | Sienna Kilmartin | CHARTERED (dormant) |
+| Evren Matsuda | Chief Learning Officer | wrenchli-PEOPLE.md | Sienna Kilmartin | CHARTERED |
+| Vera | Outcomes Agent | wrenchli-OUTCOMES.md | Tobias Wren | CHARTERED (build first) |
+| Argus | Compliance Watchdog | wrenchli-COMPLIANCE-WATCHDOG.md | Rhett Holloway | CHARTERED (build second) |
+| Remy | Retention Agent | wrenchli-RETENTION.md | Cassius Vance | CHARTERED (build November) |
 
 #### September 2026 Additions (2026-09-25) — Vera, Argus, Remy
 
