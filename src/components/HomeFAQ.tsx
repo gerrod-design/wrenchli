@@ -46,9 +46,9 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "Does Wrenchli offer financing for repairs?",
-    a: "Yes. We partner with financing providers to offer flexible payment plans for vehicle repairs. All credit types are welcome, and you can see your estimated monthly payment before committing.",
+    a: "Not yet — we're building it now. Our financing page shows every way to pay for a repair, from paying in full to Michigan's upcoming Affordable Loan program, and you can join the list to be notified at launch. Our rule: we'll never show a loan above 24% APR.",
     richAnswer: (
-      <>Yes. We partner with financing providers to offer <Link to="/financing-options" className="text-primary underline hover:text-primary/80">flexible payment plans</Link> for vehicle repairs. All credit types are welcome, and you can see your estimated monthly payment before committing.</>
+      <>Not yet — we're building it now. See every <Link to="/financing-options" className="text-primary underline hover:text-primary/80">way to pay for a repair</Link>, from paying in full to Michigan's upcoming Affordable Loan program. Our rule: we'll never show a loan above 24% APR.</>
     ),
   },
   {
