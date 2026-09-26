@@ -32,11 +32,11 @@ const journeys = [
     title: "Repair Shop",
     subtitle: "Want more customers?",
     description:
-      "Our shop partner program is currently paused. When it reopens, the vision is simple: customers who arrive already knowing what's wrong.",
+      "Our free referral pilot is now enrolling Detroit shops. The vision is simple: customers who arrive already knowing what's wrong.",
     features: [
-      "Program currently paused",
-      "No onboarding at this time",
-      "Check back for updates",
+      "Free 90-day pilot — now enrolling",
+      "No exclusivity, no auto-billing",
+      "Outcome reporting required",
     ],
     primaryCta: { label: "Learn More", to: "/for-shops" },
     secondaryCta: { label: "Free Assessment", to: "/#quote" },
