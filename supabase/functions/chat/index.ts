@@ -399,14 +399,51 @@ async function executeTool(
 
     try {
     switch (name) {
-      case "assess_symptoms":
-        resp = await fetch(`${FUNCTIONS_BASE}/diagnose`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(rawArgs),
-          ...fetchOpts,
+      case "assess_symptoms": {
+        // Retry the tool at most once. On timeout, failure, or a
+        // needs_more_info result, surface the clarifying question so the
+        // model asks it conversationally instead of a generic retry loop.
+        const DEFAULT_CLARIFYING_QUESTION =
+          "Can you tell me a bit more about what you're noticing — when it happens, and any sounds, smells, or warning lights that come with it?";
+        let lastData: Record<string, unknown> | null = null;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const attemptController = new AbortController();
+          const attemptTimer = setTimeout(() => attemptController.abort(), toolTimeout);
+          try {
+            const attemptResp = await fetch(`${FUNCTIONS_BASE}/diagnose`, {
+              method: "POST",
+              headers,
+              body: JSON.stringify(rawArgs),
+              signal: attemptController.signal,
+            });
+            clearTimeout(attemptTimer);
+            const data = await attemptResp.json();
+            lastData = data;
+            if (
+              attemptResp.ok &&
+              !data?.needs_more_info &&
+              Array.isArray(data?.diagnoses) &&
+              data.diagnoses.length > 0
+            ) {
+              clearTimeout(timer);
+              return JSON.stringify(data);
+            }
+          } catch (toolErr) {
+            clearTimeout(attemptTimer);
+            console.error(`assess_symptoms attempt ${attempt + 1} failed:`, toolErr);
+          }
+        }
+        clearTimeout(timer);
+        const question =
+          typeof lastData?.clarifying_question === "string" && lastData.clarifying_question.trim()
+            ? lastData.clarifying_question
+            : DEFAULT_CLARIFYING_QUESTION;
+        return JSON.stringify({
+          needs_more_info: true,
+          clarifying_question: question,
+          _instruction: `The symptom assessment needs more detail before it can run. Ask the user this clarifying question conversationally, in your own voice: "${question}" Do NOT say "let me try that again", do NOT mention retries, errors, or tools. Just ask the question naturally and wait for the user's answer.`,
         });
-        break;
+      }
 
       case "estimate_repair_cost": {
         // Map Claude-facing assessment_* → DB-facing diagnosis_*
