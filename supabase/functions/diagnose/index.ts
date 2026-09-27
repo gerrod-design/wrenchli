@@ -71,14 +71,29 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     const DEFAULT_CLARIFYING_QUESTION =
       "Can you tell me a bit more about what you're noticing — when it happens, and any sounds, smells, or warning lights that come with it?";
 
-    // 25s internal timeout on the model call — return a graceful
-    // needs_more_info instead of hanging the request.
-    const modelController = new AbortController();
-    const modelTimer = setTimeout(() => modelController.abort(), 25000);
+    // Hard 25s cap on the model call. Two layers: an AbortController that
+    // cancels the underlying HTTP request, AND a Promise.race so the function
+    // responds at 25s even if the abort signal is ever ignored. Either way the
+    // caller gets a graceful needs_more_info, never a hang.
+    const gracefulTimeout = () =>
+      new Response(
+        JSON.stringify({
+          needs_more_info: true,
+          clarifying_question: DEFAULT_CLARIFYING_QUESTION,
+        }),
+        { status: 200, headers: { ...securityHeaders, "Content-Type": "application/json" } }
+      );
 
-    let response: Response;
+    const modelController = new AbortController();
+    let modelTimedOut = false;
+    const modelTimer = setTimeout(() => {
+      modelTimedOut = true;
+      modelController.abort();
+    }, 25000);
+
+    let response: Response | null = null;
     try {
-      response = await fetch(ANTHROPIC_API_URL, {
+      const fetchPromise = fetch(ANTHROPIC_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -149,18 +164,23 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
       }),
         signal: modelController.signal,
       });
-    } catch (fetchErr) {
-      clearTimeout(modelTimer);
-      console.error("diagnose model call timed out or failed:", fetchErr);
-      return new Response(
-        JSON.stringify({
-          needs_more_info: true,
-          clarifying_question: DEFAULT_CLARIFYING_QUESTION,
-        }),
-        { status: 200, headers: { ...securityHeaders, "Content-Type": "application/json" } }
+
+      // Race the fetch against a hard 25s deadline. If the fetch wins, use its
+      // response; if the deadline wins (or the abort fires), response stays null
+      // and we fall through to the graceful timeout below.
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), 25000)
       );
+      response = await Promise.race([fetchPromise, timeoutPromise]);
+    } catch (fetchErr) {
+      console.error("diagnose model call timed out or failed:", fetchErr);
+      response = null;
     }
     clearTimeout(modelTimer);
+
+    if (!response || modelTimedOut) {
+      return gracefulTimeout();
+    }
 
     if (!response.ok) {
       if (response.status === 429) {
@@ -183,13 +203,20 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
       );
     }
 
-    const data = await response.json();
-    const toolUse = data.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_diagnoses");
-    if (!toolUse) {
-      return new Response(
-        JSON.stringify({ error: "Unexpected AI response format" }),
-        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
-      );
+    // Model-output parsing is fully guarded: a truncated, empty, or
+    // unparseable model response is NEVER a 400/500 — it falls back to the
+    // graceful needs_more_info response with HTTP 200.
+    let toolUse: any = null;
+    try {
+      const data = await response.json();
+      toolUse = data?.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_diagnoses") ?? null;
+    } catch (parseErr) {
+      console.error("diagnose model output parse failed:", parseErr);
+      return gracefulTimeout();
+    }
+    if (!toolUse || !toolUse.input) {
+      console.error("diagnose model output missing tool_use block");
+      return gracefulTimeout();
     }
 
     const diagnoses = Array.isArray(toolUse.input?.diagnoses) ? toolUse.input.diagnoses : [];
