@@ -71,14 +71,29 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     const DEFAULT_CLARIFYING_QUESTION =
       "Can you tell me a bit more about what you're noticing — when it happens, and any sounds, smells, or warning lights that come with it?";
 
-    // 25s internal timeout on the model call — return a graceful
-    // needs_more_info instead of hanging the request.
-    const modelController = new AbortController();
-    const modelTimer = setTimeout(() => modelController.abort(), 25000);
+    // Hard 25s cap on the model call. Two layers: an AbortController that
+    // cancels the underlying HTTP request, AND a Promise.race so the function
+    // responds at 25s even if the abort signal is ever ignored. Either way the
+    // caller gets a graceful needs_more_info, never a hang.
+    const gracefulTimeout = () =>
+      new Response(
+        JSON.stringify({
+          needs_more_info: true,
+          clarifying_question: DEFAULT_CLARIFYING_QUESTION,
+        }),
+        { status: 200, headers: { ...securityHeaders, "Content-Type": "application/json" } }
+      );
 
-    let response: Response;
+    const modelController = new AbortController();
+    let modelTimedOut = false;
+    const modelTimer = setTimeout(() => {
+      modelTimedOut = true;
+      modelController.abort();
+    }, 25000);
+
+    let response: Response | null = null;
     try {
-      response = await fetch(ANTHROPIC_API_URL, {
+      const fetchPromise = fetch(ANTHROPIC_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
