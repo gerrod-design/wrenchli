@@ -147,7 +147,20 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
         ],
         tool_choice: { type: "tool", name: "provide_diagnoses" },
       }),
-    });
+        signal: modelController.signal,
+      });
+    } catch (fetchErr) {
+      clearTimeout(modelTimer);
+      console.error("diagnose model call timed out or failed:", fetchErr);
+      return new Response(
+        JSON.stringify({
+          needs_more_info: true,
+          clarifying_question: DEFAULT_CLARIFYING_QUESTION,
+        }),
+        { status: 200, headers: { ...securityHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    clearTimeout(modelTimer);
 
     if (!response.ok) {
       if (response.status === 429) {
