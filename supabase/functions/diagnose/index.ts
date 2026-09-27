@@ -50,11 +50,11 @@ serve(async (req) => {
       );
     }
 
-    const safeYear = (year || "").slice(0, 4);
-    const safeMake = (make || "").slice(0, 30);
-    const safeModel = (model || "").slice(0, 30);
-    const safeCodes = (codes || "").slice(0, 60);
-    const safeSymptom = (symptom || "").slice(0, 500);
+    const safeYear = String(year ?? "").slice(0, 4);
+    const safeMake = String(make ?? "").slice(0, 30);
+    const safeModel = String(model ?? "").slice(0, 30);
+    const safeCodes = String(codes ?? "").slice(0, 60);
+    const safeSymptom = String(symptom ?? "").slice(0, 500);
 
     const vehicleStr = [safeYear, safeMake, safeModel].filter(Boolean).join(" ");
 
