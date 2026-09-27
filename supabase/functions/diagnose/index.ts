@@ -203,13 +203,20 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
       );
     }
 
-    const data = await response.json();
-    const toolUse = data.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_diagnoses");
-    if (!toolUse) {
-      return new Response(
-        JSON.stringify({ error: "Unexpected AI response format" }),
-        { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } }
-      );
+    // Model-output parsing is fully guarded: a truncated, empty, or
+    // unparseable model response is NEVER a 400/500 — it falls back to the
+    // graceful needs_more_info response with HTTP 200.
+    let toolUse: any = null;
+    try {
+      const data = await response.json();
+      toolUse = data?.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_diagnoses") ?? null;
+    } catch (parseErr) {
+      console.error("diagnose model output parse failed:", parseErr);
+      return gracefulTimeout();
+    }
+    if (!toolUse || !toolUse.input) {
+      console.error("diagnose model output missing tool_use block");
+      return gracefulTimeout();
     }
 
     const diagnoses = Array.isArray(toolUse.input?.diagnoses) ? toolUse.input.diagnoses : [];
