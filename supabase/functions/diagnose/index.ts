@@ -164,18 +164,23 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
       }),
         signal: modelController.signal,
       });
-    } catch (fetchErr) {
-      clearTimeout(modelTimer);
-      console.error("diagnose model call timed out or failed:", fetchErr);
-      return new Response(
-        JSON.stringify({
-          needs_more_info: true,
-          clarifying_question: DEFAULT_CLARIFYING_QUESTION,
-        }),
-        { status: 200, headers: { ...securityHeaders, "Content-Type": "application/json" } }
+
+      // Race the fetch against a hard 25s deadline. If the fetch wins, use its
+      // response; if the deadline wins (or the abort fires), response stays null
+      // and we fall through to the graceful timeout below.
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), 25000)
       );
+      response = await Promise.race([fetchPromise, timeoutPromise]);
+    } catch (fetchErr) {
+      console.error("diagnose model call timed out or failed:", fetchErr);
+      response = null;
     }
     clearTimeout(modelTimer);
+
+    if (!response || modelTimedOut) {
+      return gracefulTimeout();
+    }
 
     if (!response.ok) {
       if (response.status === 429) {
