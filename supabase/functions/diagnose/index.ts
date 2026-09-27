@@ -68,7 +68,17 @@ serve(async (req) => {
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
-    const response = await fetch(ANTHROPIC_API_URL, {
+    const DEFAULT_CLARIFYING_QUESTION =
+      "Can you tell me a bit more about what you're noticing — when it happens, and any sounds, smells, or warning lights that come with it?";
+
+    // 25s internal timeout on the model call — return a graceful
+    // needs_more_info instead of hanging the request.
+    const modelController = new AbortController();
+    const modelTimer = setTimeout(() => modelController.abort(), 25000);
+
+    let response: Response;
+    try {
+      response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
