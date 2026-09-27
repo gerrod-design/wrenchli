@@ -193,6 +193,18 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
     }
 
     const diagnoses = Array.isArray(toolUse.input?.diagnoses) ? toolUse.input.diagnoses : [];
+
+    // Never return an empty diagnoses array — ask one clarifying question instead.
+    if (diagnoses.length === 0) {
+      return new Response(
+        JSON.stringify({
+          needs_more_info: true,
+          clarifying_question: DEFAULT_CLARIFYING_QUESTION,
+        }),
+        { status: 200, headers: { ...securityHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     for (const diagnosis of diagnoses) {
       const text = `${diagnosis.title ?? ""} ${(diagnosis.common_causes ?? []).join(" ")} ${diagnosis.whats_happening ?? ""}`;
       const safetyCritical = /\bbrak/i.test(text) || /\bsteer/i.test(text) || /\bair\s?bags?/i.test(text) || /\bfuel/i.test(text);
