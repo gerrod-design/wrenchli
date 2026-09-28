@@ -218,7 +218,7 @@ export default function ForShopsPreview() {
               Join the Pilot Program
             </h2>
             <p className="text-center text-sm mb-8" style={{ color: "#6B7280" }}>
-              Currently accepting shops in Michigan and Ohio. Free to join. No commitment. Cancel anytime.
+              Currently accepting shops in Michigan. Free to join. No commitment. Cancel anytime.
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">

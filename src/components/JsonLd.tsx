@@ -21,7 +21,6 @@ export function HomeJsonLd() {
       },
       areaServed: [
         { "@type": "State", name: "Michigan" },
-        { "@type": "State", name: "Ohio" },
       ],
     },
     {
@@ -52,7 +51,6 @@ export function HomeJsonLd() {
       },
       areaServed: [
         { "@type": "State", name: "Michigan" },
-        { "@type": "State", name: "Ohio" },
       ],
       offers: {
         "@type": "Offer",
