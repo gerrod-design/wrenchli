@@ -27,6 +27,9 @@ export interface SymptomData {
   // unknown fields today; these ride along so image-aware assessment can
   // consume them without a frontend change later.
   photo_urls?: string[];
+  // Signed video-clip URLs attached at intake (15s cap, consumer-coached).
+  // Same forward-compat contract as photo_urls.
+  video_urls?: string[];
 }
 
 export interface PossibleCause {

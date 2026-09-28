@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
-import { Loader2, ArrowRight, ArrowLeft, Camera, ImagePlus, X } from "lucide-react";
+import { Loader2, ArrowRight, ArrowLeft, Camera, ImagePlus, X, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { VehicleData, SymptomData, DiagnosisResult } from "../DiagnosticWizard";
 import { logFunnelEvent } from "@/lib/funnelTracking";
+import VideoCaptureModal, { MAX_VIDEO_SECONDS } from "./VideoCaptureModal";
 
 interface Props {
   vehicle: VehicleData;
@@ -59,7 +60,36 @@ interface PhotoItem {
   failed: boolean;
 }
 
+interface VideoItem {
+  id: string;
+  previewUrl: string;
+  uploadedUrl: string | null;
+  failed: boolean;
+}
+
 const MAX_PHOTOS = 5;
+const MAX_VIDEOS = 1;
+
+// Coaching: the 15 seconds only produce a usable clip if the consumer
+// knows what to point at. The tip adapts to what they've already told us.
+function buildVideoTip(
+  description: string,
+  whenItHappens: string[],
+  warningLights: string[],
+  location: string
+): string {
+  const text = `${description} ${whenItHappens.join(" ")}`.toLowerCase();
+  const hasLights = warningLights.length > 0 && !warningLights.includes("None");
+  if (hasLights)
+    return "Point the camera at your dashboard with the ignition on, so the warning lights stay clearly visible for the full clip.";
+  if (/(noise|sound|squeal|squeak|grind|rattle|knock|hum|whine|clunk|click|roar|hiss)/.test(text))
+    return "Record while you reproduce the sound — turn the wheel, press the brake, or rev gently, whichever triggers it.";
+  if (location === "Underneath the car" || /(leak|drip|puddle|fluid|oil|coolant)/.test(text))
+    return "Point at where the fluid meets the ground, then slowly tilt up to show where it's coming from.";
+  if (/(shake|vibrat|wobble)/.test(text))
+    return "Prop the phone where it can see the shaking part — steering wheel, mirror, or hood — and hold it steady.";
+  return "Point the camera at the problem area and hold the phone steady for the full clip.";
+}
 
 function chipStyle(selected: boolean): React.CSSProperties {
   return {
@@ -77,6 +107,9 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
   const [warningLights, setWarningLights] = useState<string[]>([]);
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [photoNote, setPhotoNote] = useState("");
+  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [videoNote, setVideoNote] = useState("");
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -147,11 +180,63 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
     });
   };
 
+  const uploadVideo = async (file: File): Promise<string | null> => {
+    const ext = file.name.split(".").pop() || "mp4";
+    // Same bucket as photos (avoids a storage migration); videos live under
+    // their own prefix so lifecycle rules can treat them separately later.
+    const path = `wizard-videos/${sessionId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("damage-photos")
+      .upload(path, file, { contentType: file.type });
+    if (upErr) {
+      console.error("Wizard video upload error:", upErr);
+      return null;
+    }
+    const { data, error: signErr } = await supabase.storage
+      .from("damage-photos")
+      .createSignedUrl(path, 3600 * 24 * 7);
+    if (signErr || !data?.signedUrl) {
+      console.error("Wizard video signed-URL error:", signErr);
+      return null;
+    }
+    return data.signedUrl;
+  };
+
+  const handleVideoCaptured = async (file: File) => {
+    const item: VideoItem = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      previewUrl: URL.createObjectURL(file),
+      uploadedUrl: null,
+      failed: false,
+    };
+    setVideos([item]);
+
+    // Upload in the background; the run continues with or without the clip.
+    const url = await uploadVideo(file);
+    setVideos((prev) =>
+      prev.map((v) => (v.id === item.id ? { ...v, uploadedUrl: url, failed: url === null } : v))
+    );
+    if (url === null) {
+      setVideoNote(
+        "The video couldn't attach just now — no problem, your description is enough to continue."
+      );
+    }
+  };
+
+  const removeVideo = (id: string) => {
+    setVideos((prev) => {
+      const target = prev.find((v) => v.id === id);
+      if (target) URL.revokeObjectURL(target.previewUrl);
+      return prev.filter((v) => v.id !== id);
+    });
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
 
     const uploadedUrls = photos.map((p) => p.uploadedUrl).filter((u): u is string => u !== null);
+    const uploadedVideoUrls = videos.map((v) => v.uploadedUrl).filter((u): u is string => u !== null);
 
     const symptomData: SymptomData = {
       primary_symptom: description.trim(),
@@ -161,8 +246,9 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
       warning_lights: warningLights.length ? warningLights : undefined,
       raw_description: description.trim(),
       // Forward-compatible: the assessment endpoint ignores unknown fields today;
-      // photo URLs ride along so image-aware assessment can consume them later.
+      // photo/video URLs ride along so media-aware assessment can consume them later.
       photo_urls: uploadedUrls.length ? uploadedUrls : undefined,
+      video_urls: uploadedVideoUrls.length ? uploadedVideoUrls : undefined,
     };
 
     // Instrumentation: which guided fields earned their place vs. were skipped.
@@ -171,6 +257,7 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
     if (whenItHappens.length) used.push("when");
     if (warningLights.length) used.push("lights");
     if (uploadedUrls.length) used.push(`photos${uploadedUrls.length}`);
+    if (uploadedVideoUrls.length) used.push(`video${uploadedVideoUrls.length}`);
     logFunnelEvent(sessionId, 2, `symptom_detail:${used.join("+") || "none"}`);
 
     try {
@@ -293,14 +380,14 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
         </div>
       </div>
 
-      {/* 3 — The car speaks: photos */}
+      {/* 3 — The car speaks: photos + video */}
       <div className="rounded-lg p-4 space-y-3" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
         <div>
           <p className="text-sm font-medium" style={{ color: "#F5F5F5" }}>
             Show us <span style={{ color: "#6B7280", fontWeight: 400 }}>(optional)</span>
           </p>
           <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
-            A photo is worth five minutes of typing — snap the warning light, the leak, the worn part. Your mechanic sees exactly what you see.
+            A photo is worth five minutes of typing — snap the warning light, the leak, the worn part. A 15-second video catches what photos can't: the noise, the shake, the light flickering on.
           </p>
         </div>
 
@@ -341,6 +428,43 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
             <ImagePlus className="h-4 w-4" /> Upload
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setShowVideoModal(true)}
+          disabled={videos.length >= MAX_VIDEOS}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium transition-opacity disabled:opacity-40"
+          style={{ background: "#0F1117", border: "1px solid #E07B3940", color: "#E07B39" }}
+        >
+          <Video className="h-4 w-4" /> Record a {MAX_VIDEO_SECONDS}-second video
+        </button>
+
+        {videos.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {videos.map((v) => (
+              <div key={v.id} className="relative">
+                <video
+                  src={v.previewUrl}
+                  muted
+                  playsInline
+                  className="h-16 w-24 rounded-lg object-cover"
+                  style={{ border: "1px solid #2A2D37", opacity: v.failed ? 0.45 : 1 }}
+                />
+                <button
+                  type="button"
+                  aria-label="Remove video"
+                  onClick={() => removeVideo(v.id)}
+                  className="absolute -top-1.5 -right-1.5 rounded-full p-0.5"
+                  style={{ background: "#0F1117", border: "1px solid #2A2D37", color: "#9CA3AF" }}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {videoNote && <p className="text-xs" style={{ color: "#F59E0B" }}>{videoNote}</p>}
 
         {photos.length > 0 && (
           <div className="flex flex-wrap gap-2">
@@ -421,6 +545,14 @@ export default function SymptomStep({ vehicle, sessionId, onNext, onVehicleInval
           )}
         </button>
       </div>
+
+      {showVideoModal && (
+        <VideoCaptureModal
+          tip={buildVideoTip(description, whenItHappens, warningLights, location)}
+          onClose={() => setShowVideoModal(false)}
+          onCaptured={handleVideoCaptured}
+        />
+      )}
     </div>
   );
 }
