@@ -23,6 +23,10 @@ export interface SymptomData {
   severity?: "minor" | "moderate" | "urgent" | "do_not_drive";
   warning_lights?: string[];
   raw_description?: string;
+  // Signed photo URLs attached at intake. The assessment endpoint ignores
+  // unknown fields today; these ride along so image-aware assessment can
+  // consume them without a frontend change later.
+  photo_urls?: string[];
 }
 
 export interface PossibleCause {
