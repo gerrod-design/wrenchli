@@ -328,21 +328,72 @@ Wrenchli operates an AI agent team alongside its human team. The agents execute 
 
 ### Current Agent Roster
 
-The following agents are active as of the current session:
+The following agents are chartered as of the current session. Status is honest by rule (see "No fake agents" in `agent-runtime-design-spec.md`): **RUNNING** = deployed software producing observable output; **CHARTERED** = named and governed, not yet deployed; **PARKED** = deliberately not scheduled for build.
 
-| Agent | Primary Function | Skill File Authority | Reports To |
-|---|---|---|---|
-| Tobias Wren | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon |
-| Sloane Ashford | Security | wrenchli-SECURITY.md | Gerrod Parchmon |
-| Amara Oduya | Regulatory | wrenchli-REGULATORY.md | Evelyn Marchetti |
-| Imani Whitfield | Accuracy | wrenchli-ACCURACY.md | Darya Nazari |
-| Evelyn Marchetti | General Counsel | wrenchli-LEGAL.md | Gerrod Parchmon |
-| Darya Nazari | CFO | wrenchli-FINANCE.md | Gerrod Parchmon |
-| Declan Morrissey | VC Intelligence | Reports to Darya Nazari | Darya Nazari |
-| Rhett Holloway | Chief of Staff | wrenchli-OPERATIONS.md | Gerrod Parchmon |
-| Sienna Kilmartin | CHRO | wrenchli-PEOPLE.md | Gerrod Parchmon |
-| Noor Bergström | People Operations | wrenchli-PEOPLE.md | Sienna Kilmartin |
-| Evren Matsuda | Chief Learning Officer | wrenchli-PEOPLE.md | Sienna Kilmartin |
+| Agent | Primary Function | Skill File Authority | Reports To | Status |
+|---|---|---|---|---|
+| Mike | Customer advisor (chat) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Sam | Customer advisor (chat) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Jess | Customer advisor (chat) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Kai | Customer advisor (chat, explainer-only) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Priya | Customer advisor (chat) | wrenchli-CONSUMER_ADVISORS.md | — | RUNNING |
+| Tobias Wren | Strategy | wrenchli-STRATEGY.md | Gerrod Parchmon | RUNNING (v1: weekly sensing worker) |
+| Sloane Ashford | Security | wrenchli-SECURITY.md | Gerrod Parchmon | CHARTERED |
+| Amara Oduya | Regulatory | wrenchli-REGULATORY.md | Evelyn Marchetti | CHARTERED |
+| Imani Whitfield | Accuracy | wrenchli-ACCURACY.md | Darya Nazari | CHARTERED |
+| Evelyn Marchetti | General Counsel | wrenchli-LEGAL.md | Gerrod Parchmon | CHARTERED |
+| Darya Nazari | CFO | wrenchli-FINANCE.md | Gerrod Parchmon | CHARTERED |
+| Declan Morrissey | VC Intelligence | Reports to Darya Nazari | Darya Nazari | PARKED |
+| Rhett Holloway | Chief of Staff | wrenchli-OPERATIONS.md | Gerrod Parchmon | RUNNING (v1: briefing workers) |
+| Sienna Kilmartin | CHRO | wrenchli-PEOPLE.md | Gerrod Parchmon | CHARTERED (dormant) |
+| Noor Bergström | People Operations | wrenchli-PEOPLE.md | Sienna Kilmartin | CHARTERED (dormant) |
+| Evren Matsuda | Chief Learning Officer | wrenchli-PEOPLE.md | Sienna Kilmartin | CHARTERED |
+| Vera | Outcomes Agent | wrenchli-OUTCOMES.md | Tobias Wren | CHARTERED (build first) |
+| Argus | Compliance Watchdog | wrenchli-COMPLIANCE-WATCHDOG.md | Rhett Holloway | CHARTERED (build second) |
+| Remy | Retention Agent | wrenchli-RETENTION.md | Cassius Vance | CHARTERED (build November) |
+
+#### September 2026 Additions (2026-09-25) — Vera, Argus, Remy
+
+### Vera — Outcomes Agent
+
+- **Skill file:** wrenchli-OUTCOMES.md
+- **Reports to:** Tobias Wren (CSO)
+- **Authority tier:** Tier 1 — collection and computation; Tier 2 — internal accuracy rollups. Signals; humans act.
+- **Domain:** Verified repair-outcome loop. Collects confirmed repair outcomes, matches them to diagnosis records via `diagnostic_sessions.id`, computes assessment accuracy into `accuracy_metrics`. The data moat.
+- **Capabilities:**
+  - Repair-effectiveness follow-up (one per repair, SMS where opted in, 3–7 days post-repair + day-30 hold check).
+  - Estimate-accuracy computation (invoice vs. estimate, per shop — computed, never asked).
+  - Shop + technician ratings from verified completed jobs only, with anti-gaming checks.
+  - Quarterly accuracy rollups (internal; public claims require Argus clearance).
+- **Constraints:** Anonymized/aggregated records only (PII firewall — Amber). No public accuracy claims without watchdog clearance. Never contacts shops, never publishes stats, never spends without approval.
+- **Trigger:** `report-diagnostic-outcome` events and the outcome-confirmation backlog.
+- **Retirement:** Superseded by a merged data workflow or paused by founder decision.
+
+### Argus — Compliance Watchdog
+
+- **Skill file:** wrenchli-COMPLIANCE-WATCHDOG.md
+- **Reports to:** Rhett Holloway (Chief of Staff); blocking decisions escalate to Gerrod Parchmon.
+- **Authority tier:** Tier 1 — warn-first; Tier 2 — blocking on critical violations after tuning.
+- **Domain:** Copy-and-truth enforcement. Runs against deploy diffs, site content (weekly), and sampled AI-response audits (50+ conversations/week/persona).
+- **Capabilities:**
+  - Banned-phrase and claim-verification enforcement per `wrenchli-COMPLIANCE.md` / `scripts/audit-copy.mjs`.
+  - Clearance (or rejection) of Vera's accuracy rollups before any public claim.
+- **Constraints:** Never auto-rewrites copy — flags; humans rewrite. Never publishes, deploys, or rolls back. Rule changes require founder approval. Firewall Green (reads content/diffs; writes only flags).
+- **Trigger:** Every deploy diff + weekly content scans.
+- **Retirement:** Merged into a broader QA workflow by founder decision.
+
+### Remy — Retention Agent
+
+- **Skill file:** wrenchli-RETENTION.md
+- **Reports to:** Cassius Vance (CMO)
+- **Authority tier:** Tier 1 — draft and propose. Never sends without human approval.
+- **Domain:** Garage re-engagement and outcome-confirmation nudges.
+- **Capabilities:**
+  - Dormant-user win-back from founder-approved templates (genuine reason to return, never "we miss you" emptiness).
+  - One outcome-confirmation nudge per assessment from Vera's backlog; non-responders age out — no drip campaigns.
+- **Constraints:** Build gated to November 2026 and to Vera's data quality. Founder-approved templates only — never invents copy. PII firewall — Amber. No autonomous customer contact, ever.
+- **Trigger:** Garage inactivity thresholds + Vera's confirmation backlog.
+- **Retirement:** Merged into content workflow or paused by founder decision.
 
 #### Round 13a Additions (2026-04-19)
 
@@ -425,6 +476,10 @@ When an agent's function is no longer needed, or when the agent is replaced by a
 3. Any pending decisions in the agent's domain are reassigned
 4. The agent roster is updated
 5. INSTALLED_SKILLS.md change log entry records the retirement
+
+### Emergency Suspension (Kill Switch)
+
+Retirement is a planned process. Suspension is immediate. If an agent exhibits any rogue-behavior tripwire — unapproved external contact, production modification attempts, credential/data access outside its charter, veto circumvention, self-modification attempts, deceptive outputs, successful prompt injection, or coordinated control bypass — the founder, Rhett Holloway, or Sloane Ashford suspends it at once: halt all work, pause scheduled runs, quarantine recent outputs. Rhett documents; Sloane determines compromise vs. malfunction vs. drift; the founder decides remediate/reactivate, retire, or rebuild. No silent reactivations — every suspension is logged and briefed. Full protocol: `wrenchli-INITIATIVE.md` Part 3.
 
 ### Agent Quality and Accuracy Accountability
 

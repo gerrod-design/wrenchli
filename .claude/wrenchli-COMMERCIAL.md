@@ -248,7 +248,7 @@ Recommended posture: [proceed / proceed with partner notification / requires pro
 
   - Analyzes proposed product releases for timing risk (too early = ahead of market; too late = competitors capture the moment).
 
-  - Coordinates with Ingrid Halvorsen (Market Signal Aggregation Agent) on external market signals.
+  - Coordinates with the strategy/sensing workflow (Tobias Wren) on external market signals.
 
   - Coordinates with Amara Oduya on regulatory timing (new rules that would affect product launch).
 

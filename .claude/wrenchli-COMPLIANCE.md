@@ -27,16 +27,16 @@ Scan the copy for any of the following banned phrases. If found, flag as a hard 
 | Wrenchli diagnoses | Wrenchli assesses symptoms |
 | AutoZone | (remove entirely — never add back) |
 | we're building, we are building | we built |
-| coming soon to Michigan and Ohio | live in Michigan and Ohio |
+| coming soon (availability claims) | Michigan-pilot language only — never claim shop matching is live; "live in Michigan" describes assessment/Garage only; no Ohio availability claims |
 | broken (in context of vehicle repair experience) | harder than it needs to be |
 | vetted shops, vetted local shops, vetted repair shops | trusted shops, trusted local shops |
 | embedded financing | repair financing on the way |
 | modern tools for shops | (rewrite — Wrenchli is not SMS software) |
 | paper tickets and phone calls | (rewrite — do not mock incumbent shop workflows) |
 | dealerships do worse work, independents do worse work | (rewrite — never compare quality across shop types) |
-| Pro Only | Shop Required |
+| Pro Only | (flag for human rewrite — Garage Pro retired 2026-09-17; no auto-substitution) |
 | Always free | Assessment always free |
-| verified repair shops, verified shops (in find-a-shop context) | trusted shops |
+| verified repair shops, verified shops | trusted shops (always banned — Verified Score does not exist) |
 | financing options (as current feature) | repair financing on the way |
 | predictive maintenance alerts | (rewrite — not a current feature) |
 
@@ -157,7 +157,7 @@ The banned and preferred language tables in this file supersede any conflicting 
 
 ### Never say, always say
 
-**Never**: diagnosis, diagnose, AI-powered diagnosis, machine learning diagnosis, our platform, diagnose your car, AutoZone, we're building, coming soon, broken (for repair experience), vetted shops, embedded financing, modern tools for shops, paper tickets and phone calls, dealerships do worse work, Pro Only, Always free, verified shops (outside Verified Score), financing options (as feature), predictive maintenance alerts.
+**Never**: diagnosis, diagnose, AI-powered diagnosis, machine learning diagnosis, our platform, diagnose your car, AutoZone, we're building, coming soon, broken (for repair experience), vetted shops, embedded financing, modern tools for shops, paper tickets and phone calls, dealerships do worse work, Pro Only, Always free, verified shops, financing options (as feature), predictive maintenance alerts. Availability claims are Michigan-only: never claim shop matching is live anywhere; "live in Michigan" describes the assessment and Garage only; no Ohio availability claims.
 
 **Always**: symptom assessment, likely causes, assessment results, repair likelihood report, Wrenchli assesses symptoms, monitor / schedule / soon / immediate, easy / moderate / Shop Required, Assessment always free, trusted shops, repair financing on the way, Wrenchli (instead of "our platform").
 

@@ -8,9 +8,17 @@ interface WaitlistFormProps {
   userType?: "consumer" | "shop";
   source?: string;
   className?: string;
+  toastTitle?: string;
+  toastDescription?: string;
 }
 
-export default function WaitlistForm({ userType = "consumer", source = "home", className = "" }: WaitlistFormProps) {
+export default function WaitlistForm({
+  userType = "consumer",
+  source = "home",
+  className = "",
+  toastTitle = "You're on the list! 🎉",
+  toastDescription = "We'll notify you when Wrenchli launches in your area.",
+}: WaitlistFormProps) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +31,7 @@ export default function WaitlistForm({ userType = "consumer", source = "home", c
     try {
       const { error } = await supabase.from("waitlist_signups").insert({ email, name: name || null });
       if (error) throw error;
-      toast({ title: "You're on the list! 🎉", description: "We'll notify you when Wrenchli launches in your area." });
+      toast({ title: toastTitle, description: toastDescription });
       setEmail("");
       setName("");
     } catch {

@@ -24,7 +24,7 @@ const userPaths = [
     title: "Repair Shops",
     subtitle: "Want more customers?",
     description:
-      "Shop matching is currently paused. Join the early access list and we'll notify you when it goes live.",
+      "We're now enrolling Detroit shops in a free 90-day referral pilot — customers arrive pre-assessed, with symptoms and a fair cost range.",
     href: "/shops",
     tokenBg: "bg-wrenchli-trust-blue/10",
     tokenBorder: "border-wrenchli-trust-blue/20 hover:border-wrenchli-trust-blue/40",

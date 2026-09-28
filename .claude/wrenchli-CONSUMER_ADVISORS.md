@@ -29,7 +29,7 @@ This skill triggers automatically — without announcement — when the prompt i
 - Changes to a consumer-advisor prompt, persona definition, or chat routing logic
 - Activation, pause, or retirement of a consumer-facing agent
 - Sample audit findings on Mike, Sam, Jess, Kai, or Priya conversations
-- Consumer-advisor transcript data being routed to internal agents (Maren Laurent, Elias Thorne, Augustin Reyes, Theo Ashworth, etc.)
+- Consumer-advisor transcript data being routed to internal agents (Maren Laurent, Elias Thorne, Augustin Reyes, etc.)
 - Any proposal that would give a consumer advisor access to internal data, internal skill files, or internal-agent context
 - Any proposal that would give an internal agent direct operational authority over a live consumer conversation
 - Any consumer complaint or escalation traceable to advisor behavior

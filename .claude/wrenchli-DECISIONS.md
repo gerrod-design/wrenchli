@@ -45,7 +45,7 @@ Four conflict types exist, each with a different resolution pattern:
 
 **Information Conflict.** The agents have different facts or different interpretations of the same facts. The conflict is epistemic — one or both agents are working with incomplete or incorrect information.
 
-*Example:* Theo Ashworth (Competitive Intelligence) reports Competitor X is entering Michigan; Ingrid Halvorsen (Market Signal Aggregation) sees no signal of that. Both may be technically correct (Theo caught an early signal Ingrid missed, or Theo is pattern-matching a false positive).
+*Example:* the strategy/sensing workflow's competitive-intelligence pass reports Competitor X is entering Michigan; its market-signal pass sees no signal of that. Both may be technically correct (an early signal caught in one pass and missed in the other, or a false positive from pattern-matching).
 
 *Resolution pattern:* Reconcile the information first, then re-run both analyses. Imani Whitfield (Verification and Accuracy Agent) verifies which agent's information is correct. If both are correct but incomplete, the combined picture emerges only when both contributions are integrated.
 

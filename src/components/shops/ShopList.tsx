@@ -35,7 +35,7 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
           No Shops Found{searchedZip ? ` Near ${searchedZip}` : ""}
         </h3>
         <p className="text-muted-foreground max-w-md mx-auto mb-6">
-          Shop matching is currently paused — Wrenchli has no partner shops right now. The listings above are reference-only. Save your assessment to share with whichever qualified mechanic you trust.
+          We're now enrolling Detroit shops in our free referral pilot — Wrenchli has no partner shops right now. The listings above are reference-only. Save your assessment to share with whichever qualified mechanic you trust.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
@@ -77,7 +77,7 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
     <div className="space-y-4">
       {/* FTC Material Connection Disclosure */}
       <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-        Shop matching is currently paused and Wrenchli has no partner shops. Any shops shown are for reference only — Wrenchli has no business relationship with them, and this does not affect the content of your symptom assessment.
+        Wrenchli is now enrolling shops in its free referral pilot. Wrenchli has no partner shops yet — any shops shown are for reference only, Wrenchli has no business relationship with them, and this does not affect the content of your symptom assessment.
       </p>
       
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">

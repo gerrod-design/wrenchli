@@ -249,7 +249,7 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
       <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
         <h4 className="text-xs font-mono mb-2" style={{ color: "#E07B39" }}>ABOUT SHOP MATCHING</h4>
         <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>
-          Shop matching is currently paused — Wrenchli has no partner shops. When the shop track reopens, partner shops will earn placement through verified repair outcomes, not paid placement.
+          Wrenchli is now enrolling Detroit shops in a free 90-day referral pilot. Partner shops earn placement through verified repair outcomes, not paid placement.
         </p>
       </div>
 

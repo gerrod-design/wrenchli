@@ -12,7 +12,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { symptoms, year, make, model, trim, vin, zip_code } = await req.json();
+    const { symptoms, year, make, model, trim, vin, zip_code, session_id: incomingSessionId } = await req.json();
 
     if (!symptoms || symptoms.trim().length < 3) {
       return new Response(JSON.stringify({ error: "Please describe your symptoms" }), {
@@ -142,6 +142,50 @@ ${historicalLine}`;
 
     const diagnosis = toolUse.input;
 
+    // ── Session linkage (Outcomes agent dependency, 2026-09-25) ──
+    // Ensure a diagnostic_sessions row exists and capture its id so
+    // diagnosis_records.session_id is populated and outcome_reports can
+    // join back via diagnostic_sessions.id.
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const restHeaders = {
+      apikey: SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json",
+    };
+    let sessionId: string | null = null;
+    try {
+      if (incomingSessionId && UUID_RE.test(incomingSessionId)) {
+        // Reuse the caller's session if the row exists; otherwise create it with that id.
+        const check = await fetch(
+          `${SUPABASE_URL}/rest/v1/diagnostic_sessions?id=eq.${incomingSessionId}&select=id`,
+          { headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` } }
+        );
+        const rows = await check.json().catch(() => []);
+        if (Array.isArray(rows) && rows.length > 0) {
+          sessionId = incomingSessionId;
+        } else {
+          const created = await fetch(`${SUPABASE_URL}/rest/v1/diagnostic_sessions`, {
+            method: "POST",
+            headers: { ...restHeaders, Prefer: "return=representation" },
+            body: JSON.stringify({ id: incomingSessionId, status: "intake" }),
+          });
+          const createdRows = await created.json().catch(() => []);
+          if (Array.isArray(createdRows) && createdRows[0]?.id) sessionId = createdRows[0].id;
+        }
+      }
+      if (!sessionId) {
+        const created = await fetch(`${SUPABASE_URL}/rest/v1/diagnostic_sessions`, {
+          method: "POST",
+          headers: { ...restHeaders, Prefer: "return=representation" },
+          body: JSON.stringify({ status: "intake" }),
+        });
+        const createdRows = await created.json().catch(() => []);
+        if (Array.isArray(createdRows) && createdRows[0]?.id) sessionId = createdRows[0].id;
+      }
+    } catch (e) {
+      console.error("Failed to ensure diagnostic session:", e);
+    }
+
     // Store in diagnosis_records
     let trackingNumber: string | null = null;
     try {
@@ -156,6 +200,7 @@ ${historicalLine}`;
           Prefer: "return=minimal",
         },
         body: JSON.stringify({
+          session_id: sessionId,
           symptoms,
           vehicle_year: year || null,
           vehicle_make: make || null,
@@ -184,6 +229,7 @@ ${historicalLine}`;
     return new Response(JSON.stringify({
       ...diagnosis,
       trackingNumber,
+      sessionId,
       historicalData,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
