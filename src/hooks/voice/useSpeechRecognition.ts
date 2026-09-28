@@ -1,5 +1,12 @@
 import { useState, useRef, useCallback } from "react";
 
+// The TS DOM lib does not include the Web Speech API event type; the hook
+// only reads `results`, so declare the minimal shape it needs.
+type SpeechRecognitionEvent = Event & {
+  readonly resultIndex: number;
+  readonly results: SpeechRecognitionResultList;
+};
+
 const SILENCE_TIMEOUT_MS = 4500;
 
 export function useSpeechRecognition() {
