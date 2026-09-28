@@ -2481,6 +2481,39 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_interest: {
+        Row: {
+          city: string | null
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          phone: string | null
+          shop_name: string
+          shop_system: string | null
+        }
+        Insert: {
+          city?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          phone?: string | null
+          shop_name: string
+          shop_system?: string | null
+        }
+        Update: {
+          city?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          phone?: string | null
+          shop_name?: string
+          shop_system?: string | null
+        }
+        Relationships: []
+      }
       shop_jobs: {
         Row: {
           completed_at: string | null
@@ -2793,6 +2826,33 @@ export type Database = {
           slug?: string | null
           updated_at?: string | null
           verified_status?: string | null
+        }
+        Relationships: []
+      }
+      shop_nominations: {
+        Row: {
+          city: string | null
+          consumer_email: string | null
+          created_at: string
+          id: string
+          shop_name: string
+          source: string
+        }
+        Insert: {
+          city?: string | null
+          consumer_email?: string | null
+          created_at?: string
+          id?: string
+          shop_name: string
+          source?: string
+        }
+        Update: {
+          city?: string | null
+          consumer_email?: string | null
+          created_at?: string
+          id?: string
+          shop_name?: string
+          source?: string
         }
         Relationships: []
       }

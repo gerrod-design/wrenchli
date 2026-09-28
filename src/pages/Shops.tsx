@@ -12,7 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import SectionReveal from "@/components/SectionReveal";
-import WaitlistForm from "@/components/WaitlistForm";
+import ShopNominationForm from "@/components/shops/ShopNominationForm";
+import ShopInterestForm from "@/components/shops/ShopInterestForm";
 
 const valueProps = [
   {
@@ -73,6 +74,18 @@ export default function Shops() {
               Shop partner program currently paused — Wrenchli is not
               onboarding repair shops at this time.
             </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <a href="#nominate">
+                <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
+                  Nominate your shop
+                </Button>
+              </a>
+              <a href="#shop-interest">
+                <Button size="lg" variant="outline" className="border-accent/40 text-accent-foreground hover:bg-accent/10 font-semibold">
+                  I'm a shop — express interest
+                </Button>
+              </a>
+            </div>
           </SectionReveal>
         </div>
       </section>
@@ -180,22 +193,38 @@ export default function Shops() {
       </section>
 
 
-      {/* CTA */}
+      {/* CTA — paused program interest capture */}
       <section className="section-padding bg-wrenchli-trust-blue text-accent-foreground">
-        <div className="container-wrenchli max-w-2xl text-center">
+        <div className="container-wrenchli max-w-5xl">
           <SectionReveal>
-            <Wrench className="h-12 w-12 mx-auto mb-4 text-accent" />
-            <h2 className="font-heading text-3xl font-bold md:text-5xl">
-              Ready to Grow Your Shop?
-            </h2>
-            <p className="mt-4 text-lg text-accent-foreground/70">
-              Wrenchli is focused on the free driver assessment right now.
-            </p>
-            <p className="mt-8 mx-auto max-w-xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
-              Shop partner program currently paused — Wrenchli is not
-              onboarding repair shops at this time.
-            </p>
+            <div className="text-center">
+              <Wrench className="h-12 w-12 mx-auto mb-4 text-accent" />
+              <h2 className="font-heading text-3xl font-bold md:text-5xl">
+                Help Bring Wrenchli to Your Area
+              </h2>
+              <p className="mt-4 text-lg text-accent-foreground/70 max-w-2xl mx-auto">
+                Wrenchli is focused on the free driver assessment right now.
+                We're onboarding shops gradually — make your interest known
+                and we'll reach out when we open in your area.
+              </p>
+              <p className="mt-6 mx-auto max-w-xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-base font-semibold leading-relaxed">
+                Shop partner program currently paused — Wrenchli is not
+                onboarding repair shops at this time.
+              </p>
+            </div>
           </SectionReveal>
+          <div className="mt-10 grid gap-6 md:grid-cols-2 md:items-start">
+            <SectionReveal>
+              <div id="nominate" className="scroll-mt-24">
+                <ShopNominationForm source="for-shops" />
+              </div>
+            </SectionReveal>
+            <SectionReveal delay={100}>
+              <div id="shop-interest" className="scroll-mt-24">
+                <ShopInterestForm />
+              </div>
+            </SectionReveal>
+          </div>
         </div>
       </section>
     </main>
