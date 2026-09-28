@@ -176,7 +176,7 @@ describe("Assessment Flow — Happy Path", () => {
     // ── Step 2: Symptom Entry ──
     expect(screen.getByText(/2019 Ford F-150/)).toBeInTheDocument();
 
-    const symptomTextarea = screen.getByPlaceholderText(/Car won't start/i);
+    const symptomTextarea = screen.getByPlaceholderText(/Squealing noise/i);
     fireEvent.change(symptomTextarea, {
       target: { value: "Grinding noise when braking, especially at low speeds" },
     });
@@ -271,7 +271,7 @@ describe("Assessment Flow — Missing Fields", () => {
     });
 
     // Short description
-    fireEvent.change(screen.getByPlaceholderText(/Car won't start/i), {
+    fireEvent.change(screen.getByPlaceholderText(/Squealing noise/i), {
       target: { value: "noise" },
     });
 
