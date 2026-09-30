@@ -12,14 +12,22 @@ export function isVideoCaptureSupported(): boolean {
   );
 }
 
-/** Best-effort MediaRecorder mime type: vp9 -> vp8 -> webm -> mp4 -> default. */
+/** Best-effort MediaRecorder mime type. */
 export function pickVideoMimeType(): string {
-  const candidates = [
+  const webmCandidates = [
     "video/webm;codecs=vp9,opus",
     "video/webm;codecs=vp8,opus",
     "video/webm",
     "video/mp4",
   ];
+  // Safari (desktop + every iOS browser, all WebKit under the hood) records
+  // most reliably to mp4 — its webm duration metadata is unreliable, which
+  // breaks downstream frame extraction.
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  const isWebKit = /Safari/.test(ua) && !/Chrome|Chromium/.test(ua);
+  const candidates = isWebKit
+    ? ["video/mp4", ...webmCandidates]
+    : webmCandidates;
   try {
     if (typeof MediaRecorder === "undefined" || !MediaRecorder.isTypeSupported) return "";
     for (const c of candidates) {
