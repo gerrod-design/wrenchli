@@ -15,8 +15,40 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { pickVideoMimeType, videoExtensionForMimeType } from "@/lib/videoCapture";
+import { loadVideo } from "@/lib/videoFrameExtractor";
 
 const MAX_RECORD_SECONDS = 60;
+
+/**
+ * Validate the finished recording the moment it stops — BEFORE the review
+ * screen appears. Returns a human-readable issue, or null when the recording
+ * looks usable. A bad recording must surface here, on the review screen,
+ * never after the consumer has tapped "Use video" and waited through upload.
+ */
+async function probeRecording(blob: Blob, recordedSeconds: number): Promise<string | null> {
+  if (blob.size < 20_000) {
+    return "This recording didn't save properly — the file came out empty. Please retake it.";
+  }
+  let video: HTMLVideoElement | null = null;
+  try {
+    video = await loadVideo(new File([blob], "probe", { type: blob.type }));
+    if (video.videoWidth === 0) {
+      return "This recording has no picture. Please retake it.";
+    }
+    const dur = video.duration;
+    const brokenDuration = !Number.isFinite(dur) || dur < 0.5;
+    // A broken duration stamp on an otherwise real file is fine — the
+    // analysis pipeline falls back to the stopwatch-measured length.
+    if (brokenDuration && recordedSeconds < 2) {
+      return "This recording didn't save properly. Please retake it.";
+    }
+    return null;
+  } catch {
+    return "We couldn't read this recording. Please retake it.";
+  } finally {
+    if (video) URL.revokeObjectURL(video.src);
+  }
+}
 
 function formatElapsed(totalSeconds: number): string {
   const m = Math.floor(totalSeconds / 60);
@@ -51,6 +83,9 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
     const [elapsed, setElapsed] = useState(0);
     const [reviewUrl, setReviewUrl] = useState<string | null>(null);
     const [errorMsg, setErrorMsg] = useState("");
+    /** Set when the finished recording fails validation — shown on the review
+     *  screen with "Use video" disabled, so the problem surfaces before upload. */
+    const [recordingIssue, setRecordingIssue] = useState<string | null>(null);
 
     const streamRef = useRef<MediaStream | null>(null);
     const recorderRef = useRef<MediaRecorder | null>(null);
@@ -151,6 +186,7 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
       cancelledRef.current = false;
       revokeReview();
       setErrorMsg("");
+      setRecordingIssue(null);
       setElapsed(0);
       setRecordedSeconds(0);
       setPhase("starting");
@@ -191,7 +227,8 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
         recorder.onstop = () => {
           if (cancelledRef.current) return;
           clearTimers();
-          setRecordedSeconds(Math.floor((Date.now() - startedAtRef.current) / 1000));
+          const seconds = Math.floor((Date.now() - startedAtRef.current) / 1000);
+          setRecordedSeconds(seconds);
           const blob = new Blob(chunksRef.current, {
             type: mimeTypeRef.current || "video/webm",
           });
@@ -203,11 +240,17 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
             setErrorMsg("The recording came out empty. Please try again.");
             return;
           }
-          const url = URL.createObjectURL(blob);
-          reviewBlobRef.current = blob;
-          reviewUrlRef.current = url;
-          setReviewUrl(url);
-          setPhase("review");
+          // Validate the recording BEFORE the review screen appears: a bad
+          // recording must surface here, never after "Use video" is tapped.
+          void probeRecording(blob, seconds).then((issue) => {
+            if (cancelledRef.current) return;
+            const url = URL.createObjectURL(blob);
+            reviewBlobRef.current = blob;
+            reviewUrlRef.current = url;
+            setReviewUrl(url);
+            setRecordingIssue(issue);
+            setPhase("review");
+          });
         };
         recorderRef.current = recorder;
         // No timeslice: Safari's MediaRecorder is most reliable delivering the
@@ -373,6 +416,11 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
                 <p className="text-xs text-muted-foreground text-center">
                   Play it back — check you can see the problem and hear the sound.
                 </p>
+                {recordingIssue && (
+                  <p className="text-xs text-center rounded-lg bg-red-50 text-red-800 px-3 py-2 border border-red-200">
+                    {recordingIssue}
+                  </p>
+                )}
                 {recordedSeconds < 3 && (
                   <p className="text-xs text-center rounded-lg bg-amber-50 text-amber-800 px-3 py-2 border border-amber-200">
                     That clip was very short ({recordedSeconds}s). A few seconds of the
@@ -391,7 +439,8 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
                   <button
                     type="button"
                     onClick={handleUseVideo}
-                    className="flex-1 rounded-xl bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    disabled={!!recordingIssue}
+                    className={`flex-1 rounded-xl bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity flex items-center justify-center gap-2${recordingIssue ? " opacity-40 cursor-not-allowed hover:opacity-40" : ""}`}
                   >
                     <Check className="h-4 w-4" />
                     Use video

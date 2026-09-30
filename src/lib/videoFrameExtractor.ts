@@ -14,7 +14,7 @@ export interface ExtractionProgress {
 /**
  * Load a video element from a File and wait for metadata.
  */
-function loadVideo(file: File): Promise<HTMLVideoElement> {
+export function loadVideo(file: File): Promise<HTMLVideoElement> {
   return new Promise((resolve, reject) => {
     const video = document.createElement("video");
     video.preload = "auto";
