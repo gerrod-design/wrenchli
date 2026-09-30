@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { flushSync } from "react-dom";
 import { X, Send, Loader2, ImagePlus, Camera, History, MessageSquarePlus, Mic, MicOff, Volume2, VolumeX, Film, ScanLine, Keyboard } from "lucide-react";
 import AudioRecordButton from "./chatbot/AudioRecordButton";
 import MechanicAvatar, { type AgentType } from "./MechanicAvatar";
@@ -18,6 +19,8 @@ import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 import AudioWaveform from "./chatbot/AudioWaveform";
 import { extractVideoFrames, isVideoFile, MAX_VIDEO_SIZE } from "@/lib/videoFrameExtractor";
 import { extractVideoAudio } from "@/lib/videoAudioExtractor";
+import VideoCaptureDialog, { type VideoCaptureHandle } from "./chatbot/VideoCaptureDialog";
+import { isVideoCaptureSupported } from "@/lib/videoCapture";
 import { decodeVin, sanitizeVin, isValidVin, type DecodedVehicle } from "@/lib/vinDecoder";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -69,6 +72,9 @@ export default function ChatBot() {
   const [vinText, setVinText] = useState("");
   const [vinLoading, setVinLoading] = useState(false);
   const [vinError, setVinError] = useState("");
+  const [videoDialogOpen, setVideoDialogOpen] = useState(false);
+  const [videoCaptureSupported] = useState(() => isVideoCaptureSupported());
+  const videoCaptureRef = useRef<VideoCaptureHandle>(null);
   const [hasInteracted, setHasInteracted] = useState(() =>
     localStorage.getItem("wrenchli_chat_interacted") === "true"
   );
@@ -233,6 +239,20 @@ export default function ChatBot() {
   const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(true); };
   const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(false); };
   const removePendingPhoto = (index: number) => setPendingPhotos((prev) => prev.filter((_, i) => i !== index));
+
+  // In-chat video capture: open the dialog and start camera+mic synchronously
+  // inside the tap gesture (flushSync) so iOS Safari grants the permission prompt.
+  const handleRecordVideoClick = () => {
+    flushSync(() => setVideoDialogOpen(true));
+    videoCaptureRef.current?.beginCapture();
+  };
+
+  // The recorded clip becomes a File and flows through the existing upload pipeline.
+  const handleUseRecordedVideo = (file: File) => {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    void handleFileUpload(dt.files);
+  };
 
   const ensureActiveConversation = useCallback((): string => {
     if (activeId) return activeId;
@@ -802,6 +822,13 @@ export default function ChatBot() {
                     <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><Camera className="h-4 w-4" /></span>
                     <span className="text-[11px] leading-none font-medium whitespace-nowrap">Take Photo</span>
                   </button>
+                  {videoCaptureSupported && (
+                    <button type="button" onClick={handleRecordVideoClick} disabled={loading || uploading || pendingPhotos.length >= 5}
+                      className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Record video">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><Film className="h-4 w-4" /></span>
+                      <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Video</span>
+                    </button>
+                  )}
                   <span className="flex flex-col items-center gap-1 text-muted-foreground">
                     <AudioRecordButton
                       disabled={loading || uploading}
@@ -885,6 +912,15 @@ export default function ChatBot() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* In-chat video capture */}
+      <VideoCaptureDialog
+        ref={videoCaptureRef}
+        open={videoDialogOpen}
+        onOpenChange={setVideoDialogOpen}
+        onUseVideo={handleUseRecordedVideo}
+        onFallbackToPicker={() => fileInputRef.current?.click()}
+      />
 
       {/* VIN Scan/Entry Modal */}
       <Dialog open={vinModalOpen} onOpenChange={setVinModalOpen}>

@@ -299,7 +299,7 @@ When a user mentions having a photo, damage picture, video clip, or wanting to s
 - Tell them to tap the camera icon (📷) or image icon (🖼️) at the bottom of the chat to upload it.
 - They can upload photos OR short video clips. Videos are automatically broken into key frames AND the audio track is extracted for combined visual+audio assessment.
 - Say something like: "Go ahead and tap the camera icon below to upload your photo or video — I'll take a look right away!"
-- Do NOT just link to the /damage-diagnosis page as the primary option. The inline upload is faster and keeps them in the conversation. (Note: the /damage-diagnosis URL is a legacy route name; do not rename it in your response — link to it as-is when needed.)
+- Do NOT just link to the /damage-assessment page as the primary option. The inline upload is faster and keeps them in the conversation. (Note: the page lives at /damage-assessment; the old /damage-diagnosis URL redirects there — always link to /damage-assessment.)
 - Once they upload, use the assess_damage_photo tool to analyze it.
 - If you receive multiple images that look like sequential video frames, treat them as a video walkthrough of the issue and analyze them together for a comprehensive view.
 
@@ -366,7 +366,7 @@ IMPORTANT: When calling estimate_repair_cost, use exact parameter names: "assess
 
 **Available pages (use markdown links when relevant):**
 - [Vehicle Insights](/vehicle-insights) — full DIY symptom assessment tools
-- [Photo Assessment](/damage-diagnosis) — upload photos for AI analysis (route name is legacy; link as-is)
+- [Photo Assessment](/damage-assessment) — upload photos for AI analysis
 - [Get a Quote](/get-quote) — request shop quotes
 - [DIY Guides](/diy) — step-by-step repair tutorials
 - [Financing](/financing-options) — payment plan options (Wrenchli financing on the way)

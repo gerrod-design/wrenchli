@@ -60,7 +60,7 @@ export default function DamageDiagnosisPage() {
       <SEO
         title="Photo Damage Assessment — Wrenchli"
         description="Upload photos of your vehicle damage and get instant AI-powered symptom assessment with repair options and cost estimates."
-        path="/damage-diagnosis"
+        path="/damage-assessment"
       />
 
       {/* Hero */}

@@ -118,7 +118,8 @@ function AnimatedRoutes() {
           <Route path="/developers/gpt-actions" element={<CustomGPTGuide />} />
           <Route path="/pilot" element={<Pilot />} />
           <Route path="/find-shops" element={<FindShops />} />
-          <Route path="/damage-diagnosis" element={<DamageDiagnosis />} />
+          <Route path="/damage-assessment" element={<DamageDiagnosis />} />
+          <Route path="/damage-diagnosis" element={<Navigate to="/damage-assessment" replace />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<Accessibility />} />
