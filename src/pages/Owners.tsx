@@ -16,7 +16,7 @@ import { useLocation } from "@/contexts/LocationContext";
 
 
 const valueProps = [
-  { icon: ShieldCheck, title: "Transparent Pricing", desc: "See real prices upfront. No surprises, no hidden fees." },
+  { icon: ShieldCheck, title: "Transparent Pricing", desc: "See typical cost ranges upfront, so you know what's fair before you walk in." },
   { icon: Zap, title: "Find Qualified Shops", desc: "Find qualified local shops and know exactly what questions to ask before you walk in." },
 ];
 

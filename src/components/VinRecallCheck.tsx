@@ -60,8 +60,8 @@ export default function VinRecallCheck() {
   };
 
   const assessmentLink = state.status === "found" || state.status === "clear"
-    ? `/#quote`
-    : "/#quote";
+    ? `/#assessment`
+    : "/#assessment";
 
   return (
     <section className="section-padding" style={{ backgroundColor: "#0F1117" }}>

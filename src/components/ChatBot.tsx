@@ -75,6 +75,8 @@ export default function ChatBot() {
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
   const [videoCaptureSupported] = useState(() => isVideoCaptureSupported());
   const videoCaptureRef = useRef<VideoCaptureHandle>(null);
+  /** Last in-chat recording, kept so a failed analysis can be retried without re-recording. */
+  const lastVideoRef = useRef<{ file: File; recordedSeconds: number } | null>(null);
   const [hasInteracted, setHasInteracted] = useState(() =>
     localStorage.getItem("wrenchli_chat_interacted") === "true"
   );
@@ -221,9 +223,23 @@ export default function ChatBot() {
             .catch(() => {
               toast.success(`📸 Extracted ${uploaded.length} frames — send a message to analyze`);
             });
+          lastVideoRef.current = null; // extraction succeeded — nothing to retry
         }
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Failed to process video.");
+        const retryVideo = lastVideoRef.current;
+        toast.error(err instanceof Error ? err.message : "Failed to process video.", {
+          duration: 9000,
+          action: retryVideo
+            ? {
+                label: "Try again",
+                onClick: () => {
+                  const dt = new DataTransfer();
+                  dt.items.add(retryVideo.file);
+                  void handleFileUpload(dt.files, { knownVideoDurationSec: retryVideo.recordedSeconds });
+                },
+              }
+            : undefined,
+        });
       }
     } else {
       const uploaded: string[] = [];
@@ -252,6 +268,7 @@ export default function ChatBot() {
 
   // The recorded clip becomes a File and flows through the existing upload pipeline.
   const handleUseRecordedVideo = (file: File, recordedSeconds: number) => {
+    lastVideoRef.current = { file, recordedSeconds };
     const dt = new DataTransfer();
     dt.items.add(file);
     void handleFileUpload(dt.files, { knownVideoDurationSec: recordedSeconds });

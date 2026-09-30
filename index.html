@@ -3,6 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Keep Vercel preview deployments out of search results. Production
+      // (wrenchli.net) is unaffected and stays indexable.
+      if (/(^|\.)vercel\.app$/.test(window.location.hostname)) {
+        var m = document.createElement("meta");
+        m.name = "robots";
+        m.content = "noindex, nofollow";
+        document.head.appendChild(m);
+      }
+    </script>
     <link rel="icon" href="/favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />

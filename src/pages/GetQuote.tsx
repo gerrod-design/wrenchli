@@ -205,7 +205,7 @@ export default function GetQuote() {
               Start with an assessment to get accurate repair cost estimates.
             </p>
             <Button asChild className="mt-6 h-12 px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
-              <Link to="/#quote">
+              <Link to="/#assessment">
                 <Car className="mr-2 h-4 w-4" /> Start Your Assessment
               </Link>
             </Button>

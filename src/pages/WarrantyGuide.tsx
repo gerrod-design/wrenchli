@@ -367,7 +367,7 @@ export default function WarrantyGuide() {
                 className="mt-5 h-12 px-8 font-bold text-base transition-transform hover:scale-[1.02]"
                 style={{ backgroundColor: "#E07B39", color: "white" }}
               >
-                <Link to="/#quote" className="inline-flex items-center gap-2">
+                <Link to="/#assessment" className="inline-flex items-center gap-2">
                   Get Your Free Assessment
                   <ArrowRight className="h-4 w-4" />
                 </Link>

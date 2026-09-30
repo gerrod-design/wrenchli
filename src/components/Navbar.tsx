@@ -177,7 +177,7 @@ export default function Navbar() {
           <NotificationBell />
           <GarageDropdown />
           <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
-            <Link to="/#quote">Free Assessment</Link>
+            <Link to="/#assessment">Free Assessment</Link>
           </Button>
           <Button asChild size="sm" className="bg-wrenchli-trust-blue text-white hover:bg-wrenchli-trust-blue/90 font-semibold">
             <Link to="/for-shops#apply">For Shops</Link>
@@ -275,7 +275,7 @@ export default function Navbar() {
 
           <div className="mt-6 flex flex-col gap-3">
             <Button asChild className="h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-base" onClick={() => setOpen(false)}>
-              <Link to="/#quote">Free Assessment</Link>
+              <Link to="/#assessment">Free Assessment</Link>
             </Button>
             <Button asChild variant="outline" className="h-12 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground text-base" onClick={() => setOpen(false)}>
               <Link to="/for-shops#apply">For Shops</Link>

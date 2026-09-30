@@ -89,7 +89,7 @@ export default function QuickActionBar() {
   };
 
   return (
-    <section id="quote" className="relative -mt-8 z-10">
+    <section id="assessment" className="relative -mt-8 z-10">
       <div className="container-wrenchli">
         <h2 className="text-center font-heading text-lg md:text-2xl font-semibold text-foreground mb-5">
           Ready? Start here.

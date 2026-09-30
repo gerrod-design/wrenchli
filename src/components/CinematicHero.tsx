@@ -17,7 +17,7 @@ export default function CinematicHero() {
   }, []);
 
   const handleScrollDown = () => {
-    document.getElementById("quote")?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById("assessment")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const fadeUp = (delay: number, y = 20) => ({
@@ -70,7 +70,7 @@ export default function CinematicHero() {
             size="lg"
             className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base md:text-lg transition-transform hover:scale-[1.02] shadow-[0_4px_15px_hsl(var(--accent)/0.4)]"
           >
-            <Link to="/#quote">Start Your Free Assessment</Link>
+            <Link to="/#assessment">Start Your Free Assessment</Link>
           </Button>
           <span
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-white"

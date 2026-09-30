@@ -360,6 +360,15 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
               <div className="flex flex-col items-center justify-center py-12 gap-3">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">Starting camera…</p>
+                <div className="mt-2 w-full rounded-xl bg-muted/60 border border-border px-4 py-3 space-y-1.5">
+                  <p className="text-xs font-semibold text-foreground">For the best analysis:</p>
+                  <p className="text-xs text-muted-foreground">
+                    Engine running, phone close to the sound, and show the problem on camera — 15–30 seconds is plenty.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Heads up: your video can capture faces, voices, or license plates — only record what you're comfortable sharing.
+                  </p>
+                </div>
               </div>
             )}
 

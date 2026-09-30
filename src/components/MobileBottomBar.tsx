@@ -13,7 +13,7 @@ export default function MobileBottomBar() {
       {isInsightsPage ? (
         <>
           <Link
-            to="/#quote"
+            to="/#assessment"
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
             <Stethoscope className="h-4 w-4" />
@@ -30,7 +30,7 @@ export default function MobileBottomBar() {
       ) : isFindShopsPage ? (
         <>
           <Link
-            to="/#quote"
+            to="/#assessment"
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-2 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
             <Stethoscope className="h-4 w-4" />
@@ -47,7 +47,7 @@ export default function MobileBottomBar() {
       ) : (
         <>
           <Link
-            to="/#quote"
+            to="/#assessment"
             className="flex h-12 flex-1 items-center justify-center gap-2 mx-1 rounded-lg bg-accent text-accent-foreground font-semibold text-sm"
           >
             <Stethoscope className="h-4 w-4" />

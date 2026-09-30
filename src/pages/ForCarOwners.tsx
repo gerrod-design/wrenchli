@@ -162,7 +162,7 @@ export default function ForCarOwners() {
               Finding an honest mechanic shouldn't feel like a gamble. Wrenchli gives you transparent pricing and the confidence to say yes to the right repair at the right price.
             </p>
             <Button asChild size="lg" className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
-              <Link to="/#quote">
+              <Link to="/#assessment">
                 Get Your Free Quote <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -252,7 +252,7 @@ export default function ForCarOwners() {
               Get your first quote in under 60 seconds. Free for vehicle owners — always.
             </p>
             <Button asChild size="lg" className="mt-8 h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg transition-transform hover:scale-[1.02]">
-              <Link to="/#quote">
+              <Link to="/#assessment">
                 Get Your Free Quote <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>

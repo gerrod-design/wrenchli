@@ -166,7 +166,7 @@ export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRenam
           </Link>
         </Button>
         <Button asChild size="sm" variant="outline" className="h-8 text-xs">
-          <Link to={`/?year=${vehicle.year}&make=${vehicle.make}&model=${vehicle.model}#quote`}>
+          <Link to={`/?year=${vehicle.year}&make=${vehicle.make}&model=${vehicle.model}#assessment`}>
             Get Quotes
           </Link>
         </Button>
