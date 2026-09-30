@@ -220,6 +220,17 @@ export default function InlineChatWidget() {
         return [...prev, { role: "assistant", content: assistantSoFar }];
       });
     };
+    // Discard the partial assistant reply before an automatic retry so the
+    // retried stream starts from a clean message instead of appending to
+    // truncated text.
+    const resetPartial = () => {
+      assistantSoFar = "";
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") return prev.slice(0, -1);
+        return prev;
+      });
+    };
 
     try {
       await streamChat({
@@ -248,6 +259,7 @@ export default function InlineChatWidget() {
           }
         },
         onError: (msg) => { upsert(msg); setLoading(false); },
+        onRetry: resetPartial,
       });
     } catch {
       upsert("Sorry, something went wrong. Please try again.");

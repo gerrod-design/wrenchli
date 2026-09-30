@@ -773,9 +773,26 @@ function convertAnthropicStreamToOpenAI(
         pendingText = "";
         emit(opening);
       };
+      // Guard against a stalled upstream: if no bytes arrive within the idle
+      // window, fail into the graceful error path below instead of hanging
+      // until the platform kills the isolate.
+      const IDLE_TIMEOUT_MS = 30000;
+      const readWithIdleTimeout = async () => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        try {
+          return await Promise.race([
+            reader.read(),
+            new Promise<never>((_, reject) => {
+              timer = setTimeout(() => reject(new Error("upstream idle timeout")), IDLE_TIMEOUT_MS);
+            }),
+          ]);
+        } finally {
+          if (timer) clearTimeout(timer);
+        }
+      };
       try {
         while (true) {
-          const { done, value } = await reader.read();
+          const { done, value } = await readWithIdleTimeout();
           if (done) break;
           buffer += decoder.decode(value, { stream: true });
 
@@ -818,7 +835,14 @@ function convertAnthropicStreamToOpenAI(
         controller.close();
       } catch (err) {
         console.error("Stream conversion error:", err);
-        controller.error(err);
+        // Never tear down the client connection abruptly: release the upstream
+        // reader, flush any buffered opening text, then send a machine-readable
+        // error frame followed by [DONE] so the client can retry gracefully.
+        try { reader.cancel(); } catch { /* ignore */ }
+        if (pendingText) flushPending();
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "stream_interrupted" })}\n\n`));
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
       }
     },
   });
@@ -906,21 +930,35 @@ Deno.serve(async (req) => {
     } catch (abortErr) {
       clearTimeout(turn1Timeout);
       console.error("Turn 1 timed out or aborted:", abortErr);
-      const fallbackResp = await fetch(ANTHROPIC_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          max_tokens: 2048,
-          system: systemContent,
-          messages: anthropicMessages,
-          stream: true,
-        }),
-      });
+      const fallbackController = new AbortController();
+      const fallbackTimeout = setTimeout(() => fallbackController.abort(), 60000);
+      let fallbackResp: Response;
+      try {
+        fallbackResp = await fetch(ANTHROPIC_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            max_tokens: 2048,
+            system: systemContent,
+            messages: anthropicMessages,
+            stream: true,
+          }),
+          signal: fallbackController.signal,
+        });
+      } catch (e) {
+        clearTimeout(fallbackTimeout);
+        console.error("Turn 1 fallback fetch failed or timed out:", e);
+        return new Response(
+          JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
+          { status: 503, headers: { ...securityHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      clearTimeout(fallbackTimeout);
       if (!fallbackResp.ok || !fallbackResp.body) {
         return new Response(
           JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
@@ -1005,21 +1043,38 @@ Deno.serve(async (req) => {
       { role: "user", content: toolResults },
     ];
 
-    const turn2Resp = await fetch(ANTHROPIC_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 2048,
-        system: systemContent,
-        messages: turn2Messages,
-        stream: true,
-      }),
-    });
+    // ── Turn 2: Streaming request (tool results folded in). Guarded by its own
+    // timeout so a hung upstream fails fast instead of hanging the client.
+    const turn2Controller = new AbortController();
+    const turn2Timeout = setTimeout(() => turn2Controller.abort(), 60000);
+
+    let turn2Resp: Response;
+    try {
+      turn2Resp = await fetch(ANTHROPIC_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 2048,
+          system: systemContent,
+          messages: turn2Messages,
+          stream: true,
+        }),
+        signal: turn2Controller.signal,
+      });
+    } catch (e) {
+      clearTimeout(turn2Timeout);
+      console.error("Turn 2 fetch failed or timed out:", e);
+      return new Response(
+        JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
+        { status: 503, headers: { ...securityHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    clearTimeout(turn2Timeout);
 
     if (!turn2Resp.ok || !turn2Resp.body) {
       const t = await turn2Resp.text();
