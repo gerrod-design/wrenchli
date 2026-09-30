@@ -33,8 +33,12 @@ export interface VideoCaptureHandle {
 interface VideoCaptureDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Called with the finished clip. The parent feeds it into handleFileUpload. */
-  onUseVideo: (file: File) => void;
+  /**
+   * Called with the finished clip. The parent feeds it into handleFileUpload.
+   * recordedSeconds is the stopwatch-measured length — the pipeline uses it
+   * when the file's own duration metadata is unreliable (iOS Safari).
+   */
+  onUseVideo: (file: File, recordedSeconds: number) => void;
   /** Fallback when permission is denied: parent opens the file picker. */
   onFallbackToPicker?: () => void;
 }
@@ -206,7 +210,9 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
           setPhase("review");
         };
         recorderRef.current = recorder;
-        recorder.start(250);
+        // No timeslice: Safari's MediaRecorder is most reliable delivering the
+        // whole recording in one chunk at stop. We assemble at stop anyway.
+        recorder.start();
 
         startedAtRef.current = Date.now();
         setPhase("recording");
@@ -274,14 +280,15 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
       const file = new File([blob], `wrenchli-video-${Date.now()}.${ext}`, {
         type: blob.type || "video/webm",
       });
+      const seconds = recordedSeconds;
       teardown();
       revokeReview();
       setElapsed(0);
       setRecordedSeconds(0);
       setPhase("idle");
       onOpenChange(false);
-      onUseVideo(file);
-    }, [teardown, revokeReview, onOpenChange, onUseVideo]);
+      onUseVideo(file, seconds);
+    }, [teardown, revokeReview, onOpenChange, onUseVideo, recordedSeconds]);
 
     const handleFallbackToPicker = useCallback(() => {
       teardown();

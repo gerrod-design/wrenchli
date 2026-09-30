@@ -157,7 +157,10 @@ export default function ChatBot() {
     return urlData.signedUrl;
   };
 
-  const handleFileUpload = async (files: FileList | null) => {
+  const handleFileUpload = async (
+    files: FileList | null,
+    opts?: { knownVideoDurationSec?: number },
+  ) => {
     if (!files || files.length === 0) return;
     const remaining = 5 - pendingPhotos.length;
     if (remaining <= 0) { toast.error("Maximum 5 photos per message."); return; }
@@ -175,7 +178,7 @@ export default function ChatBot() {
       toast.info("🎬 Extracting frames & audio from video…", { duration: 8000 });
       try {
         const [frames, audioBlob] = await Promise.all([
-          extractVideoFrames(videoFile, Math.min(4, remaining)),
+          extractVideoFrames(videoFile, Math.min(4, remaining), undefined, opts?.knownVideoDurationSec),
           extractVideoAudio(videoFile),
         ]);
 
@@ -248,10 +251,10 @@ export default function ChatBot() {
   };
 
   // The recorded clip becomes a File and flows through the existing upload pipeline.
-  const handleUseRecordedVideo = (file: File) => {
+  const handleUseRecordedVideo = (file: File, recordedSeconds: number) => {
     const dt = new DataTransfer();
     dt.items.add(file);
-    void handleFileUpload(dt.files);
+    void handleFileUpload(dt.files, { knownVideoDurationSec: recordedSeconds });
   };
 
   const ensureActiveConversation = useCallback((): string => {
