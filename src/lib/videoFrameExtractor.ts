@@ -109,7 +109,7 @@ export async function extractVideoFrames(
 
   if (!duration || duration < 0.5) {
     URL.revokeObjectURL(video.src);
-    throw new Error("Video is too short to extract frames.");
+    throw new Error("That video was too short to analyze — please record at least a couple of seconds.");
   }
 
   const canvas = document.createElement("canvas");

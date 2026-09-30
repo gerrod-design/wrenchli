@@ -60,6 +60,21 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
     const cancelledRef = useRef(false);
     const startInFlightRef = useRef(false);
     const previewVideoRef = useRef<HTMLVideoElement>(null);
+    const [recordedSeconds, setRecordedSeconds] = useState(0);
+
+    /**
+     * Attach the live stream whenever the preview element mounts. The preview
+     * <video> only exists during the "recording" phase, but beginCapture runs
+     * during "starting" — so assigning srcObject there misses the element and
+     * the user records blind. The callback ref covers every mount.
+     */
+    const attachPreviewRef = useCallback((el: HTMLVideoElement | null) => {
+      previewVideoRef.current = el;
+      if (el && streamRef.current) {
+        el.srcObject = streamRef.current;
+        void el.play().catch(() => {});
+      }
+    }, []);
 
     const clearTimers = useCallback(() => {
       if (timerRef.current !== null) {
@@ -110,6 +125,7 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
       teardown();
       revokeReview();
       setElapsed(0);
+      setRecordedSeconds(0);
       setPhase("idle");
       onOpenChange(false);
     }, [teardown, revokeReview, onOpenChange]);
@@ -132,6 +148,7 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
       revokeReview();
       setErrorMsg("");
       setElapsed(0);
+      setRecordedSeconds(0);
       setPhase("starting");
 
       try {
@@ -170,6 +187,7 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
         recorder.onstop = () => {
           if (cancelledRef.current) return;
           clearTimers();
+          setRecordedSeconds(Math.floor((Date.now() - startedAtRef.current) / 1000));
           const blob = new Blob(chunksRef.current, {
             type: mimeTypeRef.current || "video/webm",
           });
@@ -259,6 +277,7 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
       teardown();
       revokeReview();
       setElapsed(0);
+      setRecordedSeconds(0);
       setPhase("idle");
       onOpenChange(false);
       onUseVideo(file);
@@ -298,7 +317,7 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
               <div className="space-y-3">
                 <div className="relative rounded-xl overflow-hidden bg-black aspect-video">
                   <video
-                    ref={previewVideoRef}
+                    ref={attachPreviewRef}
                     muted
                     playsInline
                     autoPlay
@@ -347,6 +366,12 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
                 <p className="text-xs text-muted-foreground text-center">
                   Play it back — check you can see the problem and hear the sound.
                 </p>
+                {recordedSeconds < 3 && (
+                  <p className="text-xs text-center rounded-lg bg-amber-50 text-amber-800 px-3 py-2 border border-amber-200">
+                    That clip was very short ({recordedSeconds}s). A few seconds of the
+                    problem — sight and sound together — gives a much better analysis.
+                  </p>
+                )}
                 <div className="flex gap-2">
                   <button
                     type="button"
