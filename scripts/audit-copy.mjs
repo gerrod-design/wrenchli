@@ -23,7 +23,7 @@ const CONSUMER_DIRS = [
   "src/content/blog",
 ];
 
-const EXTENSIONS = [".tsx", ".ts", ".jsx", ".md"];
+const EXTENSIONS = [".tsx", ".ts", ".jsx", ".md", ".html"];
 
 // Files/dirs that are NOT consumer-facing
 const SKIP_PATTERNS = [
@@ -73,6 +73,13 @@ const BANNED_WORDS = [
   { pattern: /\bverified shops?\b/gi, label: "verified shops", fix: 'Always banned — use "trusted shops" (Verified Score does not exist)' },
   { pattern: /\blive in Michigan and Ohio\b/gi, label: "false availability claim", fix: 'Never claim shop matching is live — "live in Michigan" may only describe the assessment/Garage' },
   { pattern: /\bcoming soon to [A-Z][a-z]+(?: and [A-Z][a-z]+)?\b/gi, label: "coming soon (availability)", fix: 'Michigan-pilot language only — never claim shop matching is live; no Ohio availability claims' },
+  // Pricing claims — costs are always estimates. Warning (not error): context
+  // decides. Legit in quoted customer speech (testimonials) and for Wrenchli's
+  // own fees to shops; never promise a shop's pricing to a consumer.
+  { pattern: /\breal prices?\b/gi, label: '"real prices" (pricing claim)', severity: "warning", fix: 'Costs are estimates — use "typical cost ranges". OK in quoted customer speech.' },
+  { pattern: /\bno hidden fees?\b/gi, label: '"no hidden fees" (pricing claim)', severity: "warning", fix: 'OK only for Wrenchli\'s own fees to shops; never promise a shop\'s pricing. Use "typical cost ranges".' },
+  { pattern: /\bno surprises\b/gi, label: '"no surprises" (absolute promise)', severity: "warning", fix: 'Avoid absolute promises — say what the consumer actually gets.' },
+  { pattern: /\bguaranteed prices?\b/gi, label: '"guaranteed price" (pricing claim)', severity: "warning", fix: 'Costs are estimates — use "typical cost ranges".' },
 ];
 
 // Words that make "broken" OK in technical context (e.g. "broken hose")
@@ -193,7 +200,7 @@ function scan() {
           for (const match of matches) {
             if (rule.contextCheck && rule.label.includes("broken") && BROKEN_OK_CONTEXT.test(line)) continue;
             if (rule.contextOk && rule.contextOk.test(line)) continue;
-            findings.push({ severity: "error", category: "Banned word", file: rel, line: i + 1, text: `"${match[0]}"`, fix: rule.fix });
+            findings.push({ severity: rule.severity || "error", category: "Banned word", file: rel, line: i + 1, text: `"${match[0]}"`, fix: rule.fix });
           }
         }
       } else {
@@ -204,7 +211,7 @@ function scan() {
             if (rule.contextCheck && rule.label.includes("broken") && BROKEN_OK_CONTEXT.test(text)) continue;
             if (rule.contextOk && rule.contextOk.test(text)) continue;
             const lineNum = lines.findIndex((l) => l.includes(text.slice(0, 30))) + 1;
-            findings.push({ severity: "error", category: "Banned word", file: rel, line: lineNum || "?", text: `"${match[0]}"`, fix: rule.fix });
+            findings.push({ severity: rule.severity || "error", category: "Banned word", file: rel, line: lineNum || "?", text: `"${match[0]}"`, fix: rule.fix });
           }
         }
       }

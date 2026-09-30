@@ -42,6 +42,17 @@ Scan the copy for any of the following banned phrases. If found, flag as a hard 
 
 If a banned phrase is found inside a direct quote from a third party (e.g., news article citation, shop owner testimonial), preserve the quote verbatim but flag it in the COPY CHECK so a human can decide whether to use a different quote.
 
+### Check 1A — Pricing-claim scan (FLAG FOR REVIEW, not hard fail)
+
+Repair costs are always estimates. Flag the following for human review — context decides whether the use is legitimate:
+
+| Phrase | Legitimate use | Must be rewritten |
+|---|---|---|
+| real prices | Quoted customer speech (testimonials) | Brand promises about shop pricing — use "typical cost ranges" |
+| no hidden fees | Wrenchli's own fees to shops | Promises about a shop's pricing to a consumer — use "typical cost ranges" |
+| no surprises | — | Absolute promises — say what the consumer actually gets |
+| guaranteed price(s) | — | Costs are estimates — use "typical cost ranges" |
+
 ### Check 2 — Required terminology scan (HARD FAIL)
 
 Verify that required Wrenchli terminology is used correctly when the subject matter calls for it:
