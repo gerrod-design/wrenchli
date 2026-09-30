@@ -59,7 +59,7 @@ export default function Index() {
           </SectionReveal>
           <SectionReveal delay={0}>
             <div className="rounded-xl border border-border bg-muted/30 p-6 md:p-8">
-              <span className="inline-block text-sm font-bold text-accent mb-4">Always free</span>
+              <span className="inline-block text-sm font-bold text-accent mb-4">Assessment always free</span>
               <h3 className="font-heading text-xl font-bold mb-1">Free</h3>
               <p className="text-xs text-muted-foreground mb-6">No credit card required</p>
               <ul className="grid gap-3 sm:grid-cols-2">

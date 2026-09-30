@@ -1,10 +1,11 @@
 name: Copy Audit
 
+# Runs on every branch push and every pull request — banned copy must be
+# caught before merge, not after it ships. Hard errors fail the build;
+# warnings (pricing claims, sentence length) are review-only and never fail.
 on:
   push:
-    branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   copy-audit:
@@ -21,5 +22,4 @@ jobs:
       - run: npm ci
 
       - name: Run copy audit
-        run: |
-          node scripts/audit-copy.mjs || echo "::warning::Copy audit found violations — see report above"
+        run: node scripts/audit-copy.mjs

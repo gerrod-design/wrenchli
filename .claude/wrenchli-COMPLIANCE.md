@@ -36,7 +36,7 @@ Scan the copy for any of the following banned phrases. If found, flag as a hard 
 | dealerships do worse work, independents do worse work | (rewrite — never compare quality across shop types) |
 | Pro Only | (flag for human rewrite — Garage Pro retired 2026-09-17; no auto-substitution) |
 | Always free | Assessment always free |
-| verified repair shops, verified shops | trusted shops (always banned — Verified Score does not exist) |
+| verified repair shops, verified shops | trusted shops ("verified" is reserved for the Verified Score product feature — see /verified-score) |
 | financing options (as current feature) | repair financing on the way |
 | predictive maintenance alerts | (rewrite — not a current feature) |
 
@@ -168,7 +168,7 @@ The banned and preferred language tables in this file supersede any conflicting 
 
 ### Never say, always say
 
-**Never**: diagnosis, diagnose, AI-powered diagnosis, machine learning diagnosis, our platform, diagnose your car, AutoZone, we're building, coming soon, broken (for repair experience), vetted shops, embedded financing, modern tools for shops, paper tickets and phone calls, dealerships do worse work, Pro Only, Always free, verified shops, financing options (as feature), predictive maintenance alerts. Availability claims are Michigan-only: never claim shop matching is live anywhere; "live in Michigan" describes the assessment and Garage only; no Ohio availability claims.
+**Never**: diagnosis, diagnose, AI-powered diagnosis, machine learning diagnosis, our platform, diagnose your car, AutoZone, we're building, coming soon, broken (for repair experience), vetted shops, embedded financing, modern tools for shops, paper tickets and phone calls, dealerships do worse work, Pro Only, Always free, verified shops (outside the Verified Score product feature), financing options (as feature), predictive maintenance alerts. Availability claims are Michigan-only: never claim shop matching is live anywhere; "live in Michigan" describes the assessment and Garage only; no Ohio availability claims.
 
 **Always**: symptom assessment, likely causes, assessment results, repair likelihood report, Wrenchli assesses symptoms, monitor / schedule / soon / immediate, easy / moderate / Shop Required, Assessment always free, trusted shops, repair financing on the way, Wrenchli (instead of "our platform").
 

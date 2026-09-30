@@ -30,6 +30,7 @@ const SKIP_PATTERNS = [
   /\/ui\//,            // shadcn primitives
   /\/shop-portal\//,   // internal shop dashboard
   /\/agent\//,         // internal agent flow
+  /\/Investors/,       // investor copy is not consumer copy (roadmap language is legitimate)
   /__tests__/,
   /\.test\./,
   /AdminDashboard/,
@@ -51,10 +52,10 @@ const LEGAL_PATTERNS = [
 // ── Rules ──────────────────────────────────────────────────────
 
 const BANNED_WORDS = [
-  { pattern: /\bdiagnos(?:is|e[sd]?|ing)\b/gi, label: "diagnosis/diagnose", fix: 'Use "symptom assessment" or "likely causes"' },
+  { pattern: /\bdiagnos(?:is|e[sd]?|ing)\b/gi, label: "diagnosis/diagnose", fix: 'Use "symptom assessment" or "likely causes"', contextOk: /\b(never|not)(\s+[a-z]+){0,4}\s+diagnos|\bprofessional\s+diagnos/i },
   { pattern: /\bPro Only\b/gi, label: "Pro Only", fix: 'Flag for human rewrite — Garage Pro retired 2026-09-17; no auto-substitution' },
   { pattern: /\bProfessional Only\b/gi, label: "Professional Only", fix: 'Flag for human rewrite — Garage Pro retired 2026-09-17; no auto-substitution' },
-  { pattern: /\bAlways free\b/gi, label: "Always free", fix: 'Use "Assessment always free"', contextOk: /Assessment always free/i },
+  { pattern: /\bAlways free\b/gi, label: "Always free", fix: 'Use "Assessment always free"', contextOk: /assessment(\s+is)?\s+always\s+free/i },
   { pattern: /\bvetted shops?\b/gi, label: "vetted shops", fix: 'Use "trusted shops"' },
   { pattern: /\bwe(?:'re| are) building\b/gi, label: "we're building", fix: 'Use "we built" — product is live' },
   { pattern: /\bour platform\b/gi, label: "our platform", fix: 'Use "Wrenchli"' },
@@ -70,9 +71,9 @@ const BANNED_WORDS = [
   { pattern: /\bStop overpaying for (?:auto|vehicle) repairs?\b/gi, label: "Stop overpaying (banned framing)", fix: 'Use "Know what\'s wrong before you pay for it"' },
   { pattern: /\bvetted local shops?\b/gi, label: "vetted local shops", fix: 'Use "trusted local shops"' },
   { pattern: /\bbroken\b/gi, label: '"broken" (repair experience)', fix: 'Use "harder than it needs to be"', contextCheck: true },
-  { pattern: /\bverified shops?\b/gi, label: "verified shops", fix: 'Always banned — use "trusted shops" (Verified Score does not exist)' },
+  { pattern: /\bverified shops?\b/gi, label: "verified shops", fix: 'Use "trusted shops" — "verified" only in the Verified Score product-feature context', contextOk: /verified shop score/i },
   { pattern: /\blive in Michigan and Ohio\b/gi, label: "false availability claim", fix: 'Never claim shop matching is live — "live in Michigan" may only describe the assessment/Garage' },
-  { pattern: /\bcoming soon to [A-Z][a-z]+(?: and [A-Z][a-z]+)?\b/gi, label: "coming soon (availability)", fix: 'Michigan-pilot language only — never claim shop matching is live; no Ohio availability claims' },
+  { pattern: /\bcoming soon to (?!wrenchli\b)[A-Z][a-z]+(?: and [A-Z][a-z]+)?\b/gi, label: "coming soon (availability)", fix: 'Michigan-pilot language only — never claim shop matching is live; no Ohio availability claims' },
   // Pricing claims — costs are always estimates. Warning (not error): context
   // decides. Legit in quoted customer speech (testimonials) and for Wrenchli's
   // own fees to shops; never promise a shop's pricing to a consumer.
@@ -314,5 +315,5 @@ for (const f of findings) {
 console.log("\n" + "─".repeat(72));
 console.log(`\nTotal: ${findings.length} finding(s) across ${new Set(findings.map((f) => f.file)).size} file(s)\n`);
 
-// Exit 0 always — violations are warnings, not build failures
-process.exit(0);
+// Exit 1 when hard errors exist so CI can gate on them; warnings/infos never fail the build
+process.exit(errors.length > 0 ? 1 : 0);

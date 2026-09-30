@@ -247,7 +247,7 @@ export default function DesignPreview() {
         <section className="px-6 py-16" style={{ background: "#F0EFEC" }}>
           <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
             {[
-              { icon: Shield, title: "Transparent Pricing", desc: "See real cost ranges before you visit a shop. No surprises." },
+              { icon: Shield, title: "Transparent Pricing", desc: "See typical cost ranges before you visit a shop." },
               { icon: Zap, title: "Instant Assessment", desc: "Structured symptom assessment in seconds, with confidence-scored likely causes." },
               { icon: Activity, title: "Accuracy Tracked", desc: "We track our symptom-to-repair match rate — and publish the results." },
             ].map((v) => (
