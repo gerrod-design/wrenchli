@@ -366,7 +366,13 @@ const VideoCaptureDialog = forwardRef<VideoCaptureHandle, VideoCaptureDialogProp
                     Engine running, phone close to the sound, and show the problem on camera — 15–30 seconds is plenty.
                   </p>
                   <p className="text-xs text-muted-foreground">
+                    Say out loud what you're doing ("starting the engine", "turning left") — the microphone is part of the analysis. If a dashboard warning light is on, point the camera at it for a few seconds.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
                     Heads up: your video can capture faces, voices, or license plates — only record what you're comfortable sharing.
+                  </p>
+                  <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                    Never record while driving — pull over or have a passenger record.
                   </p>
                 </div>
               </div>

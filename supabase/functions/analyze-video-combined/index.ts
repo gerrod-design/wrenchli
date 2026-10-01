@@ -40,6 +40,12 @@ Provide:
 3. Combined assessment (2-3 sentences connecting visual + audio)
 4. Urgency level and recommended next step
 
+Safety is non-negotiable: if anything you see or hear suggests a safety-critical problem — brakes, steering, fuel smell, smoke or flames, overheating, airbag or brake warning lights, sudden loss of power — say clearly and early: "Don't drive it — have it inspected before you drive further."
+
+Recording quality comes before conclusions: if the frames are black, too dark, or blurry, or the audio is only wind/silence, do NOT guess at causes. Say plainly what's wrong with the recording and give one specific re-record tip (e.g. "record closer to the engine with the hood open").
+
+End every response with this exact line on its own: "This is a symptom assessment, not a professional inspection."
+
 Keep it conversational, like talking to a friend. Be specific about what you observe in each modality.
 
 If the audio is mostly silence, wind, or ambient noise, say so and focus on the visual analysis. Don't make up sounds you don't hear.`;
@@ -172,7 +178,10 @@ Deno.serve(async (req: Request) => {
     let response: Response | null = null;
     let lastStatus = 0;
     let lastErrText = "";
+    let attemptsUsed = 0;
+    const geminiStart = Date.now();
     for (let attempt = 0; attempt < 2; attempt++) {
+      attemptsUsed = attempt + 1;
       try {
         const resp = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
           method: "POST",
@@ -204,6 +213,19 @@ Deno.serve(async (req: Request) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Unit-economics log: model, latency, attempts, input sizes per clip.
+    console.log(
+      JSON.stringify({
+        event: "video_analysis",
+        model: GEMINI_MODEL,
+        latencyMs: Date.now() - geminiStart,
+        attempts: attemptsUsed,
+        frames: analyzedFrameCount,
+        audioBytes: audioB64 ? audioB64.length : 0,
+        hasAudio: hasUsableAudio,
+      }),
+    );
 
     const result = await response.json();
     const analysis = result?.candidates?.[0]?.content?.parts
