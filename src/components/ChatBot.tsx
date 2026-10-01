@@ -203,27 +203,47 @@ export default function ChatBot() {
           }
 
           const analyzeUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-video-combined`;
+          // Keep lastVideoRef until analysis succeeds, so a failed analysis can
+          // offer "Try again" that re-runs the video pipeline without a new recording.
+          const retryVideoAnalysis = () => {
+            const retryVideo = lastVideoRef.current;
+            if (!retryVideo) return;
+            // Drop the previous attempt's frames so the retry starts clean.
+            setPendingPhotos((p) => p.filter((url) => !uploaded.includes(url)));
+            const dt = new DataTransfer();
+            dt.items.add(retryVideo.file);
+            void handleFileUpload(dt.files, { knownVideoDurationSec: retryVideo.recordedSeconds });
+          };
           fetch(analyzeUrl, {
             method: "POST",
             headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
             body: formData,
           })
-            .then((r) => r.json())
-            .then((data) => {
-              if (data.analysis) {
-                const label = data.has_audio
-                  ? `🎬🔊 [Analyzed video: ${data.frame_count} frames + audio]`
-                  : `🎬 [Analyzed video: ${data.frame_count} frames, no audio detected]`;
-                const userMsg: Msg = { role: "user", content: label, image_urls: uploaded };
-                const assistantMsg: Msg = { role: "assistant", content: data.analysis };
-                setMessages((prev) => [...prev, userMsg, assistantMsg]);
-                setPendingPhotos((p) => p.filter((url) => !uploaded.includes(url)));
+            .then(async (r) => {
+              const data = await r.json().catch(() => ({}));
+              if (!r.ok || !data.analysis) {
+                throw new Error((data && data.error) || `Video analysis failed (HTTP ${r.status})`);
               }
+              return data;
+            })
+            .then((data) => {
+              const label = data.has_audio
+                ? `🎬🔊 [Analyzed video: ${data.frame_count} frames + audio]`
+                : `🎬 [Analyzed video: ${data.frame_count} frames, no audio detected]`;
+              const userMsg: Msg = { role: "user", content: label, image_urls: uploaded };
+              const assistantMsg: Msg = { role: "assistant", content: data.analysis };
+              setMessages((prev) => [...prev, userMsg, assistantMsg]);
+              setPendingPhotos((p) => p.filter((url) => !uploaded.includes(url)));
+              lastVideoRef.current = null; // analysis succeeded — nothing to retry
             })
             .catch(() => {
-              toast.success(`📸 Extracted ${uploaded.length} frames — send a message to analyze`);
+              toast.error("Video analysis didn't go through — your recording is kept.", {
+                duration: 12000,
+                action: lastVideoRef.current
+                  ? { label: "Try again", onClick: retryVideoAnalysis }
+                  : undefined,
+              });
             });
-          lastVideoRef.current = null; // extraction succeeded — nothing to retry
         }
       } catch (err) {
         const retryVideo = lastVideoRef.current;
