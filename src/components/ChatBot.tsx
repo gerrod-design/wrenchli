@@ -29,6 +29,8 @@ import { trackVoiceEvent } from "@/lib/voiceTelemetry";
 import { handleStartFailure } from "@/lib/voiceRetry";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
+const VIDEO_PROGRESS_TEXT =
+  "🎬 Working on your video \u2014 pulling out the pictures and sound. This can take a minute or two, hang tight\u2026";
 
 const AGENT_META: Record<AgentType, { name: string; role: string; color: string }> = {
   mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
@@ -178,6 +180,12 @@ export default function ChatBot() {
         return;
       }
       toast.info("🎬 Extracting frames & audio from video…", { duration: 8000 });
+      // Persistent progress message: extraction + AI analysis can take a
+      // minute or two, long after the toasts above expire. Without this the
+      // chat looks dead and users bail out early.
+      setMessages((prev) => [...prev, { role: "assistant", content: VIDEO_PROGRESS_TEXT }]);
+      const clearVideoProgress = () =>
+        setMessages((prev) => prev.filter((m) => m.content !== VIDEO_PROGRESS_TEXT));
       try {
         const [frames, audioBlob] = await Promise.all([
           extractVideoFrames(videoFile, Math.min(4, remaining), undefined, opts?.knownVideoDurationSec),
@@ -236,6 +244,7 @@ export default function ChatBot() {
               return data;
             })
             .then((data) => {
+              clearVideoProgress();
               const label = data.has_audio
                 ? `🎬🔊 [Analyzed video: ${data.frame_count} frames + audio]`
                 : `🎬 [Analyzed video: ${data.frame_count} frames, no audio detected]`;
@@ -246,6 +255,7 @@ export default function ChatBot() {
               lastVideoRef.current = null; // analysis succeeded — nothing to retry
             })
             .catch(() => {
+              clearVideoProgress();
               toast.error("Video analysis didn't go through — your recording is kept.", {
                 duration: 12000,
                 action: lastVideoRef.current
@@ -255,6 +265,7 @@ export default function ChatBot() {
             });
         }
       } catch (err) {
+        clearVideoProgress();
         const retryVideo = lastVideoRef.current;
         toast.error(err instanceof Error ? err.message : "Failed to process video.", {
           duration: 9000,

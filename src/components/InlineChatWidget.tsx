@@ -54,6 +54,9 @@ function getAgentMeta(agent: AgentType | null | undefined) {
   return AGENT_META[agent ?? "mike"] ?? AGENT_META.mike;
 }
 
+const VIDEO_PROGRESS_TEXT =
+  "🎬 Working on your video \u2014 pulling out the pictures and sound. This can take a minute or two, hang tight\u2026";
+
 export default function InlineChatWidget() {
   const VOICE_OWNER = "inline-chat-widget";
   const navigate = useNavigate();
@@ -137,6 +140,12 @@ export default function InlineChatWidget() {
         return;
       }
       toast.info("🎬 Extracting frames & audio from video…", { duration: 8000 });
+      // Persistent progress message: extraction + AI analysis can take a
+      // minute or two, long after the toasts above expire. Without this the
+      // chat looks dead and users bail out early.
+      setMessages((prev) => [...prev, { role: "assistant", content: VIDEO_PROGRESS_TEXT }]);
+      const clearVideoProgress = () =>
+        setMessages((prev) => prev.filter((m) => m.content !== VIDEO_PROGRESS_TEXT));
       try {
         // Extract frames and audio in parallel
         const [frames, audioBlob] = await Promise.all([
@@ -199,6 +208,7 @@ export default function InlineChatWidget() {
               return data;
             })
             .then((data) => {
+              clearVideoProgress();
               const label = data.has_audio
                 ? `🎬🔊 [Analyzed video: ${data.frame_count} frames + audio]`
                 : `🎬 [Analyzed video: ${data.frame_count} frames, no audio detected]`;
@@ -210,6 +220,7 @@ export default function InlineChatWidget() {
               lastVideoRef.current = null; // analysis succeeded — nothing to retry
             })
             .catch(() => {
+              clearVideoProgress();
               toast.error("Video analysis didn't go through — your recording is kept.", {
                 duration: 12000,
                 action: lastVideoRef.current
@@ -219,6 +230,7 @@ export default function InlineChatWidget() {
             });
         }
       } catch (err) {
+        clearVideoProgress();
         const retryVideo = lastVideoRef.current;
         toast.error(err instanceof Error ? err.message : "Failed to process video.", {
           duration: 9000,
