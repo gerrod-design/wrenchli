@@ -219,9 +219,25 @@ export default function InlineChatWidget() {
               setPendingPhotos((p) => p.filter((url) => !uploaded.includes(url)));
               lastVideoRef.current = null; // analysis succeeded — nothing to retry
             })
-            .catch(() => {
+            .catch((err) => {
               clearVideoProgress();
-              toast.error("Video analysis didn't go through — your recording is kept.", {
+              // Surface a plain-language failure reason so the next test
+              // tells us exactly which layer failed (network vs timeout vs server).
+              const raw = (err && (err.message || String(err))) || "";
+              const name = (err && err.name) || "";
+              let reason;
+              if (name === "TimeoutError" || /timed out/i.test(raw)) {
+                reason = "the analysis took too long and timed out";
+              } else if (/HTTP 5\d\d|gemini_unavailable/i.test(raw)) {
+                reason = "the AI service returned an error";
+              } else if (/HTTP 4\d\d/.test(raw)) {
+                reason = "the server rejected the request";
+              } else if (/failed to fetch|networkerror|load failed|network/i.test(raw)) {
+                reason = "the upload was interrupted (network)";
+              } else {
+                reason = "an unexpected error occurred";
+              }
+              toast.error(`Video analysis didn't go through \u2014 ${reason}. Your recording is kept.`, {
                 duration: 12000,
                 action: lastVideoRef.current
                   ? { label: "Try again", onClick: retryVideoAnalysis }
