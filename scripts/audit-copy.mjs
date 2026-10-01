@@ -55,7 +55,7 @@ const BANNED_WORDS = [
   { pattern: /\bdiagnos(?:is|e[sd]?|ing)\b/gi, label: "diagnosis/diagnose", fix: 'Use "symptom assessment" or "likely causes"', contextOk: /\b(never|not)(\s+[a-z]+){0,4}\s+diagnos|\bprofessional\s+diagnos/i },
   { pattern: /\bPro Only\b/gi, label: "Pro Only", fix: 'Flag for human rewrite — Garage Pro retired 2026-09-17; no auto-substitution' },
   { pattern: /\bProfessional Only\b/gi, label: "Professional Only", fix: 'Flag for human rewrite — Garage Pro retired 2026-09-17; no auto-substitution' },
-  { pattern: /\bAlways free\b/gi, label: "Always free", fix: 'Use "Assessment always free"', contextOk: /assessment(\s+is)?\s+always\s+free/i },
+  { pattern: /\bAlways free\b/gi, label: "Always free", fix: 'Use "Assessment always free"', contextOk: /assessment[\w\s]{0,30}always\s+free/i },
   { pattern: /\bvetted shops?\b/gi, label: "vetted shops", fix: 'Use "trusted shops"' },
   { pattern: /\bwe(?:'re| are) building\b/gi, label: "we're building", fix: 'Use "we built" — product is live' },
   { pattern: /\bour platform\b/gi, label: "our platform", fix: 'Use "Wrenchli"' },
@@ -73,7 +73,7 @@ const BANNED_WORDS = [
   { pattern: /\bbroken\b/gi, label: '"broken" (repair experience)', fix: 'Use "harder than it needs to be"', contextCheck: true },
   { pattern: /\bverified shops?\b/gi, label: "verified shops", fix: 'Use "trusted shops" — "verified" only in the Verified Score product-feature context', contextOk: /verified shop score/i },
   { pattern: /\blive in Michigan and Ohio\b/gi, label: "false availability claim", fix: 'Never claim shop matching is live — "live in Michigan" may only describe the assessment/Garage' },
-  { pattern: /\bcoming soon to (?!wrenchli\b)[A-Z][a-z]+(?: and [A-Z][a-z]+)?\b/gi, label: "coming soon (availability)", fix: 'Michigan-pilot language only — never claim shop matching is live; no Ohio availability claims' },
+  { pattern: /\bcoming soon to (?!wrenchli\b)[A-Z][a-z]+(?: and [A-Z][a-z]+)?\b/gi, label: "coming soon (availability)", fix: 'Michigan + Columbus, Ohio only — never claim shop matching is live; no other Ohio availability claims' },
   // Pricing claims — costs are always estimates. Warning (not error): context
   // decides. Legit in quoted customer speech (testimonials) and for Wrenchli's
   // own fees to shops; never promise a shop's pricing to a consumer.
@@ -141,7 +141,7 @@ function extractConsumerText(content, ext) {
     if (/^(import |export |const |let |var |type |interface |function |return |if |else |switch |case |try |catch |async |await |throw |\/\/|\/\*|\*)/.test(trimmed)) continue;
 
     // Extract attribute values that are display text
-    for (const m of line.matchAll(/(?:title|label|placeholder|alt|aria-label|desc|description|subtitle|text|heading|message|tip|note|disclaimer|content)\s*[=:]\s*"([^"]{4,})"/gi)) {
+    for (const m of line.matchAll(/(?:title|label|placeholder|alt|aria-label|desc|description|subtitle|text|heading|message|tip|note|disclaimer|content|q|a)\s*[=:]\s*"([^"]{4,})"/gi)) {
       strings.push(m[1]);
     }
     // Extract strings in JSX expressions that look like messages: {"Some text here"}

@@ -29,6 +29,8 @@ import Owners from "./pages/Owners";
 import Shops from "./pages/Shops";
 import ForCarOwners from "./pages/ForCarOwners";
 import ForShops from "./pages/ForShops";
+import Columbus from "./pages/Columbus";
+import ColumbusShops from "./pages/ColumbusShops";
 import ForDealers from "./pages/ForDealers";
 import VehicleInsights from "./pages/VehicleInsights";
 import About from "./pages/About";
@@ -104,6 +106,8 @@ function AnimatedRoutes() {
           <Route path="/shops" element={<Shops />} />
           <Route path="/for-car-owners" element={<ForCarOwners />} />
           <Route path="/for-shops" element={<ForShops />} />
+          <Route path="/columbus" element={<Columbus />} />
+          <Route path="/columbus-shops" element={<ColumbusShops />} />
           <Route path="/for-dealers" element={<ForDealers />} />
           <Route path="/vehicle-insights" element={<VehicleInsights />} />
           <Route path="/about" element={<About />} />
