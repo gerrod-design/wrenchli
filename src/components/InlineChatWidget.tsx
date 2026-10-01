@@ -177,15 +177,24 @@ export default function InlineChatWidget() {
             dt.items.add(retryVideo.file);
             void handleFileUpload(dt.files, { knownVideoDurationSec: retryVideo.recordedSeconds });
           };
+          // Bound the wait: a hung analysis must surface the Try-again error
+          // instead of spinning silently. (Older browsers without
+          // AbortSignal.timeout simply skip the timeout.)
+          const analysisSignal =
+            typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(150_000) : undefined;
           fetch(analyzeUrl, {
             method: "POST",
             headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
             body: formData,
+            signal: analysisSignal,
           })
             .then(async (r) => {
               const data = await r.json().catch(() => ({}));
               if (!r.ok || !data.analysis) {
-                throw new Error((data && data.error) || `Video analysis failed (HTTP ${r.status})`);
+                const reason =
+                  (data && (data.detail || data.error)) || `Video analysis failed (HTTP ${r.status})`;
+                console.error("[video analysis] request failed:", reason);
+                throw new Error(reason);
               }
               return data;
             })

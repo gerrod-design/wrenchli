@@ -73,7 +73,9 @@ Deno.serve(async (req: Request) => {
     const fetchedFrames: { mime: string; b64: string }[] = [];
     for (const url of frameUrls.slice(0, MAX_FRAMES - frameEntries.length)) {
       try {
-        const r = await fetch(url);
+        // Bound each frame download: a stalled storage fetch must not hang
+        // the whole analysis.
+        const r = await fetch(url, { signal: AbortSignal.timeout(20_000) });
         if (!r.ok) {
           console.error("[analyze-video-combined] frame fetch failed:", r.status, url.slice(0, 80));
           continue;
@@ -155,38 +157,49 @@ Deno.serve(async (req: Request) => {
     if (vehicleContext) promptText += ` Vehicle: ${vehicleContext}.`;
     parts.push({ text: promptText });
 
-    const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: "user", parts }],
-        generationConfig: {
-          temperature: 0.4,
-          maxOutputTokens: 1024,
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      }),
+    // Call Gemini with one automatic retry on transient failures (rate limit /
+    // server overload / network blip). A single video analysis should not die
+    // on one flaky upstream response.
+    const geminiBody = JSON.stringify({
+      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: [{ role: "user", parts }],
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 1024,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("Gemini API error:", response.status, errText.slice(0, 500));
-
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited. Please try again in a moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+    let response: Response | null = null;
+    let lastStatus = 0;
+    let lastErrText = "";
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const resp = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: geminiBody,
+          signal: AbortSignal.timeout(120_000),
         });
+        lastStatus = resp.status;
+        if (resp.ok) {
+          response = resp;
+          break;
+        }
+        lastErrText = (await resp.text()).slice(0, 300);
+        console.error(`Gemini API error (attempt ${attempt + 1}):`, resp.status, lastErrText);
+        // Retry only transient statuses; 4xx (other than 429) is deterministic.
+        if (resp.status !== 429 && resp.status < 500) break;
+      } catch (e) {
+        lastErrText = e instanceof Error ? e.message : String(e);
+        console.error(`Gemini fetch failed (attempt ${attempt + 1}):`, lastErrText);
       }
-      if (response.status === 402 || response.status === 403) {
-        return new Response(JSON.stringify({ error: "Video analysis temporarily unavailable." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 2500));
+    }
 
-      return new Response(JSON.stringify({ error: "Failed to analyze video" }), {
+    if (!response) {
+      const detail = `gemini_unavailable status=${lastStatus} ${lastErrText.slice(0, 200)}`;
+      console.error("[analyze-video-combined]", detail);
+      return new Response(JSON.stringify({ error: "Failed to analyze video", detail }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
