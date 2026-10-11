@@ -23,6 +23,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { trackVoiceEvent } from "@/lib/voiceTelemetry";
+import { SymptomFlowModal } from "@/components/symptoms/SymptomFlowModal";
+import type { SymptomAnalysisResponse, SenseBundle } from "@/types/symptom";
 import { handleStartFailure } from "@/lib/voiceRetry";
 
 const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
@@ -66,6 +68,7 @@ export default function ChatBot() {
   const [uploading, setUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [vinModalOpen, setVinModalOpen] = useState(false);
+  const [symptomModalOpen, setSymptomModalOpen] = useState(false);
   const [vinText, setVinText] = useState("");
   const [vinLoading, setVinLoading] = useState(false);
   const [vinError, setVinError] = useState("");
@@ -827,6 +830,11 @@ export default function ChatBot() {
                     <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Sound</span>
                     <span className="text-[11px] text-muted-foreground italic">Powered by Google AI</span>
                   </span>
+                  <button type="button" onClick={() => setSymptomModalOpen(true)} disabled={loading || uploading}
+                    className="flex flex-col items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors disabled:opacity-40" aria-label="Record a symptom">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-blue-500/10"><Film className="h-4 w-4" /></span>
+                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Symptom</span>
+                  </button>
                   <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
                     className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Scan VIN">
                     <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"><ScanLine className="h-4 w-4" /></span>
@@ -930,6 +938,26 @@ export default function ChatBot() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Five-senses symptom flow */}
+      <SymptomFlowModal
+        open={symptomModalOpen}
+        onClose={() => setSymptomModalOpen(false)}
+        onResult={(result: SymptomAnalysisResponse, bundle: SenseBundle) => {
+          const convId = ensureActiveConversation();
+          const senses = bundle.observations
+            .filter((o) => o.descriptors.length > 0)
+            .map((o) => o.sense.toLowerCase())
+            .join(", ");
+          const userMsg: Msg = { role: "user", content: `🔍 [Symptom report: ${senses}]` };
+          const urgencyLine = result.urgency === 3 ? "Don't drive it." : result.urgency === 2 ? "Get it checked this week." : "Looks safe to drive — schedule a shop visit soon.";
+          const assistantMsg: Msg = {
+            role: "assistant",
+            content: `**Preliminary Assessment**\n\n${result.preliminaryAssessment}\n\n**Urgency:** ${urgencyLine}${result.urgencyReason ? ` ${result.urgencyReason}` : ""}`,
+          };
+          setMessages((prev) => [...prev, userMsg, assistantMsg], convId);
+        }}
+      />
     </>
   );
 }

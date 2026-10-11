@@ -1,6 +1,7 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { computeUrgency, mapToSystemAreas, generateShopSummary, type SenseBundle } from "./symptomMapping.ts";
 
-const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent";
 
 // Round 14.7 — COPY CHECK-compliant v2 prompt.
 // Source: /mnt/documents/analyze-video-combined-prompt-v2.md
@@ -38,6 +39,16 @@ Keep it conversational, like talking to a friend. Be specific about what you obs
 
 If the audio is mostly silence, wind, or ambient noise, say so and focus on the visual analysis. Don't make up sounds you don't hear.`;
 
+function encodeBase64Safe(buffer: Uint8Array): string {
+  let result = "";
+  const chunkSize = 8192;
+  for (let i = 0; i < buffer.length; i += chunkSize) {
+    const chunk = buffer.slice(i, i + chunkSize);
+    result += String.fromCharCode(...chunk);
+  }
+  return btoa(result);
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -48,9 +59,41 @@ Deno.serve(async (req: Request) => {
     const formData = await req.formData();
     const audioFile = formData.get("audio") as File | null;
     const vehicleContext = formData.get("vehicle_context") as string | null;
+    // Symptom mode (five-senses intake). Absent = damage mode (backward-compatible).
+    const analysisMode = (formData.get("analysis_mode") as string) || "damage";
+    const senseBundleRaw = formData.get("sense_bundle") as string | null;
 
-    // Frames arrive as multiple "frame" fields (File entries)
-    const frameEntries = formData.getAll("frame").filter((v) => v instanceof File) as File[];
+    // Parse frame_urls as JSON array and fetch each URL once
+    let frameEntries: { bytes: ArrayBuffer; mimeType: string }[] = [];
+    const frameUrlsRaw = formData.get("frame_urls") as string | null;
+    if (frameUrlsRaw) {
+      try {
+        const parsed = JSON.parse(frameUrlsRaw);
+        if (Array.isArray(parsed)) {
+          for (let i = 0; i < Math.min(parsed.length, 8); i++) {
+            const frameUrl = parsed[i];
+            if (typeof frameUrl === "string") {
+              try {
+                const frameResponse = await fetch(frameUrl);
+                if (frameResponse.ok) {
+                  const contentType = frameResponse.headers.get("content-type") || "image/jpeg";
+                  const mimeType = contentType.split(";")[0].trim();
+                  const bytes = await frameResponse.arrayBuffer();
+                  frameEntries.push({
+                    bytes,
+                    mimeType,
+                  });
+                }
+              } catch {
+                // Skip individual fetch failures
+              }
+            }
+          }
+        }
+      } catch {
+        // Unparseable JSON — zero frames
+      }
+    }
 
     if (frameEntries.length === 0 && !audioFile) {
       return new Response(JSON.stringify({ error: "No frames or audio provided" }), {
@@ -59,37 +102,36 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const userContent: any[] = [];
+    const parts: any[] = [];
 
-    // Add image frames
+    // Add image frames from stored bytes
     for (const frame of frameEntries) {
-      const bytes = await frame.arrayBuffer();
-      const b64 = btoa(String.fromCharCode(...new Uint8Array(bytes)));
-      const mt = frame.type || "image/jpeg";
-      userContent.push({
-        type: "image_url",
-        image_url: { url: `data:${mt};base64,${b64}` },
+      const b64 = encodeBase64Safe(new Uint8Array(frame.bytes));
+      parts.push({
+        inlineData: {
+          mimeType: frame.mimeType,
+          data: b64,
+        },
       });
     }
 
     // Add audio
     if (audioFile) {
       const audioBytes = await audioFile.arrayBuffer();
-      const b64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBytes)));
+      const b64Audio = encodeBase64Safe(new Uint8Array(audioBytes));
       const mt = audioFile.type || "audio/wav";
-      userContent.push({
-        type: "input_audio",
-        input_audio: {
+      parts.push({
+        inlineData: {
+          mimeType: mt,
           data: b64Audio,
-          format: mt.includes("wav") ? "wav" : "mp3",
         },
       });
     }
@@ -103,36 +145,70 @@ Deno.serve(async (req: Request) => {
       promptText += " I've extracted the audio track. Please listen and tell them what's likely going on.";
     }
     if (vehicleContext) promptText += ` Vehicle: ${vehicleContext}.`;
-    userContent.push({ type: "text", text: promptText });
 
-    const response = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userContent },
-        ],
-      }),
-    });
+    // Symptom mode: weight driver observations as first-class signals.
+    let senseBundle: SenseBundle | null = null;
+    if (analysisMode === "symptom" && senseBundleRaw) {
+      try {
+        senseBundle = JSON.parse(senseBundleRaw) as SenseBundle;
+        const obsLines: string[] = [];
+        for (const obs of senseBundle.observations) {
+          if (obs.descriptors.length > 0) {
+            obsLines.push(`- ${obs.sense}: ${obs.descriptors.join(", ")}${obs.freeText ? ` (also: ${obs.freeText})` : ""}`);
+          } else if (obs.freeText && obs.freeText.trim()) {
+            obsLines.push(`- ${obs.sense}: ${obs.freeText.trim()}`);
+          }
+        }
+        if (obsLines.length > 0) {
+          let bundleText = "\n\nDriver observations (treat as first-class signals alongside what you see and hear):\n" + obsLines.join("\n");
+          if (senseBundle.timing.length > 0) bundleText += `\nTiming: ${senseBundle.timing.join(", ")}`;
+          if (senseBundle.conditions.length > 0) bundleText += `\nWhen it happens: ${senseBundle.conditions.join(", ")}`;
+          if (senseBundle.locations.length > 0) bundleText += `\nLocation: ${senseBundle.locations.join(", ")}`;
+          bundleText += "\nReference these observed descriptors in your assessment where they correlate with the video/audio.";
+          promptText += bundleText;
+        }
+      } catch {
+        // Unparseable bundle — proceed without it (damage-compatible fallback)
+        senseBundle = null;
+      }
+    }
+    parts.push({ text: promptText });
 
-    if (!response.ok) {
+    // Retry transient Gemini failures (429/503) with exponential backoff —
+    // video analysis is a core feature and must not fail on a momentary spike.
+    let response: Response | null = null;
+    let status = 0;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      response = await fetch(GEMINI_URL, {
+        method: "POST",
+        headers: {
+          "x-goog-api-key": GEMINI_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: SYSTEM_PROMPT }],
+          },
+          contents: [
+            {
+              parts,
+            },
+          ],
+        }),
+      });
+      status = response.status;
+      if (response.ok) break;
       const errText = await response.text();
-      console.error("AI gateway error:", response.status, errText);
+      console.error(`Gemini API error (attempt ${attempt}/3):`, status, errText.slice(0, 200));
+      const retryable = status === 429 || status === 503;
+      if (!retryable || attempt === 3) break;
+      await new Promise((r) => setTimeout(r, 2000 * attempt));
+    }
 
-      if (response.status === 429) {
+    if (!response || !response.ok) {
+      if (status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited. Please try again in a moment." }), {
           status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds." }), {
-          status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -144,8 +220,33 @@ Deno.serve(async (req: Request) => {
     }
 
     const result = await response.json();
-    const analysis = result.choices?.[0]?.message?.content ||
+    const analysis = result.candidates?.[0]?.content?.parts
+      ?.map((part: any) => part.text)
+      .filter((text: any) => text)
+      .join("") ||
       "I couldn't make out enough from that video. Could you try uploading again with clearer footage of the area you're concerned about?";
+
+    // Symptom mode: return structured bundle-mapped response.
+    if (analysisMode === "symptom" && senseBundle) {
+      const { tier, reason } = computeUrgency(senseBundle);
+      const systemAreas = mapToSystemAreas(senseBundle);
+      const sensesCovered = senseBundle.observations
+        .filter((o) => o.descriptors.length > 0 || (o.freeText && o.freeText.trim()))
+        .map((o) => o.sense);
+      return new Response(JSON.stringify({
+        urgency: tier,
+        urgencyReason: reason ?? null,
+        systemAreas,
+        shopLanguageSummary: generateShopSummary(senseBundle, systemAreas),
+        preliminaryAssessment: analysis,
+        videoInsights: analysis,
+        sensesCovered,
+        frameCount: frameEntries.length,
+        hasAudio: !!audioFile,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     return new Response(JSON.stringify({
       analysis,

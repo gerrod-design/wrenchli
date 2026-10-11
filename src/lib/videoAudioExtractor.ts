@@ -14,10 +14,17 @@ export async function extractVideoAudio(
 
     let audioBuffer: AudioBuffer;
     try {
-      audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      // Race the decode against a timeout: on some mobile browsers
+      // decodeAudioData can stall forever (neither resolves nor rejects),
+      // which would hang the whole video pipeline with no feedback.
+      const decodePromise = audioCtx.decodeAudioData(arrayBuffer);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        window.setTimeout(() => reject(new Error("Audio decode timed out")), 25_000),
+      );
+      audioBuffer = await Promise.race([decodePromise, timeoutPromise]);
     } catch {
-      // Video has no audio track or format not decodable
-      await audioCtx.close();
+      // Video has no audio track, format not decodable, or decode stalled
+      await audioCtx.close().catch(() => {});
       return null;
     }
 
