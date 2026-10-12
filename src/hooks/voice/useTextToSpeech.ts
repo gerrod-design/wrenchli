@@ -211,7 +211,7 @@ export function useTextToSpeech(
 
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = agent === "sam" ? "en-GB" : "en-US";
+      utterance.lang = "en-US";
       utterance.rate = 1;
       utterance.pitch = 1;
 

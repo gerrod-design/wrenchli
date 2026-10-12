@@ -1,18 +1,12 @@
-import mechanicImg from "@/assets/mechanic-advisor.png";
-import agentSamImg from "@/assets/agent-sam.png";
-import agentJessImg from "@/assets/agent-jess.png";
-import agentKaiImg from "@/assets/agent-kai.png";
-import agentPriyaImg from "@/assets/agent-priya.png";
+import aidenImg from "@/assets/agent-aiden.webp";
 import wrenchliLogo from "@/assets/wrenchli-logo.jpeg";
 
-export type AgentType = "mike" | "sam" | "jess" | "kai" | "priya";
+// One continuous assistant: Aiden. Persona types retired Oct 12, 2026 —
+// the chat no longer switches identities, so there is a single agent.
+export type AgentType = "aiden";
 
 const AGENTS: Record<AgentType, { img: string; label: string }> = {
-  mike:  { img: mechanicImg,   label: "Mike — Lead Advisor" },
-  sam:   { img: agentSamImg,   label: "Sam — Cost Specialist" },
-  jess:  { img: agentJessImg,  label: "Jess — Parts & DIY Expert" },
-  kai:   { img: agentKaiImg,   label: "Kai — Finance Specialist" },
-  priya: { img: agentPriyaImg, label: "Priya — Prevention Coach" },
+  aiden: { img: aidenImg, label: "Aiden from Wrenchli" },
 };
 
 interface MechanicAvatarProps {
@@ -26,7 +20,7 @@ export default function MechanicAvatar({
   size = 48,
   showLogo = true,
   className = "",
-  agent = "mike",
+  agent = "aiden",
 }: MechanicAvatarProps) {
   const { img, label } = AGENTS[agent];
 

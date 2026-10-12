@@ -23,32 +23,28 @@ import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 import { trackVoiceEvent } from "@/lib/voiceTelemetry";
 import { handleStartFailure } from "@/lib/voiceRetry";
 
-const GREETING = "👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.";
+const GREETING = "👋 Hey there! I'm Aiden, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.";
 
 const AGENT_META: Record<AgentType, { name: string; role: string; color: string }> = {
-  mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
-  sam: { name: "Sam", role: "Cost & Value Specialist", color: "bg-amber-500" },
-  jess: { name: "Jess", role: "Parts & DIY Expert", color: "bg-emerald-500" },
-  kai: { name: "Kai", role: "Finance Specialist", color: "bg-sky-500" },
-  priya: { name: "Priya", role: "Prevention Coach", color: "bg-violet-500" },
+  aiden: { name: "Aiden", role: "Wrenchli Advisor", color: "bg-primary" },
 };
 
 /** Detect agent markers like [Agent: Sam] in message content */
 function detectAgent(content: unknown): AgentType {
-  const text = typeof content === "string" ? content : "";
-  if (/\[Agent:\s*Sam\]/i.test(text)) return "sam";
-  if (/\[Agent:\s*Jess\]/i.test(text)) return "jess";
-  return "mike";
+  // One continuous assistant (Aiden): identity never switches. Legacy
+  // [Agent: X] markers in old transcripts no longer change who is speaking.
+  void content;
+  return "aiden";
 }
 
 /** Strip agent markers from displayed content */
 function cleanAgentMarker(content: unknown): string {
   const text = typeof content === "string" ? content : "";
-  return text.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "");
+  return text.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]\s*/gi, "");
 }
 
 function getAgentMeta(agent: AgentType | null | undefined) {
-  return AGENT_META[agent ?? "mike"] ?? AGENT_META.mike;
+  return AGENT_META[agent ?? "aiden"] ?? AGENT_META.aiden;
 }
 
 export default function InlineChatWidget() {
@@ -245,18 +241,6 @@ export default function InlineChatWidget() {
           if (canSpeak && assistantSoFar.trim()) {
             void speakRef.current(assistantSoFar, detectAgent(assistantSoFar));
           }
-          // Auto-follow-up when an agent announces a handoff to another specialist
-          const finalText = assistantSoFar;
-          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Sam|Jess)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll)\s+(?:going to\s+)?(?:bring|connect|hand|let|get)|(?:let|pass(?:ing)?\s+(?:it|this)\s+to)\s+(?:Sam|Jess)\b/i.test(finalText);
-          if (announcesHandoff) {
-            if (canSpeak) {
-              waitForSpeechEndRef.current().then(() => {
-                setTimeout(() => sendRef.current("ok"), 600);
-              });
-            } else {
-              setTimeout(() => sendRef.current("ok"), 800);
-            }
-          }
         },
         onError: (msg) => { upsert(msg); setLoading(false); },
         onRetry: resetPartial,
@@ -338,7 +322,7 @@ export default function InlineChatWidget() {
           {/* Active specialist indicator */}
           {messages.length > 0 && (() => {
             const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
-            const activeAgent = lastAssistant ? detectAgent(lastAssistant.content) : "mike";
+            const activeAgent = lastAssistant ? detectAgent(lastAssistant.content) : "aiden";
             const agentInfo = getAgentMeta(activeAgent);
 
             return (
@@ -368,22 +352,16 @@ export default function InlineChatWidget() {
               const isLastMsg = i === messages.length - 1;
               // If no explicit marker found (defaults to mike) but previous agent was a specialist,
               // assume continuity unless the specialist explicitly handed back to Mike.
-              const hasExplicitMarker = m.role === "assistant" && /\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]/i.test(typeof m.content === "string" ? m.content : "");
-              if (m.role === "assistant" && currentAgent === "mike" && !hasExplicitMarker && prevAgent && prevAgent !== "mike") {
+              const hasExplicitMarker = m.role === "assistant" && /\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]/i.test(typeof m.content === "string" ? m.content : "");
+              if (m.role === "assistant" && currentAgent === "aiden" && !hasExplicitMarker && prevAgent && prevAgent !== "aiden") {
                 const prevText = typeof prevAssistant?.content === "string" ? prevAssistant.content : "";
                 const handsBackToMike = /\b(?:hand(?:ing)?\s+(?:it\s+)?(?:back|over)\s+to\s+Mike|let me get Mike|bringing Mike back|Mike (?:will|can) take it from here)\b/i.test(prevText);
                 if (!handsBackToMike) {
                   currentAgent = prevAgent;
                 }
               }
-              if (isLastMsg && loading && currentAgent === "mike" && prevAgent && prevAgent !== "mike") {
+              if (isLastMsg && loading && currentAgent === "aiden" && prevAgent && prevAgent !== "aiden") {
                 currentAgent = prevAgent;
-              } else if (isLastMsg && loading && currentAgent === "mike" && prevAssistant) {
-                const prevText = typeof prevAssistant.content === "string" ? prevAssistant.content : "";
-                const handoffMatch = prevText.match(/\b(Sam|Jess)\b/i);
-                if (handoffMatch) {
-                  currentAgent = handoffMatch[1].toLowerCase() as AgentType;
-                }
               }
               const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
               const agentName = getAgentMeta(currentAgent).name;
@@ -406,7 +384,7 @@ export default function InlineChatWidget() {
                 )}
                 <div className={`flex gap-2.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 {m.role === "assistant" && (() => {
-                  const agent = currentAgent ?? "mike";
+                  const agent = currentAgent ?? "aiden";
                   return (
                     <motion.div
                       key={`${i}-${agent}`}
@@ -422,15 +400,7 @@ export default function InlineChatWidget() {
                         </span>
                       )}
                       <span className="text-[10px] font-medium text-muted-foreground leading-none">
-                        {agent === "sam"
-                          ? "Sam"
-                          : agent === "jess"
-                            ? "Jess"
-                            : agent === "kai"
-                              ? "Kai"
-                              : agent === "priya"
-                                ? "Priya"
-                                : "Mike"}
+{"Aiden"}
                       </span>
                     </motion.div>
                   );

@@ -8,31 +8,21 @@ const corsHeaders = {
 
 // Map agent names to Azure Neural voices
 // Using conversational-style voices where available for podcast-like delivery
+// One continuous assistant: Aiden. Single voice entry (Oct 12, 2026) —
+// placeholder voice until Gerrod picks the final Aiden voice by ear.
 const VOICE_MAP: Record<string, string> = {
-  mike:  "en-US-DavisNeural",       // Warm, conversational American male
-  sam:   "en-GB-SoniaNeural",       // Polished, confident British female
-  jess:  "en-US-JaneNeural",        // Friendly, relatable American female
-  kai:   "en-US-JasonNeural",       // Clear, trustworthy American male
-  priya: "en-IN-NeerjaNeural",      // Warm, knowledgeable Indian female
+  aiden: "en-US-DavisNeural", // Warm, conversational American male
 };
 
 // Per-agent speaking style (Azure Neural voices support named styles)
 // Styles: "chat", "cheerful", "friendly", "customerservice", "calm", etc.
 const STYLE_MAP: Record<string, { style: string; styleDegree: string }> = {
-  mike:  { style: "chat",            styleDegree: "1.2" },  // Relaxed, podcast host
-  sam:   { style: "customerservice",  styleDegree: "0.8" },  // Professional but warm
-  jess:  { style: "friendly",        styleDegree: "1.3" },  // Approachable, encouraging
-  kai:   { style: "calm",            styleDegree: "1.0" },  // Steady, reassuring
-  priya: { style: "chat",            styleDegree: "1.0" },  // Conversational, coaching
+  aiden: { style: "chat", styleDegree: "1.2" }, // Relaxed, podcast host
 };
 
 // Per-agent prosody — slower rates sound more natural and podcast-like
 const PROSODY_MAP: Record<string, { rate: string; pitch: string }> = {
-  mike:  { rate: "-2%",  pitch: "+0%" },   // Relaxed, natural pace
-  sam:   { rate: "+0%",  pitch: "+0%" },    // Natural default
-  jess:  { rate: "+3%",  pitch: "+1%" },    // Slightly upbeat energy
-  kai:   { rate: "-3%",  pitch: "-1%" },    // Deliberate, trustworthy
-  priya: { rate: "+0%",  pitch: "+1%" },    // Warm, engaged
+  aiden: { rate: "-2%", pitch: "+0%" }, // Relaxed, natural pace
 };
 
 serve(async (req) => {
@@ -67,7 +57,7 @@ serve(async (req) => {
       );
     }
 
-    const voiceName = VOICE_MAP[agent] || VOICE_MAP.mike;
+    const voiceName = VOICE_MAP[agent] || VOICE_MAP.aiden;
 
     // Preprocess dollar amounts so TTS reads them naturally
     // "$1,200" → "1200 dollars", "$700" → "700 dollars"

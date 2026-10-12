@@ -28,30 +28,26 @@ import { FEATURE_NAME } from "@/data/senseChips";
 import type { SymptomAnalysisResponse, SenseBundle } from "@/types/symptom";
 import { handleStartFailure } from "@/lib/voiceRetry";
 
-const WELCOME_MESSAGE = `👋 Hey there! I'm Mike, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
+const WELCOME_MESSAGE = `👋 Hey there! I'm Aiden, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
 
 const AGENT_META: Record<AgentType, { name: string; role: string; color: string }> = {
-  mike: { name: "Mike", role: "Lead Advisor", color: "bg-primary" },
-  sam: { name: "Sam", role: "Cost & Value Specialist", color: "bg-amber-500" },
-  jess: { name: "Jess", role: "Parts & DIY Expert", color: "bg-emerald-500" },
-  kai: { name: "Kai", role: "Finance Specialist", color: "bg-sky-500" },
-  priya: { name: "Priya", role: "Prevention Coach", color: "bg-violet-500" },
+  aiden: { name: "Aiden", role: "Wrenchli Advisor", color: "bg-primary" },
 };
 
 function detectAgent(content: unknown): AgentType {
-  const text = typeof content === "string" ? content : "";
-  if (/\[Agent:\s*Sam\]/i.test(text)) return "sam";
-  if (/\[Agent:\s*Jess\]/i.test(text)) return "jess";
-  return "mike";
+  // One continuous assistant (Aiden): identity never switches. Legacy
+  // [Agent: X] markers in old transcripts no longer change who is speaking.
+  void content;
+  return "aiden";
 }
 
 function cleanAgentMarker(content: unknown): string {
   const text = typeof content === "string" ? content : "";
-  return text.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "");
+  return text.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]\s*/gi, "");
 }
 
 function getAgentMeta(agent: AgentType | null | undefined) {
-  return AGENT_META[agent ?? "mike"] ?? AGENT_META.mike;
+  return AGENT_META[agent ?? "aiden"] ?? AGENT_META.aiden;
 }
 
 export default function ChatBot() {
@@ -315,19 +311,6 @@ export default function ChatBot() {
           if (canSpeak && assistantSoFar.trim()) {
             void speakRef.current(assistantSoFar, detectAgent(assistantSoFar));
           }
-          // Auto-follow-up when an agent announces a handoff to another specialist
-          const finalText = assistantSoFar;
-          const announcesHandoff = /bring(?:ing)?\s+(?:in\s+)?(?:her|him|them|Sam|Jess)\b|let me (?:get|bring|hand|connect)|handing.*(?:over|off)|I'(?:m|ll)\s+(?:going to\s+)?(?:bring|connect|hand|let|get)|(?:let|pass(?:ing)?\s+(?:it|this)\s+to)\s+(?:Sam|Jess)\b/i.test(finalText);
-          if (announcesHandoff) {
-            if (canSpeak) {
-              // Wait for TTS to finish the full message before triggering the handoff
-              waitForSpeechEndRef.current().then(() => {
-                setTimeout(() => sendRef.current("ok"), 600);
-              });
-            } else {
-              setTimeout(() => sendRef.current("ok"), 800);
-            }
-          }
         },
         onError: (msg) => { upsert(msg); setLoading(false); },
         onRetry: resetPartial,
@@ -426,7 +409,7 @@ export default function ChatBot() {
           >
             <div className="flex flex-col items-center gap-1">
               <MechanicAvatar size={40} />
-              <span className="text-[11px] font-semibold tracking-tight">Ask Wrenchli</span>
+              <span className="text-[11px] font-semibold tracking-tight">Ask Aiden from Wrenchli</span>
             </div>
           </motion.div>
         )}
@@ -522,7 +505,7 @@ export default function ChatBot() {
             {/* Active specialist bar */}
             {(() => {
               const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
-              const activeAgent = lastAssistant ? detectAgent(lastAssistant.content) : "mike";
+              const activeAgent = lastAssistant ? detectAgent(lastAssistant.content) : "aiden";
               const agentInfo = getAgentMeta(activeAgent);
               if (!messages.length || showHistory) return null;
               return (
@@ -570,7 +553,7 @@ export default function ChatBot() {
                   {messages.length === 0 && (
                     <div className="mt-6 space-y-4">
                       <p className="text-muted-foreground text-sm text-center px-2">
-                        👋 Hey, I'm Mike — your Wrenchli advisor. How can I help?
+                        👋 Hey, I'm Aiden — your Wrenchli advisor. How can I help?
                       </p>
                       <div className="flex flex-wrap justify-center gap-2">
                         <button
@@ -618,8 +601,8 @@ export default function ChatBot() {
                     // If no explicit marker found (defaults to mike) but previous agent was a specialist,
                     // check if Mike is actually announcing himself or if the marker was just omitted.
                     // An explicit handoff back to Mike requires handoff language in the previous message.
-                    const hasExplicitMarker = m.role === "assistant" && /\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]/i.test(typeof m.content === "string" ? m.content : "");
-                    if (m.role === "assistant" && currentAgent === "mike" && !hasExplicitMarker && prevAgent && prevAgent !== "mike") {
+                    const hasExplicitMarker = m.role === "assistant" && /\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]/i.test(typeof m.content === "string" ? m.content : "");
+                    if (m.role === "assistant" && currentAgent === "aiden" && !hasExplicitMarker && prevAgent && prevAgent !== "aiden") {
                       // Check if the previous specialist message explicitly handed back to Mike
                       const prevText = typeof prevAssistant?.content === "string" ? prevAssistant.content : "";
                       const handsBackToMike = /\b(?:hand(?:ing)?\s+(?:it\s+)?(?:back|over)\s+to\s+Mike|let me get Mike|bringing Mike back|Mike (?:will|can) take it from here)\b/i.test(prevText);
@@ -628,14 +611,8 @@ export default function ChatBot() {
                         currentAgent = prevAgent;
                       }
                     }
-                    if (isLastMsg && loading && currentAgent === "mike" && prevAgent && prevAgent !== "mike") {
+                    if (isLastMsg && loading && currentAgent === "aiden" && prevAgent && prevAgent !== "aiden") {
                       currentAgent = prevAgent;
-                    } else if (isLastMsg && loading && currentAgent === "mike" && prevAssistant) {
-                      const prevText = typeof prevAssistant.content === "string" ? prevAssistant.content : "";
-                      const handoffMatch = prevText.match(/\b(Sam|Jess)\b/i);
-                      if (handoffMatch) {
-                        currentAgent = handoffMatch[1].toLowerCase() as AgentType;
-                      }
                     }
                     const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
                     const agentName = getAgentMeta(currentAgent).name;
@@ -665,7 +642,7 @@ export default function ChatBot() {
                           transition={{ type: "spring", stiffness: 400, damping: 20, duration: 0.3 }}
                           className="relative shrink-0"
                         >
-                          <MechanicAvatar size={32} className="mt-0.5" agent={currentAgent ?? "mike"} />
+                          <MechanicAvatar size={32} className="mt-0.5" agent={currentAgent ?? "aiden"} />
                           {voiceEnabled && isSpeaking && i === messages.length - 1 && (
                             <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary shadow-sm">
                               <Volume2 className="h-2.5 w-2.5 text-primary-foreground animate-pulse" />
