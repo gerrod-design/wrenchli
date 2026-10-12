@@ -70,3 +70,24 @@ export function getCoveredSenses(bundle: SenseBundle): SenseType[] {
 export function isBundleEmpty(bundle: SenseBundle): boolean {
   return getCoveredSenses(bundle).length === 0;
 }
+/**
+ * Directed recording instruction for the video-first primer flow, keyed to the single
+ * sense the driver picked first. FEEL/SMELL are used for the optional-video step and
+ * are framed for parked-only recording.
+ */
+export function generatePrimerPrompt(primer: SenseType): string {
+  switch (primer) {
+    case 'HEAR':
+      return "Hold the phone near where the noise is loudest and record about 10 seconds while the sound is happening.";
+    case 'SEE':
+      return "Point the camera at what you see and hold steady for about 10 seconds.";
+    case 'FEEL':
+      return "Only record while parked, or mount the phone on the dash before you start driving — never hold your phone while driving. If you can record safely, capture about 10 seconds.";
+    case 'SMELL':
+      return "Want to show us anything — a leak, smoke, or a warning light? Point the camera at it and hold steady for about 10 seconds.";
+    default: {
+      const exhaustiveCheck: never = primer;
+      return exhaustiveCheck;
+    }
+  }
+}

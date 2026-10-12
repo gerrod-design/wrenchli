@@ -3,6 +3,7 @@ import {
   buildSenseBundle,
   createEmptyObservations,
   generateDirectedPrompt,
+  generatePrimerPrompt,
   getCoveredSenses,
   isBundleEmpty,
 } from "../symptomBundleBuilder";
@@ -82,5 +83,25 @@ describe("generateDirectedPrompt", () => {
   it("falls back to generic instruction when bundle is empty", () => {
     const b = buildSenseBundle(createEmptyObservations(), [], [], []);
     expect(generateDirectedPrompt(b)).toContain("Record 10 seconds of the issue");
+  });
+});
+
+describe("generatePrimerPrompt", () => {
+  it("keys the HEAR instruction to where the noise is loudest", () => {
+    expect(generatePrimerPrompt("HEAR")).toContain("near where the noise is loudest");
+  });
+
+  it("keys the SEE instruction to pointing the camera", () => {
+    expect(generatePrimerPrompt("SEE")).toContain("Point the camera at what you see");
+  });
+
+  it("frames the FEEL instruction for parked-only recording", () => {
+    const prompt = generatePrimerPrompt("FEEL");
+    expect(prompt).toContain("Only record while parked");
+    expect(prompt).toContain("never hold your phone while driving");
+  });
+
+  it("frames the SMELL instruction as an optional show-us prompt", () => {
+    expect(generatePrimerPrompt("SMELL")).toContain("Want to show us anything");
   });
 });

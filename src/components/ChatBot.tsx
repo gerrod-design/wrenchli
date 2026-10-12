@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { trackVoiceEvent } from "@/lib/voiceTelemetry";
 import { SymptomFlowModal } from "@/components/symptoms/SymptomFlowModal";
+import { FEATURE_NAME } from "@/data/senseChips";
 import type { SymptomAnalysisResponse, SenseBundle } from "@/types/symptom";
 import { handleStartFailure } from "@/lib/voiceRetry";
 
@@ -831,9 +832,9 @@ export default function ChatBot() {
                     <span className="text-[11px] text-muted-foreground italic">Powered by Google AI</span>
                   </span>
                   <button type="button" onClick={() => setSymptomModalOpen(true)} disabled={loading || uploading}
-                    className="flex flex-col items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors disabled:opacity-40" aria-label="Record a symptom">
+                    className="flex flex-col items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors disabled:opacity-40" aria-label={FEATURE_NAME}>
                     <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-blue-500/10"><Film className="h-4 w-4" /></span>
-                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Symptom</span>
+                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">{FEATURE_NAME}</span>
                   </button>
                   <button type="button" onClick={() => setVinModalOpen(true)} disabled={loading}
                     className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40" aria-label="Scan VIN">

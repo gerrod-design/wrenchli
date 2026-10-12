@@ -95,7 +95,31 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    if (frameEntries.length === 0 && !audioFile) {
+    // Symptom mode: parse the sense bundle up front. A valid bundle (at
+    // least one observation with descriptors or free text) makes a
+    // zero-media submission acceptable — the smell-first / feel-first
+    // paths may have no video at all. Damage mode never parses a bundle,
+    // so its behavior is unchanged.
+    let senseBundle: SenseBundle | null = null;
+    let hasObservations = false;
+    if (analysisMode === "symptom" && senseBundleRaw) {
+      try {
+        senseBundle = JSON.parse(senseBundleRaw) as SenseBundle;
+        if (!Array.isArray(senseBundle.observations)) {
+          // Malformed bundle — treat as absent (matches prior fallback).
+          senseBundle = null;
+        } else {
+          hasObservations = senseBundle.observations.some(
+            (o) => (o.descriptors && o.descriptors.length > 0) ||
+              (o.freeText && o.freeText.trim().length > 0)
+          );
+        }
+      } catch {
+        senseBundle = null;
+      }
+    }
+
+    if (frameEntries.length === 0 && !audioFile && !hasObservations) {
       return new Response(JSON.stringify({ error: "No frames or audio provided" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -141,35 +165,37 @@ Deno.serve(async (req: Request) => {
       promptText += ` I've extracted ${frameEntries.length} key frames and the audio track from their video. Please analyze both what you SEE in the frames and what you HEAR in the audio, then provide a combined symptom assessment.`;
     } else if (frameEntries.length > 0) {
       promptText += ` I've extracted ${frameEntries.length} key frames. The video had no usable audio track. Please analyze the visual frames and tell them what's likely going on.`;
-    } else {
+    } else if (audioFile) {
       promptText += " I've extracted the audio track. Please listen and tell them what's likely going on.";
+    } else {
+      // Zero-media symptom submission (bundle-only): no video was provided.
+      promptText = "The customer is reporting a vehicle issue through their senses and did not provide a video. Base your assessment only on the observations they reported — do not claim to have seen or heard anything.";
     }
     if (vehicleContext) promptText += ` Vehicle: ${vehicleContext}.`;
 
     // Symptom mode: weight driver observations as first-class signals.
-    let senseBundle: SenseBundle | null = null;
-    if (analysisMode === "symptom" && senseBundleRaw) {
-      try {
-        senseBundle = JSON.parse(senseBundleRaw) as SenseBundle;
-        const obsLines: string[] = [];
-        for (const obs of senseBundle.observations) {
-          if (obs.descriptors.length > 0) {
-            obsLines.push(`- ${obs.sense}: ${obs.descriptors.join(", ")}${obs.freeText ? ` (also: ${obs.freeText})` : ""}`);
-          } else if (obs.freeText && obs.freeText.trim()) {
-            obsLines.push(`- ${obs.sense}: ${obs.freeText.trim()}`);
-          }
+    // (Bundle was parsed earlier, before the media check.)
+    if (senseBundle) {
+      const obsLines: string[] = [];
+      for (const obs of senseBundle.observations) {
+        if (obs.descriptors.length > 0) {
+          obsLines.push(`- ${obs.sense}: ${obs.descriptors.join(", ")}${obs.freeText ? ` (also: ${obs.freeText})` : ""}`);
+        } else if (obs.freeText && obs.freeText.trim()) {
+          obsLines.push(`- ${obs.sense}: ${obs.freeText.trim()}`);
         }
-        if (obsLines.length > 0) {
-          let bundleText = "\n\nDriver observations (treat as first-class signals alongside what you see and hear):\n" + obsLines.join("\n");
-          if (senseBundle.timing.length > 0) bundleText += `\nTiming: ${senseBundle.timing.join(", ")}`;
-          if (senseBundle.conditions.length > 0) bundleText += `\nWhen it happens: ${senseBundle.conditions.join(", ")}`;
-          if (senseBundle.locations.length > 0) bundleText += `\nLocation: ${senseBundle.locations.join(", ")}`;
-          bundleText += "\nReference these observed descriptors in your assessment where they correlate with the video/audio.";
-          promptText += bundleText;
-        }
-      } catch {
-        // Unparseable bundle — proceed without it (damage-compatible fallback)
-        senseBundle = null;
+      }
+      if (obsLines.length > 0) {
+        const hasMedia = frameEntries.length > 0 || !!audioFile;
+        let bundleText = (hasMedia
+          ? "\n\nDriver observations (treat as first-class signals alongside what you see and hear):\n"
+          : "\n\nDriver observations (treat as first-class signals):\n") + obsLines.join("\n");
+        if (senseBundle.timing.length > 0) bundleText += `\nTiming: ${senseBundle.timing.join(", ")}`;
+        if (senseBundle.conditions.length > 0) bundleText += `\nWhen it happens: ${senseBundle.conditions.join(", ")}`;
+        if (senseBundle.locations.length > 0) bundleText += `\nLocation: ${senseBundle.locations.join(", ")}`;
+        bundleText += hasMedia
+          ? "\nReference these observed descriptors in your assessment where they correlate with the video/audio."
+          : "\nBase your assessment on these observations.";
+        promptText += bundleText;
       }
     }
     parts.push({ text: promptText });
@@ -224,7 +250,9 @@ Deno.serve(async (req: Request) => {
       ?.map((part: any) => part.text)
       .filter((text: any) => text)
       .join("") ||
-      "I couldn't make out enough from that video. Could you try uploading again with clearer footage of the area you're concerned about?";
+      (frameEntries.length === 0 && !audioFile
+        ? "I couldn't put together an assessment from that report. Could you add a few more details about what you're noticing?"
+        : "I couldn't make out enough from that video. Could you try uploading again with clearer footage of the area you're concerned about?");
 
     // Symptom mode: return structured bundle-mapped response.
     if (analysisMode === "symptom" && senseBundle) {

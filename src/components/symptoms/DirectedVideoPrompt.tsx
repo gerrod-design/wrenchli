@@ -1,24 +1,36 @@
 import React from 'react';
 import { Video, ArrowLeft } from 'lucide-react';
 import type { SenseBundle } from '@/types/symptom';
-import { generateDirectedPrompt, getCoveredSenses } from '@/lib/symptomBundleBuilder';
+import { generateDirectedPrompt } from '@/lib/symptomBundleBuilder';
 import { SENSE_LABELS, SENSE_ICONS } from '@/data/senseChips';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 interface DirectedVideoPromptProps {
-  bundle: SenseBundle;
+  bundle?: SenseBundle | null;
+  promptText?: string;
   onStartRecording: () => void;
   onBack: () => void;
 }
 
 export const DirectedVideoPrompt: React.FC<DirectedVideoPromptProps> = ({
   bundle,
+  promptText,
   onStartRecording,
   onBack,
 }) => {
-  const promptText = generateDirectedPrompt(bundle);
-  const coveredSenses = getCoveredSenses(bundle);
+  const displayedPrompt =
+    promptText ?? (bundle ? generateDirectedPrompt(bundle) : '');
+
+  // Summary rows come straight from the bundle's observations. (A previous
+  // version mapped over getCoveredSenses() — plain sense strings — and read
+  // .type/.descriptors off them, which threw at render time.)
+  const summaryRows = bundle
+    ? bundle.observations.filter(
+        (obs) =>
+          obs.descriptors.length > 0 ||
+          (obs.freeText && obs.freeText.trim().length > 0)
+      )
+    : [];
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -35,7 +47,7 @@ export const DirectedVideoPrompt: React.FC<DirectedVideoPromptProps> = ({
       {/* Directed prompt instruction */}
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6">
         <p className="text-lg text-gray-800 leading-relaxed">
-          {promptText}
+          {displayedPrompt}
         </p>
       </div>
 
@@ -48,32 +60,37 @@ export const DirectedVideoPrompt: React.FC<DirectedVideoPromptProps> = ({
       </div>
 
       {/* Summary of what driver reported */}
-      <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-          What you reported
-        </h3>
-        <div className="space-y-2">
-          {coveredSenses.map((sense) => {
-            const Icon = SENSE_ICONS[sense.type];
-            const label = SENSE_LABELS[sense.type];
-            
-            return (
-              <div
-                key={sense.type}
-                className="flex items-start gap-3 text-sm"
-              >
-                <div className="flex items-center gap-2 min-w-[80px]">
-                  <Icon className="w-4 h-4 text-gray-600" />
-                  <span className="font-medium text-gray-700">{label}</span>
+      {summaryRows.length > 0 && (
+        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+            What you reported
+          </h3>
+          <div className="space-y-2">
+            {summaryRows.map((obs) => {
+              const descriptorText = obs.descriptors.join(', ');
+              const text =
+                descriptorText && obs.freeText
+                  ? `${descriptorText} (${obs.freeText})`
+                  : descriptorText || (obs.freeText as string);
+
+              return (
+                <div
+                  key={obs.sense}
+                  className="flex items-start gap-3 text-sm"
+                >
+                  <div className="flex items-center gap-2 min-w-[80px]">
+                    <span className="text-base">{SENSE_ICONS[obs.sense]}</span>
+                    <span className="font-medium text-gray-700">
+                      {SENSE_LABELS[obs.sense]}
+                    </span>
+                  </div>
+                  <span className="text-gray-600">{text}</span>
                 </div>
-                <span className="text-gray-600">
-                  {sense.descriptors.join(', ')}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Action buttons */}
       <div className="flex gap-3 pt-4">

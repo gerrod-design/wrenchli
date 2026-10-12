@@ -1,5 +1,12 @@
 import type { SenseType } from '@/types/symptom';
 
+/**
+ * Display name for the five-senses symptom feature.
+ * Final name chosen by Gerrod (2026-10-11). Change it here only —
+ * the Record Symptom button label and the modal title read from this.
+ */
+export const FEATURE_NAME = 'Use Your Senses';
+
 export const SENSE_CHIPS: Record<SenseType, string[]> = {
   SEE: [
     'warning light on',
