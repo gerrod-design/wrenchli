@@ -37,7 +37,7 @@ export const SymptomResults: React.FC<SymptomResultsProps> = ({
   onClose,
   onScheduleShop,
 }) => {
-  const urgencyConfig = URGENCY_CONFIG[result.urgencyTier];
+  const urgencyConfig = URGENCY_CONFIG[result.urgency];
   const allSenses = ['SEE', 'HEAR', 'SMELL', 'FEEL'] as const;
 
   return (
@@ -64,7 +64,7 @@ export const SymptomResults: React.FC<SymptomResultsProps> = ({
             urgencyConfig.color
           )}
         >
-          {result.urgencyTier === 3 && <AlertTriangle className="w-5 h-5" />}
+          {result.urgency === 3 && <AlertTriangle className="w-5 h-5" />}
           {urgencyConfig.label}
         </div>
 
@@ -76,7 +76,7 @@ export const SymptomResults: React.FC<SymptomResultsProps> = ({
       </div>
 
       {/* Tier 3 alert box */}
-      {result.urgencyTier === 3 && (
+      {result.urgency === 3 && (
         <div
           className={cn(
             'border-2 rounded-lg p-5 space-y-2',
@@ -114,7 +114,6 @@ export const SymptomResults: React.FC<SymptomResultsProps> = ({
         <div className="grid grid-cols-2 gap-3">
           {allSenses.map((sense) => {
             const isCovered = result.sensesCovered.includes(sense);
-            const Icon = SENSE_ICONS[sense];
             const label = SENSE_LABELS[sense];
 
             return (
@@ -132,10 +131,12 @@ export const SymptomResults: React.FC<SymptomResultsProps> = ({
                 ) : (
                   <Circle className="w-5 h-5 text-gray-400 flex-shrink-0" />
                 )}
-                <Icon className={cn(
-                  'w-4 h-4',
-                  isCovered ? 'text-gray-700' : 'text-gray-400'
-                )} />
+                <span
+                  className={cn('text-base leading-none', !isCovered && 'opacity-40')}
+                  aria-hidden="true"
+                >
+                  {SENSE_ICONS[sense]}
+                </span>
                 <span
                   className={cn(
                     'text-sm font-medium',
