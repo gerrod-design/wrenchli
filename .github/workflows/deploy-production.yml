@@ -1,0 +1,65 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+
+# Never let two deploys run at once — queue instead of cancel, so an
+# in-flight db push / function deploy is never interrupted mid-way.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to wrenchli-prod
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 # v4.2.2
+
+      # The legacy ref legitimately appears in config/environments.md (the
+      # registry that retires it) and in this workflow (this guard). Those
+      # paths are excluded; anywhere else, the ref is a regression.
+      - name: Guard against legacy backend reference
+        run: |
+          if grep -R "etytcjxqqjzpalehqoib" --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.github --exclude=environments.md .; then
+            echo "::error::Legacy project ref found in repo outside the environment registry. See config/environments.md. Aborting deploy."
+            exit 1
+          fi
+          echo "No legacy backend references found."
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1 # v1.x, pulls latest CLI binary
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+
+      - name: Push database migrations
+        run: supabase db push
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy all edge functions
+        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+
+      - name: Smoke test production
+        run: node scripts/smoke-production.mjs
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          CHAT_FUNCTION_NAME: ${{ vars.CHAT_FUNCTION_NAME }}

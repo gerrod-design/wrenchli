@@ -8,7 +8,7 @@ import DeveloperBilling from "@/components/DeveloperBilling";
 import ApiKeyManager from "@/components/ApiKeyManager";
 import { useAuth } from "@/contexts/AuthContext";
 
-const FUNCTIONS_BASE = "https://etytcjxqqjzpalehqoib.supabase.co/functions/v1";
+const FUNCTIONS_BASE = "https://aunrktvltmyrxtdygykt.supabase.co/functions/v1";
 const BASE_URL = `${FUNCTIONS_BASE}/api-diagnose`;
 const ESTIMATE_URL = `${FUNCTIONS_BASE}/api-estimate-repair`;
 const VALUE_URL = `${FUNCTIONS_BASE}/api-vehicle-value`;

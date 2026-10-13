@@ -104,7 +104,7 @@ serve(async (req) => {
             <div style="max-width: 480px; margin: 0 auto;">
               <!-- Header -->
               <div style="background-color: #1E3A5F; border-radius: 12px 12px 0 0; padding: 32px 24px; text-align: center;">
-                <img src="https://etytcjxqqjzpalehqoib.supabase.co/storage/v1/object/public/damage-photos/branding%2Fwrenchli-logo.jpeg" alt="Wrenchli" width="56" height="56" style="border-radius: 12px; margin: 0 auto 16px; display: block;" />
+                <img src="https://aunrktvltmyrxtdygykt.supabase.co/storage/v1/object/public/damage-photos/branding%2Fwrenchli-logo.jpeg" alt="Wrenchli" width="56" height="56" style="border-radius: 12px; margin: 0 auto 16px; display: block;" />
                 <h1 style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px;">Reset Your Password</h1>
               </div>
               <!-- Body -->

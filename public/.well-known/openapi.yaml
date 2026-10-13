@@ -4,7 +4,7 @@ info:
   description: AI-powered vehicle diagnostics, repair cost estimation, vehicle valuation, maintenance scheduling, and service provider search across 13 Detroit metro areas. Analyze symptoms, get repair cost estimates, urgency ratings, vehicle market values, and actionable recommendations.
   version: 1.3.0
 servers:
-  - url: https://etytcjxqqjzpalehqoib.supabase.co/functions/v1
+  - url: https://aunrktvltmyrxtdygykt.supabase.co/functions/v1
 paths:
   /api-diagnose:
     post:
