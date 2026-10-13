@@ -50,19 +50,26 @@ serve(async (req) => {
     const { diagnosis_title, diagnosis_code, vehicle_year, vehicle_make, vehicle_model, vehicle_trim, zip_code, diy_feasibility, urgency } =
       body as Record<string, string>;
 
-    if (!diagnosis_title || !zip_code) {
+    if (!diagnosis_title) {
       return new Response(
-        JSON.stringify({ error: "diagnosis_title and zip_code are required" }),
+        JSON.stringify({ error: "diagnosis_title is required" }),
         { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const zipClean = (zip_code || "").replace(/\D/g, "").slice(0, 5);
-    if (zipClean.length !== 5) {
-      return new Response(
-        JSON.stringify({ error: "Invalid ZIP code" }),
-        { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
-      );
+    // No ZIP => general/national estimate path (contract: must not error).
+    const zipInput = (zip_code || "").trim();
+    const isGeneralEstimate = zipInput.length === 0;
+
+    let zipClean = "";
+    if (!isGeneralEstimate) {
+      zipClean = zipInput.replace(/\D/g, "").slice(0, 5);
+      if (zipClean.length !== 5) {
+        return new Response(
+          JSON.stringify({ error: "Invalid ZIP code" }),
+          { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     const safeTitle = (diagnosis_title || "").slice(0, 200);
@@ -79,7 +86,17 @@ serve(async (req) => {
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
-    const userPrompt = `Estimate professional repair costs for the following:
+    const userPrompt = isGeneralEstimate
+      ? `Estimate professional repair costs for the following:
+
+Vehicle: ${vehicleStr || "Unknown vehicle"}
+Diagnosis: ${safeTitle}${safeCode ? ` (Code: ${safeCode})` : ""}
+DIY Feasibility: ${safeDiy || "unknown"}
+Urgency: ${safeUrgency || "unknown"}
+Customer ZIP Code: not provided
+
+Provide a realistic NATIONAL AVERAGE cost estimate for this repair in the United States. Do not reference any specific metro area, region, or local pricing — give a general nationwide range based on typical parts and labor costs. Be honest and transparent — this estimate will be shared with both the customer and the repair shop.`
+      : `Estimate professional repair costs for the following:
 
 Vehicle: ${vehicleStr || "Unknown vehicle"}
 Diagnosis: ${safeTitle}${safeCode ? ` (Code: ${safeCode})` : ""}
@@ -99,7 +116,9 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1024,
-        system: `You are Wrenchli's automotive repair cost estimator. You provide transparent, realistic repair cost estimates based on the assessment, vehicle, and customer's geographic area (ZIP code). Your estimates should reflect real-world pricing including parts and labor for that region. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate. ARITHMETIC RULE: cost_low must equal the low end of parts_estimate plus the low end of labor_estimate; cost_high must equal the high ends added together. Double-check your addition before responding.`,
+        system: isGeneralEstimate
+          ? `You are Wrenchli's automotive repair cost estimator. No ZIP code or region was provided, so you must give a NATIONAL AVERAGE estimate only — do not invent or imply a specific metro area, region, or local pricing. Your estimates should reflect typical real-world nationwide pricing including parts and labor. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate. ARITHMETIC RULE: cost_low must equal the low end of parts_estimate plus the low end of labor_estimate; cost_high must equal the high ends added together. Double-check your addition before responding.`
+          : `You are Wrenchli's automotive repair cost estimator. You provide transparent, realistic repair cost estimates based on the assessment, vehicle, and customer's geographic area (ZIP code). Your estimates should reflect real-world pricing including parts and labor for that region. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate. ARITHMETIC RULE: cost_low must equal the low end of parts_estimate plus the low end of labor_estimate; cost_high must equal the high ends added together. Double-check your addition before responding.`,
         messages: [{ role: "user", content: userPrompt }],
         tools: [
           {
@@ -174,6 +193,8 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
       (estimate as any).cost_high = Math.round(partsRange[1] + laborRange[1]);
     }
 
+    (estimate as any).general_estimate = isGeneralEstimate;
+
     // Log request (fire and forget)
     supabase.from("api_request_logs").insert({
       endpoint: "estimate-repair",
@@ -184,7 +205,7 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
       vehicle_make: safeMake || null,
       vehicle_model: safeModel || null,
       vehicle_trim: safeTrim || null,
-      zip_code: zipClean,
+      zip_code: zipClean || null,
       response_status: 200,
       response_time_ms: Date.now() - requestStart,
       cost_low: estimate.cost_low,
