@@ -286,6 +286,15 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
           variant="ghost"
           className="w-full h-10 text-sm font-medium text-white/50 hover:text-white hover:bg-white/5 rounded-xl transition-all"
         >
+          <Link to={`/garage/vehicles/${vehicle.id}`}>
+            Vehicle Record & Baseline
+          </Link>
+        </Button>
+        <Button
+          asChild
+          variant="ghost"
+          className="w-full h-10 text-sm font-medium text-white/50 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+        >
           <Link to={`/vehicle-insights?year=${vehicle.year}&make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}`}>
             View History
           </Link>

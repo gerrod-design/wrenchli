@@ -36,6 +36,8 @@ import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Garage from "./pages/Garage";
+import VehicleRecord from "./pages/VehicleRecord";
+import VehicleBaseline from "./pages/VehicleBaseline";
 import Investors from "./pages/Investors";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -110,6 +112,8 @@ function AnimatedRoutes() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/garage" element={<Garage />} />
+          <Route path="/garage/vehicles/:vehicleId" element={<VehicleRecord />} />
+          <Route path="/garage/vehicles/:vehicleId/baseline" element={<VehicleBaseline />} />
           <Route path="/investors" element={<Investors />} />
           {/* Paused 2026-09-17: shop quote requests imply partner shops that don't exist — not offered */}
           <Route path="/get-quote" element={<Navigate to="/" replace />} />

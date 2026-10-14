@@ -163,6 +163,16 @@ export const SymptomResults: React.FC<SymptomResultsProps> = ({
         </div>
       )}
 
+      <div className="bg-orange-50 border border-orange-200 rounded-lg p-5 space-y-2">
+        <h3 className="font-semibold text-gray-900">Just bought a car? Capture its baseline today.</h3>
+        <p className="text-sm text-gray-700">
+          Save dated photos, senses checks, and model-specific checks in your Garage while the vehicle is new to you.
+        </p>
+        <Button asChild variant="outline" className="bg-white">
+          <a href="/garage">Open your Garage</a>
+        </Button>
+      </div>
+
       {/* Footer actions */}
       <div className="flex gap-3 pt-4 border-t border-gray-200">
         <Button

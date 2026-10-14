@@ -10,6 +10,7 @@ export interface CloudVehicle {
   model: string;
   trim: string | null;
   nickname: string | null;
+  vin: string | null;
   current_mileage: number | null;
   is_active: boolean;
   is_primary: boolean;
@@ -33,7 +34,7 @@ export function useCloudVehicles() {
     try {
       const { data, error } = await supabase
         .from("user_vehicles")
-        .select("id, user_id, year, make, model, trim, nickname, current_mileage, is_active, is_primary, photo_url, created_at, updated_at")
+        .select("id, user_id, year, make, model, trim, nickname, vin, current_mileage, is_active, is_primary, photo_url, created_at, updated_at")
         .eq("is_active", true)
         .order("updated_at", { ascending: false });
       if (error) throw error;

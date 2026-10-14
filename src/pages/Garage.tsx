@@ -54,13 +54,15 @@ function AddVehicleDialog({
 }: {
   open: boolean;
   onClose: () => void;
-  onAdded: () => void;
+  onAdded: (vehicleId?: string) => void;
   initialYear?: string;
   initialMake?: string;
   initialModel?: string;
 }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [addedVehicleId, setAddedVehicleId] = useState<string | null>(null);
   const [vin, setVin] = useState("");
   const [vinDecoding, setVinDecoding] = useState(false);
   const [vinError, setVinError] = useState("");
@@ -79,6 +81,7 @@ function AddVehicleDialog({
   }, [initialYear, initialMake, initialModel]);
 
   const reset = () => {
+    setAddedVehicleId(null);
     setVin(""); setVinError(""); setVinDecoding(false);
     setYear(""); setMake(""); setModel(""); setTrim("");
     setMileage(""); setNickname("");
@@ -132,6 +135,7 @@ function AddVehicleDialog({
           make,
           model,
           trim: trim || null,
+          vin: vin.length === 17 ? vin : null,
           current_mileage: mileage ? parseInt(mileage) : null,
           nickname: nickname || null,
         })
@@ -148,9 +152,8 @@ function AddVehicleDialog({
       }
 
       toast.success("Vehicle added to your garage!");
-      reset();
-      onClose();
-      onAdded();
+      onAdded(data?.id);
+      setAddedVehicleId(data?.id ?? null);
     } catch (err: any) {
       console.error("[Garage] add error:", err);
       toast.error(err?.message || "Failed to add vehicle");
@@ -172,6 +175,27 @@ function AddVehicleDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {addedVehicleId ? (
+          <div className="space-y-4 rounded-xl border border-accent/20 bg-accent/5 p-4">
+            <div>
+              <h3 className="font-semibold">Vehicle added</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Just bought this car? Capture its baseline today while the photos and details are fresh.
+              </p>
+            </div>
+            <Button
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+              onClick={() => {
+                const vehicleId = addedVehicleId;
+                reset();
+                onClose();
+                navigate(`/garage/vehicles/${vehicleId}/baseline`);
+              }}
+            >
+              Capture its Baseline
+            </Button>
+          </div>
+        ) : (
         <div className="space-y-3">
           {/* VIN input */}
           <div className="space-y-1">
@@ -248,16 +272,25 @@ function AddVehicleDialog({
             </div>
           </div>
         </div>
+        )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => { reset(); onClose(); }}>Cancel</Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={loading || !year || !make || !model}
-            className="bg-accent text-accent-foreground hover:bg-accent/90"
-          >
-            {loading ? "Adding…" : "Add Vehicle"}
-          </Button>
+          {addedVehicleId ? (
+            <Button onClick={() => { reset(); onClose(); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
+              Done
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => { reset(); onClose(); }}>Cancel</Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={loading || !year || !make || !model}
+                className="bg-accent text-accent-foreground hover:bg-accent/90"
+              >
+                {loading ? "Adding…" : "Add Vehicle"}
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
