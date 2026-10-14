@@ -2,6 +2,7 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 import { buildVehicleContext } from "./vehicle-known-issues.ts";
+import { buildGuardContext, enforceAidenGuards } from "./aiden-guard.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const MAX_MESSAGES = 80;
@@ -708,13 +709,19 @@ function validateMessages(
 
 
 // ── Convert Anthropic SSE stream to OpenAI-compatible SSE format ──
+// The reply text is BUFFERED in full and passed through the optional
+// onTextComplete hook before anything is emitted: the Aiden guards
+// (aiden-guard.ts) must see the complete reply before any of it reaches
+// the consumer. The client already handles single-chunk delivery (the
+// non-streaming direct-reply path responds the same way).
 function convertAnthropicStreamToOpenAI(
   anthropicStream: ReadableStream<Uint8Array>,
+  onTextComplete?: (fullText: string) => Promise<string>,
 ): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let buffer = "";
-  let firstTextDeltaSent = false;
+  let fullText = "";
 
   return new ReadableStream({
     async start(controller) {
@@ -762,17 +769,22 @@ function convertAnthropicStreamToOpenAI(
               const event = JSON.parse(json);
 
               if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
-                const text: string = event.delta.text ?? "";
-                firstTextDeltaSent = true;
-                emit(text);
-              } else if (event.type === "message_stop") {
-                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                fullText += event.delta.text ?? "";
               }
             } catch {
               // skip unparseable lines
             }
           }
         }
+        let finalText = fullText;
+        if (onTextComplete && finalText) {
+          try {
+            finalText = await onTextComplete(finalText);
+          } catch (guardErr) {
+            console.error("Aiden guard hook failed; sending buffered text:", guardErr);
+          }
+        }
+        emit(finalText);
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       } catch (err) {
@@ -844,6 +856,48 @@ Deno.serve(async (req) => {
     const systemContent = SYSTEM_PROMPT + vehicleContextStr;
     const anthropicMessages = buildAnthropicMessages(messages);
 
+    // ── Aiden combined guard: one bounded regeneration, used ONLY when a
+    // draft reply violates a guard (see aiden-guard.ts). Re-asks the model
+    // with a corrective instruction appended to the system prompt, no tools.
+    const regenerateReply = async (
+      baseMessages: Array<{ role: string; content: unknown }>,
+      violations: string[],
+    ): Promise<string | null> => {
+      const correction =
+        "\n\n**SYSTEM CORRECTION — your previous draft was blocked by a compliance guard (" +
+        violations.join(", ") +
+        "). Rewrite your reply now. Requirements: if a preliminary assessment is owed, deliver it in this reply using the exact words \"preliminary assessment\" and include the required disclaimer; follow Rule 0 exactly; do NOT ask for the user's name in this reply; do not mention this correction or any guard.**";
+      const regenController = new AbortController();
+      const regenTimeout = setTimeout(() => regenController.abort(), 45000);
+      try {
+        const resp = await fetch(ANTHROPIC_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            max_tokens: 2048,
+            system: systemContent + correction,
+            messages: baseMessages,
+          }),
+          signal: regenController.signal,
+        });
+        if (!resp.ok) return null;
+        const data = await resp.json();
+        const blocks = (data.content || []).filter((b: { type: string }) => b.type === "text");
+        const text = blocks.map((b: { text: string }) => b.text).join("").trim();
+        return text || null;
+      } catch (e) {
+        console.error("Guard regeneration failed:", e);
+        return null;
+      } finally {
+        clearTimeout(regenTimeout);
+      }
+    };
+
     // ── Turn 1: Non-streaming request (may produce tool calls) ──
     const turn1Controller = new AbortController();
     const turn1Timeout = setTimeout(() => turn1Controller.abort(), 45000);
@@ -904,9 +958,17 @@ Deno.serve(async (req) => {
           { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } },
         );
       }
-      return new Response(convertAnthropicStreamToOpenAI(fallbackResp.body), {
-        headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
-      });
+      const fallbackCtx = buildGuardContext({ messages, vehicleContext, toolsCalled: [] });
+      return new Response(
+        convertAnthropicStreamToOpenAI(fallbackResp.body, async (fullText) => {
+          const g = await enforceAidenGuards(fullText, fallbackCtx, (violations) =>
+            regenerateReply(anthropicMessages, violations),
+          );
+          if (g.actions.length > 0) console.log("Aiden guard (fallback stream):", g.actions.join(", "));
+          return g.text;
+        }),
+        { headers: { ...securityHeaders, "Content-Type": "text/event-stream" } },
+      );
     }
     clearTimeout(turn1Timeout);
 
@@ -944,7 +1006,12 @@ Deno.serve(async (req) => {
     if (toolUseBlocks.length === 0) {
       const rawContent = textBlocks.map((b: { text: string }) => b.text).join("") ||
         "I'm sorry, I couldn't generate a response. Please try again.";
-      const content = rawContent;
+      const directCtx = buildGuardContext({ messages, vehicleContext, toolsCalled: [] });
+      const guarded = await enforceAidenGuards(rawContent, directCtx, (violations) =>
+        regenerateReply(anthropicMessages, violations),
+      );
+      if (guarded.actions.length > 0) console.log("Aiden guard (direct reply):", guarded.actions.join(", "));
+      const content = guarded.text;
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         start(controller) {
@@ -1023,9 +1090,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    return new Response(convertAnthropicStreamToOpenAI(turn2Resp.body), {
-      headers: { ...securityHeaders, "Content-Type": "text/event-stream" },
-    });
+    const turn2Ctx = buildGuardContext({ messages, vehicleContext, toolsCalled: toolNames });
+    return new Response(
+      convertAnthropicStreamToOpenAI(turn2Resp.body, async (fullText) => {
+        const g = await enforceAidenGuards(fullText, turn2Ctx, (violations) =>
+          regenerateReply(turn2Messages, violations),
+        );
+        if (g.actions.length > 0) console.log("Aiden guard (tool reply):", g.actions.join(", "));
+        return g.text;
+      }),
+      { headers: { ...securityHeaders, "Content-Type": "text/event-stream" } },
+    );
   } catch (e) {
     console.error("chat error:", e);
     return new Response(
