@@ -4,6 +4,7 @@ import type { SymptomAnalysisResponse } from '@/types/symptom';
 import { SENSE_LABELS, SENSE_ICONS } from '@/data/senseChips';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import JourneyPlanCard from '@/components/journey/JourneyPlanCard';
 
 interface SymptomResultsProps {
   result: SymptomAnalysisResponse;
@@ -171,6 +172,27 @@ export const SymptomResults: React.FC<SymptomResultsProps> = ({
         <Button asChild variant="outline" className="bg-white">
           <a href="/garage">Open your Garage</a>
         </Button>
+      </div>
+
+      {/* While your car is being fixed — journey plan (builder; the plan
+          persists with the vehicle's Garage record) */}
+      <div className="pt-2">
+        <JourneyPlanCard
+          mode="consumer"
+          initialSituation={{
+            downtimeDaysMin: 1,
+            downtimeDaysMax: 3,
+            dailyDistanceMiles: 10,
+            budgetTier: 'medium',
+            vehicleDrivable: result.urgency < 3,
+            metroArea: 'detroit',
+            issueCategory: result.systemAreas[0],
+          }}
+        />
+        <p className="text-xs text-gray-500 mt-2">
+          This plan lives with your vehicle in your Garage — open the Garage to
+          keep it saved to the vehicle's record.
+        </p>
       </div>
 
       {/* Footer actions */}

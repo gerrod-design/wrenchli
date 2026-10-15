@@ -30,7 +30,17 @@ export interface Shop {
 interface ShopCardProps {
   shop: Shop;
   onSchedule?: (shop: Shop) => void;
+  /** Capabilities this shop has actually declared (shop_capabilities table).
+   *  Badges render ONLY for capabilities present here — never inferred. */
+  capabilities?: string[];
 }
+
+export const CAPABILITY_LABELS: Record<string, string> = {
+  loaner_cars: "Loaner cars",
+  shuttle: "Shuttle",
+  pickup_delivery: "Pickup & delivery",
+  mobile_service: "Mobile service",
+};
 
 const priceTierLabels = {
   budget: "$",
@@ -44,7 +54,10 @@ const availabilityLabels = {
   within_week: "This Week",
 };
 
-export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
+export default function ShopCard({ shop, onSchedule, capabilities }: ShopCardProps) {
+  const declaredCapabilities = (capabilities ?? []).filter(
+    (cap) => cap in CAPABILITY_LABELS,
+  );
   const [interestLogged, setInterestLogged] = useState(false);
   const [loggingInterest, setLoggingInterest] = useState(false);
 
@@ -119,6 +132,20 @@ export default function ShopCard({ shop, onSchedule }: ShopCardProps) {
           <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Coming Soon to Wrenchli
           </span>
+        </div>
+      )}
+
+      {/* Declared capabilities — only what the shop itself has declared */}
+      {declaredCapabilities.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {declaredCapabilities.map((cap) => (
+            <span
+              key={cap}
+              className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-accent/10 text-accent border border-accent/20"
+            >
+              {CAPABILITY_LABELS[cap]}
+            </span>
+          ))}
         </div>
       )}
 

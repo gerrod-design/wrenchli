@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import ShopCard, { type Shop } from "./ShopCard";
+import { getShopCapabilities } from "@/lib/journeyPlanData";
 import { Loader2, MapPinOff, MessageSquarePlus, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -17,6 +19,23 @@ interface ShopListProps {
 }
 
 export default function ShopList({ shops, loading, onShopSelect, searchedZip, filter = "all", onFilterChange }: ShopListProps) {
+  // Declared shop capabilities (loaner cars, shuttle, pickup & delivery,
+  // mobile service) — fetched per shop; a shop shows a capability badge only
+  // when it has actually declared that capability.
+  const [capabilitiesByShop, setCapabilitiesByShop] = useState<Record<string, string[]>>({});
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const entries = await Promise.all(
+        shops.map(async (s) => [s.id, await getShopCapabilities(s.id)] as const),
+      );
+      if (!cancelled) setCapabilitiesByShop(Object.fromEntries(entries));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [shops]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -118,7 +137,7 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
             onClick={() => onShopSelect?.(shop)}
             className={onShopSelect ? "cursor-pointer" : ""}
           >
-            <ShopCard shop={shop} />
+            <ShopCard shop={shop} capabilities={capabilitiesByShop[shop.id]} />
           </div>
         ))}
       </div>

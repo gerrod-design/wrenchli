@@ -10,6 +10,7 @@ import {
   VehicleRecordSections,
 } from "@/components/garage/VehicleRecordSections";
 import { useVehicleRecord } from "@/hooks/useVehicleRecord";
+import JourneyPlanSection from "@/components/garage/JourneyPlanSection";
 import { useVehicleRecalls } from "@/hooks/useVehicleRecalls";
 import type { VehicleDocument, VehicleTimelineEvent } from "@/types/garageRecord";
 
@@ -134,6 +135,13 @@ export default function VehicleRecord() {
           onOpenDocument={openDocument}
           onOpenTimelineMedia={openTimelineMedia}
         />
+
+        {vehicleId && record.vehicle && (
+          <JourneyPlanSection
+            vehicleId={vehicleId}
+            userId={record.vehicle.user_id}
+          />
+        )}
       </div>
     </main>
   );
