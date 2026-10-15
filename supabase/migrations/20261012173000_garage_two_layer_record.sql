@@ -425,8 +425,12 @@ begin
     return new;
   end if;
 
-  if tg_op = 'UPDATE' and old.status is not distinct from new.status
-     and old.note is not distinct from new.note
+  -- A timeline event records a status change, carrying its evidence. On
+  -- UPDATE, log only when the status or the evidence media actually
+  -- changed. A note-only edit updates the check itself; it is not a
+  -- status change and must not write a duplicate event (GATE-A1).
+  if tg_op = 'UPDATE'
+     and old.status is not distinct from new.status
      and old.evidence_media is not distinct from new.evidence_media then
     return new;
   end if;
