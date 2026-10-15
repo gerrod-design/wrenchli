@@ -158,7 +158,11 @@ export function observedCoverage(checks: VehicleConditionCheck[]) {
 }
 
 function normalizeVehicleModel(model: string) {
-  return model.trim().toLocaleLowerCase().replace(/\s+1500$/, "");
+  return model
+    .trim()
+    .toLocaleLowerCase()
+    .replace(/-class$/, "")
+    .replace(/\s+1500$/, "");
 }
 
 export function matchesWeakPoint(

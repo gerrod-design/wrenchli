@@ -143,6 +143,98 @@ describe("Garage two-layer record", () => {
     )).toBe(true);
   });
 
+it("matches the GLC weak point when the vehicle model carries the NHTSA -Class suffix", () => {
+    expect(
+      matchesWeakPoint(weakPoint, {
+        make: "Mercedes-Benz",
+        model: "GLC-Class",
+        year: 2016,
+      }),
+    ).toBe(true);
+
+    expect(
+      matchesWeakPoint(weakPoint, {
+        make: "Mercedes-Benz",
+        model: "GLC-Class",
+        year: 2023,
+      }),
+    ).toBe(false);
+
+    expect(
+      matchesWeakPoint(weakPoint, {
+        make: "Toyota",
+        model: "GLC-Class",
+        year: 2016,
+      }),
+    ).toBe(false);
+  });
+
+  it("keeps matching the other library models under their stored names", () => {
+    const rav4 = {
+      ...weakPoint,
+      make: "Toyota",
+      model: "RAV4",
+      year_start: 2019,
+      year_end: 2021,
+    };
+    const crv = {
+      ...weakPoint,
+      make: "Honda",
+      model: "CR-V",
+      year_start: 2017,
+      year_end: 2019,
+    };
+    const f150 = {
+      ...weakPoint,
+      make: "Ford",
+      model: "F-150",
+      year_start: 2018,
+      year_end: 2020,
+    };
+    const silverado = {
+      ...weakPoint,
+      make: "Chevrolet",
+      model: "Silverado 1500",
+      year_start: 2019,
+      year_end: 2020,
+    };
+    const cx30 = {
+      ...weakPoint,
+      make: "Mazda",
+      model: "CX-30",
+      year_start: 2020,
+      year_end: 2024,
+    };
+
+    expect(
+      matchesWeakPoint(rav4, { make: "Toyota", model: "RAV4", year: 2020 }),
+    ).toBe(true);
+    expect(
+      matchesWeakPoint(crv, { make: "Honda", model: "CR-V", year: 2018 }),
+    ).toBe(true);
+    expect(
+      matchesWeakPoint(f150, { make: "Ford", model: "F-150", year: 2019 }),
+    ).toBe(true);
+    expect(
+      matchesWeakPoint(silverado, {
+        make: "Chevrolet",
+        model: "Silverado 1500",
+        year: 2019,
+      }),
+    ).toBe(true);
+    expect(
+      matchesWeakPoint(cx30, { make: "Mazda", model: "CX-30", year: 2022 }),
+    ).toBe(true);
+
+    expect(
+      matchesWeakPoint(rav4, {
+        make: "Mercedes-Benz",
+        model: "GLC-Class",
+        year: 2020,
+      }),
+    ).toBe(false);
+  });
+
   it("blocks baseline completion until every weak-point item is answered", () => {
     const incomplete = baselineCompletionState(allCoreResponses(), [weakPoint]);
     expect(incomplete.complete).toBe(false);
