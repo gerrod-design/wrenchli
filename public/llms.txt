@@ -12,7 +12,7 @@ Wrenchli is not a licensed mechanic and does not provide professional diagnostic
 
 - [Vehicle symptom assessment](https://wrenchli.net): Free AI-powered assessment of vehicle symptoms. No account required. Takes about a minute. Returns likely causes, urgency, cost range, and questions to ask a mechanic.
 - [About Wrenchli](https://wrenchli.net/about): Company background, founder, mission, and the information asymmetry problem Wrenchli addresses.
-- [For repair shops](https://wrenchli.net/for-shops): Wrenchli's shop program is currently on pause.
+- [For repair shops](https://wrenchli.net/for-shops): Wrenchli runs a free 90-day referral pilot for independent repair shops in Detroit and Columbus. Participating shops receive referrals with the customer's vehicle details, symptom description, likely causes, and a fair cost range attached.
 - [Garage](https://wrenchli.net/garage): Free vehicle garage with saved assessments, recall alerts, and vehicle history.
 
 ## Safety policy
@@ -49,7 +49,7 @@ Shop Required: Wrenchli's designation for repairs that must be performed by a qu
 
 ## Geographic coverage
 
-The symptom assessment is available to any vehicle owner in the United States. Shop matching is not currently offered.
+The symptom assessment is available to any vehicle owner in the United States. The shop referral pilot operates in Detroit, Michigan and Columbus, Ohio, where consumers can be referred to participating hand-verified independent shops. Wrenchli does not offer general shop matching outside the pilot areas.
 
 ## Contact
 
