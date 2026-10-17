@@ -54,7 +54,7 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
           No Shops Found{searchedZip ? ` Near ${searchedZip}` : ""}
         </h3>
         <p className="text-muted-foreground max-w-md mx-auto mb-6">
-          We're now enrolling Detroit shops in our free referral pilot — Wrenchli has no partner shops right now. The listings above are reference-only. Save your assessment to share with whichever qualified mechanic you trust.
+          We're now enrolling independent shops nationally in our free referral pilot — Wrenchli has no partner shops right now. The listings above are reference-only. Save your assessment to share with whichever qualified mechanic you trust.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">

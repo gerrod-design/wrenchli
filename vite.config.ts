@@ -30,11 +30,11 @@ const prerenderRoutes: {
   },
   {
     path: "/for-shops",
-    title: "Free Referral Pilot for Independent Detroit Shops | Wrenchli",
+    title: "Free Referral Pilot for Independent Shops | Wrenchli",
     description:
-      "Free 90-day referral pilot for independent Detroit auto repair shops. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range.",
+      "Free 90-day referral pilot for independent auto repair shops. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range.",
     content: `
-      <h1>Free Referral Pilot for Independent Detroit Shops</h1>
+      <h1>Free Referral Pilot for Independent Shops</h1>
       <h2>Customers arrive pre-assessed</h2>
       <p>Vehicle details, symptom description, likely causes, and a fair cost range — before they walk in. Free 90-day pilot for independent shops.</p>
       <h2>How it works</h2>

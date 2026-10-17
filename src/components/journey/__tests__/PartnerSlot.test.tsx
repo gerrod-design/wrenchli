@@ -42,7 +42,7 @@ describe('PartnerSlot', () => {
 
     expect(screen.getByText('Open partner slot')).toBeInTheDocument();
     expect(
-      screen.getByText('Launching with partners in Detroit and Columbus — be first.')
+      screen.getByText('Launching with partners nationally — be first.')
     ).toBeInTheDocument();
 
     const anchors = container.querySelectorAll('a');

@@ -33,8 +33,8 @@ export default function ForShops() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Free Referral Pilot for Independent Detroit Shops"
-        description="Free 90-day referral pilot for independent Detroit auto repair shops. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range."
+        title="Free Referral Pilot for Independent Shops"
+        description="Free 90-day referral pilot for independent auto repair shops. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range."
         path="/for-shops"
       />
 
@@ -43,7 +43,7 @@ export default function ForShops() {
         <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
             <h1 className="font-heading text-3xl font-extrabold leading-tight md:text-5xl">
-              Free Referral Pilot for Independent Detroit Shops
+              Free Referral Pilot for Independent Shops
             </h1>
           </SectionReveal>
         </div>

@@ -30,7 +30,7 @@ describe('PartnersJourney page', () => {
   it('renders the standing partner phrase', () => {
     render(<PartnersJourney />);
     expect(
-      screen.getAllByText('Launching with partners in Detroit and Columbus — be first.').length
+      screen.getAllByText('Launching with partners nationally — be first.').length
     ).toBeGreaterThanOrEqual(1);
   });
 

@@ -32,7 +32,7 @@ const journeys = [
     title: "Repair Shop",
     subtitle: "Want more customers?",
     description:
-      "Our free referral pilot is now enrolling Detroit shops. The vision is simple: customers who arrive already knowing what's wrong.",
+      "Our free referral pilot is now enrolling independent shops nationally. The vision is simple: customers who arrive already knowing what's wrong.",
     features: [
       "Free 90-day pilot — now enrolling",
       "No exclusivity, no auto-billing",

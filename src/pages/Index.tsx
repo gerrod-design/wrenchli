@@ -120,7 +120,7 @@ export default function Index() {
               Be the First to Know
             </h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Shop matching is currently paused while we focus on the free symptom assessment. Join the early access list and we'll notify you when it goes live in your area.
+              Shop referrals are opening shop by shop, not city by city. Wrenchli's free assessment is available everywhere, and our free referral pilot is open to independent shops nationally — where a participating shop is available, we can connect you. Join the early access list and we'll notify you as shops join near you.
             </p>
             <div className="mt-8">
               <WaitlistForm source="home-waitlist" />

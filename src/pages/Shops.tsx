@@ -40,8 +40,8 @@ const valueProps = [
 const steps = [
   {
     num: "1",
-    title: "Program Paused",
-    desc: "Wrenchli is not onboarding repair shops right now. The steps below describe how the program would work when it is open.",
+    title: "Join the Pilot",
+    desc: "Independent shops can join Wrenchli's free 90-day referral pilot now, and the steps below describe how it works.",
   },
   { num: "2", title: "Set Up Your Profile", desc: "Add services, pricing, photos, and availability." },
   { num: "3", title: "Receive Leads", desc: "Pre-qualified customers in your area request quotes." },
@@ -55,7 +55,7 @@ export default function Shops() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="For Repair Shops — Wrenchli"
-        description="Wrenchli's shop partner program is currently paused — no repair shops are being onboarded at this time. When open, the program offers pre-qualified leads, free digital tools, and no upfront fees."
+        description="Wrenchli runs a free 90-day referral pilot for independent repair shops — pre-assessed customers, no upfront fees, no exclusivity."
         path="/shops"
       />
 
@@ -70,8 +70,8 @@ export default function Shops() {
               Pre-qualified leads. Free tools. No upfront fees.
             </p>
             <p className="mt-8 mx-auto max-w-2xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
-              Shop partner program currently paused — Wrenchli is not
-              onboarding repair shops at this time.
+              Now onboarding — our free 90-day referral pilot for independent
+              shops is open nationally. Join the pilot.
             </p>
           </SectionReveal>
         </div>
@@ -192,8 +192,8 @@ export default function Shops() {
               Wrenchli is focused on the free driver assessment right now.
             </p>
             <p className="mt-8 mx-auto max-w-xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
-              Shop partner program currently paused — Wrenchli is not
-              onboarding repair shops at this time.
+              Now onboarding — our free 90-day referral pilot for independent
+              shops is open nationally. Join the pilot.
             </p>
           </SectionReveal>
         </div>

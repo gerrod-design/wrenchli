@@ -271,11 +271,11 @@ export default function DesignPreview() {
             </div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-4" style={{ color: "#1A1D27" }}>
               Shop partner program<br />
-              <span style={{ color: "#E07B39" }}>currently paused.</span>
+              <span style={{ color: "#E07B39" }}>now onboarding nationally.</span>
             </h2>
             <p className="text-lg max-w-2xl mx-auto leading-relaxed mb-12" style={{ color: "#6B7280" }}>
-              Wrenchli is focused on the national symptom assessment.
-              Shop onboarding and partner referrals are not available at this time.
+              Wrenchli's free symptom assessment is available nationally.
+              Our free 90-day referral pilot for independent repair shops is also open nationally — with referrals available wherever participating shops have joined.
             </p>
 
             <div className="grid sm:grid-cols-3 gap-6 text-left">
@@ -283,7 +283,7 @@ export default function DesignPreview() {
                 {
                   icon: Users,
                   title: "Program Status",
-                  desc: "The shop partner program is paused. Wrenchli is not onboarding repair shops at this time.",
+                  desc: "Now onboarding — the free 90-day referral pilot for independent shops is open nationally.",
                 },
                 {
                   icon: ClipboardCheck,

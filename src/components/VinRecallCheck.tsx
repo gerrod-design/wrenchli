@@ -77,8 +77,11 @@ export default function VinRecallCheck() {
                 Check your vehicle for open safety recalls
               </h2>
             </div>
-            <p className="text-sm text-white/50 mb-6 ml-[52px]">
+            <p className="text-sm text-white/50 mb-2 ml-[52px]">
               Enter your VIN — free, instant, no account required
+            </p>
+            <p className="text-xs text-white/50 mb-6 ml-[52px]">
+              This check covers NHTSA safety recalls only. Manufacturer service campaigns and warranty extensions are not included.
             </p>
 
             {/* Input */}
@@ -124,7 +127,7 @@ export default function VinRecallCheck() {
                 <div className="flex items-center gap-2 text-amber-400">
                   <AlertTriangle className="h-4 w-4 shrink-0" />
                   <span className="text-sm font-bold">
-                    {state.recalls.length} open recall{state.recalls.length > 1 ? "s" : ""} found
+                    {state.recalls.length} open safety recall{state.recalls.length > 1 ? "s" : ""} found
                   </span>
                 </div>
 
@@ -153,6 +156,10 @@ export default function VinRecallCheck() {
                     </div>
                   ))}
                 </div>
+
+                <p className="text-sm text-white/70">
+                  Manufacturer service campaigns and warranty extensions are not shown here. An authorized {state.vehicle.make} dealer can check this VIN for those.
+                </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <Button asChild className="h-11 bg-accent text-accent-foreground hover:bg-accent/90 font-bold">
@@ -184,8 +191,12 @@ export default function VinRecallCheck() {
 
                 <div className="flex items-center gap-2 text-green-400">
                   <ShieldCheck className="h-4 w-4 shrink-0" />
-                  <span className="text-sm font-bold">No open recalls found for this vehicle</span>
+                  <span className="text-sm font-bold">No open safety recalls found for this vehicle</span>
                 </div>
+
+                <p className="text-sm text-white/70">
+                  An authorized {state.vehicle.make} dealer can check this VIN for manufacturer service campaigns and warranty extensions, which this check does not cover.
+                </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <Button asChild className="h-11 bg-accent text-accent-foreground hover:bg-accent/90 font-bold">

@@ -50,7 +50,7 @@ function StageCard({ stage }: { stage: JourneyStage }) {
           <p className="text-sm">{stage.summary}</p>
           <p className="text-xs text-muted-foreground">Why not yet: {stage.laterReason}</p>
           <p className="text-xs text-muted-foreground">{stage.partnerNote}</p>
-          <p className="text-xs font-medium">Launching with partners in Detroit and Columbus — be first.</p>
+          <p className="text-xs font-medium">Launching with partners nationally — be first.</p>
         </>
       )}
     </Card>
@@ -66,7 +66,7 @@ export default function PartnersJourney() {
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">The complete Wrenchli journey — partner preview</h1>
         <p className="text-sm font-medium">
-          Launching with partners in Detroit and Columbus — be first.
+          Launching with partners nationally — be first.
         </p>
         <p className="text-sm text-muted-foreground">
           This page walks the whole journey a Wrenchli customer and shop take together. Every

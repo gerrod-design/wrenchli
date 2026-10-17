@@ -22,7 +22,7 @@ export default function PartnerSlot({
         <p className="text-sm text-muted-foreground">{description}</p>
         <Badge variant="outline">Open partner slot</Badge>
         <p className="text-sm">
-          Launching with partners in Detroit and Columbus — be first.
+          Launching with partners nationally — be first.
         </p>
         <a
           href="/contact"
