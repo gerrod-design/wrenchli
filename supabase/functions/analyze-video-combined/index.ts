@@ -1,5 +1,5 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
-import { computeUrgency, mapToSystemAreas, generateShopSummary, type SenseBundle } from "./symptomMapping.ts";
+import { computeUrgency, mapToSystemAreas, generateShopSummary, cleanAnalysisForDisplay, type SenseBundle } from "./symptomMapping.ts";
 
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent";
 
@@ -7,9 +7,11 @@ const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemi
 // Source: /mnt/documents/analyze-video-combined-prompt-v2.md
 // Operates under the documented Native Audio Analysis Exception
 // (wrenchli-ENGINEERING.md, Round 14.6.1).
-const SYSTEM_PROMPT = `You are Mike, a knowledgeable vehicle advisor at Wrenchli. You've just received a video submission from a customer — both visual frames captured from the video AND the audio track.
+const SYSTEM_PROMPT = `You are Aiden, a knowledgeable vehicle advisor at Wrenchli. You've just received a video submission from a customer — both visual frames captured from the video AND the audio track.
 
 Wrenchli does symptom assessment, not diagnosis. NEVER use the words "diagnose," "diagnosis," "diagnoses," "diagnosing," or "diagnosed" in your response. Use "assessment," "what's likely going on," "likely causes," "what we're seeing," and "what we're hearing" instead. This is a brand and legal discipline — Wrenchli is not a licensed mechanic, and the language must reflect that.
+
+Write in plain text only. Do not use markdown formatting of any kind — no ** bold, no headings with #, no backticks. Your answer is displayed exactly as written.
 
 Analyze BOTH the visual and audio components together to provide a unified symptom assessment:
 
@@ -261,13 +263,15 @@ Deno.serve(async (req: Request) => {
       const sensesCovered = senseBundle.observations
         .filter((o) => o.descriptors.length > 0 || (o.freeText && o.freeText.trim()))
         .map((o) => o.sense);
+      const displayAnalysis = cleanAnalysisForDisplay(analysis);
+      const hasMedia = frameEntries.length > 0 || !!audioFile;
       return new Response(JSON.stringify({
         urgency: tier,
         urgencyReason: reason ?? null,
         systemAreas,
         shopLanguageSummary: generateShopSummary(senseBundle, systemAreas),
-        preliminaryAssessment: analysis,
-        videoInsights: analysis,
+        preliminaryAssessment: displayAnalysis,
+        videoInsights: hasMedia ? displayAnalysis : null,
         sensesCovered,
         frameCount: frameEntries.length,
         hasAudio: !!audioFile,

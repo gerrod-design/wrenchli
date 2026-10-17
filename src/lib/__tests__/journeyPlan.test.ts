@@ -73,14 +73,27 @@ describe('buildJourneyPlan structure', () => {
     expect(transit.transitOption.agencyName).toBe('SMART');
   });
 
-  it('metro other has no public_transit item', () => {
+  it('metro other gets the national transit directory fallback item', () => {
     const plan = buildJourneyPlan({ ...baseInput, metroArea: 'other' });
     const items = itemsOf(plan, 'getting_around');
-    expect(items.find((i) => i.key === 'public_transit')).toBeUndefined();
+    const item = items.find((i) => i.key === 'public_transit');
+    expect(item).toBeDefined();
+    expect(item?.kind).toBe('real');
+    expect(item?.label).toBe('Public transit');
+    expect(item?.transitOption).toBeUndefined();
+    expect(item?.links).toEqual([
+      { label: 'Find your local transit agency', url: 'https://www.apta.com/research-technical-resources/public-transportation-links/' },
+    ]);
   });
 
   it('low budget + detroit puts public_transit first', () => {
     const plan = buildJourneyPlan({ ...baseInput, budgetTier: 'low', metroArea: 'detroit' });
+    const items = itemsOf(plan, 'getting_around');
+    expect(items[0].key).toBe('public_transit');
+  });
+
+  it('low budget + other puts the transit fallback first', () => {
+    const plan = buildJourneyPlan({ ...baseInput, budgetTier: 'low', metroArea: 'other' });
     const items = itemsOf(plan, 'getting_around');
     expect(items[0].key).toBe('public_transit');
   });
@@ -91,7 +104,7 @@ describe('buildJourneyPlan structure', () => {
     expect(items[0].key).toBe('rideshare_slot');
   });
 
-  it('rideshare_slot and rental_slot are partner_slot across full matrix', () => {
+  it('rideshare_slot and rental_slot are real items with mobility links across full matrix', () => {
     for (const budgetTier of budgetTiers) {
       for (const metroArea of metroAreas) {
         for (const vehicleDrivable of drivableOptions) {
@@ -105,9 +118,19 @@ describe('buildJourneyPlan structure', () => {
           const rideshare = items.find((i) => i.key === 'rideshare_slot');
           const rental = items.find((i) => i.key === 'rental_slot');
           expect(rideshare).toBeDefined();
-          expect(rideshare.kind).toBe('partner_slot');
+          expect(rideshare.kind).toBe('real');
+          expect(rideshare.links).toEqual([
+            { label: 'Open Uber', url: 'https://www.uber.com' },
+            { label: 'Open Lyft', url: 'https://www.lyft.com' },
+          ]);
           expect(rental).toBeDefined();
-          expect(rental.kind).toBe('partner_slot');
+          expect(rental.kind).toBe('real');
+          expect(rental.links).toEqual([
+            { label: 'Open Enterprise', url: 'https://www.enterprise.com' },
+            { label: 'Open Hertz', url: 'https://www.hertz.com' },
+            { label: 'Open Avis', url: 'https://www.avis.com' },
+            { label: 'Open Budget', url: 'https://www.budget.com' },
+          ]);
         }
       }
     }

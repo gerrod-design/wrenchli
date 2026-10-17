@@ -11,6 +11,7 @@ import {
   weakPointCheckKey,
 } from "@/lib/garageRecord";
 import { createGarageRecordPdf } from "@/lib/garageRecordPdf";
+import { toPdfSafeText } from "@/lib/garageRecordPdf";
 import type {
   VehicleBaselineResponse,
   VehicleConditionCheck,
@@ -301,6 +302,43 @@ it("matches the GLC weak point when the vehicle model carries the NHTSA -Class s
         vin: "TESTVIN",
       },
       timeline: [],
+      checks: [],
+      baselines: [],
+      responses: [],
+      documents: [],
+      weakPoints: [weakPoint],
+    });
+    expect(pdf.getNumberOfPages()).toBeGreaterThanOrEqual(1);
+  });
+
+  it("sanitizes non-WinAnsi characters for PDF export", () => {
+    expect(
+      toPdfSafeText("Drained 15.3 quarts \u2192 nearly double \u2248 capacity")
+    ).toBe("Drained 15.3 quarts -> nearly double ~ capacity");
+    expect(toPdfSafeText("a \u2014 b \u00B7 c")).toBe("a \u2014 b \u00B7 c");
+    expect(toPdfSafeText("fixed \u{1F527} now")).toBe("fixed  now");
+  });
+
+  it("creates a PDF from a record whose text contains arrows and approximations", () => {
+    const pdf = createGarageRecordPdf({
+      vehicle: {
+        id: "vehicle-1",
+        user_id: "user-1",
+        year: 2017,
+        make: "Mercedes-Benz",
+        model: "GLC",
+        vin: "TESTVIN",
+      },
+      timeline: [
+        {
+          layer: "reported",
+          occurred_at: "2026-10-02",
+          title: "Overfill findings",
+          source_name: "Steve's European",
+          source_type: "shop",
+          detail: "Drained \u2192 \u2248 double",
+        } as any,
+      ],
       checks: [],
       baselines: [],
       responses: [],

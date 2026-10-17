@@ -213,3 +213,7 @@ export function generateShopSummary(
 
   return `Customer reports ${descriptorSummary} (${timingStr}), ${conditionsStr}${locationsStr}. Likely systems: ${systemsStr}. Advise inspection and assessment.`;
 }
+
+export function cleanAnalysisForDisplay(text: string): string {
+  return text.split("**").join("");
+}

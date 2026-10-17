@@ -1,3 +1,5 @@
+import { pickBestPhoto } from "./scoring.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
@@ -9,13 +11,20 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { query } = await req.json();
+    const body = await req.json();
+    const { query } = body;
     if (!query || typeof query !== "string") {
       return new Response(JSON.stringify({ error: "query is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const queryTokens = query.trim().split(/\s+/);
+    const make = typeof body.make === "string" && body.make ? body.make : queryTokens[0] ?? "";
+    const model = typeof body.model === "string" && body.model ? body.model : queryTokens[1] ?? "";
+    const trim = typeof body.trim === "string" ? body.trim : null;
+    const bodyType = typeof body.bodyType === "string" ? body.bodyType : null;
 
     const UNSPLASH_ACCESS_KEY = Deno.env.get("UNSPLASH_ACCESS_KEY");
     if (!UNSPLASH_ACCESS_KEY) {
@@ -27,7 +36,7 @@ Deno.serve(async (req) => {
 
     const params = new URLSearchParams({
       query: query,
-      per_page: "1",
+      per_page: "10",
       orientation: "landscape",
       content_filter: "high",
     });
@@ -46,7 +55,7 @@ Deno.serve(async (req) => {
     }
 
     const data = await res.json();
-    const photo = data.results?.[0];
+    const photo = pickBestPhoto(data.results ?? [], { make, model, trim, bodyType });
 
     if (!photo) {
       return new Response(JSON.stringify({ url: null }), {

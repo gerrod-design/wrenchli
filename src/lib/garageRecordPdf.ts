@@ -27,6 +27,58 @@ export interface GarageRecordExportData {
   weakPoints: WeakPointCheck[];
 }
 
+export function toPdfSafeText(text: string): string {
+  const winAnsiSafe = new Set<string>([
+    "\u20AC", // €
+    "\u201A", // ‚
+    "\u0192", // ƒ
+    "\u201E", // „
+    "\u2026", // …
+    "\u2020", // †
+    "\u2021", // ‡
+    "\u02C6", // ˆ
+    "\u2030", // ‰
+    "\u0160", // Š
+    "\u2039", // ‹
+    "\u0152", // Œ
+    "\u017D", // Ž
+    "\u2018", // '
+    "\u2019", // '
+    "\u201C", // "
+    "\u201D", // "
+    "\u2022", // •
+    "\u2013", // –
+    "\u2014", // —
+    "\u02DC", // ˜
+    "\u2122", // ™
+    "\u0161", // š
+    "\u203A", // ›
+    "\u0153", // œ
+    "\u017E", // ž
+    "\u0178", // Ÿ
+  ]);
+
+  const replaced = text
+    .replace(/\u2192/g, "->")
+    .replace(/\u2190/g, "<-")
+    .replace(/\u2194/g, "<->")
+    .replace(/\u2248/g, "~")
+    .replace(/\u2265/g, ">=")
+    .replace(/\u2264/g, "<=")
+    .replace(/\u2210/g, "-")
+    .replace(/\u2713/g, "(yes)")
+    .replace(/\u2714/g, "(yes)")
+    .replace(/\u2605/g, "*");
+
+  return Array.from(replaced)
+    .filter((ch) => {
+      const code = ch.codePointAt(0) ?? 0;
+      if (code <= 0xff) return true;
+      return winAnsiSafe.has(ch);
+    })
+    .join("");
+}
+
 function wrap(doc: jsPDF, text: string, maxWidth: number) {
   return doc.splitTextToSize(text, maxWidth) as string[];
 }
@@ -46,7 +98,7 @@ export function createGarageRecordPdf(data: GarageRecordExportData) {
   const write = (text: string, size = 10, leading = 14, bold = false) => {
     doc.setFont("helvetica", bold ? "bold" : "normal");
     doc.setFontSize(size);
-    const lines = wrap(doc, text, width);
+    const lines = wrap(doc, toPdfSafeText(text), width);
     ensureSpace(lines.length * leading + 4);
     doc.text(lines, margin, y);
     y += lines.length * leading + 4;

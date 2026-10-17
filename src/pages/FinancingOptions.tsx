@@ -284,6 +284,72 @@ export default function FinancingOptions() {
           </SectionReveal>
         </div>
       </section>
+
+      <section className="section-padding bg-background">
+        <div className="container-wrenchli max-w-3xl">
+          <SectionReveal>
+            <h2 className="font-heading text-xl font-bold md:text-2xl">
+              When the repair costs more than the car is worth
+            </h2>
+            <div className="mt-4 space-y-4 text-sm text-muted-foreground">
+              <p>
+                Sometimes the number on the estimate isn't really a repair decision — it's a replacement decision.
+                Before you finance either one, it helps to compare the full cost of each path, not just the bill
+                in front of you.
+              </p>
+              <div className="rounded-lg border border-border p-4">
+                <p className="font-semibold text-foreground">Compare total cost, not just today's number</p>
+                <p className="mt-1">
+                  The repair path is this estimate <em>plus</em> the follow-on work an older vehicle is likely to
+                  need soon after. The replacement path is the purchase price, taxes and fees, any immediate work
+                  the replacement needs before it's dependable, and the difference between what you'd owe and what
+                  your current vehicle is worth, if anything. Line both totals up side by side before deciding.
+                </p>
+              </div>
+              <div className="rounded-lg border border-border p-4">
+                <p className="font-semibold text-foreground">Where replacement financing usually comes from</p>
+                <p className="mt-1">
+                  Typically your own bank, a credit union, or financing arranged through the dealer. A good habit:
+                  get at least one quote from a bank or credit union you already use <em>before</em> you shop, so
+                  you have something to compare the dealer's offer against.
+                </p>
+              </div>
+              <div className="rounded-lg border border-border p-4">
+                <p className="font-semibold text-foreground">Questions to ask before signing</p>
+                <ul className="mt-1 list-disc pl-5 space-y-1">
+                  <li>Is the APR fixed for the whole term?</li>
+                  <li>What is the total of all payments over the full term — not just the monthly payment?</li>
+                  <li>How long is the term, and will the car likely outlast it?</li>
+                  <li>Is there a prepayment penalty?</li>
+                  <li>Exactly what amounts are being rolled into the loan?</li>
+                </ul>
+              </div>
+              <div className="rounded-lg border border-amber-300 bg-amber-50 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-foreground">Watch for negative equity</p>
+                    <p className="mt-1">
+                      If you owe more on your current vehicle than it's worth, trading it in usually rolls that
+                      shortfall into the new loan — you start out owing more than the replacement is worth. Being
+                      upside-down again is exactly the trap to avoid. Paying the gap down first, or selling the
+                      car yourself, can be the cheaper path.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <p>
+                The same discipline applies either way: anything Wrenchli shows you stays under our 24% APR
+                ceiling, and that total-cost thinking holds whether a replacement loan is arranged through
+                Wrenchli, your bank, or a dealer.
+              </p>
+              <p className="text-xs">
+                This is general information to help you compare options — not financial advice.
+              </p>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
     </main>
   );
 }

@@ -9,8 +9,13 @@ function buildQuery(make: string, model: string): string {
   return `${make} ${model} car exterior`;
 }
 
-export function useVehiclePhoto(year: number, make: string, model: string) {
-  const key = `${year}-${make}-${model}`;
+export function useVehiclePhoto(
+  year: number,
+  make: string,
+  model: string,
+  options?: { trim?: string | null; bodyType?: string }
+) {
+  const key = `${year}-${make}-${model}-${options?.trim ?? ""}-${options?.bodyType ?? ""}`;
   const query = buildQuery(make, model);
   const [url, setUrl] = useState<string | null>(cache.get(key) ?? null);
   const [loading, setLoading] = useState(!cache.has(key));
@@ -26,7 +31,15 @@ export function useVehiclePhoto(year: number, make: string, model: string) {
     setLoading(true);
 
     supabase.functions
-      .invoke("unsplash-search", { body: { query } })
+      .invoke("unsplash-search", {
+        body: {
+          query,
+          make,
+          model,
+          trim: options?.trim ?? null,
+          bodyType: options?.bodyType ?? null,
+        },
+      })
       .then(({ data, error }) => {
         if (cancelled) return;
         const photoUrl = error ? null : data?.url ?? null;

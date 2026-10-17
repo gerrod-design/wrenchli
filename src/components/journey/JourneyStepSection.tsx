@@ -43,6 +43,21 @@ export default function JourneyStepSection({
                   Plan your trip with {item.transitOption.agencyName}
                 </a>
               )}
+              {item.links && item.links.length > 0 && (
+                <div className="space-y-1">
+                  {item.links.map((link) => (
+                    <a
+                      key={link.url}
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block text-sm font-medium text-primary underline underline-offset-4"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}

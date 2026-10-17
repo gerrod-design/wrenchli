@@ -11,6 +11,9 @@ import type { SymptomAnalysisResponse } from "@/types/symptom";
  * symptom-mode return block) for a smell-first submission with no
  * video: frameCount 0, hasAudio false. The assessment field is the
  * `urgency` number — there is no `urgencyTier` field in the payload.
+ * In the fixed symptom-mode contract, videoInsights is null when no
+ * media (frames/audio) was submitted, so the client treats it as
+ * absent (undefined here, since null and undefined are both falsy).
  */
 const zeroMediaSmellResult: SymptomAnalysisResponse = {
   urgency: 2,
@@ -19,8 +22,7 @@ const zeroMediaSmellResult: SymptomAnalysisResponse = {
   shopLanguageSummary: "Customer reports a sweet smell and normal feel.",
   preliminaryAssessment:
     "A sweet smell often points to coolant. Check the coolant level and look for leaks.",
-  videoInsights:
-    "A sweet smell often points to coolant. Check the coolant level and look for leaks.",
+  videoInsights: undefined,
   sensesCovered: ["SMELL", "FEEL"],
   frameCount: 0,
   hasAudio: false,
@@ -32,11 +34,12 @@ describe("SymptomResults — zero-media symptom response", () => {
 
     expect(screen.getByText("Preliminary Assessment")).toBeInTheDocument();
     expect(screen.getByText(/Get it checked this week/)).toBeInTheDocument();
-    // In symptom mode the edge sets videoInsights to the same text as
-    // preliminaryAssessment, so the assessment renders in both sections.
+    // With no media submitted, the assessment text must render exactly
+    // once, and the video-insights section must not render at all.
     expect(
       screen.getAllByText(/sweet smell often points to coolant/i).length
-    ).toBeGreaterThanOrEqual(1);
+    ).toBe(1);
+    expect(screen.queryByText("What we found in your video")).not.toBeInTheDocument();
   });
 
   it("renders the tier-3 do-not-drive state from the same response shape", () => {
@@ -58,10 +61,15 @@ describe("SymptomResults — zero-media symptom response", () => {
       frameCount: 4,
       hasAudio: true,
       sensesCovered: ["SEE", "HEAR", "SMELL", "FEEL"],
+      videoInsights: "In your video we can see steam rising from the engine bay.",
     };
     render(<SymptomResults result={withVideo} onClose={() => {}} />);
 
     expect(screen.getByText(/Looks safe to drive/)).toBeInTheDocument();
+    expect(screen.getByText("What we found in your video")).toBeInTheDocument();
+    expect(
+      screen.getByText("In your video we can see steam rising from the engine bay.")
+    ).toBeInTheDocument();
   });
 
   it("calls onClose from the Close button", () => {

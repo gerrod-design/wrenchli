@@ -107,7 +107,11 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
   const [menuOpen, setMenuOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
-  const { url: photoUrl, loading: photoLoading } = useVehiclePhoto(vehicle.year, vehicle.make, vehicle.model);
+  const bodyType = detectBodyType(vehicle.make, vehicle.model);
+  const { url: photoUrl, loading: photoLoading } = useVehiclePhoto(vehicle.year, vehicle.make, vehicle.model, {
+    trim: vehicle.trim,
+    bodyType,
+  });
 
   const displayName = vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const subtitle = vehicle.nickname
@@ -116,7 +120,6 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
       ? `${vehicle.year} · ${vehicle.trim}`
       : String(vehicle.year);
 
-  const bodyType = detectBodyType(vehicle.make, vehicle.model);
   const stale = vehicle.current_mileage ? isMileageStale(vehicle.updated_at) : false;
   const age = new Date().getFullYear() - vehicle.year;
 

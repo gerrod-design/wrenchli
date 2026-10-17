@@ -20,12 +20,18 @@ export interface TransitOption {
 
 export type PlanItemKind = 'real' | 'partner_slot';
 
+export interface PlanLink {
+  label: string;
+  url: string;
+}
+
 export interface PlanItem {
   key: string;
   label: string;
   kind: PlanItemKind;
   description: string;
   transitOption?: TransitOption;
+  links?: PlanLink[];
 }
 
 export interface PlanStep {
@@ -94,20 +100,30 @@ function buildGettingAroundItems(input: JourneySituationInput): PlanItem[] {
   const rideshareItem: PlanItem = {
     key: 'rideshare_slot',
     label: 'Rideshare',
-    kind: 'partner_slot',
+    kind: 'real',
     description: `Rideshare can cover short hops while your vehicle is out. ${costFrame}`,
+    links: [
+      { label: 'Open Uber', url: 'https://www.uber.com' },
+      { label: 'Open Lyft', url: 'https://www.lyft.com' },
+    ],
   };
 
   const rentalItem: PlanItem = {
     key: 'rental_slot',
     label: 'Rental car',
-    kind: 'partner_slot',
+    kind: 'real',
     description:
       'A rental car tends to make more sense for longer downtime, since it replaces your vehicle entirely rather than trip by trip. The estimated total scales with how many days you need one.',
+    links: [
+      { label: 'Open Enterprise', url: 'https://www.enterprise.com' },
+      { label: 'Open Hertz', url: 'https://www.hertz.com' },
+      { label: 'Open Avis', url: 'https://www.avis.com' },
+      { label: 'Open Budget', url: 'https://www.budget.com' },
+    ],
   };
 
   const transitOption = getTransitOptionForMetro(input.metroArea);
-  const transitItem: PlanItem | null = transitOption
+  const transitItem: PlanItem = transitOption
     ? {
         key: 'public_transit',
         label: `Public transit (${transitOption.agencyName})`,
@@ -115,15 +131,25 @@ function buildGettingAroundItems(input: JourneySituationInput): PlanItem[] {
         description: `Plan your trip using ${transitOption.agencyName}'s official trip planner at ${transitOption.plannerUrl}.`,
         transitOption,
       }
-    : null;
+    : {
+        key: 'public_transit',
+        label: 'Public transit',
+        kind: 'real',
+        description:
+          'Local transit options depend on where you live, so check the national directory of transit agencies maintained by the American Public Transportation Association (APTA) to find your local agency.',
+        links: [
+          {
+            label: 'Find your local transit agency',
+            url: 'https://www.apta.com/research-technical-resources/public-transportation-links/',
+          },
+        ],
+      };
 
-  if (transitItem && input.budgetTier === 'low') {
+  if (input.budgetTier === 'low') {
     return [transitItem, rideshareItem, rentalItem];
   }
 
-  const items: PlanItem[] = [rideshareItem, rentalItem];
-  if (transitItem) items.push(transitItem);
-  return items;
+  return [rideshareItem, rentalItem, transitItem];
 }
 
 function buildGettingCarThereItems(input: JourneySituationInput): PlanItem[] {

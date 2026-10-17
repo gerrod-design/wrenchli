@@ -153,7 +153,7 @@ export const SymptomResults: React.FC<SymptomResultsProps> = ({
       </div>
 
       {/* Video insights (if available) */}
-      {result.videoInsights && (
+      {result.videoInsights && (result.frameCount > 0 || result.hasAudio) && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-5 space-y-3">
           <h3 className="text-sm font-semibold text-blue-900 uppercase tracking-wide">
             What we found in your video
