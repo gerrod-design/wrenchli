@@ -1,4 +1,4 @@
-import { pickBestPhoto } from "./scoring.ts";
+import { pickBestPhoto, getVehicleBodyClass } from "./scoring.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,28 +34,78 @@ Deno.serve(async (req) => {
       });
     }
 
-    const params = new URLSearchParams({
-      query: query,
-      per_page: "10",
-      orientation: "landscape",
-      content_filter: "high",
-    });
+    // Widen the candidate pool: try a few query variants (the raw query, the
+    // make+model, and a body-style variant like "SUV" or "Gran Coupe") so the
+    // body-class gate in scoring.ts has a better chance of finding a matching photo.
+    // Results from all variants are merged and de-duplicated before scoring.
+    const queries: string[] = [query];
 
-    const res = await fetch(`https://api.unsplash.com/search/photos?${params}`, {
-      headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` },
-    });
+    const makeModel = `${make} ${model}`.trim();
+    if (makeModel && !queries.includes(makeModel)) {
+      queries.push(makeModel);
+    }
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Unsplash API error:", res.status, text);
+    const bodyClass = getVehicleBodyClass({ make, model, trim, bodyType });
+    let bodyStyleQuery = "";
+    if (bodyClass === "gran-coupe") {
+      bodyStyleQuery = `${make} ${model} Gran Coupe`.trim();
+    } else if (bodyClass === "suv") {
+      bodyStyleQuery = `${make} ${model} SUV`.trim();
+    }
+    if (bodyStyleQuery && !queries.includes(bodyStyleQuery)) {
+      queries.push(bodyStyleQuery);
+    }
+
+    const variants = queries.slice(0, 3);
+
+    let lastErrorStatus: number | null = null;
+    let lastErrorText = "";
+    let anySuccess = false;
+    const mergedResults: any[] = [];
+    const seenKeys = new Set<string>();
+
+    for (const variantQuery of variants) {
+      const params = new URLSearchParams({
+        query: variantQuery,
+        per_page: "30",
+        orientation: "landscape",
+        content_filter: "high",
+      });
+
+      try {
+        const res = await fetch(`https://api.unsplash.com/search/photos?${params}`, {
+          headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` },
+        });
+
+        if (!res.ok) {
+          lastErrorStatus = res.status;
+          lastErrorText = await res.text();
+          continue;
+        }
+
+        anySuccess = true;
+        const data = await res.json();
+        for (const result of data.results ?? []) {
+          const key = result?.id ?? result?.urls?.regular;
+          if (key && seenKeys.has(key)) continue;
+          if (key) seenKeys.add(key);
+          mergedResults.push(result);
+        }
+      } catch (err) {
+        lastErrorText = err instanceof Error ? err.message : String(err);
+        continue;
+      }
+    }
+
+    if (!anySuccess) {
+      console.error("Unsplash API error:", lastErrorStatus, lastErrorText);
       return new Response(JSON.stringify({ error: "Unsplash API error", url: null }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const data = await res.json();
-    const photo = pickBestPhoto(data.results ?? [], { make, model, trim, bodyType });
+    const photo = pickBestPhoto(mergedResults, { make, model, trim, bodyType });
 
     if (!photo) {
       return new Response(JSON.stringify({ url: null }), {

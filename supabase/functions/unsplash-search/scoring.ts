@@ -75,22 +75,124 @@ export function scorePhotoCandidate(
   return score;
 }
 
+export type BodyClass =
+  | "suv" | "gran-coupe" | "coupe" | "sedan" | "hatchback"
+  | "convertible" | "truck" | "minivan" | "wagon" | "unknown";
+
+export function getVehicleBodyClass(ctx: PhotoMatchContext): BodyClass {
+  const trimAndModel = `${ctx.trim ?? ""} ${ctx.model}`;
+  if (/gran\s*coupe|gran\s*coupé|\bGC\b/i.test(trimAndModel)) {
+    return "gran-coupe";
+  }
+
+  const normalized = (ctx.bodyType ?? "").toLowerCase();
+  if (!normalized) return "unknown";
+
+  if (normalized.includes("gran coupe") || normalized.includes("gran coupé")) {
+    return "gran-coupe";
+  }
+  if (/suv|sport utility|\bmpv\b|crossover/.test(normalized)) {
+    return "suv";
+  }
+  if (/coupe|coupé/.test(normalized)) {
+    return "coupe";
+  }
+  if (/convertible|cabriolet|roadster|spyder/.test(normalized)) {
+    return "convertible";
+  }
+  if (/hatch/.test(normalized)) {
+    return "hatchback";
+  }
+  if (/truck|pickup/.test(normalized)) {
+    return "truck";
+  }
+  if (/minivan/.test(normalized)) {
+    return "minivan";
+  }
+  if (/wagon|estate/.test(normalized)) {
+    return "wagon";
+  }
+  if (/sedan|saloon/.test(normalized)) {
+    return "sedan";
+  }
+
+  return "unknown";
+}
+
+export function classifyCandidateBody(candidate: UnsplashCandidateLike): BodyClass {
+  const haystack = buildHaystack(candidate);
+  if (!haystack) return "unknown";
+
+  if (/gran\s*coupe|gran\s*coupé/.test(haystack)) {
+    return "gran-coupe";
+  }
+
+  const withoutGranCoupe = haystack.replace(/gran\s*coupé?/gi, "");
+  if (/\bcoupe\b|\bcoupé\b/.test(withoutGranCoupe)) {
+    return "coupe";
+  }
+
+  if (/\bsuv\b|sport utility|\bcrossover\b/.test(haystack)) {
+    return "suv";
+  }
+  if (/\bconvertible\b|\bcabriolet\b|\broadster\b/.test(haystack)) {
+    return "convertible";
+  }
+  if (/\bhatchback\b/.test(haystack)) {
+    return "hatchback";
+  }
+  if (/\bpickup\b/.test(haystack)) {
+    return "truck";
+  }
+  if (/\bminivan\b/.test(haystack)) {
+    return "minivan";
+  }
+  if (/\bwagon\b/.test(haystack)) {
+    return "wagon";
+  }
+  if (/\bsedan\b|\bsaloon\b/.test(haystack)) {
+    return "sedan";
+  }
+
+  return "unknown";
+}
+
 export function pickBestPhoto<T extends UnsplashCandidateLike>(
   candidates: T[],
   ctx: PhotoMatchContext
 ): T | null {
   if (!candidates || candidates.length === 0) return null;
 
+  // Scoring alone could still pick a photo of the wrong body style if it happened
+  // to score well on make/model text (e.g. a sedan winning for an SUV listing).
+  // So before scoring, hard-exclude any candidate whose detected body class
+  // conflicts with the vehicle's known body class. Unknown-signal candidates
+  // (badge close-ups, etc.) are kept since they aren't a confirmed mismatch.
+  const vehicleClass = getVehicleBodyClass(ctx);
+
+  let pool: T[] = candidates;
+  if (vehicleClass !== "unknown") {
+    const classified = candidates.map((c) => classifyCandidateBody(c));
+    const hasMatch = classified.some((cls) => cls === vehicleClass);
+    if (hasMatch) {
+      pool = candidates.filter(
+        (_, i) => classified[i] === vehicleClass || classified[i] === "unknown"
+      );
+    }
+    // If nothing matches the vehicle's body class, fall back to the full pool
+    // rather than returning no photo at all.
+  }
+
   let bestIndex = 0;
   let bestScore = -Infinity;
 
-  for (let i = 0; i < candidates.length; i++) {
-    const score = scorePhotoCandidate(candidates[i], ctx);
+  for (let i = 0; i < pool.length; i++) {
+    const score = scorePhotoCandidate(pool[i], ctx);
     if (score > bestScore) {
       bestScore = score;
       bestIndex = i;
     }
   }
 
-  return candidates[bestIndex];
+  return pool[bestIndex];
 }

@@ -112,6 +112,8 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
     trim: vehicle.trim,
     bodyType,
   });
+  // An owner-supplied photo (user_vehicles.photo_url) always wins over stock.
+  const displayPhotoUrl = vehicle.photo_url ?? photoUrl;
 
   const displayName = vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const subtitle = vehicle.nickname
@@ -193,7 +195,7 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
         )}
 
         {/* Vehicle photo hero or fallback */}
-        {photoUrl ? (
+        {displayPhotoUrl ? (
           <div
             className={cn(
               "relative w-full h-48 transition-transform duration-500 ease-out",
@@ -201,7 +203,7 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
             )}
           >
             <img
-              src={photoUrl}
+              src={displayPhotoUrl}
               alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
               className="w-full h-full object-cover"
               loading="lazy"
