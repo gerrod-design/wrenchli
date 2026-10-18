@@ -15,6 +15,14 @@ export default function ResetPassword() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    let disposed = false;
+    let subscription: { unsubscribe: () => void } | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const finish = () => {
+      if (!disposed) setChecking(false);
+    };
+
     const verifyToken = async () => {
       // Check for token_hash in URL query params (from our custom edge function)
       const params = new URLSearchParams(window.location.search);
@@ -32,32 +40,43 @@ export default function ResetPassword() {
         } else {
           console.error("Token verification failed:", verifyError.message);
         }
-        setChecking(false);
+        finish();
         return;
       }
 
-      // Fallback: listen for PASSWORD_RECOVERY event from hash-based redirect
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === "PASSWORD_RECOVERY") {
+      // Hash-based recovery links: the form is shown only for a session the
+      // server validates. A garbage token in the hash cannot produce one —
+      // never trust a substring match on the hash itself.
+      const validateSession = async () => {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (!disposed && user && !userError) {
           setIsRecovery(true);
+          finish();
         }
-        setChecking(false);
-      });
-
-      const hash = window.location.hash;
-      if (hash.includes("type=recovery")) {
-        setIsRecovery(true);
-      }
-
-      const timer = setTimeout(() => setChecking(false), 3000);
-
-      return () => {
-        subscription.unsubscribe();
-        clearTimeout(timer);
       };
+
+      const { data } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY") {
+          void validateSession();
+        }
+      });
+      subscription = data.subscription;
+
+      // The recovery session may already have been established before this
+      // listener attached; check once now and once more before giving up.
+      void validateSession();
+      timer = setTimeout(() => {
+        void validateSession().finally(finish);
+      }, 3000);
     };
 
-    verifyToken();
+    void verifyToken();
+
+    return () => {
+      disposed = true;
+      subscription?.unsubscribe();
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -110,17 +129,24 @@ export default function ResetPassword() {
               <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
               <p className="text-sm font-medium">Password updated successfully!</p>
               <Button
-                onClick={() => window.location.href = "/admin/login"}
+                onClick={() => window.location.href = "/garage"}
                 className="w-full h-11 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
               >
-                Go to Admin Login
+                Back to Sign In
               </Button>
             </div>
           ) : !isRecovery ? (
             <div className="text-center space-y-4">
               <p className="text-sm text-muted-foreground">
-                This link is invalid or has expired. Please request a new password reset.
+                This link is invalid or has expired. Go to sign in and choose
+                "Forgot password?" to request a new reset link.
               </p>
+              <Button
+                onClick={() => window.location.href = "/garage"}
+                className="w-full h-11 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+              >
+                Request a New Reset Link
+              </Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -154,11 +180,11 @@ export default function ResetPassword() {
 
           <div className="text-center pt-2">
             <a
-              href="/admin/login"
+              href="/garage"
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Back to Login
+              Back to Sign In
             </a>
           </div>
         </div>

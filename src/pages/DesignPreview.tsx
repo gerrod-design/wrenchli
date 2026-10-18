@@ -180,7 +180,7 @@ export default function DesignPreview() {
         </section>
 
         {/* Live Assessment + Sample Report */}
-        <section ref={chatRef} className="px-6 pb-20 max-w-5xl mx-auto">
+        <section id="quote" ref={chatRef} className="px-6 pb-20 max-w-5xl mx-auto">
           <div className="grid md:grid-cols-5 gap-6">
             {/* Left: LIVE Assessment Wizard */}
             <div className="md:col-span-3">

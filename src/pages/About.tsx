@@ -1,4 +1,4 @@
-import { MapPin, Target, Eye, Users, Building, Award, Briefcase, Wrench, DollarSign, Hammer } from "lucide-react";
+import { MapPin, Target, Eye, Users, Building, Award, Briefcase, Wrench } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import SEO from "@/components/SEO";
 import heroAbout from "@/assets/hero-about-detroit.webp";
@@ -87,69 +87,44 @@ export default function About() {
         </div>
       </section>
 
-      {/* Meet Your AI Advisors */}
+      {/* Meet Aiden */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli max-w-4xl">
           <SectionReveal>
-            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Meet Your AI Advisors</h2>
+            <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Meet Aiden</h2>
             <p className="mt-3 text-center text-muted-foreground md:text-lg max-w-2xl mx-auto">
-              When you chat with Wrenchli, you're guided by a team of specialized AI advisors — each with a distinct expertise to get you the best outcome.
+              Wrenchli has one assistant — Aiden — who stays with you from the first symptom to the final decision. No handoffs, no repeating yourself.
             </p>
           </SectionReveal>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                agent: "mike" as const,
-                name: "Mike",
-                role: "Lead Advisor",
-                color: "bg-primary/10 border-primary/20",
-                iconColor: "text-primary",
-                icon: Wrench,
-                specialties: ["Symptom triage & DTC codes", "Guides you to the right specialist", "Photo & video damage analysis"],
-                description: "Your first point of contact. Mike listens to your car issue, asks the right questions, and connects you with the best specialist for your situation.",
-              },
-              {
-                agent: "sam" as const,
-                name: "Sam",
-                role: "Cost & Value Specialist",
-                color: "bg-amber-500/10 border-amber-500/20",
-                iconColor: "text-amber-500",
-                icon: DollarSign,
-                specialties: ["Repair cost estimates", "Vehicle valuations", "Shop recommendations & fair cost comparisons"],
-                description: "Sam handles the money side — professional repair costs, your car's market value, shop recommendations and fair cost comparisons.",
-              },
-              {
-                agent: "jess" as const,
-                name: "Jess",
-                role: "Parts & DIY Expert",
-                color: "bg-emerald-500/10 border-emerald-500/20",
-                iconColor: "text-emerald-500",
-                icon: Hammer,
-                specialties: ["Step-by-step repair walkthroughs", "Parts & tools lists", "YouTube tutorial recommendations"],
-                description: "Jess is your hands-on guru. She'll walk you through DIY repairs, tell you exactly what tools and parts you need, and find the best video guides.",
-              },
-            ].map((advisor, idx) => (
-              <SectionReveal key={advisor.agent} delay={idx * 100}>
-                <div className={`rounded-2xl border ${advisor.color} bg-card p-6 shadow-sm h-full flex flex-col items-center text-center`}>
-                  <MechanicAvatar size={80} agent={advisor.agent} showLogo={false} />
-                  <h3 className="mt-4 font-heading text-lg font-bold">{advisor.name}</h3>
-                  <div className={`mt-1 inline-flex items-center gap-1.5 text-xs font-semibold ${advisor.iconColor}`}>
-                    <advisor.icon className="h-3.5 w-3.5" />
-                    {advisor.role}
-                  </div>
-                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{advisor.description}</p>
-                  <ul className="mt-4 space-y-1.5 text-left w-full">
-                    {advisor.specialties.map((s) => (
-                      <li key={s} className="flex items-start gap-2 text-xs text-muted-foreground">
-                        <span className={`mt-1 h-1.5 w-1.5 rounded-full ${advisor.iconColor.replace("text-", "bg-")} shrink-0`} />
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
+          <div className="mt-12 max-w-xl mx-auto">
+            <SectionReveal>
+              <div className="rounded-2xl border bg-primary/10 border-primary/20 bg-card p-6 shadow-sm h-full flex flex-col items-center text-center">
+                <MechanicAvatar size={80} agent="aiden" showLogo={false} />
+                <h3 className="mt-4 font-heading text-lg font-bold">Aiden</h3>
+                <div className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                  <Wrench className="h-3.5 w-3.5" />
+                  Your Wrenchli Assistant
                 </div>
-              </SectionReveal>
-            ))}
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                  Aiden listens to what's going on with your car, asks the right questions, and helps you understand what's likely wrong, what it should cost, and what to do next — in plain language.
+                </p>
+                <ul className="mt-4 space-y-1.5 text-left w-full">
+                  {[
+                    "Symptom assessment & plain-language explanations",
+                    "Photo & video analysis of visible damage",
+                    "Repair cost estimates & fair-price comparisons",
+                    "Step-by-step DIY guidance, parts & tools lists",
+                    "Help comparing local shops and repair options",
+                  ].map((s) => (
+                    <li key={s} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </SectionReveal>
           </div>
         </div>
       </section>

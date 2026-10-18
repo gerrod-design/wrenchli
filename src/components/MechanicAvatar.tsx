@@ -22,7 +22,7 @@ export default function MechanicAvatar({
   className = "",
   agent = "aiden",
 }: MechanicAvatarProps) {
-  const { img, label } = AGENTS[agent];
+  const { img, label } = AGENTS[agent] ?? AGENTS.aiden;
 
   return (
     <div
