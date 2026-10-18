@@ -293,7 +293,7 @@ Output ONLY a valid JSON array, no other text:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Wrenchli <onboarding@resend.dev>",
+          from: "Wrenchli <no-reply@wrenchli.net>",
           to: ["gerrod@wrenchli.net"],
           subject: emailSubject,
           html: emailHtml,

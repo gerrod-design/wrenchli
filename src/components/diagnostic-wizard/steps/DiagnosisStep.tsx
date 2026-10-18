@@ -127,7 +127,7 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
         const top = topDIYCause;
         return (
           <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #2A2D37" }}>
-            <div className="px-4 py-2 text-xs font-mono" style={{ background: "#141720", color: "#E07B39" }}>DIY VS. SHOP</div>
+            <div className="px-4 py-2 text-xs font-mono" style={{ background: "#141720", color: "#E07B39" }}>DIY VS. SHOP — ESTIMATED COSTS</div>
             <div className="grid grid-cols-2 divide-x" style={{ borderColor: "#2A2D37" }}>
               <div className="p-4 space-y-2">
                 <p className="text-sm font-semibold" style={{ color: "#22C55E" }}>DIY</p>
@@ -138,7 +138,7 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
                 <p className="text-sm font-semibold" style={{ color: "#E07B39" }}>SHOP</p>
                 <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>${top.shop_parts_cost_low}–${top.shop_parts_cost_high}</span></p>
                 <p className="text-xs" style={{ color: "#9CA3AF" }}>Labor: <span style={{ color: "#F5F5F5" }}>${top.shop_labor_cost_low}–${top.shop_labor_cost_high}</span></p>
-                <p className="text-xs" style={{ color: "#9CA3AF" }}>Total: <span style={{ color: "#F5F5F5" }}>${top.estimated_cost_low}–${top.estimated_cost_high}</span></p>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>Estimated total: <span style={{ color: "#F5F5F5" }}>${top.estimated_cost_low}–${top.estimated_cost_high}</span></p>
                 <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{top.shop_time}</span></p>
               </div>
             </div>
@@ -166,11 +166,16 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
             </div>
             <div className="flex justify-between text-xs" style={{ color: "#6B7280" }}>
               <span>{Math.round(cause.probability * 100)}% likely</span>
-              <span>{cause.diy_difficulty === "professional_only" || isSafetyCriticalCause(`${cause.name} ${cause.notes ?? ""}`) ? `Shop total: $${cause.estimated_cost_low}–$${cause.estimated_cost_high}` : "See comparison above"}</span>
+              <span>{cause.diy_difficulty === "professional_only" || isSafetyCriticalCause(`${cause.name} ${cause.notes ?? ""}`) ? `Estimated shop total: $${cause.estimated_cost_low}–$${cause.estimated_cost_high}` : "See comparison above"}</span>
             </div>
           </div>
         ))}
       </div>
+
+      <p className="text-[11px] leading-relaxed" style={{ color: "#6B7280" }}>
+        All cost ranges on this page are estimates based on typical parts and labor — not quotes.
+        Your shop confirms the final price after inspecting your vehicle.
+      </p>
 
       {error && <p className="text-xs text-red-400">{error}</p>}
 

@@ -1,7 +1,6 @@
 const ALLOWED_ORIGINS = [
   "https://wrenchli.net",
   "https://www.wrenchli.net",
-  "https://wrenchli.lovable.app",
 ];
 
 const DEV_ORIGINS = [
@@ -14,12 +13,7 @@ function isAllowedOrigin(origin: string): boolean {
   const env = Deno.env.get("ENVIRONMENT");
   if (env === "development") allowed.push(...DEV_ORIGINS);
 
-  if (allowed.includes(origin)) return true;
-  // Allow Lovable preview/published domains
-  if (origin.endsWith(".lovableproject.com") || origin.endsWith(".lovable.app")) return true;
-  // Allow Vercel deployments (branch previews + production) — buildathon migration
-  if (origin.endsWith(".vercel.app")) return true;
-  return false;
+  return allowed.includes(origin);
 }
 
 export function getCorsHeaders(origin?: string | null): Record<string, string> {

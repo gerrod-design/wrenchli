@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Wrenchli <onboarding@resend.dev>",
+        from: "Wrenchli <no-reply@wrenchli.net>",
         to: ["gerrod@wrenchli.net"],
         subject: `Morning Briefing — ${dateStr}`,
         text: body,

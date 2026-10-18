@@ -86,7 +86,7 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
               <p className="text-sm font-semibold" style={{ color: "#E07B39" }}>SHOP</p>
               <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>${topDIYCause.shop_parts_cost_low}–${topDIYCause.shop_parts_cost_high}</span></p>
               <p className="text-xs" style={{ color: "#9CA3AF" }}>Labor: <span style={{ color: "#F5F5F5" }}>${topDIYCause.shop_labor_cost_low}–${topDIYCause.shop_labor_cost_high}</span></p>
-              <p className="text-xs" style={{ color: "#9CA3AF" }}>Total: <span style={{ color: "#F5F5F5" }}>${topDIYCause.estimated_cost_low}–${topDIYCause.estimated_cost_high}</span></p>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>Estimated total: <span style={{ color: "#F5F5F5" }}>${topDIYCause.estimated_cost_low}–${topDIYCause.estimated_cost_high}</span></p>
               <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{topDIYCause.shop_time}</span></p>
             </div>
           </div>

@@ -14,7 +14,7 @@ type UnifiedAlert =
 export default function NotificationBell() {
   const { alerts: recallAlerts, unreadCount: recallCount, markAsRead: markRecallRead, markAllAsRead: markAllRecallsRead } = useRecallAlerts();
   const { alerts: marketAlerts, unreadCount: marketCount, markAsRead: markMarketRead, markAllAsRead: markAllMarketsRead } = useMarketValueAlerts();
-  const { alerts: maintAlerts, unreadCount: maintCount, markAsRead: markMaintRead, markAllAsRead: markAllMaintRead } = useMaintenanceAlerts();
+  const { alerts: maintAlerts, unreadCount: maintCount, error: maintError, refetch: refetchMaint, markAsRead: markMaintRead, markAllAsRead: markAllMaintRead } = useMaintenanceAlerts();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -34,7 +34,9 @@ export default function NotificationBell() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  if (totalUnread === 0) return null;
+  // A failed maintenance-alerts fetch renders a visible degraded state
+  // (R-63) instead of the bell silently vanishing as if there were no alerts.
+  if (totalUnread === 0 && !maintError) return null;
 
   const handleMarkAllRead = () => {
     markAllRecallsRead();
@@ -57,9 +59,11 @@ export default function NotificationBell() {
         aria-label={`${totalUnread} unread notifications`}
       >
         <Bell className="h-5 w-5 text-primary-foreground/80" />
-        <span className="absolute -right-0.5 -top-0.5 flex items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground min-w-[18px] h-[18px] px-1">
-          {totalUnread > 9 ? "9+" : totalUnread}
-        </span>
+        {totalUnread > 0 && (
+          <span className="absolute -right-0.5 -top-0.5 flex items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground min-w-[18px] h-[18px] px-1">
+            {totalUnread > 9 ? "9+" : totalUnread}
+          </span>
+        )}
       </button>
 
       {open && (
@@ -105,6 +109,20 @@ export default function NotificationBell() {
               </li>
             ))}
           </ul>
+          {maintError && (
+            <div className="flex items-center justify-between gap-2 border-t border-border bg-amber-500/10 px-4 py-2">
+              <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+                Maintenance alerts unavailable right now.
+              </p>
+              <button
+                onClick={() => refetchMaint()}
+                className="text-xs font-medium text-accent hover:underline flex-shrink-0"
+              >
+                Retry
+              </button>
+            </div>
+          )}
           <div className="flex items-center justify-between border-t border-border px-4 py-2">
             <Link to="/garage" onClick={() => setOpen(false)} className="text-xs font-medium text-accent hover:underline">
               View all in Garage →

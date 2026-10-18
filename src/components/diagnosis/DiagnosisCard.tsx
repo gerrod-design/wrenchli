@@ -186,11 +186,14 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
                 <p className="text-sm font-bold text-wrenchli-teal">Shop</p>
                 <p className="text-xs text-muted-foreground">Parts: <span className="font-semibold text-foreground">{diagnosis.shop_parts_cost}</span></p>
                 <p className="text-xs text-muted-foreground">Labor: <span className="font-semibold text-foreground">{diagnosis.shop_labor_cost}</span></p>
-                <p className="text-xs text-muted-foreground">Total: <span className="font-semibold text-foreground">{diagnosis.shop_cost}</span></p>
+                <p className="text-xs text-muted-foreground">Estimated total: <span className="font-semibold text-foreground">{diagnosis.shop_cost}</span></p>
                 <p className="text-xs text-muted-foreground">Time: <span className="font-semibold text-foreground">{diagnosis.shop_time}</span></p>
               </div>
             </div>
           </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+            Cost ranges are estimates based on typical parts and labor — not quotes. Your shop confirms the final price after inspecting your vehicle.
+          </p>
           <div className="mt-2"><SavingsCallout diyCost={diagnosis.diy_cost} shopCost={diagnosis.shop_cost} /></div>
         </div>
       )}
@@ -385,7 +388,7 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
           {!diyAllowed && <div className="space-y-1 text-sm mb-4">
             <p><span className="text-muted-foreground">Parts:</span> <span className="font-semibold">{diagnosis.shop_parts_cost}</span></p>
             <p><span className="text-muted-foreground">Labor:</span> <span className="font-semibold">{diagnosis.shop_labor_cost}</span></p>
-            <p><span className="text-muted-foreground">Total:</span> <span className="font-semibold">{diagnosis.shop_cost}</span></p>
+            <p><span className="text-muted-foreground">Estimated total:</span> <span className="font-semibold">{diagnosis.shop_cost}</span></p>
             <p><span className="text-muted-foreground">Shop time:</span> <span className="font-semibold">{diagnosis.shop_time}</span></p>
           </div>}
 

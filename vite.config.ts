@@ -165,8 +165,14 @@ function prerenderPlugin(): Plugin {
           `<title>${route.title}</title>`
         );
 
-        // Replace meta description
-        html = html.replace(
+        // Upsert meta description (the shell no longer ships a static one —
+        // insert after <title> when there is nothing to replace)
+        const upsertMeta = (source: string, pattern: RegExp, tag: string) =>
+          pattern.test(source)
+            ? source.replace(pattern, tag)
+            : source.replace(/<\/title>/, `</title>\n    ${tag}`);
+        html = upsertMeta(
+          html,
           /<meta name="description" content="[^"]*"\s*\/?>/,
           `<meta name="description" content="${route.description}" />`
         );
@@ -176,7 +182,8 @@ function prerenderPlugin(): Plugin {
           /<meta property="og:title" content="[^"]*"\s*\/?>/,
           `<meta property="og:title" content="${route.title}" />`
         );
-        html = html.replace(
+        html = upsertMeta(
+          html,
           /<meta property="og:description" content="[^"]*"\s*\/?>/,
           `<meta property="og:description" content="${route.description}" />`
         );

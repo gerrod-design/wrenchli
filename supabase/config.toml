@@ -104,3 +104,24 @@ verify_jwt = false
 
 [functions.deploy-audit-fix]
 verify_jwt = false
+
+# Named-agent functions: source recovered into the repo 2026-10-18 (R-27).
+# Live configuration is verify_jwt = true for all six — kept explicit here
+# so a repo-driven deploy preserves it.
+[functions.vera-outcomes]
+verify_jwt = true
+
+[functions.argus-watchdog]
+verify_jwt = true
+
+[functions.tobias-strategy]
+verify_jwt = true
+
+[functions.amara-regulatory]
+verify_jwt = true
+
+[functions.sloane-security]
+verify_jwt = true
+
+[functions.caleb-monitor]
+verify_jwt = true

@@ -22,11 +22,15 @@ export function useMaintenanceAlerts() {
   const { user } = useAuth();
   const [alerts, setAlerts] = useState<MaintenanceAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  // A failed fetch must be distinguishable from "no alerts" (R-63): the
+  // hook used to swallow errors into an empty list, rendering as a healthy
+  // silent bell. Consumers render a degraded state when this is set.
+  const [error, setError] = useState<string | null>(null);
   const unreadCount = alerts.filter((a) => !a.is_read).length;
 
   const fetchAlerts = useCallback(async () => {
     try {
-      if (!user) { setAlerts([]); setLoading(false); return; }
+      if (!user) { setAlerts([]); setError(null); setLoading(false); return; }
 
       const { data: prefData } = await supabase
         .from("notification_preferences" as any)
@@ -35,7 +39,7 @@ export function useMaintenanceAlerts() {
         .maybeSingle();
 
       const enabled = (prefData as any)?.inapp_maintenance ?? true;
-      if (!enabled) { setAlerts([]); setLoading(false); return; }
+      if (!enabled) { setAlerts([]); setError(null); setLoading(false); return; }
 
       const { data, error } = await supabase
         .from("maintenance_alerts" as any)
@@ -45,9 +49,11 @@ export function useMaintenanceAlerts() {
 
       if (error) throw error;
       setAlerts((data as any[]) || []);
+      setError(null);
     } catch (err) {
       console.warn("Failed to fetch maintenance alerts:", err);
       setAlerts([]);
+      setError("Maintenance alerts are unavailable right now.");
     } finally {
       setLoading(false);
     }
@@ -69,5 +75,5 @@ export function useMaintenanceAlerts() {
     setAlerts([]);
   }, [alerts]);
 
-  return { alerts, unreadCount, loading, markAsRead, markAllAsRead, refetch: fetchAlerts };
+  return { alerts, unreadCount, loading, error, markAsRead, markAllAsRead, refetch: fetchAlerts };
 }

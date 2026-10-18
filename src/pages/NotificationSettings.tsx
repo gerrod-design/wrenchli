@@ -51,17 +51,29 @@ interface NotificationCategoryProps {
   prefs: NotificationPrefs;
   saving: boolean;
   updatePref: (key: keyof NotificationPrefs, value: boolean) => void;
+  /** Feature has no data source yet: render the category as not-yet-available
+   *  with disabled toggles instead of offering alerts that can never fire. */
+  unavailable?: boolean;
+  unavailableNote?: string;
 }
 
-function NotificationCategory({ icon, title, description, emailKey, inappKey, emailDesc, inappDesc, prefs, saving, updatePref }: NotificationCategoryProps) {
+function NotificationCategory({ icon, title, description, emailKey, inappKey, emailDesc, inappDesc, prefs, saving, updatePref, unavailable, unavailableNote }: NotificationCategoryProps) {
   return (
     <Card className="border-border">
       <CardHeader className="pb-4">
         <div className="flex items-center gap-2">
           {icon}
           <CardTitle className="text-lg">{title}</CardTitle>
+          {unavailable && (
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+              Not yet available
+            </span>
+          )}
         </div>
         <CardDescription>{description}</CardDescription>
+        {unavailable && unavailableNote && (
+          <p className="text-sm text-muted-foreground pt-1">{unavailableNote}</p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <ToggleRow
@@ -69,18 +81,18 @@ function NotificationCategory({ icon, title, description, emailKey, inappKey, em
           icon={<Mail className="h-4 w-4 text-accent" />}
           label="Email Notifications"
           description={emailDesc}
-          checked={prefs[emailKey]}
+          checked={unavailable ? false : prefs[emailKey]}
           onCheckedChange={(v) => updatePref(emailKey, v)}
-          disabled={saving}
+          disabled={saving || !!unavailable}
         />
         <ToggleRow
           id={inappKey}
           icon={<MonitorSmartphone className="h-4 w-4 text-accent" />}
           label="In-App Notifications"
           description={inappDesc}
-          checked={prefs[inappKey]}
+          checked={unavailable ? false : prefs[inappKey]}
           onCheckedChange={(v) => updatePref(inappKey, v)}
-          disabled={saving}
+          disabled={saving || !!unavailable}
         />
       </CardContent>
     </Card>
@@ -167,6 +179,8 @@ export default function NotificationSettings() {
               prefs={prefs}
               saving={saving}
               updatePref={updatePref}
+              unavailable
+              unavailableNote="Market value tracking isn't live yet — there's no valuation feed behind these alerts today, so they can't be sent. We'll announce it here when it launches."
             />
           </div>
         )}
@@ -175,8 +189,8 @@ export default function NotificationSettings() {
           <Shield className="mt-0.5 h-4 w-4 text-muted-foreground flex-shrink-0" />
           <p className="text-xs text-muted-foreground">
             Recall checks run automatically every day at 8:00 AM UTC. Maintenance reminders are
-            calculated from your vehicle's mileage and service history. Market value alerts
-            trigger when significant pricing changes are detected. Your data is never shared
+            calculated from your vehicle's mileage and service history. Market value alerts are
+            not yet available. Your data is never shared
             with third parties.
           </p>
         </div>

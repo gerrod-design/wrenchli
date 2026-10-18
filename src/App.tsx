@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
+import { HelmetProvider, Helmet } from "react-helmet-async";
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LocationProvider } from "@/contexts/LocationContext";
@@ -162,6 +162,23 @@ function AnimatedRoutes() {
   );
 }
 
+const DEFAULT_DESCRIPTION =
+  "Describe your car symptom in plain English — get a free instant assessment of likely causes, cost ranges, and exactly what to ask your shop. Free, no account required.";
+
+// Site-wide default description metas. Page-level <SEO> overrides these
+// (react-helmet-async dedupes to a single tag), so every route carries
+// exactly one description — the static shell tags that used to duplicate
+// the page-injected ones were removed from index.html.
+function DefaultMeta() {
+  return (
+    <Helmet>
+      <meta name="description" content={DEFAULT_DESCRIPTION} />
+      <meta property="og:description" content={DEFAULT_DESCRIPTION} />
+      <meta name="twitter:description" content={DEFAULT_DESCRIPTION} />
+    </Helmet>
+  );
+}
+
 function AppLayout() {
   const location = useLocation();
   const isAdmin =
@@ -178,6 +195,7 @@ function AppLayout() {
 
   return (
     <>
+      <DefaultMeta />
       <ScrollToTop />
       {!hideChrome && <Navbar />}
       <AnimatedRoutes />

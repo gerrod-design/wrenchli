@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, Store, ArrowRight, Users, ClipboardCheck, DollarSign, Car } from "lucide-react";
+import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, Store, ArrowRight, Users, ClipboardCheck, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
-import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import heroShop from "@/assets/hero-shop.jpg";
 
 const mockCauses = [
@@ -47,59 +47,9 @@ export default function DesignPreview() {
   return (
     <div className="min-h-screen" style={{ fontFamily: FONT }}>
 
-      {/* Nav */}
-      <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: "#1A1D27", background: "#0F1117" }}>
-        <div className="flex flex-col">
-          <span className="flex items-center gap-2 text-xl font-bold tracking-tight" style={{ color: "#F5F5F5" }}>
-            <img src={wrenchliLogo} alt="Wrenchli logo" className="h-8 w-8 object-contain" />
-            Wrenchli
-          </span>
-          <span className="ml-10 text-xs font-medium tracking-wide" style={{ color: "#6B7280" }}>
-            Mobility for All.
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link
-            to="/garage"
-            className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            style={{ color: "#9CA3AF", border: "1px solid #2A2D37" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "#E07B39";
-              e.currentTarget.style.color = "#F5F5F5";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#2A2D37";
-              e.currentTarget.style.color = "#9CA3AF";
-            }}
-          >
-            <Car className="h-4 w-4" />
-            My Garage
-          </Link>
-          <a
-            href="#for-shops"
-            className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            style={{ color: "#9CA3AF", border: "1px solid #2A2D37" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "#E07B39";
-              e.currentTarget.style.color = "#F5F5F5";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#2A2D37";
-              e.currentTarget.style.color = "#9CA3AF";
-            }}
-          >
-            <Store className="h-4 w-4" />
-            For Shops
-          </a>
-          <button
-            onClick={scrollToChat}
-            className="px-5 py-2.5 rounded-lg text-sm font-semibold"
-            style={{ background: "#E07B39", color: "#0F1117" }}
-          >
-            Start Free Assessment
-          </button>
-        </div>
-      </nav>
+      {/* Nav — shared site header (same navigation model as every other
+          page; this page previously rendered a reduced custom nav, R-30) */}
+      <Navbar />
 
       {/* ── HERO with cinematic video background ── */}
       <section className="relative overflow-hidden" style={{ minHeight: "100vh" }}>

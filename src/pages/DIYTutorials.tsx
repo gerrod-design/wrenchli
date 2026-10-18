@@ -28,6 +28,8 @@ export default function DIYTutorials() {
     },
   });
 
+  const totalTutorials = tutorials?.length ?? 0;
+
   const grouped = {
     beginner: tutorials?.filter((t) => t.difficulty === "beginner") ?? [],
     intermediate: tutorials?.filter((t) => t.difficulty === "intermediate") ?? [],
@@ -53,8 +55,8 @@ export default function DIYTutorials() {
               </h1>
             </div>
             <p className="mt-2 text-primary-foreground/70 md:text-lg max-w-2xl mx-auto">
-              Step-by-step video tutorials with parts lists, tools, and Amazon links.
-              Save 60–70% on common repairs.
+              Step-by-step video tutorials with parts lists, tools, and honest
+              difficulty ratings for common car repairs.
             </p>
           </SectionReveal>
         </div>
@@ -68,6 +70,30 @@ export default function DIYTutorials() {
               {Array.from({ length: 6 }).map((_, i) => (
                 <Skeleton key={i} className="h-64 rounded-xl" />
               ))}
+            </div>
+          ) : totalTutorials === 0 ? (
+            <div className="mx-auto max-w-2xl text-center py-8">
+              <Wrench className="h-10 w-10 text-wrenchli-teal mx-auto mb-4" />
+              <h2 className="font-heading text-2xl font-bold mb-3">
+                DIY guides are on the way
+              </h2>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                Our tutorial library is still being built — no guides are
+                published yet, and we'd rather show you nothing than a shelf
+                of placeholders. When guides land, they'll appear here with
+                parts lists, tools, and step-by-step video.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mb-8">
+                In the meantime, a free Wrenchli assessment can tell you
+                what's likely wrong and whether it's a job you can do
+                yourself or one for a shop.
+              </p>
+              <Link
+                to="/"
+                className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-accent-foreground hover:bg-accent/90 transition-colors"
+              >
+                Get a Free Assessment <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           ) : (
             Object.entries(grouped).map(([level, items]) =>
@@ -121,7 +147,8 @@ export default function DIYTutorials() {
         </div>
       </section>
 
-      {/* FTC Disclosure */}
+      {/* FTC Disclosure — only relevant while affiliate-linked guides exist */}
+      {!isLoading && totalTutorials > 0 && (
       <section className="px-4 pb-16 md:px-8">
         <div className="container-wrenchli">
           <div className="rounded-xl border border-accent/30 bg-accent/10 p-4 text-sm text-muted-foreground" role="note">
@@ -133,6 +160,7 @@ export default function DIYTutorials() {
           </div>
         </div>
       </section>
+      )}
     </main>
   );
 }
