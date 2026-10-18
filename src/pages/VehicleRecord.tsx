@@ -37,10 +37,26 @@ export default function VehicleRecord() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  if (record.loading) {
+  if (record.vehicleLoading) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8">
-        <p className="text-sm text-muted-foreground">Loading this vehicle record...</p>
+      <main className="mx-auto max-w-5xl px-4 py-6 pb-24 sm:py-8" aria-busy="true">
+        <div className="space-y-5">
+          <div className="h-9 w-32 animate-pulse rounded-md bg-muted" />
+          <div className="rounded-2xl bg-[#0F1117] p-5 sm:p-7">
+            <div className="h-3 w-40 animate-pulse rounded bg-white/20" />
+            <div className="mt-3 h-8 w-72 max-w-full animate-pulse rounded bg-white/20" />
+            <div className="mt-3 h-4 w-56 max-w-full animate-pulse rounded bg-white/10" />
+          </div>
+          <div className="space-y-4">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="rounded-xl border p-5 space-y-3">
+                <div className="h-5 w-48 animate-pulse rounded bg-muted" />
+                <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+        </div>
       </main>
     );
   }
@@ -121,6 +137,7 @@ export default function VehicleRecord() {
         )}
 
         <VehicleRecordSections
+          loading={record.sectionsLoading}
           timeline={record.timeline}
           coreChecks={record.coreDisplayChecks}
           currentChecks={record.currentConditionChecks}

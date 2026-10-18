@@ -32,7 +32,7 @@ function successPage(message: string): Response {
   <div class="icon">🚀</div>
   <h1>Fix Queued for Deployment</h1>
   <p>${message}</p>
-  <p>Lovable will pick up the change from GitHub within <span class="highlight">60 seconds</span>.</p>
+  <p>The change has been committed to GitHub and will deploy automatically within <span class="highlight">60 seconds</span>.</p>
   <p>Check <a href="https://wrenchli.net" style="color:#E07B39;">wrenchli.net</a> in <span class="highlight">2 minutes</span>.</p>
   <a class="link" href="https://github.com/gerrod-design/wrenchli/issues?q=label%3Aaudit-fix+is%3Aopen">View Issues on GitHub →</a>
 </div>
@@ -140,13 +140,13 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ── Step 4: Commit .lovable-prompts files to GitHub ──
+    // ── Step 4: Commit .fix-prompts files to GitHub ──
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
     const commitResults: string[] = [];
 
     for (const fix of prompts) {
       const filename = `${timestamp}-fix-${fix.priority}.md`;
-      const path = `.lovable-prompts/${filename}`;
+      const path = `.fix-prompts/${filename}`;
       const content = `# Wrenchli Auto-Fix — Priority ${fix.priority}\n\nAgent: ${fix.agent}\nSeverity: ${fix.severity}\n\n## Prompt\n\n${fix.prompt}\n`;
       const base64Content = btoa(unescape(encodeURIComponent(content)));
 

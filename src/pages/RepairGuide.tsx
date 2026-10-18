@@ -393,7 +393,7 @@ export default function RepairGuide() {
     "@context": "https://schema.org",
     "@type": "Service",
     name: repair.title,
-    description: repair.description[0],
+    description: repair.seoDescription,
     provider: { "@type": "Organization", name: "Wrenchli", url: "https://wrenchli.net" },
     areaServed: { "@type": "Country", name: "United States" },
     offers: {

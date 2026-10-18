@@ -316,7 +316,7 @@ export default function ApiKeyManager() {
             <Key className="h-5 w-5 text-accent" /> API Keys
           </h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage API keys for the public diagnostic endpoint
+            Manage API keys for the public assessment endpoint
           </p>
         </div>
         <div className="flex gap-2">
@@ -560,7 +560,7 @@ export default function ApiKeyManager() {
             <DialogDescription>
               {revealedKey
                 ? "Copy your key now — it won't be shown again."
-                : "Generate a new API key for the diagnostic endpoint."}
+                : "Generate a new API key for the assessment endpoint."}
             </DialogDescription>
           </DialogHeader>
 

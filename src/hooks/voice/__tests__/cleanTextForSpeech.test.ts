@@ -3,7 +3,6 @@ import { describe, it, expect } from "vitest";
 // Extract the function for testing (it's not exported, so we duplicate the logic here)
 function cleanTextForSpeech(text: string): string {
   return text
-    .replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "")
     .replace(/[#*_~`>]/g, "")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/\$(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)/g, (_m, num) => `${num.replace(/,/g, "")} dollars`)
@@ -31,16 +30,6 @@ describe("cleanTextForSpeech", () => {
     });
   });
 
-  describe("agent markers", () => {
-    it.each(["Mike", "Sam", "Jess", "Kai", "Priya"])("strips [Agent: %s]", (name) => {
-      expect(cleanTextForSpeech(`[Agent: ${name}] Hello!`)).toBe("Hello!");
-    });
-
-    it("is case-insensitive", () => {
-      expect(cleanTextForSpeech("[agent: SAM] Hi")).toBe("Hi");
-    });
-  });
-
   describe("markdown", () => {
     it("strips bold/italic markers", () => {
       expect(cleanTextForSpeech("This is **bold** and *italic*")).toBe("This is bold and italic");
@@ -62,9 +51,9 @@ describe("cleanTextForSpeech", () => {
       expect(cleanTextForSpeech("")).toBe("");
     });
 
-    it("handles combined agent marker + dollars + markdown", () => {
+    it("handles combined dollars + markdown (legacy agent markers pass through — stripping removed in R-34)", () => {
       expect(cleanTextForSpeech("[Agent: Sam] The repair costs **$1,200** for parts.")).toBe(
-        "The repair costs 1200 dollars for parts."
+        "[Agent: Sam] The repair costs 1200 dollars for parts."
       );
     });
   });

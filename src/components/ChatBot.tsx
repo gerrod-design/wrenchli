@@ -28,8 +28,6 @@ import { FEATURE_NAME } from "@/data/senseChips";
 import type { SymptomAnalysisResponse, SenseBundle } from "@/types/symptom";
 import { handleStartFailure } from "@/lib/voiceRetry";
 
-const WELCOME_MESSAGE = `👋 Hey there! I'm Aiden, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.`;
-
 const AGENT_META: Record<AgentType, { name: string; role: string; color: string }> = {
   aiden: { name: "Aiden", role: "Wrenchli Advisor", color: "bg-primary" },
 };
@@ -39,11 +37,6 @@ function detectAgent(content: unknown): AgentType {
   // [Agent: X] markers in old transcripts no longer change who is speaking.
   void content;
   return "aiden";
-}
-
-function cleanAgentMarker(content: unknown): string {
-  const text = typeof content === "string" ? content : "";
-  return text.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]\s*/gi, "");
 }
 
 function getAgentMeta(agent: AgentType | null | undefined) {
@@ -126,7 +119,6 @@ export default function ChatBot() {
 
     const timer = setTimeout(() => {
       setOpen(true);
-      setMessages([{ role: "assistant", content: WELCOME_MESSAGE }]);
       localStorage.setItem("wrenchli_chat_opened", "true");
       markInteracted();
     }, 5000);
@@ -597,23 +589,6 @@ export default function ChatBot() {
                     let currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
                     const prevAssistant = messages.slice(0, i).reverse().find(msg => msg.role === "assistant");
                     const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
-                    const isLastMsg = i === messages.length - 1;
-                    // If no explicit marker found (defaults to mike) but previous agent was a specialist,
-                    // check if Mike is actually announcing himself or if the marker was just omitted.
-                    // An explicit handoff back to Mike requires handoff language in the previous message.
-                    const hasExplicitMarker = m.role === "assistant" && /\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]/i.test(typeof m.content === "string" ? m.content : "");
-                    if (m.role === "assistant" && currentAgent === "aiden" && !hasExplicitMarker && prevAgent && prevAgent !== "aiden") {
-                      // Check if the previous specialist message explicitly handed back to Mike
-                      const prevText = typeof prevAssistant?.content === "string" ? prevAssistant.content : "";
-                      const handsBackToMike = /\b(?:hand(?:ing)?\s+(?:it\s+)?(?:back|over)\s+to\s+Mike|let me get Mike|bringing Mike back|Mike (?:will|can) take it from here)\b/i.test(prevText);
-                      if (!handsBackToMike) {
-                        // Assume the specialist is still active — marker was omitted
-                        currentAgent = prevAgent;
-                      }
-                    }
-                    if (isLastMsg && loading && currentAgent === "aiden" && prevAgent && prevAgent !== "aiden") {
-                      currentAgent = prevAgent;
-                    }
                     const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
                     const agentName = getAgentMeta(currentAgent).name;
 
@@ -689,7 +664,7 @@ export default function ChatBot() {
                               );
                             }
                           }}>
-                            {cleanAgentMarker(m.content)}
+                            {m.content}
                           </ReactMarkdown>
                         )}
                       </div>

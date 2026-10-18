@@ -56,7 +56,7 @@ describe("useTextToSpeech", () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  it("strips markdown and agent tags from text", async () => {
+  it("strips markdown from text (agent markers pass through — R-34)", async () => {
     // Mock a successful TTS response
     const mockAudio = {
       play: vi.fn().mockResolvedValue(undefined),
@@ -85,7 +85,7 @@ describe("useTextToSpeech", () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const body = JSON.parse(mockFetch.mock.calls[0][1].body);
-    expect(body.text).toBe("Hello world");
+    expect(body.text).toBe("[Agent: Mike] Hello world");
     expect(body.agent).toBe("mike");
   });
 

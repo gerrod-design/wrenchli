@@ -87,14 +87,20 @@ export function useVehicleRecord(vehicleId?: string) {
   const [documents, setDocuments] = useState<VehicleDocument[]>([]);
   const [sharePermissions, setSharePermissions] = useState<VehicleSharePermissionFields[]>([]);
   const [loading, setLoading] = useState(true);
+  const [vehicleLoading, setVehicleLoading] = useState(true);
+  const [sectionsLoading, setSectionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!vehicleId || !user) {
       setLoading(false);
+      setVehicleLoading(false);
+      setSectionsLoading(false);
       return;
     }
     setLoading(true);
+    setVehicleLoading(true);
+    setSectionsLoading(true);
     setError(null);
     try {
       const vehicleResult = await supabase
@@ -106,6 +112,7 @@ export function useVehicleRecord(vehicleId?: string) {
       if (vehicleResult.error) throw vehicleResult.error;
       const loadedVehicle = vehicleResult.data as GarageVehicle;
       setVehicle(loadedVehicle);
+      setVehicleLoading(false);
 
       const [timelineResult, checksResult, weakResult, baselinesResult, responsesResult, docsResult, sharesResult] =
         await Promise.all([
@@ -166,6 +173,8 @@ export function useVehicleRecord(vehicleId?: string) {
       setError(err instanceof Error ? err.message : "Could not load this vehicle record.");
     } finally {
       setLoading(false);
+      setVehicleLoading(false);
+      setSectionsLoading(false);
     }
   }, [user, vehicleId]);
 
@@ -487,6 +496,8 @@ export function useVehicleRecord(vehicleId?: string) {
     documents,
     sharePermissions,
     loading,
+    vehicleLoading,
+    sectionsLoading,
     error,
     refresh,
     uploadMedia,

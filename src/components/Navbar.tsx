@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
       { label: "How It Works", to: "/for-car-owners" },
       { label: "Vehicle Insights", to: "/vehicle-insights" },
       { label: "DIY Repair Guides", to: "/diy" },
-      { label: "Photo Damage Assessment", to: "/damage-diagnosis" },
+      { label: "Photo Damage Assessment", to: "/damage-assessment" },
       { label: "Financing", to: "/financing-options" },
     ],
   },

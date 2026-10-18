@@ -2,16 +2,18 @@ import { describe, it, expect } from "vitest";
 import type { AgentType } from "@/components/MechanicAvatar";
 
 /*
- * These are pure-function extractions of the detectAgent / cleanAgentMarker /
- * getAgentMeta helpers that live inside ChatBot.tsx and InlineChatWidget.tsx.
+ * These are pure-function extractions of the detectAgent / getAgentMeta
+ * helpers that live inside ChatBot.tsx and InlineChatWidget.tsx.
  * We duplicate them here so the regression suite stays decoupled from JSX
- * rendering while still catching any drift between agent metadata and marker
- * parsing logic.
+ * rendering while still catching any drift between agent metadata and
+ * identity logic.
  *
  * Contract since Oct 12, 2026: ONE continuous assistant (Aiden). The persona
- * system is retired — detectAgent always returns "aiden", legacy [Agent: X]
- * markers in old transcripts no longer switch identity, and cleanAgentMarker
- * still strips those markers from displayed text.
+ * system is retired — detectAgent always returns "aiden" and legacy
+ * [Agent: X] markers in old transcripts no longer switch identity.
+ * Client-side marker stripping (cleanAgentMarker) was removed in the
+ * audit R-34 cleanup; the server-side name-gate in the chat function is
+ * the enforcement point.
  */
 
 const AGENT_META: Record<AgentType, { name: string; role: string; color: string }> = {
@@ -25,11 +27,6 @@ function getAgentMeta(agent: AgentType | null | undefined) {
 function detectAgent(content: unknown): AgentType {
   void content;
   return "aiden";
-}
-
-function cleanAgentMarker(content: unknown): string {
-  const text = typeof content === "string" ? content : "";
-  return text.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]\s*/gi, "");
 }
 
 /* ──────────────────────────────────────────
@@ -51,29 +48,6 @@ describe("detectAgent", () => {
     expect(detectAgent(undefined)).toBe("aiden");
     expect(detectAgent(null)).toBe("aiden");
     expect(detectAgent(42)).toBe("aiden");
-  });
-});
-
-/* ──────────────────────────────────────────
-   cleanAgentMarker
-   ────────────────────────────────────────── */
-
-describe("cleanAgentMarker", () => {
-  it.each([
-    ["[Agent: Sam] Cost is $200.", "Cost is $200."],
-    ["[Agent: Priya] Check your brakes.", "Check your brakes."],
-    ["[Agent: Kai] Financing ready.", "Financing ready."],
-    ["[Agent: Jess] DIY tips.", "DIY tips."],
-    ["[Agent: Mike] Hello!", "Hello!"],
-    ["[Agent: Aiden] Hello!", "Hello!"],
-    ["No marker here.", "No marker here."],
-  ])("strips marker from: %s", (input, expected) => {
-    expect(cleanAgentMarker(input)).toBe(expected);
-  });
-
-  it("handles non-string input gracefully", () => {
-    expect(cleanAgentMarker(undefined)).toBe("");
-    expect(cleanAgentMarker(null)).toBe("");
   });
 });
 
@@ -131,12 +105,5 @@ describe("single-assistant sequence", () => {
     }
 
     expect(handoffs).toEqual([]);
-  });
-
-  it("cleans all legacy markers from display text", () => {
-    for (const m of conversation) {
-      const cleaned = cleanAgentMarker(m.content);
-      expect(cleaned).not.toMatch(/\[Agent:/i);
-    }
   });
 });

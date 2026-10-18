@@ -46,10 +46,9 @@ function createSilentWavBlob(durationMs = 120, sampleRate = 8000): Blob {
   return new Blob([buffer], { type: "audio/wav" });
 }
 
-/** Strip markdown / agent tags and normalize speech-unfriendly patterns. */
+/** Strip markdown and normalize speech-unfriendly patterns. */
 function cleanTextForSpeech(text: string): string {
   return text
-    .replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya)\]\s*/gi, "")
     .replace(/[#*_~`>]/g, "")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     // Convert "$1,200" → "1200 dollars" so TTS reads amounts naturally

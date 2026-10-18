@@ -6,8 +6,9 @@ const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
 const API_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? "";
 
 // Map each route to its prerender file so the audit reads real content
-// (Lovable hosting doesn't process vercel.json rewrites, so Googlebot UA
-// gets the SPA shell — we fetch the static prerender files directly instead.)
+// (The production host doesn't process vercel.json rewrites for crawler
+// user agents, so Googlebot UA gets the SPA shell — we fetch the static
+// prerender files directly instead.)
 const SITE = "https://wrenchli.net";
 const PAGES = [
   { name: "Homepage",       url: `${SITE}/prerender/index.html` },

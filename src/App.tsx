@@ -15,13 +15,8 @@ import Footer from "@/components/Footer";
 import MobileBottomBar from "@/components/MobileBottomBar";
 import BackToTop from "@/components/BackToTop";
 import ChatBot from "@/components/ChatBot";
-import SitePasswordGate from "@/components/SitePasswordGate";
 import ScrollToTop from "@/components/ScrollToTop";
 
-// Password gate disabled for public access
-// function SitePasswordGateWrapper() {
-//   return <SitePasswordGate><AppLayout /></SitePasswordGate>;
-// }
 import CookieConsent from "@/components/CookieConsent";
 // Index page replaced by DesignPreview promotion
 import Home from "./pages/Home";
@@ -117,23 +112,24 @@ function AnimatedRoutes() {
           <Route path="/partners/journey" element={<PartnersJourney />} />
           <Route path="/investors" element={<Investors />} />
           {/* Paused 2026-09-17: shop quote requests imply partner shops that don't exist — not offered */}
-          <Route path="/get-quote" element={<Navigate to="/" replace />} />
+          <Route path="/get-quote" element={<PreserveNavigate to="/#quote" />} />
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/developers" element={<Developers />} />
           <Route path="/developers/gpt-actions" element={<CustomGPTGuide />} />
           {/* Retired 2026-10-18 (audit R-19): the Michigan-only paid pilot page contradicted the live national free referral pilot — one offer only, at /for-shops */}
-          <Route path="/pilot" element={<Navigate to="/for-shops" replace />} />
+          <Route path="/pilot" element={<PreserveNavigate to="/for-shops" />} />
           <Route path="/find-shops" element={<FindShops />} />
-          <Route path="/damage-diagnosis" element={<DamageDiagnosis />} />
+          <Route path="/damage-assessment" element={<DamageDiagnosis />} />
+          <Route path="/damage-diagnosis" element={<PreserveNavigate to="/damage-assessment" />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/financing-options" element={<FinancingOptions />} />
-          <Route path="/mi-affordable-loan" element={<Navigate to="/financing-options" replace />} />
-          <Route path="/mi-loan-eligibility" element={<Navigate to="/financing-options" replace />} />
-          <Route path="/mi-loan-application" element={<Navigate to="/financing-options" replace />} />
-          <Route path="/mi-loan/approved" element={<Navigate to="/financing-options" replace />} />
-          <Route path="/mi-loan/denied" element={<Navigate to="/financing-options" replace />} />
+          <Route path="/mi-affordable-loan" element={<PreserveNavigate to="/financing-options" />} />
+          <Route path="/mi-loan-eligibility" element={<PreserveNavigate to="/financing-options" />} />
+          <Route path="/mi-loan-application" element={<PreserveNavigate to="/financing-options" />} />
+          <Route path="/mi-loan/approved" element={<PreserveNavigate to="/financing-options" />} />
+          <Route path="/mi-loan/denied" element={<PreserveNavigate to="/financing-options" />} />
           <Route path="/diy" element={<DIYTutorials />} />
           <Route path="/diy/:slug" element={<DIYTutorialDetail />} />
           <Route path="/repairs" element={<RepairGuidesIndex />} />
@@ -141,18 +137,18 @@ function AnimatedRoutes() {
           <Route path="/referral/:token" element={<ReferralPackage />} />
           <Route path="/find-nearby-shops" element={<FindNearbyShops />} />
           {/* Paused 2026-09-17: experimental agent booking flow with shop selection — not offered */}
-          <Route path="/agent-diagnosis" element={<Navigate to="/" replace />} />
+          <Route path="/agent-diagnosis" element={<PreserveNavigate to="/" />} />
           {/* Shop track paused 2026-09-17: onboarding/login/portal redirect to the paused notice */}
-          <Route path="/for-shops/onboarding" element={<Navigate to="/for-shops" replace />} />
-          <Route path="/shop-login" element={<Navigate to="/for-shops" replace />} />
-          <Route path="/shop-portal" element={<Navigate to="/for-shops" replace />} />
+          <Route path="/for-shops/onboarding" element={<PreserveNavigate to="/for-shops" />} />
+          <Route path="/shop-login" element={<PreserveNavigate to="/for-shops" />} />
+          <Route path="/shop-portal" element={<PreserveNavigate to="/for-shops" />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/warranty-guide" element={<WarrantyGuide />} />
           <Route path="/subprocessors" element={<Subprocessors />} />
           <Route path="/verified-score" element={<VerifiedScore />} />
-          <Route path="/diagnose" element={<Navigate to="/" replace />} />
-          <Route path="/design-preview" element={<Navigate to="/" replace />} />
+          <Route path="/diagnose" element={<PreserveNavigate to="/" />} />
+          <Route path="/design-preview" element={<PreserveNavigate to="/" />} />
           <Route path="/design-preview/for-shops" element={<ForShopsPreview />} />
           <Route path="/design-preview/for-shops/onboarding" element={<ShopOnboardingPreview />} />
           <Route path="*" element={<NotFound />} />
@@ -177,6 +173,14 @@ function DefaultMeta() {
       <meta name="twitter:description" content={DEFAULT_DESCRIPTION} />
     </Helmet>
   );
+}
+
+/** Redirect that preserves the incoming query string and hash (audit R-65). */
+function PreserveNavigate({ to }: { to: string }) {
+  const location = useLocation();
+  const [path, existingHash] = to.split("#");
+  const hash = existingHash ? `#${existingHash}` : location.hash;
+  return <Navigate to={`${path}${location.search}${hash}`} replace />;
 }
 
 function AppLayout() {
@@ -218,9 +222,7 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
-                <SitePasswordGate>
-                  <AppLayout />
-                </SitePasswordGate>
+                <AppLayout />
               </BrowserRouter>
             </VoiceChatProvider>
           </LocationProvider>

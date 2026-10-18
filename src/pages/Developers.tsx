@@ -535,6 +535,13 @@ export default function Developers() {
                 <span className="font-semibold text-accent-foreground bg-accent/20 px-2 py-0.5 rounded mr-2">POST</span>
                 <span className="text-foreground break-all">/api-diagnose</span>
               </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Assessment-named alias: <span className="font-mono text-foreground">POST /api-assess</span> — identical
+                request and response contract. <span className="font-mono text-foreground">/api-diagnose</span> remains
+                supported; new integrations should prefer <span className="font-mono text-foreground">/api-assess</span>.
+                Responses include <span className="font-mono text-foreground">assessment_title</span> as the
+                assessment-named alias of the issue title.
+              </p>
 
               <h3 className="font-semibold text-foreground mb-2">Request Body</h3>
               <div className="overflow-x-auto">
@@ -628,7 +635,8 @@ export default function Developers() {
                   </thead>
                   <tbody className="text-foreground">
                     {[
-                      ["diagnosis_title", "string", "Yes", "The identified issue (e.g. \"Worn Brake Pads\")"],
+                      ["assessment_title", "string", "Yes", "The identified issue (e.g. \"Worn Brake Pads\")"],
+                      ["diagnosis_title", "string", "Yes", "Legacy name for assessment_title (same value)"],
                       ["zip_code", "string", "Yes", "5-digit US ZIP code for localized pricing"],
                       ["diagnosis_code", "string", "No", "DTC code if applicable (e.g. P0420)"],
                       ["vehicle_year", "string", "No", "Vehicle model year"],

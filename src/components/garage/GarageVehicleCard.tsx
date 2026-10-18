@@ -187,7 +187,7 @@ export default function GarageVehicleCard({ vehicle, isActive, onRemove, onRenam
       {/* Diagnostic history */}
       {showHistory && history.length > 0 && (
         <div className="border-t border-border pt-3 space-y-2">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Diagnostic History</p>
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Assessment History</p>
           {history.slice(0, 10).map((entry) => (
             <div key={entry.id} className="rounded-lg bg-muted/50 p-2.5 space-y-1">
               <div className="flex items-center justify-between gap-2">

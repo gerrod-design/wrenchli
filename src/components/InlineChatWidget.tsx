@@ -23,8 +23,6 @@ import { useSharedVoiceChat } from "@/contexts/VoiceChatContext";
 import { trackVoiceEvent } from "@/lib/voiceTelemetry";
 import { handleStartFailure } from "@/lib/voiceRetry";
 
-const GREETING = "👋 Hey there! I'm Aiden, your Wrenchli advisor. Whether you're dealing with an issue or just want to stay ahead of one — I've got you.";
-
 const AGENT_META: Record<AgentType, { name: string; role: string; color: string }> = {
   aiden: { name: "Aiden", role: "Wrenchli Advisor", color: "bg-primary" },
 };
@@ -37,12 +35,6 @@ function detectAgent(content: unknown): AgentType {
   return "aiden";
 }
 
-/** Strip agent markers from displayed content */
-function cleanAgentMarker(content: unknown): string {
-  const text = typeof content === "string" ? content : "";
-  return text.replace(/\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]\s*/gi, "");
-}
-
 function getAgentMeta(agent: AgentType | null | undefined) {
   return AGENT_META[agent ?? "aiden"] ?? AGENT_META.aiden;
 }
@@ -51,9 +43,7 @@ export default function InlineChatWidget() {
   const VOICE_OWNER = "inline-chat-widget";
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: GREETING },
-  ]);
+  const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
@@ -349,20 +339,6 @@ export default function InlineChatWidget() {
               let currentAgent = m.role === "assistant" ? detectAgent(m.content) : null;
               const prevAssistant = messages.slice(0, i).reverse().find((msg) => msg.role === "assistant");
               const prevAgent = prevAssistant ? detectAgent(prevAssistant.content) : null;
-              const isLastMsg = i === messages.length - 1;
-              // If no explicit marker found (defaults to mike) but previous agent was a specialist,
-              // assume continuity unless the specialist explicitly handed back to Mike.
-              const hasExplicitMarker = m.role === "assistant" && /\[Agent:\s*(?:Mike|Sam|Jess|Kai|Priya|Aiden)\]/i.test(typeof m.content === "string" ? m.content : "");
-              if (m.role === "assistant" && currentAgent === "aiden" && !hasExplicitMarker && prevAgent && prevAgent !== "aiden") {
-                const prevText = typeof prevAssistant?.content === "string" ? prevAssistant.content : "";
-                const handsBackToMike = /\b(?:hand(?:ing)?\s+(?:it\s+)?(?:back|over)\s+to\s+Mike|let me get Mike|bringing Mike back|Mike (?:will|can) take it from here)\b/i.test(prevText);
-                if (!handsBackToMike) {
-                  currentAgent = prevAgent;
-                }
-              }
-              if (isLastMsg && loading && currentAgent === "aiden" && prevAgent && prevAgent !== "aiden") {
-                currentAgent = prevAgent;
-              }
               const isHandoff = currentAgent && prevAgent && currentAgent !== prevAgent;
               const agentName = getAgentMeta(currentAgent).name;
 
@@ -445,7 +421,7 @@ export default function InlineChatWidget() {
                         );
                       }
                     }}>
-                      {cleanAgentMarker(m.content)}
+                      {m.content}
                     </ReactMarkdown>
                   )}
                 </div>

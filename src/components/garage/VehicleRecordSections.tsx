@@ -432,6 +432,7 @@ interface VehicleRecordSectionsProps {
   documents: VehicleDocument[];
   baselines: VehicleBaseline[];
   sharePermissionCount: number;
+  loading?: boolean;
   reportedTools?: ReactNode;
   observedTools?: ReactNode;
   documentTools?: ReactNode;
@@ -448,6 +449,7 @@ export function VehicleRecordSections({
   documents,
   baselines,
   sharePermissionCount,
+  loading,
   reportedTools,
   observedTools,
   documentTools,
@@ -460,6 +462,24 @@ export function VehicleRecordSections({
     () => new Map(currentChecks.map((check) => [check.check_key, check])),
     [currentChecks],
   );
+
+  if (loading) {
+    return (
+      <div className="space-y-6" aria-busy="true">
+        {[0, 1, 2].map((i) => (
+          <Card key={i}>
+            <CardHeader>
+              <div className="h-5 w-48 animate-pulse rounded bg-muted" />
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="h-4 w-full animate-pulse rounded bg-muted" />
+              <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

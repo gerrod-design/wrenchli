@@ -22,6 +22,7 @@ import {
   ExternalLink,
   LogIn,
   UserPlus,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -84,7 +85,8 @@ export default function DeveloperBilling() {
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "signup">("signup");
+  const [authMode, setAuthMode] = useState<"login" | "signup" | "forgot">("login");
+  const [resetSent, setResetSent] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
@@ -164,6 +166,29 @@ export default function DeveloperBilling() {
     e.preventDefault();
     setAuthLoading(true);
     try {
+      if (authMode === "forgot") {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-password-reset`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({
+              email,
+              redirectTo: "https://wrenchli.net/reset-password",
+            }),
+          }
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          toast.error(data.error || "Failed to send reset email");
+        } else {
+          setResetSent(true);
+        }
+        return;
+      }
       const result =
         authMode === "login"
           ? await signIn(email, password)
@@ -331,56 +356,118 @@ export default function DeveloperBilling() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {authMode === "login" ? "Sign In" : "Create Account"}
+              {authMode === "login"
+                ? "Sign In"
+                : authMode === "forgot"
+                ? "Reset Password"
+                : "Create Account"}
             </DialogTitle>
             <DialogDescription>
               {authMode === "login"
                 ? "Sign in to manage your API subscription."
+                : authMode === "forgot"
+                ? "Enter your email and we'll send you a link to reset your password."
                 : "Create a developer account to get started."}
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleAuth} className="space-y-4">
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
-            <DialogFooter className="flex-col gap-2 sm:flex-col">
-              <Button type="submit" className="w-full" disabled={authLoading}>
-                {authLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-                ) : authMode === "login" ? (
-                  <LogIn className="h-4 w-4 mr-1.5" />
-                ) : (
-                  <UserPlus className="h-4 w-4 mr-1.5" />
-                )}
-                {authMode === "login" ? "Sign In" : "Sign Up"}
-              </Button>
+          {resetSent ? (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                If an account exists for that email, a reset link is on its
+                way.
+              </p>
               <Button
                 type="button"
-                variant="ghost"
-                size="sm"
                 className="w-full"
-                onClick={() =>
-                  setAuthMode(authMode === "login" ? "signup" : "login")
-                }
+                onClick={() => {
+                  setAuthMode("login");
+                  setResetSent(false);
+                }}
               >
-                {authMode === "login"
-                  ? "Don't have an account? Sign up"
-                  : "Already have an account? Sign in"}
+                Back to Sign In
               </Button>
-            </DialogFooter>
-          </form>
+            </div>
+          ) : (
+            <form onSubmit={handleAuth} className="space-y-4">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              {authMode !== "forgot" && (
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              )}
+              <DialogFooter className="flex-col gap-2 sm:flex-col">
+                <Button type="submit" className="w-full" disabled={authLoading}>
+                  {authLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                  ) : authMode === "login" ? (
+                    <LogIn className="h-4 w-4 mr-1.5" />
+                  ) : authMode === "forgot" ? (
+                    <Mail className="h-4 w-4 mr-1.5" />
+                  ) : (
+                    <UserPlus className="h-4 w-4 mr-1.5" />
+                  )}
+                  {authMode === "login"
+                    ? "Sign In"
+                    : authMode === "forgot"
+                    ? "Send Reset Link"
+                    : "Sign Up"}
+                </Button>
+                {authMode === "forgot" ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setAuthMode("login")}
+                  >
+                    Back to sign in
+                  </Button>
+                ) : (
+                  <>
+                    {authMode === "login" && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => {
+                          setAuthMode("forgot");
+                          setResetSent(false);
+                        }}
+                      >
+                        Forgot password?
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => {
+                        setAuthMode(authMode === "login" ? "signup" : "login");
+                        setResetSent(false);
+                      }}
+                    >
+                      {authMode === "login"
+                        ? "Don't have an account? Sign up"
+                        : "Already have an account? Sign in"}
+                    </Button>
+                  </>
+                )}
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     </div>

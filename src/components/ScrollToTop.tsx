@@ -15,6 +15,7 @@ export default function ScrollToTop() {
       let attempts = 0;
       let timer: ReturnType<typeof setTimeout> | undefined;
       const tryScroll = () => {
+        if (!/^#[A-Za-z][\w-]*$/.test(hash)) return;
         const el = document.querySelector(hash);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });

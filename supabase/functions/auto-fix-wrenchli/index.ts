@@ -95,11 +95,11 @@ Deno.serve(async (req) => {
     // ── Step 2: Generate fixes via Claude ──
     console.log("[auto-fix] Step 2 — generating fixes via Claude");
 
-    const fixSystemPrompt = `You are a senior engineering assistant for Wrenchli (wrenchli.net), a vehicle symptom assessment platform built on React + TypeScript + Vite + Supabase. Given the following audit findings from 6 specialist agents, identify the top 5 most impactful fixable issues and generate specific, paste-ready prompts for Lovable.dev to fix each one.
+    const fixSystemPrompt = `You are a senior engineering assistant for Wrenchli (wrenchli.net), a vehicle symptom assessment platform built on React + TypeScript + Vite + Supabase. Given the following audit findings from 6 specialist agents, identify the top 5 most impactful fixable issues and generate specific, paste-ready implementation prompts to fix each one.
 
 Rules:
 - Focus on issues affecting real users or legal compliance
-- Write each prompt as if instructing Lovable directly
+- Write each prompt as a self-contained implementation brief for an engineering agent
 - Be specific about file and component names
 - Never suggest SSR, Next.js migration, or prerendering
 - Never duplicate a fix already suggested
@@ -110,7 +110,7 @@ Output ONLY a valid JSON array, no other text:
   "title": "short description",
   "severity": "critical",
   "agent": "which agent flagged this",
-  "prompt": "the full Lovable prompt text"
+  "prompt": "the full implementation prompt text"
 }]`;
 
     const claudeRes = await fetch(ANTHROPIC_API_URL, {
@@ -185,7 +185,7 @@ Output ONLY a valid JSON array, no other text:
             },
             body: JSON.stringify({
               title: `[Audit Fix] ${fix.title}`,
-              body: `**Severity:** ${fix.severity}\n**Agent:** ${fix.agent}\n**Priority:** ${fix.priority}\n**Run ID:** ${runId}\n\n---\n\n**Lovable Prompt — paste this directly into Lovable:**\n\n${fix.prompt}`,
+              body: `**Severity:** ${fix.severity}\n**Agent:** ${fix.agent}\n**Priority:** ${fix.priority}\n**Run ID:** ${runId}\n\n---\n\n**Implementation Prompt:**\n\n${fix.prompt}`,
               labels: ["audit-fix"],
             }),
           }

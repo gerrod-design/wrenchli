@@ -16,7 +16,7 @@ export function HomeJsonLd() {
       sameAs: [],
       contactPoint: {
         "@type": "ContactPoint",
-        email: "support@wrenchli.com",
+        email: "info@wrenchli.net",
         contactType: "customer support",
       },
       areaServed: { "@type": "Country", name: "United States" },

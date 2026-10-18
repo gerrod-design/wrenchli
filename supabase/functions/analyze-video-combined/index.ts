@@ -57,8 +57,17 @@ Deno.serve(async (req: Request) => {
   const optionsResp = handleCorsOptions(req);
   if (optionsResp) return optionsResp;
 
+  let formData: FormData;
   try {
-    const formData = await req.formData();
+    formData = await req.formData();
+  } catch {
+    return new Response(
+      JSON.stringify({ error: "Expected multipart form data with an audio file, frame_urls, or a symptom sense_bundle." }),
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  try {
     const audioFile = formData.get("audio") as File | null;
     const vehicleContext = formData.get("vehicle_context") as string | null;
     // Symptom mode (five-senses intake). Absent = damage mode (backward-compatible).

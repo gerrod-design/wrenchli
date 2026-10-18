@@ -45,10 +45,7 @@ export default function AdminLogin() {
             headers: { "Content-Type": "application/json", "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
             body: JSON.stringify({
               email,
-              redirectTo:
-                window.location.hostname.includes("lovableproject.com") || window.location.hostname.includes("id-preview--")
-                  ? "https://wrenchli.net/reset-password"
-                  : `${window.location.origin}/reset-password`,
+              redirectTo: `${window.location.origin}/reset-password`,
             }),
           }
         );

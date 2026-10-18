@@ -271,7 +271,7 @@ describe("useVoiceChatOrchestrator", () => {
     expect(window.speechSynthesis.speak).toHaveBeenCalled();
   });
 
-  it("speak strips agent tags and markdown before sending to TTS", async () => {
+  it("speak strips markdown before sending to TTS (agent markers pass through — R-34)", async () => {
     const { result } = renderHook(() => useVoiceChat());
     act(() => result.current.toggleVoice());
 
@@ -280,8 +280,7 @@ describe("useVoiceChatOrchestrator", () => {
     });
 
     const body = JSON.parse((fetch as any).mock.calls[0][1].body);
-    expect(body.text).toBe("Hello world");
-    expect(body.text).not.toContain("[Agent:");
+    expect(body.text).toBe("[Agent: Mike] Hello world");
     expect(body.text).not.toContain("**");
   });
 });

@@ -7,6 +7,7 @@ import { useGarage, isDismissedForSession, dismissForSession, vehicleKey } from 
 import type { DecodedVehicle } from "@/lib/vinDecoder";
 import VehicleSilhouette, { DEFAULT_COLOR, mapBodyClass, type VehicleColor } from "./VehicleSilhouette";
 import VehicleColorPicker from "./VehicleColorPicker";
+import AuthGateModal from "@/components/AuthGateModal";
 
 interface Props {
   vehicle: DecodedVehicle;
@@ -23,6 +24,7 @@ export default function GarageSavePrompt({ vehicle, vin }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR.hex);
+  const [showAuth, setShowAuth] = useState(false);
 
   const bodyType = mapBodyClass(vehicle.bodyClass || "");
 
@@ -31,15 +33,26 @@ export default function GarageSavePrompt({ vehicle, vin }: Props) {
 
   if (justSaved) {
     return (
-      <div className="mt-3 flex items-center gap-3 rounded-lg border border-wrenchli-green/30 bg-wrenchli-green/5 px-4 py-3">
-        <VehicleSilhouette bodyType={bodyType} color={selectedColor} className="w-16 h-8 shrink-0" />
-        <div className="flex-1 min-w-0">
-          <Lock className="inline h-3.5 w-3.5 text-wrenchli-green mr-1" />
-          <span className="text-xs text-muted-foreground">
-            Saved! 🔒 Your vehicle is stored in this browser. Account sync coming soon.
-          </span>
+      <>
+        <div className="mt-3 flex items-center gap-3 rounded-lg border border-wrenchli-green/30 bg-wrenchli-green/5 px-4 py-3">
+          <VehicleSilhouette bodyType={bodyType} color={selectedColor} className="w-16 h-8 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <Lock className="inline h-3.5 w-3.5 text-wrenchli-green mr-1" />
+            <span className="text-xs text-muted-foreground">
+              Saved in this browser.{" "}
+              <button
+                type="button"
+                className="underline font-medium text-foreground"
+                onClick={() => setShowAuth(true)}
+              >
+                Sign in
+              </button>{" "}
+              to sync it to your Garage.
+            </span>
+          </div>
         </div>
-      </div>
+        <AuthGateModal open={showAuth} onClose={() => setShowAuth(false)} onAuthenticated={() => setShowAuth(false)} />
+      </>
     );
   }
 
