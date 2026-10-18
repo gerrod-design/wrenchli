@@ -32,6 +32,9 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import InteractiveVehicleCard from "@/components/garage/InteractiveVehicleCard";
+import VehiclePhotoPicker from "@/components/garage/VehiclePhotoPicker";
+import { useResolvedVehiclePhoto, useVehicleOwnerPhoto } from "@/hooks/useVehicleOwnerPhoto";
+import { attachVehiclePhotoIfSelected, type VehiclePhotoClient } from "@/lib/vehiclePhoto";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
@@ -72,6 +75,10 @@ function AddVehicleDialog({
   const [trim, setTrim] = useState("");
   const [mileage, setMileage] = useState("");
   const [nickname, setNickname] = useState("");
+  const [vinDecoded, setVinDecoded] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoSkipped, setPhotoSkipped] = useState(false);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
 
   // Update when initial values change (from URL params)
   useEffect(() => {
@@ -80,11 +87,24 @@ function AddVehicleDialog({
     if (initialModel) setModel(initialModel);
   }, [initialYear, initialMake, initialModel]);
 
+  useEffect(() => {
+    if (photoFile) {
+      const url = URL.createObjectURL(photoFile);
+      setPhotoPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setPhotoPreviewUrl(null);
+  }, [photoFile]);
+
   const reset = () => {
     setAddedVehicleId(null);
     setVin(""); setVinError(""); setVinDecoding(false);
     setYear(""); setMake(""); setModel(""); setTrim("");
     setMileage(""); setNickname("");
+    setVinDecoded(false);
+    setPhotoFile(null);
+    setPhotoSkipped(false);
+    setPhotoPreviewUrl(null);
   };
 
   const handleVinChange = (raw: string) => {
@@ -116,6 +136,7 @@ function AddVehicleDialog({
       if (result.Make) setMake(result.Make);
       if (result.Model) setModel(result.Model);
       if (result.Trim) setTrim(result.Trim);
+      setVinDecoded(true);
     } catch {
       setVinError("We couldn't decode that VIN. Please fill in your vehicle details manually.");
     } finally {
@@ -149,6 +170,18 @@ function AddVehicleDialog({
         supabase.functions.invoke("check-recalls", {
           body: { user_vehicle_id: data.id, make, model, year: parseInt(year) },
         }).catch((err) => console.warn("[Garage] check-recalls error:", err));
+      }
+
+      if (data?.id) {
+        try {
+          await attachVehiclePhotoIfSelected(supabase as unknown as VehiclePhotoClient, {
+            userId: user.id,
+            vehicleId: data.id,
+            file: photoFile,
+          });
+        } catch {
+          toast.warning("Vehicle added — the photo could not be saved. You can add it from the vehicle's card.");
+        }
       }
 
       toast.success("Vehicle added to your garage!");
@@ -271,6 +304,33 @@ function AddVehicleDialog({
               <Input placeholder="e.g. Daily Driver" value={nickname} onChange={(e) => setNickname(e.target.value)} />
             </div>
           </div>
+          {vinDecoded && (
+            <div className="space-y-2 rounded-lg border border-accent/20 bg-accent/5 p-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold">Add a photo of your car</p>
+                {!photoFile && !photoSkipped && (
+                  <button
+                    type="button"
+                    className="text-[11px] text-muted-foreground hover:underline"
+                    onClick={() => setPhotoSkipped(true)}
+                  >
+                    Skip for now
+                  </button>
+                )}
+              </div>
+              {photoSkipped && !photoFile ? (
+                <p className="text-[11px] text-muted-foreground">You can add a photo later from your vehicle's card.</p>
+              ) : (
+                <VehiclePhotoPicker
+                  displayUrl={photoPreviewUrl}
+                  hasPhoto={!!photoFile}
+                  onSelectFile={(f) => { setPhotoFile(f); setPhotoSkipped(false); }}
+                  onRemove={() => setPhotoFile(null)}
+                  tone="light"
+                />
+              )}
+            </div>
+          )}
         </div>
         )}
 
@@ -379,12 +439,17 @@ function EditVehicleDialog({
   const [mileage, setMileage] = useState(vehicle?.current_mileage?.toString() || "");
   const [trim, setTrim] = useState(vehicle?.trim || "");
   const [loading, setLoading] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(vehicle?.photo_url ?? null);
+
+  const { url: resolvedPhotoUrl } = useResolvedVehiclePhoto(photoUrl);
+  const { setPhoto, removePhoto, busy: photoBusy } = useVehicleOwnerPhoto(vehicle?.id);
 
   useEffect(() => {
     if (vehicle) {
       setNickname(vehicle.nickname || "");
       setMileage(vehicle.current_mileage?.toString() || "");
       setTrim(vehicle.trim || "");
+      setPhotoUrl(vehicle.photo_url ?? null);
     }
   }, [vehicle]);
 
@@ -416,6 +481,35 @@ function EditVehicleDialog({
           <DialogTitle>Edit Vehicle</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Vehicle Photo</Label>
+            <VehiclePhotoPicker
+              displayUrl={resolvedPhotoUrl}
+              hasPhoto={!!photoUrl}
+              busy={photoBusy}
+              tone="light"
+              onSelectFile={async (file) => {
+                try {
+                  const path = await setPhoto(file);
+                  setPhotoUrl(path);
+                  onUpdated();
+                  toast.success("Vehicle photo updated");
+                } catch {
+                  toast.error("Could not save the photo. Please try again.");
+                }
+              }}
+              onRemove={async () => {
+                try {
+                  await removePhoto(photoUrl);
+                  setPhotoUrl(null);
+                  onUpdated();
+                  toast.success("Vehicle photo removed");
+                } catch {
+                  toast.error("Could not remove the photo. Please try again.");
+                }
+              }}
+            />
+          </div>
           <div className="space-y-1">
             <Label className="text-xs">Nickname</Label>
             <Input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="e.g. Daily Driver" />

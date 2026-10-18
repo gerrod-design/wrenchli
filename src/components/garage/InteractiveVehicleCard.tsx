@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MoreHorizontal, Trash2, Edit2, Search, AlertTriangle, Clock } from "lucide-react";
+import { MoreHorizontal, Trash2, Edit2, Search, AlertTriangle, Clock, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -9,7 +9,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { CloudVehicle } from "@/hooks/useCloudVehicles";
-import { useVehiclePhoto } from "@/hooks/useVehiclePhoto";
+import { useResolvedVehiclePhoto } from "@/hooks/useVehicleOwnerPhoto";
+import VehicleSilhouette, { DEFAULT_COLOR } from "@/components/vehicle/VehicleSilhouette";
 import { cn } from "@/lib/utils";
 
 // ─── Body type detection ────────────────────────────────────────
@@ -108,12 +109,10 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
   const bodyType = detectBodyType(vehicle.make, vehicle.model);
-  const { url: photoUrl, loading: photoLoading } = useVehiclePhoto(vehicle.year, vehicle.make, vehicle.model, {
-    trim: vehicle.trim,
-    bodyType,
-  });
-  // An owner-supplied photo (user_vehicles.photo_url) always wins over stock.
-  const displayPhotoUrl = vehicle.photo_url ?? photoUrl;
+  // Owner photo only: user_vehicles.photo_url holds a private-storage path
+  // (resolved to a signed URL at render) or a direct URL. No stock imagery —
+  // when the owner has not added a photo, the card shows a silhouette.
+  const { url: displayPhotoUrl, loading: photoLoading } = useResolvedVehiclePhoto(vehicle.photo_url);
 
   const displayName = vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const subtitle = vehicle.nickname
@@ -167,6 +166,12 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
                 <Edit2 className="h-3.5 w-3.5" /> Edit Vehicle
               </button>
               <button
+                onClick={() => { onEdit(vehicle); setMenuOpen(false); }}
+                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-xs text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                <Camera className="h-3.5 w-3.5" /> Vehicle Photo
+              </button>
+              <button
                 onClick={() => { onDelete(vehicle.id); setMenuOpen(false); }}
                 className="flex w-full items-center gap-2.5 px-4 py-2.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
               >
@@ -218,13 +223,30 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
           </div>
         ) : (
           <div
+            data-testid="vehicle-photo-fallback"
             className={cn(
-              "relative w-full h-32 flex items-center justify-center transition-transform duration-500 ease-out",
+              "relative w-full h-48 flex flex-col items-center justify-center gap-3 transition-transform duration-500 ease-out",
               hovered ? "-translate-y-1" : ""
             )}
           >
-            {photoLoading && (
+            {photoLoading ? (
               <div className="w-8 h-8 border-2 border-white/10 border-t-accent rounded-full animate-spin" />
+            ) : (
+              <>
+                <VehicleSilhouette
+                  bodyType={bodyType}
+                  color={DEFAULT_COLOR.hex}
+                  className="w-56 h-24 opacity-60"
+                />
+                <button
+                  type="button"
+                  onClick={() => onEdit(vehicle)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-white/50 hover:text-white transition-colors"
+                >
+                  <Camera className="h-3.5 w-3.5" />
+                  Add a photo of your car
+                </button>
+              </>
             )}
           </div>
         )}
