@@ -15,6 +15,7 @@ const footerLinks = {
     { label: "Developers", to: "/developers" },
   ],
   "For Vehicle Owners": [
+    { label: "My Garage", to: "/garage" },
     { label: "How It Works", to: "/for-car-owners" },
     { label: "Warranty Guide", to: "/warranty-guide" },
     { label: "💬 Recommend a Shop", to: "__recommend__" },

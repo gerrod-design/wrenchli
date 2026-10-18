@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, Store, ArrowRight, Users, ClipboardCheck, DollarSign } from "lucide-react";
+import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, Store, ArrowRight, Users, ClipboardCheck, DollarSign, Car } from "lucide-react";
 import { Link } from "react-router-dom";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
@@ -59,6 +59,22 @@ export default function DesignPreview() {
           </span>
         </div>
         <div className="flex items-center gap-4">
+          <Link
+            to="/garage"
+            className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            style={{ color: "#9CA3AF", border: "1px solid #2A2D37" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "#E07B39";
+              e.currentTarget.style.color = "#F5F5F5";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "#2A2D37";
+              e.currentTarget.style.color = "#9CA3AF";
+            }}
+          >
+            <Car className="h-4 w-4" />
+            My Garage
+          </Link>
           <a
             href="#for-shops"
             className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
