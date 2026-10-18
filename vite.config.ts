@@ -59,9 +59,9 @@ const prerenderRoutes: {
 
   {
     path: "/for-dealers",
-    title: "Wrenchli for Auto Dealers | Free Service Department Partner Program — Michigan & Ohio",
+    title: "Wrenchli for Auto Dealers | Free Service Department Partner Program",
     description:
-      "Help your service advisors prepare for every trade-in, service visit, and CPO inspection. Pre-assessed customers, Tekmetric integration, and a free 90-day pilot for Michigan and Ohio dealerships.",
+      "Help your service advisors prepare for every trade-in, service visit, and CPO inspection. Pre-assessed customers, Tekmetric integration, and a free 90-day pilot for dealerships nationwide.",
     content: `
       <h1>Your Service Department, One Step Ahead</h1>
       <p>Customers who ran a Wrenchli assessment before their visit arrive knowing what's wrong — cutting intake time and increasing RO approval rates.</p>
@@ -80,15 +80,15 @@ const prerenderRoutes: {
     path: "/blog",
     title: "Vehicle Repair Guides & Symptom Articles | Wrenchli",
     description:
-      "Plain-language guides on common car symptoms, OBD codes, and DIY repairs — written for Michigan and Ohio vehicle owners.",
+      "Plain-language guides on common car symptoms, OBD codes, and DIY repairs — written for vehicle owners.",
     content: `
       <h1>Wrenchli Blog</h1>
-      <p>Repair tips, diagnostic guides, and industry insights.</p>
+      <p>Repair tips, symptom guides, and industry insights.</p>
     `,
   },
   {
     path: "/about",
-    title: "About Wrenchli | Built to Fix Vehicle Repair in Michigan",
+    title: "About Wrenchli | Fixing the Vehicle Repair Experience",
     description:
       "Wrenchli helps vehicle owners understand what is likely wrong with their car before paying for a repair. Built in Michigan by Gerrod Parchmon.",
     content: `

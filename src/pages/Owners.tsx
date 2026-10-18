@@ -12,7 +12,6 @@ import RecommendShopSection from "@/components/recommend/RecommendShopSection";
 import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 
 import WaitlistForm from "@/components/WaitlistForm";
-import { useLocation } from "@/contexts/LocationContext";
 
 
 const valueProps = [
@@ -22,7 +21,6 @@ const valueProps = [
 
 export default function Owners() {
   const [recommendOpen, setRecommendOpen] = useState(false);
-  const userLocation = useLocation();
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -66,7 +64,7 @@ export default function Owners() {
               Be the First to Know
             </h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Wrenchli is launching in {userLocation.region} soon. Join the early access list and get notified when we go live.
+              Wrenchli's free symptom assessment is live now for drivers everywhere — and we're enrolling independent shops nationally in our free referral pilot. Join the early access list for updates as partner shops join near you.
             </p>
             <div className="mt-8">
               <WaitlistForm source="owners-waitlist" />

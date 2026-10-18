@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_human": "Wrenchli Auto Assistant",
   "name_for_model": "wrenchli",
-  "description_for_human": "Get automotive diagnoses, repair cost estimates, vehicle value analysis, maintenance schedules, and find trusted local mechanics across 13 Detroit metro areas. Perfect for car problems, maintenance advice, and repair vs replace decisions.",
-  "description_for_model": "Automotive diagnostic platform that analyzes vehicle symptoms, provides repair cost estimates, vehicle value analysis with repair vs replace recommendations, maintenance schedules, and connects users with local service providers across 13 Detroit metro areas. Use when users ask about car problems, weird noises, check engine lights, repair costs, vehicle values, maintenance schedules, or finding mechanics. Can analyze symptoms, estimate costs, determine if repairs are worth it, generate brand-specific maintenance schedules, and recommend local shops. Always provide vehicle year, make, and model for accurate results.",
+  "description_for_human": "Get vehicle symptom assessments, repair cost estimates, vehicle value analysis, maintenance schedules, and find trusted local mechanics. Perfect for car problems, maintenance advice, and repair vs replace decisions.",
+  "description_for_model": "Automotive symptom assessment platform that analyzes vehicle symptoms, provides repair cost estimates, vehicle value analysis with repair vs replace recommendations, maintenance schedules, and connects users with local service providers. Use when users ask about car problems, weird noises, check engine lights, repair costs, vehicle values, maintenance schedules, or finding mechanics. Can analyze symptoms, estimate costs, determine if repairs are worth it, generate brand-specific maintenance schedules, and recommend local shops. Always provide vehicle year, make, and model for accurate results.",
   "auth": {
     "type": "service_http",
     "authorization_type": "bearer",

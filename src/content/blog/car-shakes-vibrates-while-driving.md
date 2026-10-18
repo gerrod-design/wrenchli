@@ -52,7 +52,7 @@ If the car vibrates while sitting still — at a stoplight or in park — the is
 
 **Vacuum leaks** — small cracks in rubber hoses or intake gaskets — cause the engine to run lean, producing a rough, unsteady idle.
 
-## What vibration repairs cost in Michigan and Ohio
+## What vibration repairs cost — example regional pricing (Michigan & Ohio)
 
 The range is wide because the causes are so varied:
 

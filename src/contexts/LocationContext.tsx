@@ -1,10 +1,10 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
 export interface UserLocation {
-  state: "MI" | "OH" | null;
+  state: string | null; // USPS abbreviation of any U.S. state, when resolved
   city: string | null;
   zip: string | null;
-  region: string; // "Michigan", "Ohio", or "Michigan & Ohio"
+  region: string; // resolved state's full name, or "your area" until resolved
   loading: boolean;
 }
 
@@ -12,7 +12,7 @@ const defaultLocation: UserLocation = {
   state: null,
   city: null,
   zip: null,
-  region: "Michigan & Ohio",
+  region: "your area",
   loading: true,
 };
 
@@ -22,12 +22,22 @@ export function useLocation() {
   return useContext(LocationContext);
 }
 
-/** Maps state abbreviation → friendly region name */
-function stateToRegion(state: string | null): string {
-  if (state === "MI") return "Michigan";
-  if (state === "OH") return "Ohio";
-  return "Michigan & Ohio";
-}
+/** Full state name (as returned by reverse geocoders) → USPS abbreviation */
+const STATE_ABBREV: Record<string, string> = {
+  Alabama: "AL", Alaska: "AK", Arizona: "AZ", Arkansas: "AR", California: "CA",
+  Colorado: "CO", Connecticut: "CT", Delaware: "DE", "District of Columbia": "DC",
+  Florida: "FL", Georgia: "GA", Hawaii: "HI", Idaho: "ID", Illinois: "IL",
+  Indiana: "IN", Iowa: "IA", Kansas: "KS", Kentucky: "KY", Louisiana: "LA",
+  Maine: "ME", Maryland: "MD", Massachusetts: "MA", Michigan: "MI",
+  Minnesota: "MN", Mississippi: "MS", Missouri: "MO", Montana: "MT",
+  Nebraska: "NE", Nevada: "NV", "New Hampshire": "NH", "New Jersey": "NJ",
+  "New Mexico": "NM", "New York": "NY", "North Carolina": "NC",
+  "North Dakota": "ND", Ohio: "OH", Oklahoma: "OK", Oregon: "OR",
+  Pennsylvania: "PA", "Rhode Island": "RI", "South Carolina": "SC",
+  "South Dakota": "SD", Tennessee: "TN", Texas: "TX", Utah: "UT",
+  Vermont: "VT", Virginia: "VA", Washington: "WA", "West Virginia": "WV",
+  Wisconsin: "WI", Wyoming: "WY",
+};
 
 export function LocationProvider({ children }: { children: ReactNode }) {
   const [location, setLocation] = useState<UserLocation>(defaultLocation);
@@ -67,16 +77,16 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
       if (res.ok) {
         const data = await res.json();
-        const stateCode = data.address?.state;
-        let abbrev: "MI" | "OH" | null = null;
-        if (stateCode === "Michigan" || stateCode === "MI") abbrev = "MI";
-        else if (stateCode === "Ohio" || stateCode === "OH") abbrev = "OH";
+        const stateName: string | null = data.address?.state || null;
+        const abbrev: string | null = stateName
+          ? STATE_ABBREV[stateName] || (/^[A-Z]{2}$/.test(stateName) ? stateName : null)
+          : null;
 
         const result: UserLocation = {
           state: abbrev,
           city: data.address?.city || data.address?.town || data.address?.village || null,
           zip: data.address?.postcode || null,
-          region: stateToRegion(abbrev),
+          region: stateName || "your area",
           loading: false,
         };
 

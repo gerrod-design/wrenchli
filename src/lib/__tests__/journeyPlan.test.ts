@@ -82,7 +82,7 @@ describe('buildJourneyPlan structure', () => {
     expect(item?.label).toBe('Public transit');
     expect(item?.transitOption).toBeUndefined();
     expect(item?.links).toEqual([
-      { label: 'Find your local transit agency', url: 'https://www.apta.com/research-technical-resources/public-transportation-links/' },
+      { label: 'Find your local transit agency', url: 'https://www.transportation.gov/transerve/transit-providers-state' },
     ]);
   });
 

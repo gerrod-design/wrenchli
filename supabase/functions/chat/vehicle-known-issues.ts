@@ -538,7 +538,7 @@ export function buildVehicleContext(vehicle?: {
     }
   }
 
-  context += `\n\n**IMPORTANT:** When Priya or Jess advises this user, reference these SPECIFIC known issues for their ${make} — do NOT fall back to generic maintenance suggestions (spark plugs, air filters, etc.) unless those are actually relevant to their vehicle's situation. Be specific and data-driven.`;
+  context += `\n\n**IMPORTANT:** When you advise this user, reference these SPECIFIC known issues for their ${make} — do NOT fall back to generic maintenance suggestions (spark plugs, air filters, etc.) unless those are actually relevant to their vehicle's situation. Be specific and data-driven.`;
 
   return context;
 }

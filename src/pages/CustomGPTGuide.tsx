@@ -94,7 +94,7 @@ export default function CustomGPTGuide() {
     <>
       <Helmet>
         <title>Custom GPT Actions Setup Guide — Wrenchli Developers</title>
-        <meta name="description" content="Step-by-step guide to configure a Custom GPT with Wrenchli's OpenAPI spec for AI-powered vehicle diagnostics, cost estimates, and shop finder." />
+        <meta name="description" content="Step-by-step guide to configure a Custom GPT with Wrenchli's OpenAPI spec for AI-powered vehicle symptom assessments, cost estimates, and shop finder." />
       </Helmet>
 
       <main className="min-h-screen bg-background pt-24 pb-20">
@@ -242,7 +242,7 @@ export default function CustomGPTGuide() {
               <p className="text-sm text-muted-foreground">Each action call (assess, estimate, etc.) counts as one API request against your Wrenchli plan. A typical conversation uses 2–4 calls.</p>
             </CollapsibleSection>
             <CollapsibleSection title="Can I customize which endpoints my GPT uses?">
-              <p className="text-sm text-muted-foreground">Yes — after importing the schema, you can disable specific actions in the GPT editor. For example, remove findServiceProviders if you only want diagnostics.</p>
+              <p className="text-sm text-muted-foreground">Yes — after importing the schema, you can disable specific actions in the GPT editor. For example, remove findServiceProviders if you only want symptom assessments.</p>
             </CollapsibleSection>
             <CollapsibleSection title="How do I get my referral token?">
               <p className="text-sm text-muted-foreground">

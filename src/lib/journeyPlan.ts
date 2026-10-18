@@ -140,7 +140,7 @@ function buildGettingAroundItems(input: JourneySituationInput): PlanItem[] {
         links: [
           {
             label: 'Find your local transit agency',
-            url: 'https://www.apta.com/research-technical-resources/public-transportation-links/',
+            url: 'https://www.transportation.gov/transerve/transit-providers-state',
           },
         ],
       };

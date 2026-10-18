@@ -72,15 +72,6 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
           </Link>
         </div>
 
-        <div className="bg-muted/50 rounded-lg p-4 max-w-sm mx-auto">
-          <p className="text-sm font-medium mb-1">Currently Serving</p>
-          <p className="text-xs text-muted-foreground">
-            Metro Detroit • Ann Arbor • Grand Rapids • Flint • Lansing • Kalamazoo (MI)
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Columbus • Cleveland • Cincinnati • Dayton • Akron • Toledo (OH)
-          </p>
-        </div>
       </div>
     );
   }

@@ -84,7 +84,7 @@ You can troubleshoot several of these causes yourself, right in your driveway or
 
 **Step 5: Check the key fob battery.** On push-button start vehicles, a dead key fob battery can prevent the car from recognizing the key. Most vehicles have a backup: hold the fob directly against the start button and press. Check your owner's manual for the specific procedure.
 
-## What no-start repairs cost in Michigan and Ohio
+## What no-start repairs cost — example regional pricing (Michigan & Ohio)
 
 Costs vary by cause, but here's what to expect:
 

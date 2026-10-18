@@ -61,11 +61,11 @@ interface Diagnosis {
 
 // ── System Prompt ────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are a senior automotive diagnostic expert. 
-Given a vehicle and symptom report, return a structured diagnosis.
+const SYSTEM_PROMPT = `You are Wrenchli's AI assessment engine — a senior automotive assessment specialist.
+Given a vehicle and symptom report, return a structured assessment. This is an informational assessment only, not a diagnosis.
 
 CRITICAL — VEHICLE VALIDATION (must be done FIRST):
-Before ANY diagnosis, verify the year/make/model combination is historically accurate.
+Before ANY assessment, verify the year/make/model combination is historically accurate.
 Check whether that specific model was actually manufactured in that year.
 
 Examples of INVALID combinations:
@@ -76,7 +76,7 @@ Examples of INVALID combinations:
 - Any model year beyond ${new Date().getFullYear() + 1}
 
 If the year/make/model combination is implausible or was never manufactured:
-Return ONLY this JSON — do NOT include possible_causes or run a diagnosis:
+Return ONLY this JSON — do NOT include possible_causes or run an assessment:
 {
   "vehicle_invalid": true,
   "validation_message": "We want to make sure we give you the most accurate assessment. We don't have records of a [year] [make] [model] in our database. Could you double-check your vehicle details? If your vehicle details are correct, please try a similar year or trim level."
@@ -170,7 +170,7 @@ ${symptom.severity ? `- Severity: ${symptom.severity}` : ""}
 ${symptom.warning_lights?.length ? `- Warning lights: ${symptom.warning_lights.join(", ")}` : ""}
 ${symptom.raw_description ? `- User description: "${symptom.raw_description}"` : ""}
 
-Diagnose this vehicle issue and return the JSON schema.`.trim();
+Assess this vehicle issue and return the JSON schema.`.trim();
 
     // ── 3. Call Claude API ─────────────────────────────────
     const aiResponse = await fetch(ANTHROPIC_API_URL, {

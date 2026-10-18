@@ -19,9 +19,7 @@ export function HomeJsonLd() {
         email: "support@wrenchli.com",
         contactType: "customer support",
       },
-      areaServed: [
-        { "@type": "State", name: "Michigan" },
-      ],
+      areaServed: { "@type": "Country", name: "United States" },
     },
     {
       "@context": "https://schema.org",
@@ -49,9 +47,7 @@ export function HomeJsonLd() {
         name: "Wrenchli",
         url: SITE,
       },
-      areaServed: [
-        { "@type": "State", name: "Michigan" },
-      ],
+      areaServed: { "@type": "Country", name: "United States" },
       offers: {
         "@type": "Offer",
         price: "0",

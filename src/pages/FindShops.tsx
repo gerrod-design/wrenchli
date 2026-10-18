@@ -333,7 +333,7 @@ export default function FindShops() {
                     <BellRing className="h-7 w-7 text-accent" />
                   </div>
                   <h2 className="font-heading text-2xl font-semibold mb-3">
-                    We're expanding in {resolvedCity && resolvedCity !== "Service Area" ? `${resolvedCity}'s metro` : "Metro Detroit"}
+                    {resolvedCity && resolvedCity !== "Service Area" ? `We're expanding in ${resolvedCity}'s metro` : "We're expanding near you"}
                   </h2>
                   <p className="text-muted-foreground mb-6">
                     Enter your ZIP to get notified when partner shops launch near you.
@@ -346,7 +346,7 @@ export default function FindShops() {
             <>
               {expandedRadius > 0 && (
                 <div className="mb-4 text-sm text-muted-foreground bg-muted/50 border border-border rounded-md px-4 py-2 text-center">
-                  No partner shops in that exact ZIP. Showing shops within {expandedRadius} miles for reference only — shop matching is paused.
+                  No partner shops in that exact ZIP. Showing shops within {expandedRadius} miles for reference only — Wrenchli's free referral pilot is enrolling shops nationally, and partner shops will appear here as they join.
                 </div>
               )}
               <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">

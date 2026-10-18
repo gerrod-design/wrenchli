@@ -10,7 +10,7 @@ export default function About() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="About Wrenchli | Built to Fix Vehicle Repair in Michigan"
+        title="About Wrenchli | Fixing the Vehicle Repair Experience"
         description="Wrenchli helps vehicle owners understand what is likely wrong before paying for a repair. Built in Michigan by Gerrod Parchmon."
         path="/about"
       />
@@ -23,7 +23,7 @@ export default function About() {
             <h1 className="font-heading text-3xl font-extrabold md:text-5xl lg:text-6xl">About Wrenchli</h1>
             <p className="mt-3 text-base font-semibold tracking-wide text-primary-foreground/90 md:text-lg">Mobility for All.</p>
             <p className="mt-3 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              We're fixing the vehicle repair experience — starting in Michigan.
+              We're fixing the vehicle repair experience — for drivers and independent shops everywhere.
             </p>
           </SectionReveal>
         </div>
@@ -130,7 +130,7 @@ export default function About() {
       </section>
 
       {/* Leadership Team */}
-      <section className="section-padding bg-background">
+      <section id="leadership" className="section-padding bg-background">
         <div className="container-wrenchli max-w-4xl">
           <SectionReveal>
             <h2 className="text-center font-heading text-2xl font-bold md:text-4xl">Leadership</h2>
@@ -185,7 +185,7 @@ export default function About() {
               This city built the modern automobile. It knows what it means to reinvent an industry. With a community that takes pride in keeping vehicles on the road, Detroit is the perfect proving ground for a platform that's rewriting the rules of auto repair.
             </p>
             <p className="mt-4 text-primary-foreground/60 leading-relaxed">
-              We're launching here first because this is home.
+              Detroit is home — and the standard we build to, for drivers and shops everywhere.
             </p>
           </SectionReveal>
         </div>

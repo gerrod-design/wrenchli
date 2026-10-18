@@ -30,7 +30,7 @@ Here's the problem: P0420 points at a *system*, not a specific part. The code te
 
 **Oil burning** — if your engine burns oil, it coats the catalytic converter and reduces its efficiency. Again, replacing the converter without addressing the underlying oil issue is expensive and temporary.
 
-## What it costs in Michigan and Ohio
+## What it costs — example regional pricing (Michigan & Ohio)
 
 Repair costs vary significantly depending on what's actually causing the code:
 

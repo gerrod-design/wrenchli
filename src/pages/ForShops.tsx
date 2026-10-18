@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 const steps = [
   {
     title: "Customer describes their symptoms",
-    body: "A driver in Metro Detroit describes their car problem on Wrenchli and gets a free symptom assessment.",
+    body: "A driver describes their car problem on Wrenchli and gets a free symptom assessment.",
   },
   {
     title: "We refer them to your shop",
@@ -50,7 +50,7 @@ export default function ForShops() {
       </section>
 
       {/* Customers arrive pre-assessed */}
-      <section className="section-padding bg-secondary">
+      <section id="features" className="section-padding bg-secondary">
         <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
             <h2 className="font-heading text-2xl font-bold md:text-4xl">
@@ -135,7 +135,7 @@ export default function ForShops() {
       </section>
 
       {/* CTA */}
-      <section className="section-padding bg-wrenchli-trust-blue text-accent-foreground">
+      <section id="apply" className="section-padding bg-wrenchli-trust-blue text-accent-foreground">
         <div className="container-wrenchli max-w-3xl text-center">
           <SectionReveal>
             <Button

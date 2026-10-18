@@ -106,7 +106,7 @@ export default function RecommendShopModal({ open, onClose }: RecommendShopModal
 
   const handleTextFriend = () => {
     const text = encodeURIComponent(
-      "Hey, check out Wrenchli — it helps you diagnose car problems, find DIY tutorials, or get quotes from trusted local shops. wrenchli.net"
+      "Hey, check out Wrenchli — it helps you understand what's likely going on with your car, find DIY tutorials, or get quotes from trusted local shops. wrenchli.net"
     );
     window.open(`sms:?body=${text}`, "_self");
   };

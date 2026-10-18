@@ -68,7 +68,7 @@ export default function Investors() {
             </div>
             <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                Wrenchli starts with a free national consumer symptom assessment: drivers describe what's wrong and get likely causes, urgency, and a fair cost range. Shop matching, shop software, and repair financing are paused — the assessment is the product today, and the trust layer (verified repair outcomes) is what we're building toward.
+                Wrenchli starts with a free national consumer symptom assessment: drivers describe what's wrong and get likely causes, urgency, and a fair cost range. The free referral pilot for independent shops is open nationally alongside it, and the trust layer (verified repair outcomes) is what we're building toward.
               </p>
               <p>
                 We make money when shops make money — aligning incentives across the entire ecosystem.
@@ -102,7 +102,7 @@ export default function Investors() {
             ))}
           </div>
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            Real data from our pre-launch research. Launching in Michigan &amp; Ohio.
+            Real data from our pre-launch research.
           </p>
         </div>
       </section>

@@ -10,7 +10,7 @@ export default function Blog() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Vehicle Repair Guides & Symptom Articles | Wrenchli"
-        description="Plain-language guides on common car symptoms, OBD codes, and DIY repairs — written for Michigan vehicle owners."
+        description="Plain-language guides on common car symptoms, OBD codes, and DIY repairs — written for vehicle owners."
         path="/blog"
       />
 

@@ -395,10 +395,7 @@ export default function RepairGuide() {
     name: repair.title,
     description: repair.description[0],
     provider: { "@type": "Organization", name: "Wrenchli", url: "https://wrenchli.net" },
-    areaServed: [
-      { "@type": "State", name: "Michigan" },
-      { "@type": "State", name: "Ohio" },
-    ],
+    areaServed: { "@type": "Country", name: "United States" },
     offers: {
       "@type": "AggregateOffer",
       lowPrice: repair.costLow,

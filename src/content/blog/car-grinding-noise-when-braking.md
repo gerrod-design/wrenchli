@@ -42,7 +42,7 @@ Small rocks, road grit, or rust flakes can get lodged between the pad and rotor.
 
 Less common but worth mentioning: a failing wheel bearing can produce a grinding or humming noise that gets louder when braking. The difference is that bearing noise usually changes with vehicle speed, not just when you press the brake pedal.
 
-## What brake grinding repairs cost in Michigan and Ohio
+## What brake grinding repairs cost — example regional pricing (Michigan & Ohio)
 
 Costs depend on the root cause and how long you waited to address it:
 

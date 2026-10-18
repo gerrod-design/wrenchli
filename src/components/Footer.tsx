@@ -25,7 +25,7 @@ const footerLinks = {
     { label: "Partner Program", to: "/for-shops" },
     { label: "How It Works", to: "/for-shops#how-it-works" },
     { label: "Verified Score", to: "/verified-score" },
-    { label: "Apply Now", to: "/for-shops/onboarding" },
+    { label: "Apply Now", to: "/for-shops#apply" },
   ],
   Legal: [
     { label: "Privacy Policy", to: "/privacy" },

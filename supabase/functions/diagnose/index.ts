@@ -60,9 +60,9 @@ serve(async (req) => {
 
     let userPrompt: string;
     if (safeCodes) {
-      userPrompt = `Diagnose these OBD2 diagnostic trouble codes for a ${vehicleStr || "vehicle"}: ${safeCodes}`;
+      userPrompt = `Assess these OBD2 trouble codes (DTCs) for a ${vehicleStr || "vehicle"}: ${safeCodes}`;
     } else {
-      userPrompt = `Diagnose this car problem for a ${vehicleStr || "vehicle"}: "${safeSymptom}"`;
+      userPrompt = `Assess this car problem for a ${vehicleStr || "vehicle"}: "${safeSymptom}"`;
     }
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
@@ -103,18 +103,18 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1500,
-        system: `You are Wrenchli's expert automotive diagnostics AI. Given a DTC code or symptom description, return one or more structured diagnoses using the provide_diagnoses tool. Each diagnosis should be specific to the vehicle when provided. Be honest about when a professional is needed. If the input could indicate multiple issues, return multiple diagnoses (up to 3).
+        system: `You are Wrenchli's AI assessment engine. You analyze vehicle symptoms and provide transparent, data-driven symptom assessments. This is an informational assessment only, not a diagnosis. Given a DTC code or symptom description, return one or more structured assessments using the provide_assessments tool. Each assessment should be specific to the vehicle when provided. Be honest about when a professional is needed. If the input could indicate multiple issues, return multiple assessments (up to 3).
 
 For every easy or moderate DIY result, provide one internally consistent comparison with four distinct estimates: DIY parts cost, DIY hands-on time, shop parts and labor separately plus shop total, and shop appointment/service time. Never reuse one range for two meanings. Shop total must equal shop parts plus shop labor at both ends and must not equal the DIY parts range. Use the exact same time estimates everywhere in the result and do not add competing times to explanatory text.
 
 For every part in diy_parts, provide matching safe instructions in diy_steps_by_part using the exact same part_name. Omit any part that lacks instructions. Filters, wipers, and bulbs are routine maintenance: say replace, check, or handle this maintenance; never say "schedule a repair."
 
-SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel must use diy_feasibility "advanced", return empty diy_parts and diy_steps_by_part arrays, and contain no DIY guidance.`,
+SAFETY HARD BLOCK: Any assessment involving brakes, steering, airbags, or fuel must use diy_feasibility "advanced", return empty diy_parts and diy_steps_by_part arrays, and contain no DIY guidance.`,
         messages: [{ role: "user", content: userPrompt }],
         tools: [
           {
-            name: "provide_diagnoses",
-            description: "Return structured vehicle diagnosis results",
+            name: "provide_assessments",
+            description: "Return structured vehicle assessment results",
             input_schema: {
               type: "object",
               properties: {
@@ -123,7 +123,7 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
                   items: {
                     type: "object",
                     properties: {
-                      title: { type: "string", description: "Short diagnosis title, e.g. 'Worn Brake Pads'" },
+                      title: { type: "string", description: "Short assessment title, e.g. 'Worn Brake Pads'" },
                       code: { type: "string", description: "The DTC code if applicable, e.g. 'P0420'. Empty string if from symptom." },
                       urgency: { type: "string", enum: ["low", "medium", "high"], description: "Urgency level" },
                       whats_happening: { type: "string", description: "2-3 sentence plain-language explanation. No jargon. Written for someone who knows nothing about cars." },
@@ -160,7 +160,7 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
             },
           },
         ],
-        tool_choice: { type: "tool", name: "provide_diagnoses" },
+        tool_choice: { type: "tool", name: "provide_assessments" },
       }),
         signal: modelController.signal,
       });
@@ -209,7 +209,7 @@ SAFETY HARD BLOCK: Any diagnosis involving brakes, steering, airbags, or fuel mu
     let toolUse: any = null;
     try {
       const data = await response.json();
-      toolUse = data?.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_diagnoses") ?? null;
+      toolUse = data?.content?.find((block: any) => block.type === "tool_use" && block.name === "provide_assessments") ?? null;
     } catch (parseErr) {
       console.error("diagnose model output parse failed:", parseErr);
       return gracefulTimeout();

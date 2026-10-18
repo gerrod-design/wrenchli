@@ -1,13 +1,12 @@
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
-// Native Gemini API — required because Lovable AI Gateway's OpenAI-compatible
-// /chat/completions endpoint silently drops Gemini's `inlineData` audio parts,
-// which caused Mike to hallucinate generic "ticking → valve train" answers
-// regardless of what the user actually recorded.
+// Native Gemini API — required because the OpenAI-compatible gateway endpoint
+// silently drops Gemini's `inlineData` audio parts, which caused generic
+// "ticking → valve train" answers regardless of what the user actually recorded.
 const GEMINI_MODEL = "gemini-3.6-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-const SYSTEM_PROMPT = `You are Mike, a knowledgeable vehicle advisor at Wrenchli. A customer recorded an audio clip of a noise their car is making. The audio is attached as inline data in the user message.
+const SYSTEM_PROMPT = `You are Aiden, a knowledgeable vehicle advisor at Wrenchli. A customer recorded an audio clip of a noise their car is making. The audio is attached as inline data in the user message.
 
 Wrenchli does symptom assessment, not diagnosis. NEVER use the words "diagnose," "diagnosis," "diagnoses," "diagnosing," or "diagnosed." Use "what's likely going on," "likely causes," "what we're hearing," "assessment results."
 
