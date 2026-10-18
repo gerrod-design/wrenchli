@@ -7,7 +7,6 @@ import { isValidEmail } from "../_shared/validation.ts";
 const ALLOWED_REDIRECT_DOMAINS = [
   "wrenchli.net",
   "www.wrenchli.net",
-  "wrenchli.lovable.app",
 ];
 
 const DEFAULT_RESET_URL = "https://wrenchli.net/reset-password";
@@ -96,7 +95,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Wrenchli <onboarding@resend.dev>",
+        from: "Wrenchli <no-reply@wrenchli.net>",
         to: [String(email).trim()],
         subject: "Reset Your Wrenchli Password",
         html: `
@@ -104,7 +103,7 @@ serve(async (req) => {
             <div style="max-width: 480px; margin: 0 auto;">
               <!-- Header -->
               <div style="background-color: #1E3A5F; border-radius: 12px 12px 0 0; padding: 32px 24px; text-align: center;">
-                <img src="https://aunrktvltmyrxtdygykt.supabase.co/storage/v1/object/public/damage-photos/branding%2Fwrenchli-logo.jpeg" alt="Wrenchli" width="56" height="56" style="border-radius: 12px; margin: 0 auto 16px; display: block;" />
+                <img src="https://www.wrenchli.net/apple-touch-icon.png" alt="Wrenchli" width="56" height="56" style="border-radius: 12px; margin: 0 auto 16px; display: block;" />
                 <h1 style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px;">Reset Your Password</h1>
               </div>
               <!-- Body -->
@@ -127,12 +126,12 @@ serve(async (req) => {
               </div>
               <!-- Footer -->
               <div style="background-color: #f8fafc; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none; padding: 20px 24px; text-align: center;">
-                <p style="color: #9ca3af; font-size: 12px; margin: 0;">Wrenchli — Your Car Care Companion</p>
+                <p style="color: #9ca3af; font-size: 12px; margin: 0;">Wrenchli. Mobility for All.</p>
               </div>
             </div>
           </div>
         `,
-        text: `Reset Your Wrenchli Password\n\nWe received a request to reset the password for your Wrenchli account.\n\nCopy and paste this link into your browser to set a new password:\n\n${resetLink}\n\nIf you didn't request this, you can safely ignore this email. This link will expire shortly.\n\n— Wrenchli, Your Car Care Companion`,
+        text: `Reset Your Wrenchli Password\n\nWe received a request to reset the password for your Wrenchli account.\n\nCopy and paste this link into your browser to set a new password:\n\n${resetLink}\n\nIf you didn't request this, you can safely ignore this email. This link will expire shortly.\n\n- Wrenchli. Mobility for All.`,
       }),
     });
 
