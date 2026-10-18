@@ -27,6 +27,23 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
+    // R-54 rider (Batch 1.5): same internal-only pattern as
+    // check-maintenance — the pg_cron fleet run is the only legitimate
+    // caller. The public anon key must not trigger fleet runs or email.
+    const internalSecret = Deno.env.get("INTERNAL_SECRET");
+    const callerSecret = req.headers.get("x-internal-secret");
+    const authHeader = req.headers.get("Authorization");
+    const isInternal = Boolean(
+      (internalSecret && callerSecret === internalSecret) ||
+      (serviceRoleKey && authHeader === `Bearer ${serviceRoleKey}`),
+    );
+    if (!isInternal) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...securityHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { data: vehicles, error: vErr } = await supabase
       .from("user_vehicles")
       .select("id, make, model, year, user_id");
@@ -39,6 +56,9 @@ Deno.serve(async (req) => {
     }
 
     let totalAlerts = 0;
+    // R-53: failures are counted and reported, never swallowed.
+    let failureCount = 0;
+    const failedVehicleIds: string[] = [];
     const newValueAlerts: { userId: string; vehicleName: string; previousValue: number; currentValue: number; changePercent: number; changeDirection: string; summary: string }[] = [];
 
     for (const vehicle of vehicles) {
@@ -97,11 +117,15 @@ Deno.serve(async (req) => {
           newValueAlerts.push({ userId: vehicle.user_id, vehicleName, previousValue: previous, currentValue: current, changePercent: absChange, changeDirection: direction, summary });
         }
       } catch (err) {
-        console.warn(`Failed to check market value for vehicle ${vehicle.id}:`, err);
+        failureCount++;
+        failedVehicleIds.push(vehicle.id);
+        console.error(`Failed to check market value for vehicle ${vehicle.id}:`, err);
       }
     }
 
     let emailsSent = 0;
+    // R-53: an email counts as sent only when send-alert-email confirms OK.
+    let emailsFailed = 0;
     const byUser = new Map<string, typeof newValueAlerts>();
     for (const alert of newValueAlerts) {
       if (!byUser.has(alert.userId)) byUser.set(alert.userId, []);
@@ -124,7 +148,7 @@ Deno.serve(async (req) => {
 
         for (const alert of alerts) {
           try {
-            await fetch(`${supabaseUrl}/functions/v1/send-alert-email`, {
+            const res = await fetch(`${supabaseUrl}/functions/v1/send-alert-email`, {
               method: "POST",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceRoleKey}`, "x-internal-secret": Deno.env.get("INTERNAL_SECRET") ?? "" },
               body: JSON.stringify({
@@ -136,19 +160,35 @@ Deno.serve(async (req) => {
                 },
               }),
             });
-            emailsSent++;
+            // R-53: dispatch is not delivery — count only confirmed OK.
+            if (res.ok) {
+              emailsSent++;
+            } else {
+              emailsFailed++;
+              const errBody = await res.text().catch(() => "");
+              console.error(`send-alert-email returned ${res.status} for market value alert to ${email}: ${errBody.slice(0, 300)}`);
+            }
           } catch (e) {
-            console.warn(`Failed to send market value email to ${email}:`, e);
+            emailsFailed++;
+            console.error(`Failed to send market value email to ${email}:`, e);
           }
         }
       } catch (err) {
-        console.warn(`Failed to notify user ${userId}:`, err);
+        failureCount++;
+        console.error(`Failed to notify user ${userId}:`, err);
       }
     }
 
+    // R-53: a run with failures must not report plain success.
+    const runFailed = failureCount > 0 || emailsFailed > 0;
     return new Response(
-      JSON.stringify({ message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} market value alerts, sent ${emailsSent} emails`, checked: vehicles.length, newAlerts: totalAlerts, emailsSent }),
-      { headers: { ...securityHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({
+        message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} market value alerts, sent ${emailsSent} emails` +
+          (runFailed ? `, ${emailsFailed} emails failed, ${failureCount} processing failures` : ""),
+        checked: vehicles.length, newAlerts: totalAlerts, emailsSent, emailsFailed,
+        failures: failureCount, failedVehicleIds,
+      }),
+      { status: runFailed ? 502 : 200, headers: { ...securityHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error in check-market-values:", error);

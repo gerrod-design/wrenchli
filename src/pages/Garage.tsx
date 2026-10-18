@@ -165,11 +165,24 @@ function AddVehicleDialog({
 
       if (error) throw error;
 
-      // Call check-recalls for new vehicle
+      // Call check-recalls for new vehicle. R-51 (Batch 1.5): a failed check
+      // is surfaced to the user, never swallowed to the console — the Garage
+      // also flags the vehicle with a "recall status unavailable" notice
+      // until a check succeeds.
       if (data?.id) {
         supabase.functions.invoke("check-recalls", {
           body: { user_vehicle_id: data.id, make, model, year: parseInt(year) },
-        }).catch((err) => console.warn("[Garage] check-recalls error:", err));
+        }).then(({ error: recallError }) => {
+          if (recallError) {
+            toast.warning(
+              "Vehicle added — the safety recall check couldn't be completed. Its recall status will show as unavailable in your Garage until the check succeeds."
+            );
+          }
+        }).catch(() => {
+          toast.warning(
+            "Vehicle added — the safety recall check couldn't be completed. Its recall status will show as unavailable in your Garage until the check succeeds."
+          );
+        });
       }
 
       if (data?.id) {
@@ -547,7 +560,7 @@ export default function Garage() {
   const { vehicles, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
 
   const vehicleIds = useMemo(() => vehicles.map((v) => v.id), [vehicles]);
-  const { recalls, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
+  const { recalls, recallChecks, recallUnavailableVehicleIds, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
 
   // Pre-fill from URL params (from assessment save-to-garage)
   const prefillYear = searchParams.get("addYear") || "";
@@ -580,6 +593,13 @@ export default function Garage() {
   }, [recalls]);
 
   const vehiclesWithUnreadRecalls = vehicles.filter((v) => (unreadRecallsByVehicle[v.id]?.length || 0) > 0);
+
+  // R-51 (Batch 1.5): vehicles whose recall status cannot be asserted —
+  // the last NHTSA check failed or never completed. Shown explicitly so an
+  // unchecked vehicle is never mistaken for a recall-free one.
+  const vehiclesWithUnavailableRecallStatus = vehicles.filter((v) =>
+    recallUnavailableVehicleIds.includes(v.id)
+  );
 
   const handleDelete = async (id: string) => {
     const ok = await deleteVehicle(id);
@@ -685,7 +705,7 @@ export default function Garage() {
               </Button>
 
               {/* Recall Alerts Section */}
-              {vehiclesWithUnreadRecalls.length > 0 && (
+              {(vehiclesWithUnreadRecalls.length > 0 || vehiclesWithUnavailableRecallStatus.length > 0) && (
                 <div className="space-y-3 pt-4">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-destructive" />
@@ -699,6 +719,26 @@ export default function Garage() {
                       {unreadRecallsByVehicle[v.id]?.map((r) => (
                         <RecallAlertCard key={r.id} recall={r} onMarkRead={markAsRead} />
                       ))}
+                    </div>
+                  ))}
+                  {vehiclesWithUnavailableRecallStatus.map((v) => (
+                    <div
+                      key={v.id}
+                      className="rounded-lg border border-amber-300 bg-amber-50 p-3"
+                      data-testid="recall-status-unavailable"
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        {v.nickname || `${v.year} ${v.make} ${v.model}`}
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-amber-900">
+                        Recall status unavailable
+                      </p>
+                      <p className="mt-0.5 text-sm text-amber-800">
+                        We couldn't complete the NHTSA safety recall check for this
+                        vehicle{recallChecks[v.id]?.checked_at ? ` (last tried ${new Date(recallChecks[v.id].checked_at).toLocaleDateString()})` : ""}.
+                        That doesn't mean it has no recalls — we'll keep retrying,
+                        and the status will update here once the check succeeds.
+                      </p>
                     </div>
                   ))}
                 </div>

@@ -3120,6 +3120,44 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_recall_checks: {
+        Row: {
+          campaigns_found: number | null
+          checked_at: string
+          error: string | null
+          model_used: string | null
+          note: string | null
+          status: string
+          vehicle_id: string
+        }
+        Insert: {
+          campaigns_found?: number | null
+          checked_at?: string
+          error?: string | null
+          model_used?: string | null
+          note?: string | null
+          status: string
+          vehicle_id: string
+        }
+        Update: {
+          campaigns_found?: number | null
+          checked_at?: string
+          error?: string | null
+          model_used?: string | null
+          note?: string | null
+          status?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_recall_checks_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: true
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_known_issues: {
         Row: {
           category: string | null
