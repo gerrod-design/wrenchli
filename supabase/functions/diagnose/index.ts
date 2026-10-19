@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
@@ -235,6 +236,27 @@ SAFETY HARD BLOCK: Any assessment involving brakes, steering, airbags, or fuel m
     for (const diagnosis of diagnoses) {
       const text = `${diagnosis.title ?? ""} ${(diagnosis.common_causes ?? []).join(" ")} ${diagnosis.whats_happening ?? ""}`;
       const safetyCritical = /\bbrak/i.test(text) || /\bsteer/i.test(text) || /\bair\s?bags?/i.test(text) || /\bfuel/i.test(text);
+
+      // R-56: pin cost figures to the shared rate table when the repair
+      // matches an entry (title first, then common causes). Runs before the
+      // safety override below, which still owns the DIY fields for
+      // safety-critical items.
+      const rateEntry = findRepairRate(diagnosis.title ?? "") ?? findRepairRate((diagnosis.common_causes ?? []).join(" "));
+      if (rateEntry) {
+        const figures = rateFigures(rateEntry);
+        diagnosis.shop_parts_cost = formatMoneyRange(figures.shopParts);
+        diagnosis.shop_labor_cost = formatMoneyRange(figures.shopLabor);
+        diagnosis.shop_cost = formatMoneyRange(figures.shopTotal);
+        if (figures.diyParts) {
+          diagnosis.diy_cost = formatMoneyRange(figures.diyParts);
+        }
+        if (rateEntry.diyTime) {
+          diagnosis.diy_time = rateEntry.diyTime;
+        }
+        diagnosis.shop_time = rateEntry.shopTime;
+        diagnosis.rate_source = RATE_SOURCE_ID;
+      }
+
       if (safetyCritical) {
         diagnosis.diy_feasibility = "advanced";
         diagnosis.diy_cost = "Not available — shop required";

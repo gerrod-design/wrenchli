@@ -5,15 +5,12 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { findRepairRate, rateFigures, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -136,9 +133,9 @@ const SAFETY_CRITICAL_PATTERNS = [/\bbrak/i, /\bsteer/i, /\bair\s?bags?/i, /\bfu
 // ── Main Handler ─────────────────────────────────────────────
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+  const corsResponse = handleCorsOptions(req);
+  if (corsResponse) return corsResponse;
+  const corsHeaders = getCorsHeaders(req.headers.get("origin"));
 
   try {
     // ── 1. Parse & validate input ──────────────────────────
@@ -263,6 +260,32 @@ Assess this vehicle issue and return the JSON schema.`.trim();
       cause.shop_labor_cost_high = shopLaborHigh;
       cause.estimated_cost_low = shopPartsLow + shopLaborLow;
       cause.estimated_cost_high = shopPartsHigh + shopLaborHigh;
+
+      // R-56: pin cost figures to the shared rate table when the cause
+      // matches an entry, so the wizard quotes the same figures as every
+      // other surface. DIY fields are only overwritten for DIY-eligible
+      // causes; professional_only causes keep their null DIY fields.
+      const rateEntry = findRepairRate(cause.name ?? "");
+      if (rateEntry) {
+        const figures = rateFigures(rateEntry);
+        cause.shop_parts_cost_low = figures.shopParts[0];
+        cause.shop_parts_cost_high = figures.shopParts[1];
+        cause.shop_labor_cost_low = figures.shopLabor[0];
+        cause.shop_labor_cost_high = figures.shopLabor[1];
+        cause.estimated_cost_low = figures.shopTotal[0];
+        cause.estimated_cost_high = figures.shopTotal[1];
+        cause.shop_time = rateEntry.shopTime;
+        if (isDiyEligible) {
+          if (figures.diyParts) {
+            cause.diy_parts_cost_low = figures.diyParts[0];
+            cause.diy_parts_cost_high = figures.diyParts[1];
+          }
+          if (rateEntry.diyTime) {
+            cause.diy_time = rateEntry.diyTime;
+          }
+        }
+        (cause as any).rate_source = RATE_SOURCE_ID;
+      }
     }
 
     // ── 5. Persist to Supabase ─────────────────────────────

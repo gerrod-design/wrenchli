@@ -5,10 +5,8 @@ Deno.serve(async (req) => {
   const corsResponse = handleCorsOptions(req);
   if (corsResponse) return corsResponse;
 
-  const origin = req.headers.get("Origin");
   const headers = {
     ...corsHeaders,
-    ...(origin ? { "Access-Control-Allow-Origin": origin } : {}),
     "Content-Type": "application/json",
   };
 

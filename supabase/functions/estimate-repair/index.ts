@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
+import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
@@ -191,6 +192,20 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
     if (partsRange && laborRange) {
       (estimate as any).cost_low = Math.round(partsRange[0] + laborRange[0]);
       (estimate as any).cost_high = Math.round(partsRange[1] + laborRange[1]);
+    }
+
+    // R-56: pin cost figures to the shared rate table when the repair
+    // title matches an entry. Narrative fields stay model-generated; the
+    // numbers come from the one shared source every surface reads.
+    const rateEntry = findRepairRate(safeTitle);
+    if (rateEntry) {
+      const figures = rateFigures(rateEntry);
+      (estimate as any).parts_estimate = formatMoneyRange(figures.shopParts);
+      (estimate as any).labor_estimate = formatMoneyRange(figures.shopLabor);
+      (estimate as any).labor_hours = `${figures.laborHours[0]}–${figures.laborHours[1]} hours`;
+      (estimate as any).cost_low = figures.shopTotal[0];
+      (estimate as any).cost_high = figures.shopTotal[1];
+      (estimate as any).rate_source = RATE_SOURCE_ID;
     }
 
     (estimate as any).general_estimate = isGeneralEstimate;
