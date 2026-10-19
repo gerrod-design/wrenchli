@@ -175,7 +175,10 @@ export default function VehicleRecord() {
   const [showMileageAsk, setShowMileageAsk] = useState(false);
 
   useEffect(() => {
-    if (!vehicleId || record.sectionsLoading) return;
+    // Gate on the vehicle row itself: during the pre-auth pass the record is
+    // empty (readings not yet loaded), and deciding "stale" then would show
+    // the ask for vehicles whose newest reading is fresh — and burn the caps.
+    if (!vehicleId || record.sectionsLoading || !record.vehicle) return;
     const latest = record.latestReading;
     const stale =
       !latest ||
@@ -199,7 +202,7 @@ export default function VehicleRecord() {
     setShowMileageAsk(true);
     // latestReading identity changes on refresh; the caps above gate repeats.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vehicleId, record.sectionsLoading]);
+  }, [vehicleId, record.sectionsLoading, record.vehicle]);
 
   const dismissMileageAsk = () => {
     if (!vehicleId) return;
