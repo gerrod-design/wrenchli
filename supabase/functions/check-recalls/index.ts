@@ -11,6 +11,13 @@ import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 //   (trim token, model, series + normalized variants). A sibling trim's name
 //   is never a candidate, so another trim's recalls can never be accepted
 //   as this vehicle's.
+// Batch 5 (spec SS5): the decode is now a STORED identity on the vehicle
+// row (vin_decoded_line / vin_decoded_trim / ...). The check reads those
+// fields; a live vPIC decode happens only when no stored decode exists and
+// a VIN is present, and its result is persisted for next time. A vehicle
+// with no VIN has no trustworthy identity: the check fails closed into
+// "recall status unavailable" — owner-typed display names are never used
+// as lookup candidates.
 // - NHTSA answers "no campaigns for this make/model/year" with HTTP 400 and
 //   an empty body shape — the same response it gives an unrecognized model.
 //   If every candidate fails at the vehicle's year, the primary candidates
@@ -45,6 +52,11 @@ interface VehicleRow {
   model: string;
   year: number;
   trim: string | null;
+  vin_decoded_line: string | null;
+  vin_decoded_trim: string | null;
+  vin_decoded_series: string | null;
+  vin_decoded_make: string | null;
+  vin_trim_known_gap: boolean;
 }
 
 interface VpicDecode {
@@ -52,6 +64,9 @@ interface VpicDecode {
   Model?: string;
   Trim?: string;
   Series?: string;
+  BodyClass?: string;
+  DriveType?: string;
+  ModelYear?: string;
 }
 
 function jsonResponse(body: unknown, status: number, corsHeaders: Record<string, string>) {
@@ -113,13 +128,16 @@ async function decodeVin(vin: string): Promise<VpicDecode | null> {
       Model: row.Model || undefined,
       Trim: row.Trim || undefined,
       Series: row.Series || undefined,
+      BodyClass: row.BodyClass || undefined,
+      DriveType: row.DriveType || undefined,
+      ModelYear: row.ModelYear || undefined,
     };
   } catch {
     return null;
   }
 }
 
-function buildCandidates(vehicle: VehicleRow, decode: VpicDecode | null): string[] {
+function buildCandidates(decode: VpicDecode | null): string[] {
   const candidates: string[] = [];
   const push = (value: string | null | undefined) => {
     if (!value) return;
@@ -127,18 +145,18 @@ function buildCandidates(vehicle: VehicleRow, decode: VpicDecode | null): string
     if (cleaned.length >= 2 && !candidates.includes(cleaned)) candidates.push(cleaned);
   };
 
+  // Batch 5 (spec SS5): candidates come ONLY from the decoded identity —
+  // never the display model string, never an owner-typed trim.
   // Most specific first: the trim-level model token from this vehicle's own
   // decode (e.g. "GLC300" out of Trim "GLC300 Base-4M").
-  const trimRaw = decode?.Trim || vehicle.trim || "";
+  const trimRaw = decode?.Trim || "";
   const trimToken = trimRaw.split(/[\s/-]+/).filter(Boolean)[0] || "";
   if (trimToken.length >= 3 && !TRIM_TOKEN_STOPLIST.has(trimToken.toLowerCase())) {
     push(trimToken);
   }
 
   push(decode?.Model);
-  push(vehicle.model);
   push(decode?.Series);
-  push(vehicle.trim ? vehicle.trim.split(/[\s]+/).slice(0, 2).join(" ") : null);
 
   // Normalized variants of everything above: hyphen<->space and class/series
   // suffix stripping ("GLC-Class" -> "GLC Class" -> "GLC").
@@ -197,9 +215,61 @@ async function runCheckForVehicle(
   supabase: ReturnType<typeof createClient>,
   vehicle: VehicleRow,
 ): Promise<{ vehicle_id: string; status: "ok" | "failed"; recalls_found: number; new_recalls: number; model_used: string | null }> {
-  const decode = vehicle.vin ? await decodeVin(vehicle.vin) : null;
-  const make = decode?.Make || vehicle.make;
-  const candidates = buildCandidates(vehicle, decode);
+  // Batch 5 (spec SS5): identity comes from the stored decode. A live
+  // decode is only a backfill for vehicles that predate the stored fields,
+  // and its result is persisted (with the known-gap flag when vPIC returns
+  // no trim) so the next check reads stored identity like every other.
+  let decode: VpicDecode | null = null;
+  if (vehicle.vin_decoded_line || vehicle.vin_decoded_trim || vehicle.vin_decoded_series) {
+    decode = {
+      Make: vehicle.vin_decoded_make || undefined,
+      Model: vehicle.vin_decoded_line || undefined,
+      Trim: vehicle.vin_decoded_trim || undefined,
+      Series: vehicle.vin_decoded_series || undefined,
+    };
+  } else if (vehicle.vin) {
+    decode = await decodeVin(vehicle.vin);
+    if (decode) {
+      await supabase
+        .from("user_vehicles")
+        .update({
+          vin_decoded_line: decode.Model ?? null,
+          vin_decoded_trim: decode.Trim ?? null,
+          vin_decoded_series: decode.Series ?? null,
+          vin_decoded_body: decode.BodyClass ?? null,
+          vin_decoded_drivetrain: decode.DriveType ?? null,
+          vin_decoded_year: decode.ModelYear ? parseInt(decode.ModelYear, 10) : null,
+          vin_decoded_make: decode.Make ?? null,
+          vin_decode_provider: "vPIC (NHTSA)",
+          vin_decoded_at: new Date().toISOString(),
+          vin_trim_known_gap: !decode.Trim,
+        })
+        .eq("id", vehicle.id);
+    }
+  }
+
+  if (!decode) {
+    // No VIN, or the decode failed: there is no trustworthy identity to
+    // look up. Fail closed — the Garage shows "recall status unavailable".
+    await supabase.from("vehicle_recall_checks").upsert(
+      {
+        vehicle_id: vehicle.id,
+        status: "failed",
+        checked_at: new Date().toISOString(),
+        campaigns_found: null,
+        model_used: null,
+        note: null,
+        error: vehicle.vin
+          ? "The VIN decode failed, so this vehicle's recall status cannot be determined right now."
+          : "No VIN is on record for this vehicle, so its recall status cannot be determined — owner-typed names are never used for recall lookups.",
+      },
+      { onConflict: "vehicle_id" },
+    );
+    return { vehicle_id: vehicle.id, status: "failed", recalls_found: 0, new_recalls: 0, model_used: null };
+  }
+
+  const make = decode.Make || vehicle.make;
+  const candidates = buildCandidates(decode);
   const outcome = await resolveRecalls(make, candidates, vehicle.year);
 
   if (!outcome.ok) {
@@ -317,7 +387,7 @@ Deno.serve(async (req) => {
     if (userVehicleId) {
       const { data: vehicle, error: vErr } = await supabase
         .from("user_vehicles")
-        .select("id, user_id, vin, make, model, year, trim")
+        .select("id, user_id, vin, make, model, year, trim, vin_decoded_line, vin_decoded_trim, vin_decoded_series, vin_decoded_make, vin_trim_known_gap")
         .eq("id", userVehicleId)
         .maybeSingle();
 
@@ -347,7 +417,7 @@ Deno.serve(async (req) => {
 
     const { data: vehicles, error: fleetErr } = await supabase
       .from("user_vehicles")
-      .select("id, user_id, vin, make, model, year, trim")
+      .select("id, user_id, vin, make, model, year, trim, vin_decoded_line, vin_decoded_trim, vin_decoded_series, vin_decoded_make, vin_trim_known_gap")
       .order("created_at", { ascending: true });
     if (fleetErr) throw fleetErr;
 

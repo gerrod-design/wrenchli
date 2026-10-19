@@ -24,7 +24,9 @@ interface Vehicle {
   year: number;
   make: string;
   model: string;
-  current_mileage?: number;
+  // Batch 5 (R-50): derived latest ledger reading in miles, supplied by
+  // the caller; null = no reading on record (never silently 0).
+  current_miles?: number | null;
   driving_style?: string;
   usage_type?: string;
 }

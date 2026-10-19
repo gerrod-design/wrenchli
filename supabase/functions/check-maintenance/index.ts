@@ -82,17 +82,20 @@ Deno.serve(async (req) => {
 
     const { data: vehicles, error: vErr } = await supabase
       .from("user_vehicles")
-      .select("id, make, model, year, current_mileage, user_id")
-      .not("current_mileage", "is", null);
+      .select("id, make, model, year, user_id, annual_mileage_estimate")
+      .eq("is_active", true);
 
     if (vErr) throw vErr;
     if (!vehicles || vehicles.length === 0) {
-      return new Response(JSON.stringify({ message: "No vehicles with mileage data", alerts: 0 }), {
+      return new Response(JSON.stringify({ message: "No vehicles", alerts: 0 }), {
         headers: { ...securityHeaders, "Content-Type": "application/json" },
       });
     }
 
     let totalAlerts = 0;
+    let basisChecked = 0;
+    let skippedNoReading = 0;
+    let skippedStaleReading = 0;
     // R-53: failures are counted and reported, never swallowed.
     let failureCount = 0;
     const failedVehicleIds: string[] = [];
@@ -108,7 +111,48 @@ Deno.serve(async (req) => {
 
         if ((prefData?.inapp_maintenance ?? true) === false) continue;
 
-        const currentMileage = vehicle.current_mileage;
+        // Batch 5 (R-50, spec SS1/SS3 + decision Q3): the current-mileage
+        // basis is DERIVED from the readings ledger — greatest reading_date,
+        // ties to Observed, disputed/superseded excluded. While the latest
+        // reading is <= 18 months old, due-ness may project from it using
+        // the owner's own stated annual rate, and the alert must say it is
+        // estimate-based. Past 18 months there is no estimate ("reading too
+        // old to estimate") and no alert is computed from mileage at all.
+        // A vehicle with no sourced reading gets no mileage-based alert.
+        const { data: readingRows } = await supabase
+          .from("vehicle_mileage_readings")
+          .select("odometer_miles, reading_date, layer, created_at")
+          .eq("vehicle_id", vehicle.id)
+          .eq("status", "current");
+        const eligible = (readingRows || []) as { odometer_miles: number; reading_date: string; layer: string; created_at: string }[];
+        if (eligible.length === 0) {
+          skippedNoReading++;
+          continue;
+        }
+        eligible.sort((a, b) => {
+          if (a.reading_date !== b.reading_date) return b.reading_date.localeCompare(a.reading_date);
+          if (a.layer !== b.layer) return a.layer === "observed" ? -1 : 1;
+          return b.created_at.localeCompare(a.created_at);
+        });
+        const latestReading = eligible[0];
+        const readingDateMs = new Date(`${latestReading.reading_date}T12:00:00Z`).getTime();
+        const ageMonths = (Date.now() - readingDateMs) / (30.4375 * 24 * 60 * 60 * 1000);
+        if (ageMonths > 18) {
+          skippedStaleReading++;
+          continue;
+        }
+        basisChecked++;
+        const annualRate = (vehicle as { annual_mileage_estimate: number | null }).annual_mileage_estimate;
+        let currentMileage = Number(latestReading.odometer_miles);
+        let estimateBasis = "";
+        if (annualRate != null && ageMonths > 0) {
+          currentMileage = Math.round(currentMileage + annualRate * (ageMonths / 12));
+          estimateBasis =
+            ` Mileage is an estimate projected from the reading of ${Number(latestReading.odometer_miles).toLocaleString()} miles recorded on ${latestReading.reading_date}, using your stated ${Number(annualRate).toLocaleString()} miles per year.`;
+        } else {
+          estimateBasis =
+            ` Based on your mileage reading of ${Number(latestReading.odometer_miles).toLocaleString()} miles recorded on ${latestReading.reading_date}.`;
+        }
         const vehicleName = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
 
         const { data: records } = await supabase
@@ -183,7 +227,7 @@ Deno.serve(async (req) => {
             ? `${Math.abs(milesUntilDue).toLocaleString()} miles overdue`
             : `due in ${milesUntilDue.toLocaleString()} miles`;
 
-          const summary = `${item.label} for your ${vehicleName} is ${milesText}. Estimated cost: $${item.costLow}–$${item.costHigh}.`;
+          const summary = `${item.label} for your ${vehicleName} is ${milesText}. Estimated cost: $${item.costLow}–$${item.costHigh}.${estimateBasis}`;
 
           const { error: insertErr } = await supabase
             .from("maintenance_alerts")
@@ -272,9 +316,10 @@ Deno.serve(async (req) => {
     const runFailed = failureCount > 0 || emailsFailed > 0;
     return new Response(
       JSON.stringify({
-        message: `Checked ${vehicles.length} vehicles, created ${totalAlerts} maintenance alerts, sent ${emailsSent} emails` +
+        message: `Checked ${vehicles.length} vehicles (${basisChecked} with a usable mileage basis, ${skippedNoReading} skipped with no reading on record, ${skippedStaleReading} skipped with a reading too old to estimate), created ${totalAlerts} maintenance alerts, sent ${emailsSent} emails` +
           (runFailed ? `, ${emailsFailed} emails failed, ${failureCount} processing failures` : ""),
-        checked: vehicles.length, newAlerts: totalAlerts, emailsSent, emailsFailed,
+        checked: vehicles.length, basisChecked, skippedNoReading, skippedStaleReading,
+        newAlerts: totalAlerts, emailsSent, emailsFailed,
         failures: failureCount, failedVehicleIds,
       }),
       { status: runFailed ? 502 : 200, headers: { ...securityHeaders, "Content-Type": "application/json" } }

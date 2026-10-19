@@ -13,6 +13,8 @@ import { getUpcomingMaintenance } from "@/data/maintenanceSchedule";
 interface Props {
   vehicle: GarageVehicle;
   cloudVehicle?: CloudVehicle;
+  /** Batch 5: derived latest ledger reading in miles (null = no reading). */
+  currentMiles?: number | null;
   upcomingMaintenance: UpcomingMaintenance[];
   isSelected: boolean;
   onClick: () => void;
@@ -25,9 +27,9 @@ const PRIORITY_STYLES = {
   upcoming: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
 };
 
-export default function GarageOverviewCard({ vehicle, cloudVehicle, upcomingMaintenance, isSelected, onClick }: Props) {
+export default function GarageOverviewCard({ vehicle, cloudVehicle, currentMiles, upcomingMaintenance, isSelected, onClick }: Props) {
   const displayName = [vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ");
-  const mileage = cloudVehicle?.current_mileage;
+  const mileage = currentMiles ?? undefined;
 
   // Get worst priority among upcoming maintenance
   const worstPriority = upcomingMaintenance.length > 0

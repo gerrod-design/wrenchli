@@ -9,6 +9,13 @@ import {
   weakPointCheckKey,
 } from "@/lib/garageRecord";
 import { downloadGarageRecordPdf } from "@/lib/garageRecordPdf";
+import {
+  deriveDiscrepancy,
+  deriveLatestReading,
+  type MileageReading,
+  type MileageSource,
+  type ReadingDisputeFact,
+} from "@/lib/mileage";
 import type {
   BaselineResponseValue,
   GarageMediaRef,
@@ -35,6 +42,19 @@ export interface AddTimelineInput {
   occurredAt?: string;
   odometer?: number | null;
   media?: GarageMediaRef[];
+}
+
+export interface AddReadingInput {
+  odometer_value: number;
+  unit: "mi" | "km";
+  reading_date: string;
+  source: MileageSource;
+  source_detail?: string | null;
+  layer: RecordLayer;
+  outlier_confirmed?: boolean;
+  evidence_media?: GarageMediaRef[];
+  /** Correction path: the reading this one replaces (marked superseded). */
+  supersedesId?: string;
 }
 
 export interface AttachDocumentInput {
@@ -86,6 +106,8 @@ export function useVehicleRecord(vehicleId?: string) {
   const [responses, setResponses] = useState<VehicleBaselineResponse[]>([]);
   const [documents, setDocuments] = useState<VehicleDocument[]>([]);
   const [sharePermissions, setSharePermissions] = useState<VehicleSharePermissionFields[]>([]);
+  const [readings, setReadings] = useState<MileageReading[]>([]);
+  const [disputeFacts, setDisputeFacts] = useState<ReadingDisputeFact[]>([]);
   const [loading, setLoading] = useState(true);
   const [vehicleLoading, setVehicleLoading] = useState(true);
   const [sectionsLoading, setSectionsLoading] = useState(true);
@@ -103,19 +125,42 @@ export function useVehicleRecord(vehicleId?: string) {
     setSectionsLoading(true);
     setError(null);
     try {
-      const vehicleResult = await supabase
+      // Batch 5 / R-28 rider: the identity query and every section query
+      // fire CONCURRENTLY. Previously the sections waited for the vehicle
+      // row to return before starting, serializing two round trips into
+      // the page's settle time; only the weak-point filter actually needs
+      // the vehicle, and it is applied after both resolve.
+      const vehiclePromise = supabase
         .from("user_vehicles")
-        .select("id, user_id, year, make, model, trim, nickname, vin, photo_url, current_mileage, created_at")
+        .select("id, user_id, year, make, model, trim, nickname, vin, photo_url, created_at, annual_mileage_estimate, driving_style, usage_type, profile_provenance, vin_decoded_line, vin_decoded_trim, vin_decoded_series, vin_decoded_body, vin_decoded_drivetrain, vin_decoded_year, vin_decoded_make, vin_decode_provider, vin_decoded_at, vin_trim_known_gap")
         .eq("id", vehicleId)
         .eq("user_id", user.id)
         .single();
-      if (vehicleResult.error) throw vehicleResult.error;
-      const loadedVehicle = vehicleResult.data as GarageVehicle;
-      setVehicle(loadedVehicle);
-      setVehicleLoading(false);
+      const readingsPromise = supabase
+        .from("vehicle_mileage_readings")
+        .select("*")
+        .eq("vehicle_id", vehicleId)
+        .order("reading_date", { ascending: false })
+        .order("created_at", { ascending: false });
+      const disputesPromise = supabase
+        .from("vehicle_mileage_reading_disputes")
+        .select("*")
+        .eq("vehicle_id", vehicleId)
+        .order("created_at", { ascending: false });
 
-      const [timelineResult, checksResult, weakResult, baselinesResult, responsesResult, docsResult, sharesResult] =
+      // Progressive render (Batch 4) is retained: the identity header
+      // paints as soon as the vehicle row lands, without waiting for the
+      // sections, even though all queries started together.
+      void vehiclePromise.then((r) => {
+        if (!r.error && r.data) {
+          setVehicle(r.data as unknown as GarageVehicle);
+          setVehicleLoading(false);
+        }
+      });
+
+      const [vehicleResult, timelineResult, checksResult, weakResult, baselinesResult, responsesResult, docsResult, sharesResult, readingsResult, disputesResult] =
         await Promise.all([
+          vehiclePromise,
           supabase
             .from("vehicle_timeline_events" as any)
             .select("*")
@@ -151,13 +196,23 @@ export function useVehicleRecord(vehicleId?: string) {
             .select("*")
             .eq("vehicle_id", vehicleId)
             .order("created_at", { ascending: false }),
+          readingsPromise,
+          disputesPromise,
         ]);
+
+      if (vehicleResult.error) throw vehicleResult.error;
+      const loadedVehicle = vehicleResult.data as unknown as GarageVehicle;
+      setVehicle(loadedVehicle);
+      setVehicleLoading(false);
 
       const firstError =
         timelineResult.error || checksResult.error || weakResult.error || baselinesResult.error ||
-        responsesResult.error || docsResult.error || sharesResult.error;
+        responsesResult.error || docsResult.error || sharesResult.error ||
+        readingsResult.error || disputesResult.error;
       if (firstError) throw firstError;
 
+      setReadings((readingsResult.data ?? []) as unknown as MileageReading[]);
+      setDisputeFacts((disputesResult.data ?? []) as unknown as ReadingDisputeFact[]);
       setTimeline((timelineResult.data ?? []) as VehicleTimelineEvent[]);
       setConditionChecks((checksResult.data ?? []) as VehicleConditionCheck[]);
       setWeakPoints(
@@ -181,6 +236,16 @@ export function useVehicleRecord(vehicleId?: string) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // Batch 5 (spec SS1/SS3): derived mileage state. The display value is
+  // computed from the ledger on every render — greatest reading_date,
+  // ties to Observed, disputed/superseded excluded — never read from a
+  // stored attribute.
+  const latestReading = useMemo(() => deriveLatestReading(readings), [readings]);
+  const mileageDiscrepancy = useMemo(
+    () => deriveDiscrepancy(readings, disputeFacts),
+    [readings, disputeFacts],
+  );
 
   const currentConditionChecks = useMemo(() => {
     const latestByKey = new Map<string, VehicleConditionCheck>();
@@ -326,7 +391,7 @@ export function useVehicleRecord(vehicleId?: string) {
           vehicle_id: vehicle.id,
           owner_user_id: user.id,
           vin: vehicle.vin,
-          odometer: odometer ?? vehicle.current_mileage ?? null,
+          odometer: odometer ?? latestReading?.odometer_miles ?? null,
           status: "in_progress",
         })
         .select("*")
@@ -335,7 +400,7 @@ export function useVehicleRecord(vehicleId?: string) {
       await refresh();
       return data as VehicleBaseline;
     },
-    [baselines, refresh, user, vehicle],
+    [baselines, latestReading, refresh, user, vehicle],
   );
 
   const saveBaselineResponse = useCallback(
@@ -470,6 +535,132 @@ export function useVehicleRecord(vehicleId?: string) {
     [refresh],
   );
 
+  // ── Mileage ledger actions (Batch 5, spec SS1–SS4) ──────────────────
+  const addReading = useCallback(
+    async (input: AddReadingInput) => {
+      if (!vehicle || !user) throw new Error("Sign in and open a Garage vehicle first.");
+      const { data, error: insertError } = await supabase
+        .from("vehicle_mileage_readings")
+        .insert({
+          vehicle_id: vehicle.id,
+          owner_user_id: user.id,
+          odometer_value: input.odometer_value,
+          unit: input.unit,
+          reading_date: input.reading_date,
+          source: input.source,
+          source_detail: input.source_detail?.trim() || null,
+          layer: input.layer,
+          outlier_confirmed: input.outlier_confirmed ?? false,
+          evidence_media: input.evidence_media ?? [],
+        })
+        .select("*")
+        .single();
+      if (insertError) throw insertError;
+      const created = data as unknown as MileageReading;
+      if (input.supersedesId) {
+        // Correction path (spec SS2): the wrong reading is never edited —
+        // it is marked superseded, pointing at its replacement.
+        const { error: linkError } = await supabase
+          .from("vehicle_mileage_readings")
+          .update({ status: "superseded", superseded_by: created.id })
+          .eq("id", input.supersedesId);
+        if (linkError) throw linkError;
+      }
+      await refresh();
+      return created;
+    },
+    [refresh, user, vehicle],
+  );
+
+  const addDisputeFact = useCallback(
+    async (kind: ReadingDisputeFact["kind"], readingId: string | null, reason: string) => {
+      if (!vehicle || !user) throw new Error("Sign in and open a Garage vehicle first.");
+      const trimmed = reason.trim();
+      if (!trimmed) throw new Error("A reason is required.");
+      const { error: factError } = await supabase
+        .from("vehicle_mileage_reading_disputes")
+        .insert({
+          vehicle_id: vehicle.id,
+          reading_id: readingId,
+          kind,
+          raised_by: user.id,
+          reason: trimmed,
+        });
+      if (factError) throw factError;
+    },
+    [user, vehicle],
+  );
+
+  const disputeReading = useCallback(
+    async (reading: MileageReading, reason: string) => {
+      // Spec SS3/SS5-decision Q5: disputing is a stamped fact plus a status
+      // transition. The reading itself is never edited or deleted, and a
+      // shop (Observed) reading is flagged exactly the same way.
+      await addDisputeFact("dispute", reading.id, reason);
+      const { error: statusError } = await supabase
+        .from("vehicle_mileage_readings")
+        .update({ status: "disputed" })
+        .eq("id", reading.id);
+      if (statusError) throw statusError;
+      await refresh();
+    },
+    [addDisputeFact, refresh],
+  );
+
+  const dismissDispute = useCallback(
+    async (reading: MileageReading, reason: string) => {
+      await addDisputeFact("dispute_dismissal", reading.id, reason);
+      const { error: statusError } = await supabase
+        .from("vehicle_mileage_readings")
+        .update({ status: "current" })
+        .eq("id", reading.id);
+      if (statusError) throw statusError;
+      await refresh();
+    },
+    [addDisputeFact, refresh],
+  );
+
+  const dismissDiscrepancy = useCallback(
+    async (reason: string) => {
+      await addDisputeFact("discrepancy_dismissal", null, reason);
+      await refresh();
+    },
+    [addDisputeFact, refresh],
+  );
+
+  const saveProfileFields = useCallback(
+    async (fields: {
+      annual_mileage_estimate?: number | null;
+      driving_style?: string | null;
+      usage_type?: string | null;
+    }) => {
+      if (!vehicle || !user) throw new Error("Sign in and open a Garage vehicle first.");
+      // R-57: a profile value exists only where the owner supplied it, and
+      // every stored value carries its provenance stamp in the same write —
+      // the database gatekeeper rejects a value without one.
+      const provenance: Record<string, { source: string; recorded_at: string }> = {
+        ...((vehicle.profile_provenance as Record<string, { source: string; recorded_at: string }> | null) ?? {}),
+      };
+      const update: Record<string, unknown> = {};
+      (Object.keys(fields) as Array<keyof typeof fields>).forEach((key) => {
+        update[key] = fields[key];
+        if (fields[key] !== null && fields[key] !== undefined) {
+          provenance[key] = { source: "owner_reported", recorded_at: new Date().toISOString() };
+        } else {
+          delete provenance[key];
+        }
+      });
+      update.profile_provenance = provenance;
+      const { error: updateError } = await supabase
+        .from("user_vehicles")
+        .update(update as never)
+        .eq("id", vehicle.id);
+      if (updateError) throw updateError;
+      await refresh();
+    },
+    [refresh, user, vehicle],
+  );
+
   const exportPdf = useCallback(() => {
     if (!vehicle) return;
     downloadGarageRecordPdf({
@@ -495,6 +686,10 @@ export function useVehicleRecord(vehicleId?: string) {
     responses,
     documents,
     sharePermissions,
+    readings,
+    disputeFacts,
+    latestReading,
+    mileageDiscrepancy,
     loading,
     vehicleLoading,
     sectionsLoading,
@@ -504,6 +699,11 @@ export function useVehicleRecord(vehicleId?: string) {
     getSignedMediaUrl,
     addTimelineEvent,
     attachDocument,
+    addReading,
+    disputeReading,
+    dismissDispute,
+    dismissDiscrepancy,
+    saveProfileFields,
     startBaseline,
     saveBaselineResponse,
     completeBaseline,

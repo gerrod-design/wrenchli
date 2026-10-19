@@ -5,7 +5,10 @@ interface Vehicle {
   year: number;
   make: string;
   model: string;
-  current_mileage?: number;
+  // Batch 5 (R-50): the derived latest ledger reading in miles, supplied
+  // by the caller. Null means NO reading exists — consumers must skip
+  // mileage-based logic, never treat the absence as 0 miles.
+  current_miles?: number | null;
   driving_style?: string;
   usage_type?: string;
   annual_mileage_estimate?: number;
@@ -94,7 +97,8 @@ export class InsightsEngine {
 
   private static async generateMaintenanceInsights(vehicle: Vehicle): Promise<ProactiveInsight[]> {
     const insights: ProactiveInsight[] = [];
-    const currentMileage = vehicle.current_mileage || 0;
+    if (vehicle.current_miles == null) return insights;
+    const currentMileage = vehicle.current_miles;
     const vehicleAge = new Date().getFullYear() - vehicle.year;
     const maintenanceSchedule = this.getMaintenanceSchedule(vehicle.make, currentMileage, vehicleAge);
 
@@ -132,7 +136,7 @@ export class InsightsEngine {
     const insights: ProactiveInsight[] = [];
     const marketAnalysis = await this.getMarketAnalysis(vehicle);
     const vehicleAge = new Date().getFullYear() - vehicle.year;
-    const currentMileage = vehicle.current_mileage || 0;
+    const currentMileage = vehicle.current_miles ?? Number.POSITIVE_INFINITY;
 
     if (vehicleAge >= 5 && vehicleAge <= 8 && currentMileage < 100000) {
       insights.push({
@@ -180,7 +184,7 @@ export class InsightsEngine {
     const reliabilityAlerts = this.getReliabilityAlerts(vehicle);
 
     reliabilityAlerts.forEach((alert) => {
-      const currentMileage = vehicle.current_mileage || 0;
+      const currentMileage = vehicle.current_miles ?? -1;
       const isInRiskRange =
         currentMileage >= alert.typical_mileage_range.min &&
         currentMileage <= alert.typical_mileage_range.max + 20000;
@@ -221,7 +225,7 @@ export class InsightsEngine {
   private static async generateFinancialInsights(vehicle: Vehicle): Promise<ProactiveInsight[]> {
     const insights: ProactiveInsight[] = [];
     const vehicleAge = new Date().getFullYear() - vehicle.year;
-    const currentMileage = vehicle.current_mileage || 0;
+    const currentMileage = vehicle.current_miles ?? 0;
 
     if (vehicleAge >= 7 || currentMileage > 90000) {
       const estimatedAnnualMaintenance = this.estimateAnnualMaintenanceCost(vehicle);
@@ -379,14 +383,14 @@ export class InsightsEngine {
 
   private static async getMarketAnalysis(vehicle: Vehicle): Promise<MarketAnalysis> {
     const vehicleAge = new Date().getFullYear() - vehicle.year;
-    const currentMileage = vehicle.current_mileage || 0;
+    const currentMileage = vehicle.current_miles ?? null;
 
     let baseValue = 30000;
     if (["Honda", "Toyota", "Mazda"].includes(vehicle.make)) baseValue = 28000;
     if (["BMW", "Mercedes-Benz", "Audi"].includes(vehicle.make)) baseValue = 45000;
 
     const ageDepreciation = baseValue * Math.min(vehicleAge * 0.15, 0.8);
-    const mileageDepreciation = (currentMileage - vehicleAge * 12000) * 0.15;
+    const mileageDepreciation = currentMileage == null ? 0 : (currentMileage - vehicleAge * 12000) * 0.15;
     const currentValue = Math.max(baseValue - ageDepreciation - mileageDepreciation, 2000);
 
     const trendPercentage = (Math.random() - 0.5) * 10;
@@ -487,7 +491,7 @@ export class InsightsEngine {
 
   private static estimateAnnualMaintenanceCost(vehicle: Vehicle): number {
     const vehicleAge = new Date().getFullYear() - vehicle.year;
-    const currentMileage = vehicle.current_mileage || 0;
+    const currentMileage = vehicle.current_miles ?? 0;
 
     let baseCost = 800;
 

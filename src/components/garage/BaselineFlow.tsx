@@ -249,8 +249,10 @@ export function BaselineFlow({ record }: { record: RecordApi }) {
   }, [defaultSource, sourceName]);
 
   useEffect(() => {
-    if (!odometer && vehicle?.current_mileage) setOdometer(String(vehicle.current_mileage));
-  }, [odometer, vehicle?.current_mileage]);
+    // Batch 5: the baseline odometer prefill comes from the latest sourced
+    // ledger reading — never a stored bare attribute.
+    if (!odometer && record.latestReading) setOdometer(String(Math.round(record.latestReading.odometer_miles)));
+  }, [odometer, record.latestReading]);
 
   const selectedBaseline = useMemo(() => {
     if (startNewRequested) return null;

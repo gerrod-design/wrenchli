@@ -76,6 +76,10 @@ function AddVehicleDialog({
   const [mileage, setMileage] = useState("");
   const [nickname, setNickname] = useState("");
   const [vinDecoded, setVinDecoded] = useState(false);
+  // Batch 5 (spec SS5): the raw VIN-decode result, persisted as the
+  // vehicle's decoded identity (separate from the display strings) when
+  // the vehicle is saved.
+  const [vinDecodeResult, setVinDecodeResult] = useState<Record<string, string> | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoSkipped, setPhotoSkipped] = useState(false);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
@@ -102,6 +106,7 @@ function AddVehicleDialog({
     setYear(""); setMake(""); setModel(""); setTrim("");
     setMileage(""); setNickname("");
     setVinDecoded(false);
+    setVinDecodeResult(null);
     setPhotoFile(null);
     setPhotoSkipped(false);
     setPhotoPreviewUrl(null);
@@ -136,6 +141,7 @@ function AddVehicleDialog({
       if (result.Make) setMake(result.Make);
       if (result.Model) setModel(result.Model);
       if (result.Trim) setTrim(result.Trim);
+      setVinDecodeResult(result as Record<string, string>);
       setVinDecoded(true);
     } catch {
       setVinError("We couldn't decode that VIN. Please fill in your vehicle details manually.");
@@ -157,13 +163,46 @@ function AddVehicleDialog({
           model,
           trim: trim || null,
           vin: vin.length === 17 ? vin : null,
-          current_mileage: mileage ? parseInt(mileage) : null,
           nickname: nickname || null,
+          // Batch 5 (spec SS5): persist the decode itself as identity.
+          ...(vinDecodeResult
+            ? {
+                vin_decoded_line: vinDecodeResult.Model || null,
+                vin_decoded_trim: vinDecodeResult.Trim || null,
+                vin_decoded_series: vinDecodeResult.Series || null,
+                vin_decoded_body: vinDecodeResult.BodyClass || null,
+                vin_decoded_drivetrain: vinDecodeResult.DriveType || null,
+                vin_decoded_year: vinDecodeResult.ModelYear ? parseInt(vinDecodeResult.ModelYear) : null,
+                vin_decoded_make: vinDecodeResult.Make || null,
+                vin_decode_provider: "vPIC (NHTSA)",
+                vin_decoded_at: new Date().toISOString(),
+                vin_trim_known_gap: !vinDecodeResult.Trim,
+              }
+            : {}),
         })
         .select("id")
         .single();
 
       if (error) throw error;
+
+      // Batch 5 (R-50): a mileage typed at add time becomes the vehicle's
+      // first ledger reading — dated today, sourced to the owner — never a
+      // bare attribute on the vehicle row.
+      if (data?.id && mileage) {
+        const { error: readingError } = await supabase.from("vehicle_mileage_readings").insert({
+          vehicle_id: data.id,
+          owner_user_id: user.id,
+          odometer_value: parseInt(mileage),
+          unit: "mi",
+          reading_date: new Date().toISOString().slice(0, 10),
+          source: "owner_reported",
+          source_detail: "Reported when the vehicle was added",
+          layer: "reported",
+        });
+        if (readingError) {
+          toast.warning("Vehicle added — the mileage reading could not be saved. You can record it from the vehicle's record.");
+        }
+      }
 
       // Call check-recalls for new vehicle. R-51 (Batch 1.5): a failed check
       // is surfaced to the user, never swallowed to the console — the Garage
@@ -304,13 +343,14 @@ function AddVehicleDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-xs">Mileage</Label>
+              <Label className="text-xs">Current mileage (optional)</Label>
               <Input
                 placeholder="e.g. 45000"
                 inputMode="numeric"
                 value={mileage}
                 onChange={(e) => setMileage(e.target.value.replace(/\D/g, ""))}
               />
+              <p className="text-[11px] text-muted-foreground">Saved as a dated reading with you as its source.</p>
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Nickname</Label>
@@ -449,7 +489,6 @@ function EditVehicleDialog({
   onUpdated: () => void;
 }) {
   const [nickname, setNickname] = useState(vehicle?.nickname || "");
-  const [mileage, setMileage] = useState(vehicle?.current_mileage?.toString() || "");
   const [trim, setTrim] = useState(vehicle?.trim || "");
   const [loading, setLoading] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(vehicle?.photo_url ?? null);
@@ -460,7 +499,6 @@ function EditVehicleDialog({
   useEffect(() => {
     if (vehicle) {
       setNickname(vehicle.nickname || "");
-      setMileage(vehicle.current_mileage?.toString() || "");
       setTrim(vehicle.trim || "");
       setPhotoUrl(vehicle.photo_url ?? null);
     }
@@ -473,7 +511,6 @@ function EditVehicleDialog({
       .from("user_vehicles")
       .update({
         nickname: nickname || null,
-        current_mileage: mileage ? parseInt(mileage) : null,
         trim: trim || null,
       })
       .eq("id", vehicle.id);
@@ -527,15 +564,10 @@ function EditVehicleDialog({
             <Label className="text-xs">Nickname</Label>
             <Input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="e.g. Daily Driver" />
           </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Mileage</Label>
-            <Input
-              value={mileage}
-              onChange={(e) => setMileage(e.target.value.replace(/\D/g, ""))}
-              placeholder="e.g. 45000"
-              inputMode="numeric"
-            />
-          </div>
+          <p className="text-xs text-muted-foreground">
+            Mileage is kept in the vehicle's record as dated, sourced readings — open the
+            vehicle to record or correct it.
+          </p>
           <div className="space-y-1">
             <Label className="text-xs">Trim</Label>
             <Input value={trim} onChange={(e) => setTrim(e.target.value)} placeholder="e.g. SE" />
@@ -557,7 +589,7 @@ export default function Garage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { vehicles, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
+  const { vehicles, latestReadings, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
 
   const vehicleIds = useMemo(() => vehicles.map((v) => v.id), [vehicles]);
   const { recalls, recallChecks, recallUnavailableVehicleIds, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
@@ -688,6 +720,7 @@ export default function Garage() {
                 <InteractiveVehicleCard
                   key={v.id}
                   vehicle={v}
+                  latestReading={latestReadings[v.id] ?? null}
                   unreadRecalls={unreadByVehicle(v.id)}
                   onDelete={handleDelete}
                   onEdit={setEditingVehicle}

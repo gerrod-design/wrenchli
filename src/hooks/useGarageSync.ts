@@ -19,8 +19,6 @@ export interface CloudVehicle {
   body_type: string | null;
   color: string | null;
   nickname: string | null;
-  current_mileage: number | null;
-  last_mileage_update: string | null;
   location_zip: string | null;
   purchase_date: string | null;
   purchase_price: number | null;
@@ -28,6 +26,22 @@ export interface CloudVehicle {
   driving_style: string | null;
   annual_mileage_estimate: number | null;
   usage_type: string | null;
+  // Batch 5 (R-57): per-field provenance stamps for the profile fields
+  // above — { <field>: { source, recorded_at } }. A non-null profile value
+  // without a stamp is rejected by the database gatekeeper.
+  profile_provenance: Record<string, { source: string; recorded_at: string }> | null;
+  // Batch 5 (spec SS5): VIN-decoded identity, stored separately from the
+  // display strings. Recall/maintenance logic reads these, never `model`.
+  vin_decoded_line: string | null;
+  vin_decoded_trim: string | null;
+  vin_decoded_series: string | null;
+  vin_decoded_body: string | null;
+  vin_decoded_drivetrain: string | null;
+  vin_decoded_year: number | null;
+  vin_decoded_make: string | null;
+  vin_decode_provider: string | null;
+  vin_decoded_at: string | null;
+  vin_trim_known_gap: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -134,26 +148,39 @@ export function useGarageSync() {
     }
   }, [user, garage.vehicles, cloudVehicles, fetchCloudVehicles]);
 
-  // Update mileage for a cloud vehicle
-  const updateMileage = useCallback(
-    async (vehicleId: string, mileage: number) => {
-      if (!user) return;
-      const { error } = await supabase
-        .from("user_vehicles")
-        .update({ current_mileage: mileage, last_mileage_update: new Date().toISOString() })
-        .eq("id", vehicleId);
-
-      if (error) {
-        toast.error("Failed to update mileage");
-        return;
+  // Record a mileage reading for a cloud vehicle (Batch 5, R-50).
+  // Mileage is an append-only ledger fact with a source — never a bare
+  // attribute write. The database gatekeeper rejects unsourced writes.
+  const addMileageReading = useCallback(
+    async (
+      vehicleId: string,
+      reading: {
+        odometer_value: number;
+        unit: "mi" | "km";
+        reading_date: string;
+        source: "owner_reported" | "dashboard_photo" | "shop_document" | "purchase_document";
+        source_detail?: string | null;
+        layer?: "reported" | "observed";
+        outlier_confirmed?: boolean;
       }
-      setCloudVehicles((prev) =>
-        prev.map((v) =>
-          v.id === vehicleId
-            ? { ...v, current_mileage: mileage, last_mileage_update: new Date().toISOString() }
-            : v
-        )
-      );
+    ) => {
+      if (!user) return false;
+      const { error } = await supabase.from("vehicle_mileage_readings").insert({
+        vehicle_id: vehicleId,
+        owner_user_id: user.id,
+        odometer_value: reading.odometer_value,
+        unit: reading.unit,
+        reading_date: reading.reading_date,
+        source: reading.source,
+        source_detail: reading.source_detail ?? null,
+        layer: reading.layer ?? "reported",
+        outlier_confirmed: reading.outlier_confirmed ?? false,
+      });
+      if (error) {
+        toast.error("Failed to record mileage");
+        return false;
+      }
+      return true;
     },
     [user]
   );
@@ -198,7 +225,7 @@ export function useGarageSync() {
     syncing,
     lastSyncAt,
     syncToCloud,
-    updateMileage,
+    addMileageReading,
     updateVehicleDetails,
     findCloudVehicle,
     fetchCloudVehicles,

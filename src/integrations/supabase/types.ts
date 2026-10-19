@@ -572,6 +572,16 @@ export type Database = {
           vehicle_trim: string | null
           vehicle_year: string | null
           vin: string | null
+          vin_decode_provider: string | null
+          vin_decoded_at: string | null
+          vin_decoded_body: string | null
+          vin_decoded_drivetrain: string | null
+          vin_decoded_line: string | null
+          vin_decoded_make: string | null
+          vin_decoded_series: string | null
+          vin_decoded_trim: string | null
+          vin_decoded_year: number | null
+          vin_trim_known_gap: boolean
           zip_code: string | null
         }
         Insert: {
@@ -611,6 +621,16 @@ export type Database = {
           vehicle_trim?: string | null
           vehicle_year?: string | null
           vin?: string | null
+          vin_decode_provider?: string | null
+          vin_decoded_at?: string | null
+          vin_decoded_body?: string | null
+          vin_decoded_drivetrain?: string | null
+          vin_decoded_line?: string | null
+          vin_decoded_make?: string | null
+          vin_decoded_series?: string | null
+          vin_decoded_trim?: string | null
+          vin_decoded_year?: number | null
+          vin_trim_known_gap?: boolean
           zip_code?: string | null
         }
         Update: {
@@ -650,6 +670,16 @@ export type Database = {
           vehicle_trim?: string | null
           vehicle_year?: string | null
           vin?: string | null
+          vin_decode_provider?: string | null
+          vin_decoded_at?: string | null
+          vin_decoded_body?: string | null
+          vin_decoded_drivetrain?: string | null
+          vin_decoded_line?: string | null
+          vin_decoded_make?: string | null
+          vin_decoded_series?: string | null
+          vin_decoded_trim?: string | null
+          vin_decoded_year?: number | null
+          vin_trim_known_gap?: boolean
           zip_code?: string | null
         }
         Relationships: [
@@ -3033,7 +3063,6 @@ export type Database = {
           body_type: string | null
           color: string | null
           created_at: string
-          current_mileage: number | null
           drive_type: string | null
           driving_style: string | null
           engine: string | null
@@ -3041,12 +3070,12 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_primary: boolean | null
-          last_mileage_update: string | null
           location_zip: string | null
           make: string
           model: string
           nickname: string | null
           photo_url: string | null
+          profile_provenance: Json
           purchase_date: string | null
           purchase_mileage: number | null
           purchase_price: number | null
@@ -3063,7 +3092,6 @@ export type Database = {
           body_type?: string | null
           color?: string | null
           created_at?: string
-          current_mileage?: number | null
           drive_type?: string | null
           driving_style?: string | null
           engine?: string | null
@@ -3071,12 +3099,12 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_primary?: boolean | null
-          last_mileage_update?: string | null
           location_zip?: string | null
           make: string
           model: string
           nickname?: string | null
           photo_url?: string | null
+          profile_provenance?: Json
           purchase_date?: string | null
           purchase_mileage?: number | null
           purchase_price?: number | null
@@ -3093,7 +3121,6 @@ export type Database = {
           body_type?: string | null
           color?: string | null
           created_at?: string
-          current_mileage?: number | null
           drive_type?: string | null
           driving_style?: string | null
           engine?: string | null
@@ -3101,12 +3128,12 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_primary?: boolean | null
-          last_mileage_update?: string | null
           location_zip?: string | null
           make?: string
           model?: string
           nickname?: string | null
           photo_url?: string | null
+          profile_provenance?: Json
           purchase_date?: string | null
           purchase_mileage?: number | null
           purchase_price?: number | null
@@ -3119,6 +3146,150 @@ export type Database = {
           year?: number
         }
         Relationships: []
+      }
+      garage_data_migrations: {
+        Row: {
+          action: string
+          applied_at: string
+          detail: string | null
+          id: string
+          migration: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          action: string
+          applied_at?: string
+          detail?: string | null
+          id?: string
+          migration: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          action?: string
+          applied_at?: string
+          detail?: string | null
+          id?: string
+          migration?: string
+          vehicle_id?: string | null
+        }
+        Relationships: []
+      }
+      vehicle_mileage_reading_disputes: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          raised_by: string
+          reading_id: string | null
+          reason: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          raised_by: string
+          reading_id?: string | null
+          reason: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          raised_by?: string
+          reading_id?: string | null
+          reason?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_mileage_reading_disputes_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_mileage_readings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_mileage_reading_disputes_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_mileage_readings: {
+        Row: {
+          created_at: string
+          evidence_media: Json
+          id: string
+          layer: string
+          odometer_miles: number
+          odometer_value: number
+          outlier_confirmed: boolean
+          owner_user_id: string
+          reading_date: string
+          source: string
+          source_detail: string | null
+          status: string
+          superseded_by: string | null
+          unit: string
+          unsupported: boolean
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          evidence_media?: Json
+          id?: string
+          layer: string
+          odometer_miles?: number
+          odometer_value: number
+          outlier_confirmed?: boolean
+          owner_user_id: string
+          reading_date: string
+          source: string
+          source_detail?: string | null
+          status?: string
+          superseded_by?: string | null
+          unit: string
+          unsupported?: boolean
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          evidence_media?: Json
+          id?: string
+          layer?: string
+          odometer_miles?: number
+          odometer_value?: number
+          outlier_confirmed?: boolean
+          owner_user_id?: string
+          reading_date?: string
+          source?: string
+          source_detail?: string | null
+          status?: string
+          superseded_by?: string | null
+          unit?: string
+          unsupported?: boolean
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_mileage_readings_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "vehicle_mileage_readings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_mileage_readings_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vehicle_recall_checks: {
         Row: {
@@ -3185,7 +3356,7 @@ export type Database = {
         Insert: {
           category?: string | null
           complaint_count?: number | null
-          confidence_score?: number
+          confidence_score?: number | null
           created_at?: string
           description: string
           estimated_cost?: string | null
@@ -3208,7 +3379,7 @@ export type Database = {
         Update: {
           category?: string | null
           complaint_count?: number | null
-          confidence_score?: number
+          confidence_score?: number | null
           created_at?: string
           description?: string
           estimated_cost?: string | null

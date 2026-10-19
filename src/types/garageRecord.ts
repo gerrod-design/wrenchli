@@ -32,8 +32,27 @@ export interface GarageVehicle {
   nickname?: string | null;
   vin?: string | null;
   photo_url?: string | null;
+  /** @deprecated Batch 5 (R-50): mileage is derived from the readings
+   * ledger (deriveLatestReading), never a stored attribute. The database
+   * column is dropped; this field is never populated. */
   current_mileage?: number | null;
   created_at?: string;
+  // Batch 5 (R-57): owner-supplied profile fields + their provenance.
+  annual_mileage_estimate?: number | null;
+  driving_style?: string | null;
+  usage_type?: string | null;
+  profile_provenance?: Record<string, { source: string; recorded_at: string }> | null;
+  // Batch 5 (spec SS5): VIN-decoded identity, distinct from display strings.
+  vin_decoded_line?: string | null;
+  vin_decoded_trim?: string | null;
+  vin_decoded_series?: string | null;
+  vin_decoded_body?: string | null;
+  vin_decoded_drivetrain?: string | null;
+  vin_decoded_year?: number | null;
+  vin_decoded_make?: string | null;
+  vin_decode_provider?: string | null;
+  vin_decoded_at?: string | null;
+  vin_trim_known_gap?: boolean;
 }
 
 export interface VehicleTimelineEvent {

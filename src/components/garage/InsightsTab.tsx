@@ -11,10 +11,12 @@ import type { CloudVehicle } from "@/hooks/useGarageSync";
 interface Props {
   vehicle: GarageVehicle;
   cloudVehicle?: CloudVehicle;
+  /** Batch 5: derived latest ledger reading in miles (null = no reading). */
+  currentMiles?: number | null;
   isAuthenticated: boolean;
 }
 
-export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: Props) {
+export default function InsightsTab({ vehicle, cloudVehicle, currentMiles, isAuthenticated }: Props) {
   // Fetch maintenance cost data for chart
   const [costData, setCostData] = useState<{ month: string; cost: number }[]>([]);
   const [loadingCosts, setLoadingCosts] = useState(false);
@@ -52,7 +54,7 @@ export default function InsightsTab({ vehicle, cloudVehicle, isAuthenticated }: 
 
   const year = parseInt(vehicle.year);
   const age = new Date().getFullYear() - year;
-  const mileage = cloudVehicle?.current_mileage;
+  const mileage = currentMiles ?? undefined;
   const isReliable = RELIABLE_BRANDS.includes(vehicle.make);
 
   // Generate insights using DB-backed known issues (with static fallback)

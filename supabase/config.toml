@@ -15,6 +15,9 @@ verify_jwt = false
 [functions.check-recalls]
 verify_jwt = false
 
+[functions.read-odometer-photo]
+verify_jwt = false
+
 [functions.recommend-products]
 verify_jwt = false
 

@@ -1,24 +1,233 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ClipboardCheck, Download, RefreshCw } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, Download, Gauge, RefreshCw } from "lucide-react";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DocumentAttachForm,
   TimelineEntryForm,
   VehicleRecordSections,
 } from "@/components/garage/VehicleRecordSections";
+import MileageLedgerSection, { type OdometerPhotoResult } from "@/components/garage/MileageLedgerSection";
 import { useVehicleRecord } from "@/hooks/useVehicleRecord";
 import JourneyPlanSection from "@/components/garage/JourneyPlanSection";
 import { useVehicleRecalls } from "@/hooks/useVehicleRecalls";
-import type { VehicleDocument, VehicleTimelineEvent } from "@/types/garageRecord";
+import { supabase } from "@/integrations/supabase/client";
+import { formatReadingLabel } from "@/lib/mileage";
+import type { GarageVehicle, VehicleDocument, VehicleTimelineEvent } from "@/types/garageRecord";
+import { toast } from "sonner";
+
+// Batch 5, spec SS7: the proactive mileage ask. In-context only, and only
+// when a stale or missing reading actually changes an answer (no reading
+// at all, or the newest is over a year old). Caps: at most one ask per
+// vehicle per 90 days, one per session, and after two dismissals the ask
+// goes quiet for 180 days. State lives in localStorage — dismissals are
+// owner-local facts about nagging, not record facts.
+const MILEAGE_ASK_KEY = (vehicleId: string) => `wrenchli.mileageAsk.${vehicleId}`;
+const MILEAGE_ASK_SESSION_KEY = "wrenchli.mileageAsk.sessionShown";
+
+interface MileageAskState {
+  lastShownAt?: string;
+  dismissals: string[];
+  suppressedUntil?: string;
+}
+
+function readMileageAskState(vehicleId: string): MileageAskState {
+  try {
+    const raw = localStorage.getItem(MILEAGE_ASK_KEY(vehicleId));
+    if (raw) return JSON.parse(raw) as MileageAskState;
+  } catch {
+    /* storage unavailable — treat as never asked */
+  }
+  return { dismissals: [] };
+}
+
+function writeMileageAskState(vehicleId: string, state: MileageAskState) {
+  try {
+    localStorage.setItem(MILEAGE_ASK_KEY(vehicleId), JSON.stringify(state));
+  } catch {
+    /* storage unavailable — the ask simply may reappear */
+  }
+}
+
+function DrivingProfileCard({ vehicle, onSave }: {
+  vehicle: GarageVehicle;
+  onSave: (fields: {
+    annual_mileage_estimate?: number | null;
+    driving_style?: string | null;
+    usage_type?: string | null;
+  }) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [annual, setAnnual] = useState(vehicle.annual_mileage_estimate?.toString() ?? "");
+  const [style, setStyle] = useState(vehicle.driving_style ?? "");
+  const [usage, setUsage] = useState(vehicle.usage_type ?? "");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setAnnual(vehicle.annual_mileage_estimate?.toString() ?? "");
+    setStyle(vehicle.driving_style ?? "");
+    setUsage(vehicle.usage_type ?? "");
+  }, [vehicle.annual_mileage_estimate, vehicle.driving_style, vehicle.usage_type]);
+
+  const stamp = (field: string) => vehicle.profile_provenance?.[field]?.recorded_at;
+  const row = (label: string, value: string | null | undefined, field: string) => (
+    <div className="flex items-baseline justify-between gap-3 py-1.5">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      {value ? (
+        <span className="text-sm font-medium">
+          {value}
+          {stamp(field) && (
+            <span className="ml-2 text-xs font-normal text-muted-foreground">
+              you provided this on {new Date(stamp(field) as string).toLocaleDateString("en-US")}
+            </span>
+          )}
+        </span>
+      ) : (
+        <span className="text-sm font-medium text-muted-foreground">Not set</span>
+      )}
+    </div>
+  );
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await onSave({
+        annual_mileage_estimate: annual.trim() ? Number(annual) : null,
+        driving_style: style || null,
+        usage_type: usage || null,
+      });
+      toast.success("Driving profile saved.");
+      setEditing(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save the driving profile.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Driving profile</CardTitle>
+        <CardDescription>
+          These fields are used only when you provide them. Nothing here is pre-filled from a
+          template — an unset field stays unset, and estimates that use your numbers say so.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {!editing ? (
+          <div>
+            <div className="divide-y">
+              {row("Miles driven per year", vehicle.annual_mileage_estimate ? vehicle.annual_mileage_estimate.toLocaleString("en-US") : null, "annual_mileage_estimate")}
+              {row("Driving style", vehicle.driving_style, "driving_style")}
+              {row("Main use", vehicle.usage_type, "usage_type")}
+            </div>
+            <Button variant="outline" size="sm" className="mt-3" onClick={() => setEditing(true)}>
+              {vehicle.annual_mileage_estimate || vehicle.driving_style || vehicle.usage_type ? "Update" : "Add yours"}
+            </Button>
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Miles driven per year</Label>
+              <Input inputMode="numeric" value={annual} onChange={(e) => setAnnual(e.target.value)} placeholder="e.g. 12000" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Driving style</Label>
+              <select aria-label="Driving style" className="h-10 w-full rounded-md border border-input bg-background px-2 text-sm" value={style} onChange={(e) => setStyle(e.target.value)}>
+                <option value="">Not set</option>
+                <option value="Gentle">Gentle</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Aggressive">Aggressive</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Main use</Label>
+              <select aria-label="Main use" className="h-10 w-full rounded-md border border-input bg-background px-2 text-sm" value={usage} onChange={(e) => setUsage(e.target.value)}>
+                <option value="">Not set</option>
+                <option value="Personal">Personal</option>
+                <option value="Commute">Commute</option>
+                <option value="Family">Family</option>
+                <option value="Business">Business</option>
+              </select>
+            </div>
+            <div className="flex gap-2 sm:col-span-3">
+              <Button size="sm" onClick={() => void save()} disabled={saving}>Save</Button>
+              <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function VehicleRecord() {
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const record = useVehicleRecord(vehicleId);
   const vehicleIds = useMemo(() => (vehicleId ? [vehicleId] : []), [vehicleId]);
   const { recalls } = useVehicleRecalls(vehicleIds);
+  const [showMileageAsk, setShowMileageAsk] = useState(false);
+
+  useEffect(() => {
+    if (!vehicleId || record.sectionsLoading) return;
+    const latest = record.latestReading;
+    const stale =
+      !latest ||
+      Date.now() - new Date(`${latest.reading_date}T12:00:00Z`).getTime() > 365 * 24 * 60 * 60 * 1000;
+    if (!stale) return;
+    try {
+      if (sessionStorage.getItem(MILEAGE_ASK_SESSION_KEY)) return;
+    } catch {
+      /* session storage unavailable — fall through to the per-vehicle caps */
+    }
+    const state = readMileageAskState(vehicleId);
+    const now = Date.now();
+    if (state.suppressedUntil && new Date(state.suppressedUntil).getTime() > now) return;
+    if (state.lastShownAt && now - new Date(state.lastShownAt).getTime() < 90 * 24 * 60 * 60 * 1000) return;
+    writeMileageAskState(vehicleId, { ...state, lastShownAt: new Date().toISOString() });
+    try {
+      sessionStorage.setItem(MILEAGE_ASK_SESSION_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+    setShowMileageAsk(true);
+    // latestReading identity changes on refresh; the caps above gate repeats.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehicleId, record.sectionsLoading]);
+
+  const dismissMileageAsk = () => {
+    if (!vehicleId) return;
+    const state = readMileageAskState(vehicleId);
+    const dismissals = [...state.dismissals, new Date().toISOString()];
+    const next: MileageAskState = { ...state, dismissals };
+    if (dismissals.length >= 2) {
+      next.suppressedUntil = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString();
+    }
+    writeMileageAskState(vehicleId, next);
+    setShowMileageAsk(false);
+  };
+
+  const readOdometerPhoto = async (file: File): Promise<OdometerPhotoResult | null> => {
+    const media = await record.uploadMedia(file);
+    const url = await record.getSignedMediaUrl(media);
+    const { data, error } = await supabase.functions.invoke("read-odometer-photo", {
+      body: { image_url: url },
+    });
+    if (error) throw error;
+    const parsed = data as { value?: number; unit?: string; confident?: boolean } | null;
+    if (!parsed || typeof parsed.value !== "number" || !parsed.confident) return null;
+    return {
+      value: parsed.value,
+      unit: parsed.unit === "km" ? "km" : "mi",
+      evidence: media,
+    };
+  };
 
   const openDocument = async (document: VehicleDocument) => {
     const url = await record.getSignedMediaUrl({
@@ -103,7 +312,10 @@ export default function VehicleRecord() {
               </h1>
               <p className="text-sm text-white/60 mt-2">
                 {vehicle.year} {vehicle.make} {vehicle.model}{vehicle.trim ? ` ${vehicle.trim}` : ""}
-                {vehicle.current_mileage ? ` · ${vehicle.current_mileage.toLocaleString()} mi` : ""}
+                {" · "}
+                {record.latestReading
+                  ? formatReadingLabel(record.latestReading, "mi")
+                  : "No reading on record yet"}
               </p>
               {vehicle.vin && <p className="text-xs text-white/50 mt-1 font-mono">VIN {vehicle.vin}</p>}
             </div>
@@ -135,6 +347,45 @@ export default function VehicleRecord() {
             <AlertDescription>{record.error}</AlertDescription>
           </Alert>
         )}
+
+        {showMileageAsk && (
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4">
+            <Gauge className="h-5 w-5 shrink-0 text-sky-700" />
+            <p className="flex-1 text-sm text-sky-900">
+              {record.latestReading
+                ? "The newest mileage reading for this vehicle is over a year old, so maintenance timing can only be estimated. A current reading makes it exact."
+                : "There is no mileage reading on record for this vehicle yet, so maintenance timing cannot be calculated. Adding one takes a few seconds."}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setShowMileageAsk(false);
+                  document.getElementById("mileage-ledger")?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Record a reading
+              </Button>
+              <Button size="sm" variant="ghost" onClick={dismissMileageAsk}>
+                Not now
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <div id="mileage-ledger">
+          <MileageLedgerSection
+            readings={record.readings}
+            discrepancy={record.mileageDiscrepancy}
+            onAddReading={record.addReading}
+            onDispute={record.disputeReading}
+            onDismissDispute={record.dismissDispute}
+            onDismissDiscrepancy={record.dismissDiscrepancy}
+            onReadOdometerPhoto={readOdometerPhoto}
+          />
+        </div>
+
+        <DrivingProfileCard vehicle={vehicle} onSave={record.saveProfileFields} />
 
         <VehicleRecordSections
           loading={record.sectionsLoading}

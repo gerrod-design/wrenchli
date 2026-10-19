@@ -44,18 +44,24 @@ export function useVehicleRecalls(vehicleIds: string[]) {
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("recall_alerts")
-        .select("*")
-        .in("vehicle_id", vehicleIds)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
+      // Batch 5 / R-28 rider: the alerts and checks queries are
+      // independent — run them concurrently instead of serially.
+      const [alertsResult, checksResult] = await Promise.all([
+        supabase
+          .from("recall_alerts")
+          .select("*")
+          .in("vehicle_id", vehicleIds)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("vehicle_recall_checks")
+          .select("*")
+          .in("vehicle_id", vehicleIds),
+      ]);
+      if (alertsResult.error) throw alertsResult.error;
+      const { data, error } = alertsResult;
       setRecalls((data as RecallAlert[]) || []);
 
-      const { data: checkData, error: checkError } = await supabase
-        .from("vehicle_recall_checks")
-        .select("*")
-        .in("vehicle_id", vehicleIds);
+      const { data: checkData, error: checkError } = checksResult;
       if (checkError) throw checkError;
       const byVehicle: Record<string, RecallCheck> = {};
       for (const row of (checkData as RecallCheck[]) || []) {

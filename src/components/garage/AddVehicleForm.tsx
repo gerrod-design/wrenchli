@@ -98,9 +98,11 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
     purchase_date: "",
     purchase_price: "",
     purchase_mileage: "",
-    driving_style: "normal",
-    annual_mileage_estimate: "12000",
-    usage_type: "commuter",
+    // Batch 5 (R-57): no template defaults — these stay unset unless the
+    // owner picks them, and are stored with a provenance stamp.
+    driving_style: "",
+    annual_mileage_estimate: "",
+    usage_type: "",
   });
 
   const handleVinDecoded = (vehicle: DecodedVehicle) => {
@@ -150,24 +152,58 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
 
       // If authenticated, also save to cloud with full details
       if (user) {
-        const { error } = await supabase.from("user_vehicles").insert({
+        const provenance: Record<string, { source: string; recorded_at: string }> = {};
+        const stamp = () => ({ source: "owner_reported", recorded_at: new Date().toISOString() });
+        const profile: Record<string, unknown> = {};
+        if (formData.driving_style) { profile.driving_style = formData.driving_style; provenance.driving_style = stamp(); }
+        if (formData.usage_type) { profile.usage_type = formData.usage_type; provenance.usage_type = stamp(); }
+        if (formData.annual_mileage_estimate) {
+          profile.annual_mileage_estimate = parseInt(formData.annual_mileage_estimate);
+          provenance.annual_mileage_estimate = stamp();
+        }
+        if (Object.keys(provenance).length > 0) profile.profile_provenance = provenance;
+
+        const { data: inserted, error } = await supabase.from("user_vehicles").insert({
           user_id: user.id,
           year: parseInt(formData.year),
           make: formData.make,
           model: formData.model,
           trim: formData.trim || null,
-          current_mileage: parseInt(formData.current_mileage) || null,
           location_zip: formData.location_zip || null,
           purchase_date: formData.purchase_date || null,
           purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
           purchase_mileage: formData.purchase_mileage ? parseInt(formData.purchase_mileage) : null,
-          driving_style: formData.driving_style,
-          annual_mileage_estimate: parseInt(formData.annual_mileage_estimate),
-          usage_type: formData.usage_type,
-        });
+          ...profile,
+        }).select("id").single();
 
         if (error && error.code !== "23505") {
           console.error("[AddVehicle] cloud insert error:", error);
+        }
+
+        // Batch 5 (R-50): mileages become dated, sourced ledger readings.
+        if (!error && inserted?.id) {
+          const today = new Date().toISOString().slice(0, 10);
+          const readings: Array<Record<string, unknown>> = [];
+          if (formData.purchase_mileage && formData.purchase_date) {
+            readings.push({
+              vehicle_id: inserted.id, owner_user_id: user.id,
+              odometer_value: parseInt(formData.purchase_mileage), unit: "mi",
+              reading_date: formData.purchase_date, source: "purchase_document",
+              source_detail: "Purchase mileage from purchase documents", layer: "reported",
+            });
+          }
+          if (formData.current_mileage) {
+            readings.push({
+              vehicle_id: inserted.id, owner_user_id: user.id,
+              odometer_value: parseInt(formData.current_mileage), unit: "mi",
+              reading_date: today, source: "owner_reported",
+              source_detail: "Reported when the vehicle was added", layer: "reported",
+            });
+          }
+          if (readings.length > 0) {
+            const { error: readingError } = await supabase.from("vehicle_mileage_readings").insert(readings);
+            if (readingError) console.error("[AddVehicle] reading insert error:", readingError);
+          }
         }
       }
 
@@ -190,7 +226,7 @@ export default function AddVehicleForm({ isOpen, onClose, onVehicleAdded }: AddV
       year: "", make: "", model: "", trim: "",
       current_mileage: "", location_zip: "", purchase_date: "",
       purchase_price: "", purchase_mileage: "",
-      driving_style: "normal", annual_mileage_estimate: "12000", usage_type: "commuter",
+      driving_style: "", annual_mileage_estimate: "", usage_type: "",
     });
     onClose();
   };

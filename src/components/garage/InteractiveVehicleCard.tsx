@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { CloudVehicle } from "@/hooks/useCloudVehicles";
+import { formatReadingDate, formatReadingLabel, type MileageReading } from "@/lib/mileage";
 import { useResolvedVehiclePhoto } from "@/hooks/useVehicleOwnerPhoto";
 import VehicleSilhouette, { DEFAULT_COLOR } from "@/components/vehicle/VehicleSilhouette";
 import { cn } from "@/lib/utils";
@@ -99,12 +100,16 @@ function StatDivider() {
 // ─── Component ──────────────────────────────────────────────────
 interface Props {
   vehicle: CloudVehicle;
+  /** Batch 5 (R-50, spec Q1): the derived latest ledger reading. The card
+   * face shows the sourced reading and its date only — no estimate, and
+   * "No reading on record yet" when the ledger is empty. */
+  latestReading?: MileageReading | null;
   unreadRecalls: number;
   onDelete: (id: string) => void;
   onEdit: (v: CloudVehicle) => void;
 }
 
-export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelete, onEdit }: Props) {
+export default function InteractiveVehicleCard({ vehicle, latestReading, unreadRecalls, onDelete, onEdit }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
@@ -121,7 +126,7 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
       ? `${vehicle.year} · ${vehicle.trim}`
       : String(vehicle.year);
 
-  const stale = vehicle.current_mileage ? isMileageStale(vehicle.updated_at) : false;
+  const stale = latestReading ? isMileageStale(latestReading.reading_date) : false;
   const age = new Date().getFullYear() - vehicle.year;
 
   return (
@@ -270,11 +275,15 @@ export default function InteractiveVehicleCard({ vehicle, unreadRecalls, onDelet
                 stale ? "text-accent animate-pulse" : "text-white/60"
               )}
               style={{ fontFamily: "'IBM Plex Mono', monospace" }}
-              title={stale ? "Mileage hasn't been updated in 90+ days" : undefined}
+              title={
+                latestReading
+                  ? `${formatReadingLabel(latestReading, "mi")}${stale ? " — no newer reading in 90+ days" : ""}`
+                  : "No mileage reading on record yet"
+              }
             >
-              {vehicle.current_mileage
-                ? `${vehicle.current_mileage.toLocaleString()} mi`
-                : "— mi"
+              {latestReading
+                ? `${Math.round(latestReading.odometer_miles).toLocaleString()} mi · ${formatReadingDate(latestReading.reading_date)}`
+                : "No reading on record yet"
               }
             </span>
           </div>
