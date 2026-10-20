@@ -126,29 +126,10 @@ serve(async (req) => {
     // ── 2. Fetch the original diagnosis from Supabase ──────
     const { data: sessionData, error: sessionError } = await supabase
       .from("diagnostic_sessions")
-      .select(`
-        id,
-        user_id,
-        vehicle_id,
-        diagnoses (
-          id,
-          confidence,
-          urgency,
-          explanation
-        ),
-        possible_causes:diagnoses (
-          possible_causes (
-            name,
-            probability,
-            sort_order
-          )
-        ),
-        vehicles (
-          make,
-          model,
-          year
-        )
-      `)
+      // Keep this select on ONE line: the previous multiline string silently
+      // resolved both diagnoses embeds to null (measured against PostgREST),
+      // which kept the accuracy path (§4–§5) from ever running.
+      .select("id, user_id, vehicle_id, diagnoses(id, confidence, urgency, explanation), possible_causes:diagnoses(possible_causes(name, probability, sort_order)), vehicles(make, model, year)")
       .eq("id", outcome.session_id)
       .single();
 
@@ -159,7 +140,15 @@ serve(async (req) => {
       );
     }
 
-    const diagnosis = sessionData.diagnoses?.[0];
+    // The diagnoses relationship is one-to-one (UNIQUE session_id), so both
+    // embeds come back as single objects, not arrays — normalize before use.
+    const diagnosis = Array.isArray(sessionData.diagnoses)
+      ? sessionData.diagnoses[0]
+      : sessionData.diagnoses;
+    const causesEmbed = Array.isArray(sessionData.possible_causes)
+      ? sessionData.possible_causes[0]
+      : sessionData.possible_causes;
+    const allCauses = causesEmbed?.possible_causes ?? [];
     const vehicle = sessionData.vehicles;
 
     // ── 3. Save outcome report ─────────────────────────────
@@ -224,7 +213,6 @@ serve(async (req) => {
     const canScore = outcome.shop_visit && outcome.actual_diagnosis && diagnosis;
 
     if (canScore) {
-      const allCauses = sessionData.possible_causes?.[0]?.possible_causes ?? [];
       const sortedCauses = [...allCauses].sort((a: any, b: any) => a.sort_order - b.sort_order);
       const topCause = sortedCauses[0]?.name ?? "Unknown";
       const allCauseNames = sortedCauses.map((c: any) => c.name);
@@ -288,7 +276,6 @@ Score this diagnostic accuracy.`.trim();
     }
 
     // ── 5. Save accuracy record ────────────────────────────
-    const allCauses = sessionData.possible_causes?.[0]?.possible_causes ?? [];
     const sortedCauses = [...allCauses].sort((a: any, b: any) => a.sort_order - b.sort_order);
 
     const { error: accuracyError } = await supabase
