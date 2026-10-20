@@ -158,13 +158,13 @@ Deno.serve(async (req) => {
     {
       const { data: reports, error } = await supabase
         .from("outcome_reports")
-        .select("id, actual_diagnosis, actual_cost")
+        .select("id, repair_status")
         .gte("reported_at", sevenDaysAgo);
 
       if (error) throw error;
 
       const incomplete = (reports ?? []).filter(
-        (r: any) => r.actual_diagnosis === null || r.actual_cost === null,
+        (r: any) => r.repair_status === null,
       );
 
       const status = incomplete.length === 0 ? "pass" : "warning";
@@ -173,8 +173,8 @@ Deno.serve(async (req) => {
         check_name: "outcome_data_completeness",
         status,
         details: incomplete.length === 0
-          ? "All outcome reports in last 7 days have complete data"
-          : `${incomplete.length} outcome reports with incomplete data`,
+          ? "All outcome reports in last 7 days have a recorded repair status"
+          : `${incomplete.length} outcome reports with no recorded repair status`,
         checked_at: checkedAt,
       });
 
@@ -182,7 +182,7 @@ Deno.serve(async (req) => {
         alertEntries.push({
           check_name: "outcome_data_completeness",
           severity: "medium",
-          details: `${incomplete.length} outcome reports with incomplete data in last 7 days`,
+          details: `${incomplete.length} outcome reports with no recorded repair status in last 7 days`,
         });
       }
     }

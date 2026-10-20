@@ -77,11 +77,48 @@ serve(async (req) => {
     );
 
     // ── 1. Parse input ─────────────────────────────────────
-    const outcome = await req.json() as OutcomeInput;
+    let outcome: OutcomeInput;
+    try {
+      outcome = await req.json() as OutcomeInput;
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (!outcome.session_id) {
       return new Response(
         JSON.stringify({ error: "Missing session_id" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (outcome.shop_visit !== undefined && typeof outcome.shop_visit !== "boolean") {
+      return new Response(
+        JSON.stringify({ error: "shop_visit must be a boolean" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (
+      outcome.problem_fixed !== undefined &&
+      !["yes", "no", "partial"].includes(outcome.problem_fixed)
+    ) {
+      return new Response(
+        JSON.stringify({ error: "problem_fixed must be one of: yes, no, partial" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (
+      outcome.actual_cost !== undefined &&
+      (typeof outcome.actual_cost !== "number" ||
+        !Number.isFinite(outcome.actual_cost) ||
+        outcome.actual_cost < 0)
+    ) {
+      return new Response(
+        JSON.stringify({ error: "actual_cost must be a non-negative number" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -91,6 +128,7 @@ serve(async (req) => {
       .from("diagnostic_sessions")
       .select(`
         id,
+        user_id,
         vehicle_id,
         diagnoses (
           id,
@@ -125,19 +163,56 @@ serve(async (req) => {
     const vehicle = sessionData.vehicles;
 
     // ── 3. Save outcome report ─────────────────────────────
+    // outcome_reports was redesigned after this function was written; its
+    // original columns no longer exist. Map this pipe's contract onto
+    // the live design — repair_status / invoice_amount_cents / shop_ref /
+    // notes — instead of inserting columns that are not there (Batch 7,
+    // 2026-10-20). Structured actuals also live in diagnostic_accuracy (§5).
+    const notesParts: string[] = [];
+    if (outcome.actual_diagnosis) {
+      notesParts.push(`Shop finding: ${outcome.actual_diagnosis}`);
+    }
+    if (outcome.shop_feedback) {
+      notesParts.push(`Shop feedback: ${outcome.shop_feedback}`);
+    }
+    if (outcome.no_visit_reason) {
+      notesParts.push(`No-visit reason: ${outcome.no_visit_reason}`);
+    }
+    if (outcome.diy_notes) {
+      notesParts.push(`DIY notes: ${outcome.diy_notes}`);
+    }
+    if (outcome.repair_date) {
+      notesParts.push(`Repair date: ${outcome.repair_date}`);
+    }
+    if (outcome.problem_fixed === "partial") {
+      // The live repair_status vocabulary (fixed / still_same / worse) has
+      // no partial value; leave repair_status null and keep the raw answer.
+      notesParts.push(
+        "Problem fixed: partial (no partial value in the repair_status vocabulary)"
+      );
+    }
+    const notes = notesParts.length > 0 ? notesParts.join(" | ") : null;
+
+    const repairStatus =
+      outcome.problem_fixed === "yes"
+        ? "fixed"
+        : outcome.problem_fixed === "no"
+          ? "still_same"
+          : null;
+
+    const invoiceAmountCents =
+      outcome.actual_cost != null ? Math.round(outcome.actual_cost * 100) : null;
+
     const { data: outcomeRecord, error: outcomeError } = await supabase
       .from("outcome_reports")
       .insert({
         session_id: outcome.session_id,
-        shop_visit: outcome.shop_visit,
-        actual_diagnosis: outcome.actual_diagnosis ?? null,
-        actual_cost: outcome.actual_cost ?? null,
-        problem_fixed: outcome.problem_fixed ?? null,
-        repair_date: outcome.repair_date ?? null,
-        shop_name: outcome.shop_name ?? null,
-        shop_feedback: outcome.shop_feedback ?? null,
-        no_visit_reason: outcome.no_visit_reason ?? null,
-        diy_notes: outcome.diy_notes ?? null,
+        user_id: sessionData.user_id ?? null,
+        repair_status: repairStatus,
+        invoice_amount_cents: invoiceAmountCents,
+        shop_ref: outcome.shop_name ?? null,
+        collection_channel: "in_product",
+        notes,
       })
       .select()
       .single();
