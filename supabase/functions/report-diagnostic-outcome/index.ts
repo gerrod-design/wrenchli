@@ -250,12 +250,29 @@ Score this diagnostic accuracy.`.trim();
       if (!aiResponse.ok) throw new Error(`AI service error: ${aiResponse.status}`);
 
       const aiData = await aiResponse.json();
-      const rawText = aiData.content?.[0]?.text ?? "";
+      // The model's reply may sit in a later content block, arrive wrapped in
+      // markdown fences, or carry prose around the JSON — the previous strict
+      // JSON.parse(content[0].text) silently put every scored outcome on the
+      // 0.5 fallback (measured in Batch 7's live acceptance proofs).
+      const rawText = (aiData.content ?? [])
+        .filter((b: any) => b?.type === "text")
+        .map((b: any) => b.text ?? "")
+        .join("");
 
       try {
         matchResult = JSON.parse(rawText);
       } catch {
-        matchResult = {
+        const start = rawText.indexOf("{");
+        const end = rawText.lastIndexOf("}");
+        let extracted: SemanticMatchResult | null = null;
+        if (start >= 0 && end > start) {
+          try {
+            extracted = JSON.parse(rawText.slice(start, end + 1));
+          } catch {
+            extracted = null;
+          }
+        }
+        matchResult = extracted ?? {
           accuracy_score: 0.5,
           match_label: "unverified",
           match_explanation: "Outcome recorded. Accuracy scoring unavailable.",
