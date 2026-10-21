@@ -12,6 +12,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import type { Msg } from "./chatbot/types";
 import { streamChat } from "./chatbot/streamChat";
 import {
+  HANDOFF_PENDING_EVENT,
   consumePendingHandoff,
   getMostRecentHandoff,
   isHandoffExpired,
@@ -64,6 +65,13 @@ export default function ChatBot() {
   const [activeHandoff, setActiveHandoff] = useState<HandoffRef | null>(null);
   const [seededConvId, setSeededConvId] = useState<string | null>(null);
   const sessionStartKeyRef = useRef<string | null>(null);
+  // Continuity 1.1: handoffs already seeded in this page session. A handoff
+  // seeds at most once per session, even across fresh conversations; the
+  // device return path re-seeds on a later visit because refs reset.
+  const seededHandoffKeysRef = useRef<Set<string>>(new Set());
+  // Bumped whenever setPendingHandoff fires its window event, so the
+  // seeding effect re-runs even when the panel was already open.
+  const [handoffSignal, setHandoffSignal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -136,6 +144,14 @@ export default function ChatBot() {
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Continuity 1.1: a pending handoff set while this panel is already open
+  // changes no state the seeding effect watches — listen for its event.
+  useEffect(() => {
+    const onPending = () => setHandoffSignal((n) => n + 1);
+    window.addEventListener(HANDOFF_PENDING_EVENT, onPending);
+    return () => window.removeEventListener(HANDOFF_PENDING_EVENT, onPending);
   }, []);
 
   // Stick-to-bottom scrolling (Batch 8, F12): the messages container is
@@ -340,14 +356,19 @@ export default function ChatBot() {
     }
   }, [ensureActiveConversation, setMessages, getAuthToken]);
 
-  // Fire the handoff session start once per (conversation, handoff) when the
-  // panel opens on an empty conversation and a handoff candidate exists: the
-  // pending one from the assessment bridge, else the most recent on this
-  // device (the return path). An expired token still starts the session with
-  // the hint so Aiden gives the honest expired message, never a guess.
+  // Fire the handoff session start when a handoff candidate exists and the
+  // user has not spoken in this conversation yet: the pending one from the
+  // assessment bridge, else the most recent on this device (the return
+  // path). An expired token still starts the session with the hint so Aiden
+  // gives the honest expired message, never a guess. Assistant-only content
+  // (the canned greeting is a render placeholder, and a restored opening
+  // has no user reply yet) must not block seeding; a conversation with any
+  // user message is a real conversation and is never disturbed. The effect
+  // re-runs when a handoff is set while the panel is already open via
+  // handoffSignal (Continuity 1.1).
   useEffect(() => {
     if (!open || loading) return;
-    if (messages.length > 0) return;
+    if (messages.some((m) => m.role === "user")) return;
     const pending = consumePendingHandoff();
     let candidate: { ref: HandoffRef; expiredHint: boolean } | null = null;
     if (pending) {
@@ -368,11 +389,14 @@ export default function ChatBot() {
       }
     }
     if (!candidate) return;
-    const key = `${activeId ?? "new"}:${candidate.ref.kind}:${candidate.ref.kind === "token" ? candidate.ref.token : candidate.ref.id}`;
+    const refKey = `${candidate.ref.kind}:${candidate.ref.kind === "token" ? candidate.ref.token : candidate.ref.id}`;
+    const key = `${activeId ?? "new"}:${refKey}`;
     if (sessionStartKeyRef.current === key) return;
+    if (seededHandoffKeysRef.current.has(refKey)) return;
     sessionStartKeyRef.current = key;
+    seededHandoffKeysRef.current.add(refKey);
     void startHandoffSession(candidate);
-  }, [open, loading, activeId, messages, startHandoffSession]);
+  }, [open, loading, activeId, messages, startHandoffSession, handoffSignal]);
 
   const send = useCallback(async (override?: string) => {
     const text = (override ?? input).trim();

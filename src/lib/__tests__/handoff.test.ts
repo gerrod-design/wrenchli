@@ -16,6 +16,7 @@ import {
   isHandoffExpired,
   setPendingHandoff,
   consumePendingHandoff,
+  HANDOFF_PENDING_EVENT,
   type DeviceHandoff,
 } from "../handoff";
 
@@ -225,5 +226,21 @@ describe("consumePendingHandoff", () => {
     const result = consumePendingHandoff();
     expect(result).toEqual({ kind: "owned", id: "abc" });
     expect(sessionStorage.getItem(PENDING_KEY)).toBeNull();
+  });
+});
+
+describe("pending handoff notification (Continuity 1.1)", () => {
+  it("dispatches HANDOFF_PENDING_EVENT on window every time a pending handoff is set", () => {
+    const seen: string[] = [];
+    const listener = (e: Event) => seen.push(e.type);
+    window.addEventListener(HANDOFF_PENDING_EVENT, listener);
+    try {
+      setPendingHandoff({ kind: "token", token: "t1" });
+      setPendingHandoff({ kind: "owned", id: "o1" });
+    } finally {
+      window.removeEventListener(HANDOFF_PENDING_EVENT, listener);
+    }
+    expect(HANDOFF_PENDING_EVENT).toBe("wrenchli:pending-handoff");
+    expect(seen).toEqual(["wrenchli:pending-handoff", "wrenchli:pending-handoff"]);
   });
 });

@@ -40,6 +40,10 @@ export const MAX_DEVICE_HANDOFFS = 3;
 
 const STORAGE_KEY = "wrenchli_handoffs_v1";
 const PENDING_KEY = "wrenchli_pending_handoff";
+/** Fired on window whenever a pending handoff is set, so an already-open
+ *  chat panel can start the handoff session without waiting for an
+ *  unrelated state change (Continuity 1.1). */
+export const HANDOFF_PENDING_EVENT = "wrenchli:pending-handoff";
 
 // Local structural types mirroring the wizard's shapes — defined here to
 // avoid a component -> lib import cycle. Do NOT import wizard types.
@@ -158,6 +162,15 @@ export function isHandoffExpired(h: DeviceHandoff, now: Date = new Date()): bool
 export function setPendingHandoff(ref: HandoffRef): void {
   try {
     sessionStorage.setItem(PENDING_KEY, JSON.stringify(ref));
+  } catch {
+    // ignore
+  }
+  // Notify any mounted chat surface that a handoff is waiting. Best-effort:
+  // a failed dispatch must never break the caller.
+  try {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent(HANDOFF_PENDING_EVENT));
+    }
   } catch {
     // ignore
   }
