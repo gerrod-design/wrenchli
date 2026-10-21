@@ -5,6 +5,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
+import { findRepairRate, rateFigures, RATE_SOURCE_ID } from "./repair-rates.ts";
 
 // API endpoints keep CORS open (* via getCorsHeaders fallback) since they're
 // consumed by third-party integrations authenticated via x-api-key.
@@ -20,7 +21,7 @@ interface DiagnoseRequest {
   location?: string;
 }
 
-function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: string; model: string }) {
+function analyzeSymptomsRaw(symptoms: string[], vehicle: { year: number; make: string; model: string }) {
   const text = symptoms.join(" ").toLowerCase();
 
   if (text.includes("grinding") || text.includes("brake")) {
@@ -46,6 +47,32 @@ function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: stri
   }
 
   return { issue: "Professional Inspection Recommended", description: "Multiple symptoms or unclear issue. A professional inspection will identify the specific problem.", urgency: "medium" as const, cost_estimate: { min: 100, max: 400 }, action: "Schedule an inspection appointment with a local mechanic", safety: "Safe to drive short distances unless symptoms worsen", diy_possible: false };
+}
+
+// R-56 (Batch 9): buckets whose definition names one specific repair that
+// exists in the shared rate table derive their cost_estimate from the
+// table, so the public API quotes the same figure as every other surface
+// for the same repair. Buckets spanning several repairs (overheating,
+// transmission) or lacking a table entry keep their bucket range and
+// visibly lack rate_source (Batch 6 matcher precedent: no match, no pin,
+// no invented rates).
+const BUCKET_RATE_LABELS: Record<string, string> = {
+  "Brake System Issue": "Brake Pads Replacement",
+  "Battery or Starting System Issue": "Battery Replacement",
+};
+
+export function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: string; model: string }) {
+  const result = analyzeSymptomsRaw(symptoms, vehicle);
+  const label = BUCKET_RATE_LABELS[result.issue];
+  if (label) {
+    const entry = findRepairRate(label);
+    if (entry) {
+      const figures = rateFigures(entry);
+      result.cost_estimate = { min: figures.shopTotal[0], max: figures.shopTotal[1] };
+      (result as any).rate_source = RATE_SOURCE_ID;
+    }
+  }
+  return result as any;
 }
 
 async function hashApiKey(key: string): Promise<string> {
@@ -119,8 +146,8 @@ export async function handleApiDiagnose(req: Request, endpoint: string): Promise
     const baseUrl = "https://wrenchli.net";
 
     const response = {
-      diagnosis: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate },
-      assessment: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate },
+      diagnosis: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate, ...(diagnosis.rate_source ? { rate_source: diagnosis.rate_source } : {}) },
+      assessment: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate, ...(diagnosis.rate_source ? { rate_source: diagnosis.rate_source } : {}) },
       assessment_title: diagnosis.issue,
       recommendations: { immediate_action: diagnosis.action, safety_advice: diagnosis.safety, diy_feasible: diagnosis.diy_possible },
       wrenchli_services: {

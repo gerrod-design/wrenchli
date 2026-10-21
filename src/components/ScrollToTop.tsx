@@ -14,11 +14,28 @@ export default function ScrollToTop() {
     if (hash) {
       let attempts = 0;
       let timer: ReturnType<typeof setTimeout> | undefined;
+      // The element can be found before the page layout has settled
+      // (hero media and fonts still loading above it): the smooth scroll
+      // is then clamped or lands short, and nothing re-checks, so a cold
+      // landing can end at the top of the page with the target section
+      // below the fold (audit R-65, intermittent on desktop cold loads).
+      // After the first scroll, verify the landing and keep retrying
+      // briefly until the element is actually at the top of the viewport.
+      const verifyLanding = () => {
+        if (!/^#[A-Za-z][\w-]*$/.test(hash)) return;
+        const el = document.querySelector(hash);
+        if (!el) return;
+        if (el.getBoundingClientRect().top > 24 && attempts++ < 20) {
+          el.scrollIntoView({ behavior: "smooth" });
+          timer = setTimeout(verifyLanding, 150);
+        }
+      };
       const tryScroll = () => {
         if (!/^#[A-Za-z][\w-]*$/.test(hash)) return;
         const el = document.querySelector(hash);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
+          timer = setTimeout(verifyLanding, 350);
         } else if (attempts++ < 20) {
           timer = setTimeout(tryScroll, 100);
         }

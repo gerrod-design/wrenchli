@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
@@ -140,6 +141,24 @@ ${historicalLine}`;
     if (!toolUse) throw new Error("No tool call in response");
 
     const diagnosis = toolUse.input;
+
+    // R-56 (Batch 9): pin the cost estimate to the shared rate table when
+    // the primary assessment matches an entry, so this path quotes the same
+    // figure as the consumer pipelines for the same repair. Runs before the
+    // diagnosis_records insert below, so the stored estimate is the figure
+    // the user was shown. No match: the model estimate stands, visibly
+    // lacking rate_source (Batch 6 matcher precedent).
+    const rateEntry = findRepairRate(diagnosis.primaryDiagnosis ?? "");
+    if (rateEntry) {
+      const figures = rateFigures(rateEntry);
+      diagnosis.costEstimate = {
+        min: figures.shopTotal[0],
+        max: figures.shopTotal[1],
+        breakdown:
+          `${rateEntry.label} — parts ${formatMoneyRange(figures.shopParts)} + labor ${formatMoneyRange(figures.shopLabor)} (shared rate table)`,
+      };
+      (diagnosis as any).rate_source = RATE_SOURCE_ID;
+    }
 
     // ── Session linkage (Outcomes agent dependency, 2026-09-25) ──
     // Ensure a diagnostic_sessions row exists and capture its id so

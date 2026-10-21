@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
+import { findRepairRate, rateFigures, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
@@ -117,6 +118,23 @@ Be specific and helpful. Provide realistic cost estimates in USD. If you cannot 
         JSON.stringify({ error: "Could not analyze the image. Please try with a clearer photo.", raw_response: content }),
         { status: 422, headers: { ...securityHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // R-56 (Batch 9): pin any repair option whose name matches the shared
+    // rate table to the table figure and stamp it with rate_source. Body-
+    // damage options (dents, bumpers, paint, panels) have no table entries
+    // and keep their model estimates, visibly lacking rate_source (Batch 6
+    // matcher precedent: no match, no pin, no invented rates).
+    if (Array.isArray(diagnosis.repair_options)) {
+      for (const option of diagnosis.repair_options) {
+        const rateEntry = findRepairRate(option.option ?? "");
+        if (rateEntry) {
+          const figures = rateFigures(rateEntry);
+          option.estimated_cost_low = figures.shopTotal[0];
+          option.estimated_cost_high = figures.shopTotal[1];
+          option.rate_source = RATE_SOURCE_ID;
+        }
+      }
     }
 
     return new Response(JSON.stringify({ diagnosis, image_urls }), {
