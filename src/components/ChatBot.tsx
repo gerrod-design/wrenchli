@@ -11,6 +11,13 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Msg } from "./chatbot/types";
 import { streamChat } from "./chatbot/streamChat";
+import {
+  consumePendingHandoff,
+  getMostRecentHandoff,
+  isHandoffExpired,
+  toChatHandoffParam,
+  type HandoffRef,
+} from "@/lib/handoff";
 import { useChatHistory } from "./chatbot/useChatHistory";
 import { MessageActions } from "./chatbot/MessageActions";
 import { ConversationList } from "./chatbot/ConversationList";
@@ -53,6 +60,10 @@ export default function ChatBot() {
     startNewChat, switchConversation, removeConversation, renameConversation, togglePin, clearAllHistory,
   } = useChatHistory();
   const [input, setInput] = useState("");
+  // Continuity Phase 1: the handoff seeding this conversation, if any.
+  const [activeHandoff, setActiveHandoff] = useState<HandoffRef | null>(null);
+  const [seededConvId, setSeededConvId] = useState<string | null>(null);
+  const sessionStartKeyRef = useRef<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -274,6 +285,95 @@ export default function ChatBot() {
     return startNewChat();
   }, [activeId, startNewChat]);
 
+  const getAuthToken = useCallback(async (): Promise<string | undefined> => {
+    try {
+      const { data } = await supabase.auth.getSession();
+      return data.session?.access_token ?? undefined;
+    } catch {
+      return undefined;
+    }
+  }, []);
+
+  // Continuity Phase 1: open a handoff-seeded conversation. The server holds
+  // the snapshot; this only passes the opaque reference and streams Aiden's
+  // opening line (the server composes it from the snapshot it resolved).
+  const startHandoffSession = useCallback(async (candidate: { ref: HandoffRef; expiredHint: boolean }) => {
+    const convId = ensureActiveConversation();
+    setActiveHandoff(candidate.ref);
+    setSeededConvId(convId);
+    setLoading(true);
+
+    let assistantSoFar = "";
+    const upsert = (chunk: string) => {
+      assistantSoFar += chunk;
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") {
+          return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
+        }
+        return [...prev, { role: "assistant", content: assistantSoFar }];
+      }, convId);
+    };
+    const resetPartial = () => {
+      assistantSoFar = "";
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") return prev.slice(0, -1);
+        return prev;
+      }, convId);
+    };
+
+    try {
+      await streamChat({
+        messages: [],
+        sessionStart: true,
+        handoff: toChatHandoffParam(candidate.ref, candidate.expiredHint),
+        authToken: await getAuthToken(),
+        onDelta: upsert,
+        onDone: () => setLoading(false),
+        onError: (msg) => { upsert(msg); setLoading(false); },
+        onRetry: resetPartial,
+      });
+    } catch {
+      upsert("Sorry, something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }, [ensureActiveConversation, setMessages, getAuthToken]);
+
+  // Fire the handoff session start once per (conversation, handoff) when the
+  // panel opens on an empty conversation and a handoff candidate exists: the
+  // pending one from the assessment bridge, else the most recent on this
+  // device (the return path). An expired token still starts the session with
+  // the hint so Aiden gives the honest expired message, never a guess.
+  useEffect(() => {
+    if (!open || loading) return;
+    if (messages.length > 0) return;
+    const pending = consumePendingHandoff();
+    let candidate: { ref: HandoffRef; expiredHint: boolean } | null = null;
+    if (pending) {
+      candidate = { ref: pending, expiredHint: false };
+      if (pending.kind === "token") {
+        const rec = getMostRecentHandoff();
+        if (rec && rec.ref.kind === "token" && rec.ref.token === pending.token) {
+          candidate.expiredHint = isHandoffExpired(rec);
+        }
+      }
+    } else {
+      const rec = getMostRecentHandoff();
+      if (rec) {
+        candidate = {
+          ref: rec.ref,
+          expiredHint: rec.ref.kind === "token" ? isHandoffExpired(rec) : false,
+        };
+      }
+    }
+    if (!candidate) return;
+    const key = `${activeId ?? "new"}:${candidate.ref.kind}:${candidate.ref.kind === "token" ? candidate.ref.token : candidate.ref.id}`;
+    if (sessionStartKeyRef.current === key) return;
+    sessionStartKeyRef.current = key;
+    void startHandoffSession(candidate);
+  }, [open, loading, activeId, messages, startHandoffSession]);
+
   const send = useCallback(async (override?: string) => {
     const text = (override ?? input).trim();
     if ((!text && pendingPhotos.length === 0) || loading) return;
@@ -337,6 +437,8 @@ export default function ChatBot() {
       await streamChat({
         messages: [...messages, userMsg],
         vehicleContext,
+        handoff: activeHandoff && activeId === seededConvId ? toChatHandoffParam(activeHandoff) : undefined,
+        authToken: await getAuthToken(),
         onDelta: upsert,
         onDone: () => {
           setLoading(false);
@@ -355,7 +457,7 @@ export default function ChatBot() {
       upsert("Sorry, something went wrong. Please try again.");
       setLoading(false);
     }
-  }, [input, loading, messages, pendingPhotos, setMessages, ensureActiveConversation]);
+  }, [input, loading, messages, pendingPhotos, setMessages, ensureActiveConversation, activeHandoff, seededConvId, activeId, getAuthToken]);
 
   const handleVinDecoded = useCallback((vehicle: DecodedVehicle) => {
     setVinModalOpen(false);

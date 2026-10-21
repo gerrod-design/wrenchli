@@ -47,6 +47,9 @@ export async function streamChat({
   onError,
   onRetry,
   vehicleContext,
+  handoff,
+  authToken,
+  sessionStart,
 }: {
   messages: Msg[];
   onDelta: (t: string) => void;
@@ -55,6 +58,12 @@ export async function streamChat({
   /** Called before an automatic retry so the caller can discard partial output. */
   onRetry?: () => void;
   vehicleContext?: { year?: string; make?: string; model?: string; mileage?: number };
+  /** Continuity Phase 1: opaque handoff reference; the server resolves it. */
+  handoff?: { token?: string; snapshotId?: string; clientExpiredHint?: boolean };
+  /** The signed-in user's access token, when one exists (session state only). */
+  authToken?: string;
+  /** True for the server-generated opening turn of a handoff session. */
+  sessionStart?: boolean;
 }) {
   // Keep only the most recent messages to stay within API limits
   const trimmedMessages = messages.length > MAX_MESSAGES_TO_SEND
@@ -92,7 +101,13 @@ export async function streamChat({
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: trimmedMessages, vehicleContext }),
+        body: JSON.stringify({
+          messages: trimmedMessages,
+          vehicleContext,
+          ...(handoff ? { handoff } : {}),
+          ...(authToken ? { authToken } : {}),
+          ...(sessionStart ? { sessionStart: true } : {}),
+        }),
         signal: fetchController.signal,
       });
     } catch (e) {

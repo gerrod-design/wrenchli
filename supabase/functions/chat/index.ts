@@ -4,6 +4,8 @@ import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 import { buildVehicleContext } from "./vehicle-known-issues.ts";
 import { buildGuardContext, enforceAidenGuards } from "./aiden-guard.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { buildSessionContext, resolveHandoff, SESSION_START_TURN } from "./handoff-context.ts";
+import type { HandoffRef, HandoffResolution } from "./handoff-context.ts";
 
 const MAX_MESSAGES = 80;
 const MAX_CONTENT_LENGTH = 8000;
@@ -832,20 +834,49 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!body || typeof body !== "object" || !Array.isArray((body as Record<string, unknown>).messages)) {
+    const reqBody = (body ?? {}) as Record<string, unknown>;
+    const sessionStart = reqBody.sessionStart === true;
+    if (!body || typeof body !== "object" || (!sessionStart && !Array.isArray(reqBody.messages))) {
       return new Response(
         JSON.stringify({ error: "Invalid request format" }),
         { status: 400, headers: { ...securityHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const validated = validateMessages((body as Record<string, unknown>).messages as unknown[], securityHeaders);
-    if (validated instanceof Response) return validated;
-    const messages = validated;
+    let messages: Array<{ role: string; content: string; image_urls?: string[] }> = [];
+    if (!sessionStart) {
+      const validated = validateMessages(reqBody.messages as unknown[], securityHeaders);
+      if (validated instanceof Response) return validated;
+      messages = validated;
+    }
 
-    const vehicleContext = (body as Record<string, unknown>).vehicleContext as
+    const vehicleContext = reqBody.vehicleContext as
       | { year?: string; make?: string; model?: string; mileage?: number }
       | undefined;
+    const handoffRef = (reqBody.handoff ?? undefined) as HandoffRef | undefined;
+    const authToken = typeof reqBody.authToken === "string" ? reqBody.authToken : undefined;
+    let userId: string | null = null;
+    let handoffResolution: HandoffResolution | null = null;
+    if (authToken || handoffRef) {
+      try {
+        const admin = createClient(
+          Deno.env.get("SUPABASE_URL") ?? "",
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+          { auth: { persistSession: false } },
+        );
+        if (authToken) {
+          const { data } = await admin.auth.getUser(authToken);
+          userId = data?.user?.id ?? null;
+        }
+        if (handoffRef) {
+          handoffResolution = await resolveHandoff(admin, handoffRef, userId);
+        }
+      } catch (e) {
+        console.error("Handoff resolution failed:", e);
+        if (handoffRef) handoffResolution = { status: "unreadable" };
+      }
+    }
+    const sessionContextStr = buildSessionContext(handoffResolution, { signedIn: !!userId });
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
@@ -853,8 +884,10 @@ Deno.serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
     const vehicleContextStr = buildVehicleContext(vehicleContext);
-    const systemContent = SYSTEM_PROMPT + vehicleContextStr;
-    const anthropicMessages = buildAnthropicMessages(messages);
+    const systemContent = SYSTEM_PROMPT + vehicleContextStr + sessionContextStr;
+    const anthropicMessages = sessionStart
+      ? [{ role: "user", content: SESSION_START_TURN }]
+      : buildAnthropicMessages(messages);
 
     // ── Aiden combined guard: one bounded regeneration, used ONLY when a
     // draft reply violates a guard (see aiden-guard.ts). Re-asks the model

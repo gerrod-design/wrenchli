@@ -5,6 +5,8 @@ import SymptomStep from "./steps/SymptomStep";
 import DiagnosisStep from "./steps/DiagnosisStep";
 import RecommendationStep from "./steps/RecommendationStep";
 import { logFunnelEvent, flushPendingFunnelEvents } from "@/lib/funnelTracking";
+import { buildSnapshotFromWizard, createAssessmentHandoff, setPendingHandoff } from "@/lib/handoff";
+import type { HandoffRef } from "@/lib/handoff";
 
 export type WizardStep = "vehicle" | "symptoms" | "diagnosing" | "recommendation";
 
@@ -14,6 +16,7 @@ export interface VehicleData {
   model: string;
   mileage: number;
   trim?: string;
+  vin?: string;
 }
 
 export interface SymptomData {
@@ -66,6 +69,32 @@ export default function DiagnosticWizard() {
   const [symptoms, setSymptoms] = useState<SymptomData | null>(null);
   const [diagnosis, setDiagnosis] = useState<DiagnosisResult | null>(null);
   const [recommendation, setRecommendation] = useState<RecommendationResult | null>(null);
+  // Continuity Phase 1: server-side snapshot of this completed assessment.
+  // The bridge offers continuity ONLY when the snapshot write succeeded
+  // (spec SS1.1) — a null ref leaves the bridge exactly as it was.
+  const [handoffRef, setHandoffRef] = useState<HandoffRef | null>(null);
+  const handoffAttemptedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (step !== "recommendation" || !vehicle || !symptoms || !diagnosis) return;
+    const key = sessionId ?? diagnosis.diagnosis_id ?? "anon";
+    if (handoffAttemptedRef.current === key) return;
+    handoffAttemptedRef.current = key;
+    let cancelled = false;
+    void createAssessmentHandoff(
+      buildSnapshotFromWizard({
+        vehicle,
+        symptoms: symptoms as unknown as Record<string, unknown>,
+        assessment: diagnosis,
+      }),
+      diagnosis.diagnosis_id,
+    ).then((ref) => {
+      if (!cancelled) setHandoffRef(ref);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [step, vehicle, symptoms, diagnosis, sessionId]);
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
   const stepIndex = ["vehicle", "symptoms", "diagnosing", "recommendation"].indexOf(step);
@@ -200,6 +229,8 @@ export default function DiagnosticWizard() {
               setDiagnosis(null);
               setRecommendation(null);
               setSessionId(null);
+              setHandoffRef(null);
+              handoffAttemptedRef.current = null;
             }}
           />
         )}
@@ -208,6 +239,7 @@ export default function DiagnosticWizard() {
       {/* Chat bridge */}
       <button
         onClick={() => {
+          if (handoffRef) setPendingHandoff(handoffRef);
           const chatTrigger = document.querySelector<HTMLElement>('[data-chat-trigger]');
           if (chatTrigger) {
             chatTrigger.click();

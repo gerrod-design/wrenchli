@@ -131,3 +131,6 @@ verify_jwt = true
 
 [functions.caleb-monitor]
 verify_jwt = true
+
+[functions.assessment-handoff]
+verify_jwt = false

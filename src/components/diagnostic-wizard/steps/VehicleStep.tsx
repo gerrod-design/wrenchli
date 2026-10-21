@@ -100,7 +100,7 @@ export default function VehicleStep({ onNext }: Props) {
         .insert({ id: sessionId, vehicle_id: vehicleId, status: "intake", anon_session_id: anonSessionId });
       if (sErr) throw sErr;
 
-      onNext({ year: y, make: make.trim(), model: model.trim(), mileage: m }, sessionId);
+      onNext({ year: y, make: make.trim(), model: model.trim(), mileage: m, vin: vin.trim() ? vin.trim().toUpperCase() : undefined }, sessionId);
     } catch (e: any) {
       setError(e.message || "Failed to create session");
     } finally {
