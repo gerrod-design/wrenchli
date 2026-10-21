@@ -56,6 +56,10 @@ export default function InlineChatWidget() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const vinCameraRef = useRef<HTMLInputElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const isStuckToBottomRef = useRef(true);
+  const mainTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const {
     voiceEnabled, toggleVoice, isListening, isSpeaking, transcript, setTranscript,
@@ -76,12 +80,53 @@ export default function InlineChatWidget() {
     if (transcript && voiceOwner === VOICE_OWNER) setInput(transcript);
   }, [transcript, voiceOwner]);
 
+  const scrollToBottomInstant = useCallback(() => {
+    const el = messagesContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, []);
+
+  // Stick-to-bottom scrolling (Batch 8.5, ported from the Batch 8 ChatBot fix):
+  // the messages container is scrolled directly instead of scrollIntoView on a
+  // sentinel — repeated smooth scrollIntoView calls restarted per streamed
+  // chunk and let the view lag behind / yank a reading user back to the bottom.
   useEffect(() => {
-    // Only scroll within the chat container, not the whole page
-    if (messages.length > 1) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (isStuckToBottomRef.current) {
+      scrollToBottomInstant();
     }
-  }, [messages]);
+  }, [messages, scrollToBottomInstant]);
+
+  // On mount (this widget's equivalent of "open"), pin to bottom and re-pin
+  // as message/layout height settles after first paint.
+  useEffect(() => {
+    isStuckToBottomRef.current = true;
+    scrollToBottomInstant();
+    const frame = requestAnimationFrame(() => {
+      if (isStuckToBottomRef.current) scrollToBottomInstant();
+    });
+    const t300 = setTimeout(() => {
+      if (isStuckToBottomRef.current) scrollToBottomInstant();
+    }, 300);
+    const t900 = setTimeout(() => {
+      if (isStuckToBottomRef.current) scrollToBottomInstant();
+    }, 900);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(t300);
+      clearTimeout(t900);
+    };
+  }, [scrollToBottomInstant]);
+
+  // Auto-grow both composer textareas (only one is mounted at a time) to fit
+  // content up to 120px, then scroll internally.
+  useEffect(() => {
+    for (const ref of [mainTextareaRef, editTextareaRef]) {
+      const el = ref.current;
+      if (el) {
+        el.style.height = "auto";
+        el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+      }
+    }
+  }, [input]);
 
   const uploadPhoto = async (file: File): Promise<string | null> => {
     if (!file.type.startsWith("image/")) { toast.error("Only image files are supported."); return null; }
@@ -185,6 +230,7 @@ export default function InlineChatWidget() {
   const send = useCallback(async (override?: string) => {
     const text = (override ?? input).trim();
     if ((!text && pendingPhotos.length === 0) || loading) return;
+    isStuckToBottomRef.current = true;
     setInput("");
     const userMsg: Msg = {
       role: "user",
@@ -325,7 +371,13 @@ export default function InlineChatWidget() {
           })()}
 
           {/* Chat messages area */}
-          <div className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}>
+          <div
+            ref={messagesContainerRef}
+            onScroll={(e) => {
+              const el = e.currentTarget;
+              isStuckToBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight <= 80;
+            }}
+            className="overflow-y-auto px-4 py-4 space-y-3" style={{ maxHeight: isMobile ? "350px" : "380px", minHeight: "200px", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}>
             {messages.map((m, i) => {
               // Hide auto-handoff "ok" messages from user
               if (m.role === "user" && /^ok$/i.test(m.content.trim())) {
@@ -625,12 +677,21 @@ export default function InlineChatWidget() {
             ) : (
               /* ── Text mode (default) ── */
               <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2">
-                <input
+                <textarea
+                  ref={mainTextareaRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      send();
+                    }
+                  }}
                   placeholder={pendingPhotos.length > 0 ? "Describe the damage (optional)…" : "Tell me what's going on…"}
                   maxLength={8000}
-                  className="flex-1 rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-ring"
+                  rows={1}
+                  style={{ maxHeight: "120px" }}
+                  className="flex-1 rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-ring resize-none overflow-y-auto"
                   disabled={loading}
                 />
                 <button type="submit" disabled={loading || (!input.trim() && pendingPhotos.length === 0)}
@@ -672,12 +733,21 @@ export default function InlineChatWidget() {
             {/* Transcript preview in voice mode with text input for editing */}
             {voiceEnabled && input && !isListening && (
               <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 mt-2">
-                <input
+                <textarea
+                  ref={editTextareaRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      send();
+                    }
+                  }}
                   placeholder="Edit before sending…"
                   maxLength={8000}
-                  className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+                  rows={1}
+                  style={{ maxHeight: "120px" }}
+                  className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring resize-none overflow-y-auto"
                   disabled={loading}
                 />
                 <button type="submit" disabled={loading || !input.trim()}
