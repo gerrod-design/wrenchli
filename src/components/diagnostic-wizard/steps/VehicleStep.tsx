@@ -84,6 +84,11 @@ export default function VehicleStep({ onNext }: Props) {
     try {
       const anonSessionId = getAnonSessionId();
 
+      // RLS admits the guest shape only for the anon role; an authenticated insert
+      // must carry user_id to satisfy the owner policies on both tables.
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData?.session?.user?.id ?? null;
+
       // Pre-generate IDs so we don't need SELECT policies for anon users
       const vehicleId = crypto.randomUUID();
       const sessionId = crypto.randomUUID();
@@ -91,13 +96,13 @@ export default function VehicleStep({ onNext }: Props) {
       // Create vehicle record (no .select() — anon has no SELECT policy)
       const { error: vErr } = await supabase
         .from("vehicles")
-        .insert({ id: vehicleId, year: y, make: make.trim(), model: model.trim(), mileage: m, anon_session_id: anonSessionId } as any);
+        .insert({ id: vehicleId, year: y, make: make.trim(), model: model.trim(), mileage: m, anon_session_id: anonSessionId, ...(userId ? { user_id: userId } : {}) } as any);
       if (vErr) throw vErr;
 
       // Create diagnostic session
       const { error: sErr } = await supabase
         .from("diagnostic_sessions")
-        .insert({ id: sessionId, vehicle_id: vehicleId, status: "intake", anon_session_id: anonSessionId });
+        .insert({ id: sessionId, vehicle_id: vehicleId, status: "intake", anon_session_id: anonSessionId, ...(userId ? { user_id: userId } : {}) });
       if (sErr) throw sErr;
 
       onNext({ year: y, make: make.trim(), model: model.trim(), mileage: m, vin: vin.trim() ? vin.trim().toUpperCase() : undefined }, sessionId);

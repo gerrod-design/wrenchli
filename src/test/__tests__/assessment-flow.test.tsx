@@ -418,3 +418,89 @@ describe("Shop Selection", () => {
     expect(spinner).toBeInTheDocument();
   });
 });
+
+/* ================================================================== */
+/* TEST 5: Step 1 insert ownership (R-71)                              */
+/* ================================================================== */
+
+
+describe("Assessment Flow — Step 1 insert ownership (R-71)", () => {
+  let insertedRows: Record<string, any[]>;
+
+  beforeEach(() => {
+    insertedRows = {};
+
+    (supabase.from as Mock).mockImplementation((table: string) => ({
+      insert: vi.fn((row: any) => {
+        (insertedRows[table] ??= []).push(row);
+        return Promise.resolve({ error: null });
+      }),
+    }));
+
+    (supabase.functions.invoke as Mock).mockResolvedValue({ data: null, error: null });
+  });
+
+  async function fillAndContinue() {
+    renderWizard();
+
+    fireEvent.change(screen.getByPlaceholderText("Year (e.g. 2019)"), {
+      target: { value: "2019" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Make (e.g. Honda)"), {
+      target: { value: "Ford" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Model (e.g. Civic)"), {
+      target: { value: "F-150" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Mileage"), {
+      target: { value: "85000" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /continue/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Describe the problem")).toBeInTheDocument();
+    });
+  }
+
+  it("guest submit inserts carry anon_session_id and no user_id", async () => {
+    (supabase.auth.getSession as Mock).mockResolvedValue({
+      data: { session: null },
+      error: null,
+    });
+
+    await fillAndContinue();
+
+    expect(insertedRows.vehicles).toHaveLength(1);
+    const vehicleRow = insertedRows.vehicles[0];
+    expect(vehicleRow.anon_session_id).toBe("test-anon-session-id");
+    expect(vehicleRow).not.toHaveProperty("user_id");
+
+    const sessionRow = insertedRows.diagnostic_sessions[0];
+    expect(sessionRow.anon_session_id).toBe("test-anon-session-id");
+    expect(sessionRow).not.toHaveProperty("user_id");
+    expect(sessionRow.vehicle_id).toBe(vehicleRow.id);
+  });
+
+  it("signed-in submit inserts carry user_id on both tables", async () => {
+    (supabase.auth.getSession as Mock).mockResolvedValue({
+      data: {
+        session: {
+          user: { id: "user-r71" },
+          access_token: "tok",
+        },
+      },
+      error: null,
+    });
+
+    await fillAndContinue();
+
+    const vehicleRow = insertedRows.vehicles[0];
+    expect(vehicleRow.user_id).toBe("user-r71");
+    expect(vehicleRow.anon_session_id).toBe("test-anon-session-id");
+
+    const sessionRow = insertedRows.diagnostic_sessions[0];
+    expect(sessionRow.user_id).toBe("user-r71");
+    expect(sessionRow.vehicle_id).toBe(vehicleRow.id);
+  });
+});
