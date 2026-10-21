@@ -127,9 +127,52 @@ export default function ChatBot() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Stick-to-bottom scrolling (Batch 8, F12): the messages container is
+  // scrolled directly instead of scrollIntoView on a sentinel — repeated
+  // smooth scrollIntoView calls restarted per streamed chunk and let the
+  // view lag behind / land away from the latest message.
+  const isStuckToBottomRef = useRef(true);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const scrollToBottomInstant = useCallback(() => {
+    const el = dropZoneRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, []);
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (isStuckToBottomRef.current) scrollToBottomInstant();
+  }, [messages, scrollToBottomInstant]);
+
+  useEffect(() => {
+    if (!open) return;
+    isStuckToBottomRef.current = true;
+    scrollToBottomInstant();
+    // Message height can still settle after open (font swap, markdown
+    // layout) — re-pin shortly after, but only while the user is still
+    // stuck to the bottom (scrolling up cancels via the onScroll flag).
+    const raf = requestAnimationFrame(() => {
+      if (isStuckToBottomRef.current) scrollToBottomInstant();
+    });
+    const t1 = setTimeout(() => {
+      if (isStuckToBottomRef.current) scrollToBottomInstant();
+    }, 300);
+    const t2 = setTimeout(() => {
+      if (isStuckToBottomRef.current) scrollToBottomInstant();
+    }, 900);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [open, scrollToBottomInstant]);
+
+  // Auto-grow the composer textarea as dictation/typing adds lines (F9).
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  }, [input]);
 
   const uploadPhoto = async (file: File): Promise<string | null> => {
     if (!file.type.startsWith("image/")) { toast.error("Only image files are supported."); return null; }
@@ -234,6 +277,7 @@ export default function ChatBot() {
   const send = useCallback(async (override?: string) => {
     const text = (override ?? input).trim();
     if ((!text && pendingPhotos.length === 0) || loading) return;
+    isStuckToBottomRef.current = true;
     const convId = ensureActiveConversation();
     setInput("");
     const userMsg: Msg = {
@@ -415,7 +459,7 @@ export default function ChatBot() {
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed inset-x-0 bottom-[60px] z-[45] flex flex-col overflow-hidden rounded-t-2xl border border-border bg-card shadow-2xl md:inset-x-auto md:bottom-8 md:right-6 md:w-[340px] md:max-w-[calc(100vw-2rem)] md:rounded-2xl"
-            style={{ height: isMobile ? "calc(100dvh - 60px)" : "min(440px, calc(100vh - 10rem))", WebkitTransform: "translate3d(0,0,0)", overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" } as React.CSSProperties}
+            style={{ height: isMobile ? "calc(100dvh - 60px - 64px)" : "min(440px, calc(100vh - 10rem))", WebkitTransform: "translate3d(0,0,0)", overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" } as React.CSSProperties}
           >
             {/* Header */}
             <div className="flex items-center justify-between bg-primary px-4 py-3">
@@ -529,6 +573,10 @@ export default function ChatBot() {
                 {/* Messages */}
                 <div
                   ref={dropZoneRef}
+                  onScroll={(e) => {
+                    const el = e.currentTarget;
+                    isStuckToBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight <= 80;
+                  }}
                   onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}
                   className={`flex-1 overflow-y-auto px-4 py-3 space-y-3 relative transition-colors ${isDragOver ? "bg-accent/10" : ""}`}
                   style={{ WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}
@@ -780,9 +828,10 @@ export default function ChatBot() {
                         setMessages((prev) => [...prev, userMsg, assistantMsg], convId);
                       }}
                     />
-                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Sound</span>
+                    <span className="text-[11px] leading-none font-medium whitespace-nowrap">Record Car Sound</span>
                     <span className="text-[11px] text-muted-foreground italic">Powered by Google AI</span>
                   </span>
+                  {/* Blue highlight is deliberate: it marks "Describe issue" as the primary capture path; the other capture actions stay uniform gray. */}
                   <button type="button" onClick={() => setSymptomModalOpen(true)} disabled={loading || uploading}
                     className="flex flex-col items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors disabled:opacity-40" aria-label={FEATURE_NAME}>
                     <span className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-blue-500/10"><Film className="h-4 w-4" /></span>
@@ -798,10 +847,16 @@ export default function ChatBot() {
                 {/* Input */}
                 <div className="border-t border-border">
                   <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-center gap-2 px-3 py-2">
-                    <input value={input} onChange={(e) => setInput(e.target.value)}
+                    <textarea ref={textareaRef} rows={1} value={input} onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          send();
+                        }
+                      }}
                       placeholder={isListening ? "Listening…" : pendingPhotos.length > 0 ? "Describe the damage (optional)…" : voiceEnabled ? "Tap mic or type…" : "Type a message…"}
                       maxLength={8000}
-                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring" disabled={loading} />
+                      className="flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring overflow-y-auto" style={{ maxHeight: "120px" }} disabled={loading} />
                     {voiceEnabled && supportsSTT && (
                       <>
                         {isListening && <AudioWaveform />}

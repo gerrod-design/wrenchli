@@ -7,30 +7,47 @@ interface DIYOutcomePromptProps {
 }
 
 export default function DIYOutcomePrompt({ sessionId, onGoToShop }: DIYOutcomePromptProps) {
-  const [status, setStatus] = useState<"prompt" | "saving" | "done">("prompt");
+  const [status, setStatus] = useState<"prompt" | "saving" | "done" | "error">("prompt");
+  const [lastArgs, setLastArgs] = useState<{
+    problemFixed: "yes" | "no";
+    diyNotes: string;
+    noVisitReason?: string;
+  } | null>(null);
 
   const submit = async (
     problemFixed: "yes" | "no",
     diyNotes: string,
     noVisitReason?: string
   ) => {
+    setLastArgs({ problemFixed, diyNotes, noVisitReason });
     setStatus("saving");
-    // Fire-and-forget to report-diagnostic-outcome edge function
+    // Report-diagnostic-outcome edge function
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/report-diagnostic-outcome`;
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-      },
-      body: JSON.stringify({
-        session_id: sessionId,
-        shop_visit: false,
-        problem_fixed: problemFixed,
-        diy_notes: diyNotes,
-        no_visit_reason: noVisitReason,
-      }),
-    }).catch(console.error);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          shop_visit: false,
+          problem_fixed: problemFixed,
+          diy_notes: diyNotes,
+          no_visit_reason: noVisitReason,
+        }),
+      });
+
+      if (!response.ok) {
+        setStatus("error");
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+      return;
+    }
 
     setStatus("done");
 
@@ -44,6 +61,30 @@ export default function DIYOutcomePrompt({ sessionId, onGoToShop }: DIYOutcomePr
       <p className="text-xs text-muted-foreground text-center py-3">
         Thanks — this helps us improve.
       </p>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>
+        <p className="text-sm font-medium" style={{ color: "#F5F5F5" }}>
+          We couldn't send your answer.
+        </p>
+        <p className="text-[11px] text-muted-foreground">
+          Please check your connection and try again.
+        </p>
+        <button
+          onClick={() => {
+            if (lastArgs) {
+              submit(lastArgs.problemFixed, lastArgs.diyNotes, lastArgs.noVisitReason);
+            }
+          }}
+          className="px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+          style={{ background: "#3B82F620", color: "#3B82F6", border: "1px solid #3B82F640" }}
+        >
+          Try again
+        </button>
+      </div>
     );
   }
 

@@ -124,7 +124,7 @@ export default function Navbar() {
   }, [location.pathname]);
 
   return (
-    <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+    <nav className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg">
       <div className="container-wrenchli flex h-16 items-center justify-between md:h-[68px]">
         {/* Logo */}
         <Link to="/" className="flex flex-col">
@@ -273,7 +273,7 @@ export default function Navbar() {
             <Button asChild className="h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-base" onClick={() => setOpen(false)}>
               <Link to="/#quote">Free Assessment</Link>
             </Button>
-            <Button asChild variant="outline" className="h-12 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground text-base" onClick={() => setOpen(false)}>
+            <Button asChild variant="outline" className="h-12 bg-transparent border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground text-base" onClick={() => setOpen(false)}>
               <Link to="/for-shops#apply">For Shops</Link>
             </Button>
             <Button asChild variant="ghost" className="h-12 text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 text-base" onClick={() => setOpen(false)}>
