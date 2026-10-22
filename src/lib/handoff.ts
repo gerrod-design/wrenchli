@@ -254,7 +254,8 @@ function saveDeviceHandoff(record: DeviceHandoff): void {
 
 export async function createAssessmentHandoff(
   snapshot: HandoffSnapshot,
-  sourceAssessmentId?: string
+  sourceAssessmentId?: string,
+  userVehicleId?: string
 ): Promise<HandoffRef | null> {
   try {
     const { data, error } = await supabase.functions.invoke("assessment-handoff", {
@@ -262,6 +263,7 @@ export async function createAssessmentHandoff(
         action: "create",
         snapshot,
         ...(sourceAssessmentId ? { sourceAssessmentId } : {}),
+        ...(userVehicleId ? { userVehicleId } : {}),
       },
     });
 

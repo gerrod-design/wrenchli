@@ -201,6 +201,25 @@ function jsonResponse(body: unknown, status: number, headers: Record<string, str
   });
 }
 
+async function resolveOwnerUserId(req: Request): Promise<string | null> {
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const presented = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+
+  let ownerUserId: string | null = null;
+  if (presented) {
+    const anonClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    );
+    const { data, error } = await anonClient.auth.getUser(presented);
+    if (!error && data?.user) {
+      ownerUserId = data.user.id;
+    }
+  }
+
+  return ownerUserId;
+}
+
 serve(async (req: Request) => {
   const corsResponse = handleCorsOptions(req);
   if (corsResponse) return corsResponse;
@@ -239,7 +258,7 @@ serve(async (req: Request) => {
     return jsonResponse({ error: "Invalid JSON" }, 400, headers);
   }
 
-  if (!isPlainObject(body) || (body.action !== "create" && body.action !== "delete")) {
+  if (!isPlainObject(body) || (body.action !== "create" && body.action !== "delete" && body.action !== "link")) {
     return jsonResponse({ error: "Unknown action" }, 400, headers);
   }
 
@@ -269,6 +288,62 @@ serve(async (req: Request) => {
     return jsonResponse({ deleted: data?.length ?? 0 }, 200, headers);
   }
 
+  // R-70 Tier 2 claim step: the client proposes candidate handoffs from its own
+  // exact-match rule; this function verifies ownership of both sides server-side
+  // before linking.
+  if (body.action === "link") {
+    const linkUserVehicleId = (body as Record<string, unknown>).userVehicleId;
+    const linkHandoffIds = (body as Record<string, unknown>).handoffIds;
+
+    const linkUserVehicleIdValid =
+      typeof linkUserVehicleId === "string" && linkUserVehicleId.length >= 1 && linkUserVehicleId.length <= 64;
+    const linkHandoffIdsValid =
+      Array.isArray(linkHandoffIds) &&
+      linkHandoffIds.length >= 1 &&
+      linkHandoffIds.length <= 50 &&
+      linkHandoffIds.every((id) => typeof id === "string" && id.length >= 1 && id.length <= 64);
+
+    if (!linkUserVehicleIdValid || !linkHandoffIdsValid) {
+      return jsonResponse({ error: "Invalid link request" }, 400, headers);
+    }
+
+    const linkOwnerUserId = await resolveOwnerUserId(req);
+    if (!linkOwnerUserId) {
+      return jsonResponse({ error: "Sign-in required" }, 401, headers);
+    }
+
+    const { data: linkVehicle, error: linkVehicleError } = await serviceClient
+      .from("user_vehicles")
+      .select("id")
+      .eq("id", linkUserVehicleId as string)
+      .eq("user_id", linkOwnerUserId)
+      .maybeSingle();
+
+    if (linkVehicleError) {
+      console.error(linkVehicleError.message);
+      return jsonResponse({ error: "Could not link assessments" }, 500, headers);
+    }
+
+    if (!linkVehicle) {
+      return jsonResponse({ error: "Vehicle not found for this account" }, 403, headers);
+    }
+
+    const { data: linkUpdated, error: linkUpdateError } = await serviceClient
+      .from("assessment_handoffs")
+      .update({ user_vehicle_id: linkUserVehicleId as string })
+      .in("id", linkHandoffIds as string[])
+      .eq("owner_user_id", linkOwnerUserId)
+      .is("user_vehicle_id", null)
+      .select("id");
+
+    if (linkUpdateError) {
+      console.error(linkUpdateError.message);
+      return jsonResponse({ error: "Could not link assessments" }, 500, headers);
+    }
+
+    return jsonResponse({ linked: linkUpdated?.length ?? 0 }, 200, headers);
+  }
+
   // action === "create"
   const rebuilt = validateSnapshot(body.snapshot);
   if (!rebuilt) {
@@ -282,18 +357,37 @@ serve(async (req: Request) => {
     }
   }
 
-  const authHeader = req.headers.get("Authorization") ?? "";
-  const presented = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  const ownerUserId = await resolveOwnerUserId(req);
 
-  let ownerUserId: string | null = null;
-  if (presented) {
-    const anonClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
-    const { data, error } = await anonClient.auth.getUser(presented);
-    if (!error && data?.user) {
-      ownerUserId = data.user.id;
+  // The stamp is best-effort metadata; any doubt (not owned, VIN conflict)
+  // saves the handoff unlinked rather than failing the save.
+  let stampedVehicleId: string | null = null;
+  const requestedUserVehicleId = (body as Record<string, unknown>).userVehicleId;
+  if (
+    ownerUserId &&
+    typeof requestedUserVehicleId === "string" &&
+    requestedUserVehicleId.length >= 1 &&
+    requestedUserVehicleId.length <= 64
+  ) {
+    const { data: stampVehicle, error: stampVehicleError } = await serviceClient
+      .from("user_vehicles")
+      .select("id, vin")
+      .eq("id", requestedUserVehicleId)
+      .eq("user_id", ownerUserId)
+      .maybeSingle();
+
+    if (!stampVehicleError && stampVehicle) {
+      const snapshotVehicle = isPlainObject(rebuilt.vehicle) ? rebuilt.vehicle : null;
+      const snapshotVin =
+        snapshotVehicle && typeof snapshotVehicle.vin === "string"
+          ? snapshotVehicle.vin.trim().toUpperCase()
+          : "";
+      const vehicleVin = typeof stampVehicle.vin === "string" ? stampVehicle.vin.trim().toUpperCase() : "";
+      const vinConflict = snapshotVin !== "" && vehicleVin !== "" && snapshotVin !== vehicleVin;
+
+      if (!vinConflict) {
+        stampedVehicleId = stampVehicle.id;
+      }
     }
   }
 
@@ -304,6 +398,7 @@ serve(async (req: Request) => {
         owner_user_id: ownerUserId,
         snapshot: rebuilt,
         source_assessment_id: sourceAssessmentId,
+        user_vehicle_id: stampedVehicleId,
       })
       .select("id")
       .single();
@@ -313,7 +408,7 @@ serve(async (req: Request) => {
       return jsonResponse({ error: "Could not save the assessment handoff" }, 500, headers);
     }
 
-    return jsonResponse({ id: data.id, kind: "owned" }, 200, headers);
+    return jsonResponse({ id: data.id, kind: "owned", userVehicleLinked: stampedVehicleId !== null }, 200, headers);
   }
 
   // Token path — signed-out caller.

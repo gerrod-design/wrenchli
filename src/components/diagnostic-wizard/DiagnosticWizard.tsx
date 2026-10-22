@@ -6,6 +6,8 @@ import DiagnosisStep from "./steps/DiagnosisStep";
 import RecommendationStep from "./steps/RecommendationStep";
 import { logFunnelEvent, flushPendingFunnelEvents } from "@/lib/funnelTracking";
 import { buildSnapshotFromWizard, createAssessmentHandoff, setPendingHandoff } from "@/lib/handoff";
+import { resolveStampVehicleId } from "@/lib/handoffLink";
+import { useSearchParams } from "react-router-dom";
 import type { HandoffRef } from "@/lib/handoff";
 
 export type WizardStep = "vehicle" | "symptoms" | "diagnosing" | "recommendation";
@@ -75,6 +77,23 @@ export default function DiagnosticWizard() {
   const [handoffRef, setHandoffRef] = useState<HandoffRef | null>(null);
   const handoffAttemptedRef = useRef<string | null>(null);
 
+  // R-70: a Garage card launch carries the vehicle id + its YMM; guests and direct visits have no launch identity
+  const [searchParams] = useSearchParams();
+  const launchRef = useRef<{ userVehicleId: string; year: number; make: string; model: string } | null>(null);
+  const launchCapturedRef = useRef(false);
+  if (!launchCapturedRef.current) {
+    launchCapturedRef.current = true;
+    const userVehicleId = searchParams.get("vehicleId");
+    const yearParam = searchParams.get("year");
+    const make = searchParams.get("make");
+    const model = searchParams.get("model");
+    const year = yearParam ? parseInt(yearParam, 10) : NaN;
+    launchRef.current =
+      userVehicleId && Number.isFinite(year) && make && model
+        ? { userVehicleId, year, make, model }
+        : null;
+  }
+
   useEffect(() => {
     if (step !== "recommendation" || !vehicle || !symptoms || !diagnosis) return;
     const key = sessionId ?? diagnosis.diagnosis_id ?? "anon";
@@ -88,6 +107,7 @@ export default function DiagnosticWizard() {
         assessment: diagnosis,
       }),
       diagnosis.diagnosis_id,
+      resolveStampVehicleId(launchRef.current, vehicle) ?? undefined,
     ).then((ref) => {
       if (!cancelled) setHandoffRef(ref);
     });

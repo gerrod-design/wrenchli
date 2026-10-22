@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { AssessmentSummary } from "@/lib/handoffLink";
 import { Link, useNavigate } from "react-router-dom";
 import { MoreHorizontal, Trash2, Edit2, Search, AlertTriangle, Clock, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,14 +35,30 @@ function detectBodyType(make: string, model: string): string {
 }
 
 // ─── Health ring ────────────────────────────────────────────────
-function HealthRing({ size = 48 }: { size?: number }) {
+function HealthRing({
+  size = 48,
+  assessmentCount = 0,
+  latestAssessmentDate = null,
+}: {
+  size?: number;
+  assessmentCount?: number;
+  latestAssessmentDate?: string | null;
+}) {
   const strokeWidth = 3;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  // No assessments: grey, 0%
-  const color = "rgba(255,255,255,0.2)";
-  const percent = 0;
+  // R-70: the ring reflects this vehicle's linked assessments — a full
+  // accent ring with the count when any exist; grey 0% when none. It is a
+  // presence indicator, not an invented health score.
+  const hasAssessments = assessmentCount > 0;
+  const color = hasAssessments ? "#E07B39" : "rgba(255,255,255,0.2)";
+  const percent = hasAssessments ? 100 : 0;
   const offset = circumference - (percent / 100) * circumference;
+  const tooltipText = hasAssessments
+    ? latestAssessmentDate
+      ? `${assessmentCount} assessment${assessmentCount === 1 ? "" : "s"} · latest ${new Date(latestAssessmentDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+      : `${assessmentCount} assessment${assessmentCount === 1 ? "" : "s"}`
+    : "No assessments yet";
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -73,14 +90,18 @@ function HealthRing({ size = 48 }: { size?: number }) {
                 className="transition-[stroke-dashoffset] duration-700 ease-out"
               />
             </svg>
-            <span className="absolute text-[10px] text-white/40">—</span>
+            {hasAssessments ? (
+              <span className="absolute text-[11px] font-semibold text-white/90">{assessmentCount}</span>
+            ) : (
+              <span className="absolute text-[10px] text-white/40">—</span>
+            )}
           </div>
         </TooltipTrigger>
         <TooltipContent
           side="left"
           className="bg-[#1a1a24] text-white/80 border-white/10 text-xs"
         >
-          No assessments yet
+          {tooltipText}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -104,12 +125,15 @@ interface Props {
    * face shows the sourced reading and its date only — no estimate, and
    * "No reading on record yet" when the ledger is empty. */
   latestReading?: MileageReading | null;
+  /** R-70: this vehicle's linked assessments (count + latest date), read
+   *  by user_vehicle_id — null when none are linked. */
+  assessmentSummary?: AssessmentSummary | null;
   unreadRecalls: number;
   onDelete: (id: string) => void;
   onEdit: (v: CloudVehicle) => void;
 }
 
-export default function InteractiveVehicleCard({ vehicle, latestReading, unreadRecalls, onDelete, onEdit }: Props) {
+export default function InteractiveVehicleCard({ vehicle, latestReading, unreadRecalls, assessmentSummary, onDelete, onEdit }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
@@ -151,7 +175,7 @@ export default function InteractiveVehicleCard({ vehicle, latestReading, unreadR
       >
         {/* Health ring — top-right */}
         <div className="absolute top-4 right-4 z-10">
-          <HealthRing size={48} />
+          <HealthRing size={48} assessmentCount={assessmentSummary?.count ?? 0} latestAssessmentDate={assessmentSummary?.latestDate ?? null} />
         </div>
 
         {/* Menu — top-right below health ring */}
@@ -301,7 +325,9 @@ export default function InteractiveVehicleCard({ vehicle, latestReading, unreadR
               className="text-xs text-white/60 font-medium"
               style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             >
-              No assessments
+              {assessmentSummary && assessmentSummary.count > 0
+                ? `${assessmentSummary.count} assessment${assessmentSummary.count === 1 ? "" : "s"}`
+                : "No assessments"}
             </span>
           </div>
         </div>
@@ -312,7 +338,7 @@ export default function InteractiveVehicleCard({ vehicle, latestReading, unreadR
         <Button
           className="w-full h-11 text-sm font-bold bg-accent text-white hover:bg-accent/90 rounded-xl shadow-lg shadow-accent/10 transition-all"
           onClick={() =>
-            navigate(`/?year=${vehicle.year}&make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}`)
+            navigate(`/?year=${vehicle.year}&make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}&vehicleId=${vehicle.id}`)
           }
         >
           <Search className="mr-2 h-4 w-4" /> Start Assessment

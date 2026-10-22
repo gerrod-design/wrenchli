@@ -397,6 +397,47 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_handoffs: {
+        Row: {
+          id: string
+          owner_user_id: string | null
+          token_hash: string | null
+          snapshot: Json
+          source_assessment_id: string | null
+          user_vehicle_id: string | null
+          expires_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          owner_user_id?: string | null
+          token_hash?: string | null
+          snapshot: Json
+          source_assessment_id?: string | null
+          user_vehicle_id?: string | null
+          expires_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          owner_user_id?: string | null
+          token_hash?: string | null
+          snapshot?: Json
+          source_assessment_id?: string | null
+          user_vehicle_id?: string | null
+          expires_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_handoffs_user_vehicle_id_fkey"
+            columns: ["user_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "user_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      },
       audit_runs: {
         Row: {
           agent_results: Json | null

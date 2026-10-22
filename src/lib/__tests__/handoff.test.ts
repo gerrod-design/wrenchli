@@ -244,3 +244,23 @@ describe("pending handoff notification (Continuity 1.1)", () => {
     expect(seen).toEqual(["wrenchli:pending-handoff", "wrenchli:pending-handoff"]);
   });
 });
+
+describe("createAssessmentHandoff userVehicleId (R-70)", () => {
+  it("includes userVehicleId in the invoke body when provided", async () => {
+    invokeMock.mockResolvedValue({ data: { kind: "owned", id: "h1" }, error: null });
+
+    await createAssessmentHandoff(buildTestSnapshot(), undefined, "uv-123");
+
+    const body = invokeMock.mock.calls[invokeMock.mock.calls.length - 1][1].body;
+    expect(body.userVehicleId).toBe("uv-123");
+  });
+
+  it("NEGATIVE CONTROL: omits userVehicleId from the invoke body when not provided", async () => {
+    invokeMock.mockResolvedValue({ data: { kind: "owned", id: "h1" }, error: null });
+
+    await createAssessmentHandoff(buildTestSnapshot());
+
+    const body = invokeMock.mock.calls[invokeMock.mock.calls.length - 1][1].body;
+    expect(body).not.toHaveProperty("userVehicleId");
+  });
+});

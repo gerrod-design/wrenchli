@@ -15,6 +15,8 @@ import {
 import MileageLedgerSection, { type OdometerPhotoResult } from "@/components/garage/MileageLedgerSection";
 import JourneyPlanSection from "@/components/garage/JourneyPlanSection";
 import { VehicleRecordProvider, useVehicleRecordContext } from "@/contexts/VehicleRecordContext";
+import VehicleAssessmentsSection from "@/components/garage/VehicleAssessmentsSection";
+import type { HandoffSnapshot } from "@/lib/handoff";
 import { supabase } from "@/integrations/supabase/client";
 import { formatReadingLabel } from "@/lib/mileage";
 import type { GarageVehicle, VehicleDocument, VehicleTimelineEvent } from "@/types/garageRecord";
@@ -169,6 +171,47 @@ function DrivingProfileCard({ vehicle, onSave }: {
 function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
   const { record, recalls } = useVehicleRecordContext();
   const [showMileageAsk, setShowMileageAsk] = useState(false);
+
+  // R-70 Tier 2: assessments linked to this vehicle (user_vehicle_id).
+  const [linkedAssessments, setLinkedAssessments] = useState<
+    Array<{ id: string; snapshot: HandoffSnapshot }>
+  >([]);
+  
+  useEffect(() => {
+    let cancelled = false;
+  
+    if (!vehicleId) {
+      setLinkedAssessments([]);
+      return () => {
+        cancelled = true;
+      };
+    }
+  
+    supabase
+      .from("assessment_handoffs")
+      .select("id, snapshot, created_at")
+      .eq("user_vehicle_id", vehicleId)
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+  
+        if (error || !data) {
+          setLinkedAssessments([]);
+          return;
+        }
+  
+        setLinkedAssessments(
+          data.map((row) => ({
+            id: row.id,
+            snapshot: row.snapshot as unknown as HandoffSnapshot,
+          }))
+        );
+      });
+  
+    return () => {
+      cancelled = true;
+    };
+  }, [vehicleId]);
 
   useEffect(() => {
     // Gate on the vehicle row itself: during the pre-auth pass the record is
@@ -385,6 +428,8 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
         </div>
 
         <DrivingProfileCard vehicle={vehicle} onSave={record.saveProfileFields} />
+
+        <VehicleAssessmentsSection handoffs={linkedAssessments} />
 
         <VehicleRecordSections
           loading={record.sectionsLoading}

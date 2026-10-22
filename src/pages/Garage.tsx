@@ -35,6 +35,7 @@ import InteractiveVehicleCard from "@/components/garage/InteractiveVehicleCard";
 import VehiclePhotoPicker from "@/components/garage/VehiclePhotoPicker";
 import { useResolvedVehiclePhoto, useVehicleOwnerPhoto } from "@/hooks/useVehicleOwnerPhoto";
 import { attachVehiclePhotoIfSelected, type VehiclePhotoClient } from "@/lib/vehiclePhoto";
+import { claimHandoffsForVehicle, fetchAssessmentSummaries, type AssessmentSummary } from "@/lib/handoffLink";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
@@ -234,6 +235,27 @@ function AddVehicleDialog({
         } catch {
           toast.warning("Vehicle added — the photo could not be saved. You can add it from the vehicle's card.");
         }
+      }
+
+      // R-70 Tier 2 claim step: attach this owner's previously saved,
+      // still-unlinked assessments that belong to this exact vehicle.
+      // Best-effort — the add already succeeded; a failed claim changes
+      // nothing the user sees beyond the missing link.
+      try {
+        const linkedCount = await claimHandoffsForVehicle({
+          id: data.id,
+          year: parseInt(year),
+          make,
+          model,
+          vin: vin.length === 17 ? vin : null,
+        });
+        if (linkedCount > 0) {
+          toast.success(
+            `${linkedCount} saved assessment${linkedCount === 1 ? "" : "s"} linked to this vehicle.`
+          );
+        }
+      } catch {
+        // claim is best-effort; ignore
       }
 
       toast.success("Vehicle added to your garage!");
@@ -592,6 +614,25 @@ export default function Garage() {
   const { vehicles, latestReadings, loading: vehiclesLoading, fetchVehicles, deleteVehicle } = useCloudVehicles();
 
   const vehicleIds = useMemo(() => vehicles.map((v) => v.id), [vehicles]);
+
+  // R-70: per-vehicle assessment summaries for the garage cards' health rings/footers
+  const [assessmentSummaries, setAssessmentSummaries] = useState<Record<string, AssessmentSummary>>({});
+  
+  useEffect(() => {
+    let cancelled = false;
+    if (!user || vehicleIds.length === 0) {
+      setAssessmentSummaries({});
+      return;
+    }
+    fetchAssessmentSummaries(vehicleIds).then((summaries) => {
+      if (!cancelled) {
+        setAssessmentSummaries(summaries);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [vehicleIds, user]);
   const { recalls, recallChecks, recallUnavailableVehicleIds, markAsRead, unreadByVehicle } = useVehicleRecalls(vehicleIds);
 
   // Pre-fill from URL params (from assessment save-to-garage)
@@ -721,6 +762,7 @@ export default function Garage() {
                   key={v.id}
                   vehicle={v}
                   latestReading={latestReadings[v.id] ?? null}
+                  assessmentSummary={assessmentSummaries[v.id] ?? null}
                   unreadRecalls={unreadByVehicle(v.id)}
                   onDelete={handleDelete}
                   onEdit={setEditingVehicle}
