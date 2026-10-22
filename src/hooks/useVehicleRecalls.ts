@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -75,7 +75,37 @@ export function useVehicleRecalls(vehicleIds: string[]) {
     }
   }, [user, vehicleIds.join(",")]);
 
-  useEffect(() => { fetchRecalls(); }, [fetchRecalls]);
+  // R-28 (follow-up): same auth-event re-fire guard as useVehicleRecord —
+  // the effect-driven load runs at most once per (user, vehicleIds) key;
+  // direct fetchRecalls() calls always fetch in full.
+  const lastUserIdRef = useRef<string | null>(null);
+  const inFlightKeysRef = useRef<Set<string>>(new Set());
+  const completedKeysRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const currentUserId = user?.id ?? null;
+    if (lastUserIdRef.current !== currentUserId) {
+      inFlightKeysRef.current.clear();
+      completedKeysRef.current.clear();
+      lastUserIdRef.current = currentUserId;
+    }
+
+    if (!user || vehicleIds.length === 0) {
+      fetchRecalls();
+      return;
+    }
+
+    const key = `${user.id}:${vehicleIds.join(",")}`;
+    if (inFlightKeysRef.current.has(key) || completedKeysRef.current.has(key)) {
+      return;
+    }
+
+    inFlightKeysRef.current.add(key);
+    Promise.resolve(fetchRecalls()).finally(() => {
+      inFlightKeysRef.current.delete(key);
+      completedKeysRef.current.add(key);
+    });
+  }, [fetchRecalls]);
 
   const markAsRead = useCallback(async (recallId: string) => {
     const { error } = await supabase

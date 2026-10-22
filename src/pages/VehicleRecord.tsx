@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, Download, Gauge, RefreshCw } from "lucide-react";
 import SEO from "@/components/SEO";
@@ -13,9 +13,8 @@ import {
   VehicleRecordSections,
 } from "@/components/garage/VehicleRecordSections";
 import MileageLedgerSection, { type OdometerPhotoResult } from "@/components/garage/MileageLedgerSection";
-import { useVehicleRecord } from "@/hooks/useVehicleRecord";
 import JourneyPlanSection from "@/components/garage/JourneyPlanSection";
-import { useVehicleRecalls } from "@/hooks/useVehicleRecalls";
+import { VehicleRecordProvider, useVehicleRecordContext } from "@/contexts/VehicleRecordContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatReadingLabel } from "@/lib/mileage";
 import type { GarageVehicle, VehicleDocument, VehicleTimelineEvent } from "@/types/garageRecord";
@@ -167,11 +166,8 @@ function DrivingProfileCard({ vehicle, onSave }: {
   );
 }
 
-export default function VehicleRecord() {
-  const { vehicleId } = useParams<{ vehicleId: string }>();
-  const record = useVehicleRecord(vehicleId);
-  const vehicleIds = useMemo(() => (vehicleId ? [vehicleId] : []), [vehicleId]);
-  const { recalls } = useVehicleRecalls(vehicleIds);
+function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
+  const { record, recalls } = useVehicleRecordContext();
   const [showMileageAsk, setShowMileageAsk] = useState(false);
 
   useEffect(() => {
@@ -415,5 +411,14 @@ export default function VehicleRecord() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function VehicleRecord() {
+  const { vehicleId } = useParams<{ vehicleId: string }>();
+  return (
+    <VehicleRecordProvider vehicleId={vehicleId}>
+      <VehicleRecordView vehicleId={vehicleId} />
+    </VehicleRecordProvider>
   );
 }

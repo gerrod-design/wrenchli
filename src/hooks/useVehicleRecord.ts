@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -233,8 +233,39 @@ export function useVehicleRecord(vehicleId?: string) {
     }
   }, [user, vehicleId]);
 
+  // R-28 (follow-up): AuthProvider emits a NEW user object on every auth
+  // event (initial session, sign-in, token refresh), and refresh is keyed
+  // on that object — so this effect used to re-fire the ENTIRE record wave
+  // once per auth event (measured 3x per page load). The effect-driven
+  // initial load now runs at most once per (user, vehicle) key. Direct
+  // refresh() calls (Refresh button, post-mutation) always fetch in full.
+  const lastUserIdRef = useRef<string | null>(null);
+  const inFlightKeysRef = useRef<Set<string>>(new Set());
+  const completedKeysRef = useRef<Set<string>>(new Set());
+
   useEffect(() => {
-    void refresh();
+    const currentUserId = user?.id ?? null;
+    if (lastUserIdRef.current !== currentUserId) {
+      inFlightKeysRef.current.clear();
+      completedKeysRef.current.clear();
+      lastUserIdRef.current = currentUserId;
+    }
+
+    if (!user || !vehicleId) {
+      void refresh();
+      return;
+    }
+
+    const key = `${user.id}:${vehicleId}`;
+    if (inFlightKeysRef.current.has(key) || completedKeysRef.current.has(key)) {
+      return;
+    }
+
+    inFlightKeysRef.current.add(key);
+    void refresh().finally(() => {
+      inFlightKeysRef.current.delete(key);
+      completedKeysRef.current.add(key);
+    });
   }, [refresh]);
 
   // Batch 5 (spec SS1/SS3): derived mileage state. The display value is
