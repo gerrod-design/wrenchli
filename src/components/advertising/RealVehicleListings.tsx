@@ -71,7 +71,7 @@ interface VehicleSearchParams {
 
 /* ─── Fetch from edge function ─── */
 
-async function fetchVehicleListings(params: VehicleSearchParams): Promise<{ listings: EnhancedVehicleListing[]; source: string }> {
+async function fetchVehicleListings(params: VehicleSearchParams): Promise<{ listings: EnhancedVehicleListing[]; source: string; unavailable: boolean }> {
   const { data, error } = await supabase.functions.invoke("vehicle-search", {
     body: {
       zipCode: params.userZipCode,
@@ -85,6 +85,13 @@ async function fetchVehicleListings(params: VehicleSearchParams): Promise<{ list
   });
 
   if (error) throw new Error(error.message || "Vehicle search failed");
+
+  // R-72: the listings feed is down (no key, rejected key, upstream error).
+  // Show the honest unavailable state — never substitute listings.
+  if (data?.available === false) {
+    return { listings: [], source: "unavailable", unavailable: true };
+  }
+
   if (!data?.success) throw new Error(data?.error || "No results");
 
   const listings: EnhancedVehicleListing[] = (data.listings || []).map((l: any) => ({
@@ -93,7 +100,7 @@ async function fetchVehicleListings(params: VehicleSearchParams): Promise<{ list
     source: l.source as EnhancedVehicleListing["source"],
   }));
 
-  return { listings, source: data.source || "unknown" };
+  return { listings, source: data.source || "unknown", unavailable: false };
 }
 
 /* ─── Relevance scoring ─── */
@@ -427,6 +434,7 @@ export const VehicleListingsSection = ({
   const [listings, setListings] = useState<EnhancedVehicleListing[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
   const [totalResults, setTotalResults] = useState(0);
   const [dataSource, setDataSource] = useState<string>("unknown");
 
@@ -434,6 +442,7 @@ export const VehicleListingsSection = ({
     if (!userZipCode) return;
     setLoading(true);
     setError(null);
+    setUnavailable(false);
     fetchVehicleListings({
       userZipCode,
       maxDistance: 50,
@@ -443,7 +452,8 @@ export const VehicleListingsSection = ({
       maxMileage: 100000,
       makes: ["Honda", "Toyota", "Ford", "Chevrolet", "Nissan"],
     })
-      .then(({ listings: all, source }) => {
+      .then(({ listings: all, source, unavailable: isUnavailable }) => {
+        setUnavailable(isUnavailable);
         all.sort((a, b) => relevanceScore(b) - relevanceScore(a));
         setListings(all.slice(0, 6));
         setTotalResults(all.length);
@@ -478,6 +488,19 @@ export const VehicleListingsSection = ({
     );
   }
 
+  if (unavailable) {
+    return (
+      <section className="bg-gradient-to-r from-ad-success-bg to-ad-success-bg-end rounded-2xl p-6 border border-ad-success-border">
+        <div className="text-center py-8">
+          <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-4" />
+          <h3 className="font-heading text-lg font-bold text-ad-success-heading mb-2">Listings Unavailable</h3>
+          <p className="text-sm text-ad-success-text mb-4">Car listings are temporarily unavailable. Try again shortly.</p>
+          <Button size="sm" onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </section>
+    );
+  }
+
   if (listings.length === 0) return null;
 
   const avgPayment = Math.round(listings.reduce((s, l) => s + (l.monthlyPayment?.amount || 0), 0) / listings.length);
@@ -491,7 +514,7 @@ export const VehicleListingsSection = ({
           <p className="text-sm text-ad-success-text">{totalResults} vehicles found within 50 miles • Better long-term value</p>
         </div>
         <Badge className="ml-auto bg-ad-vehicle-live text-ad-vehicle-live-text border-ad-vehicle-live-border">
-          {dataSource === "fallback" ? "Sample Results" : "Live Results"}
+          Live Results
         </Badge>
       </div>
 
