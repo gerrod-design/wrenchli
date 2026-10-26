@@ -31,6 +31,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { trackVoiceEvent } from "@/lib/voiceTelemetry";
+import {
+  consumePrefillMessage,
+  PREFILL_MESSAGE_EVENT,
+} from "@/lib/scanReport/prefill";
 import { SymptomFlowModal } from "@/components/symptoms/SymptomFlowModal";
 import { FEATURE_NAME } from "@/data/senseChips";
 import type { SymptomAnalysisResponse, SenseBundle } from "@/types/symptom";
@@ -153,6 +157,22 @@ export default function ChatBot() {
     window.addEventListener(HANDOFF_PENDING_EVENT, onPending);
     return () => window.removeEventListener(HANDOFF_PENDING_EVENT, onPending);
   }, []);
+
+  // Scan report import: "Go through this with Aiden" stashes a prefill
+  // message (see lib/scanReport/prefill). Consume it once: open the panel
+  // and place the text in the composer. It is never auto-sent.
+  useEffect(() => {
+    const applyPrefill = () => {
+      const message = consumePrefillMessage();
+      if (!message) return;
+      setOpen(true);
+      markInteracted();
+      setInput(message);
+    };
+    applyPrefill();
+    window.addEventListener(PREFILL_MESSAGE_EVENT, applyPrefill);
+    return () => window.removeEventListener(PREFILL_MESSAGE_EVENT, applyPrefill);
+  }, [markInteracted]);
 
   // Stick-to-bottom scrolling (Batch 8, F12): the messages container is
   // scrolled directly instead of scrollIntoView on a sentinel — repeated

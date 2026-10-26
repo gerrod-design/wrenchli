@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useNotificationPreferences, NotificationPrefs } from "@/hooks/useNotificationPreferences";
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
+import ProactiveSettings from "@/components/proactive/ProactiveSettings";
 
 interface ToggleRowProps {
   id: string;
@@ -182,6 +183,12 @@ export default function NotificationSettings() {
               unavailable
               unavailableNote="Market value tracking isn't live yet — there's no valuation feed behind these alerts today, so they can't be sent. We'll announce it here when it launches."
             />
+          </div>
+        )}
+
+        {!loading && (
+          <div className="mt-6">
+            <ProactiveSettings />
           </div>
         )}
 

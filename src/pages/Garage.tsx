@@ -31,7 +31,10 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import AidenProactiveCard from "@/components/proactive/AidenProactiveCard";
 import InteractiveVehicleCard from "@/components/garage/InteractiveVehicleCard";
+import ScanReportImport from "@/components/garage/ScanReportImport";
+import { scanReportCopy } from "@/lib/scanReport/copy";
 import VehiclePhotoPicker from "@/components/garage/VehiclePhotoPicker";
 import { useResolvedVehiclePhoto, useVehicleOwnerPhoto } from "@/hooks/useVehicleOwnerPhoto";
 import { attachVehiclePhotoIfSelected, type VehiclePhotoClient } from "@/lib/vehiclePhoto";
@@ -732,6 +735,12 @@ export default function Garage() {
             <h1 className="font-heading text-2xl font-bold md:text-3xl">My Garage</h1>
           </div>
 
+          {/* Aiden speaks first (Proactive Events Phase 1): renders at
+              most one card, and nothing when no message is due. */}
+          <div className="mb-6">
+            <AidenProactiveCard />
+          </div>
+
 
           {isLoading ? (
             <div className="space-y-3">
@@ -778,6 +787,15 @@ export default function Garage() {
                 <Plus className="mr-2 h-4 w-4" />
                 Add Another Vehicle
               </Button>
+
+              {/* Scan report import — the report is matched and filed only
+                  after the owner confirms the vehicle inside the flow. */}
+              <div className="rounded-xl border border-border bg-white p-4">
+                <h2 className="font-heading text-base font-bold mb-2">
+                  {scanReportCopy.sectionTitle}
+                </h2>
+                <ScanReportImport />
+              </div>
 
               {/* Recall Alerts Section */}
               {(vehiclesWithUnreadRecalls.length > 0 || vehiclesWithUnavailableRecallStatus.length > 0) && (

@@ -16,6 +16,7 @@ import MileageLedgerSection, { type OdometerPhotoResult } from "@/components/gar
 import JourneyPlanSection from "@/components/garage/JourneyPlanSection";
 import { VehicleRecordProvider, useVehicleRecordContext } from "@/contexts/VehicleRecordContext";
 import VehicleAssessmentsSection from "@/components/garage/VehicleAssessmentsSection";
+import ScanReportsSection from "@/components/garage/ScanReportsSection";
 import type { HandoffSnapshot } from "@/lib/handoff";
 import { supabase } from "@/integrations/supabase/client";
 import { formatReadingLabel } from "@/lib/mileage";
@@ -430,6 +431,8 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
         <DrivingProfileCard vehicle={vehicle} onSave={record.saveProfileFields} />
 
         <VehicleAssessmentsSection handoffs={linkedAssessments} />
+
+        {vehicleId && <ScanReportsSection vehicleId={vehicleId} />}
 
         <VehicleRecordSections
           loading={record.sectionsLoading}
