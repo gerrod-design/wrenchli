@@ -60,7 +60,7 @@ function callerClient(req: Request): SupabaseClient {
 
 async function extractPdfText(bytes: Uint8Array): Promise<string> {
   try {
-    const unpdf = await import("https://esm.sh/unpdf@0.12.1");
+    const unpdf = await import("https://esm.sh/unpdf@1.9.1");
     const pdf = await unpdf.getDocumentProxy(bytes);
     const { text } = await unpdf.extractText(pdf, { mergePages: true });
     return Array.isArray(text) ? text.join("\n") : (text ?? "");
