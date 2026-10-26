@@ -134,3 +134,6 @@ verify_jwt = true
 
 [functions.assessment-handoff]
 verify_jwt = false
+
+[functions.check-proactive-events]
+verify_jwt = false
