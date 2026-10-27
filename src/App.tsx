@@ -183,7 +183,7 @@ function PreserveNavigate({ to }: { to: string }) {
   return <Navigate to={`${path}${location.search}${hash}`} replace />;
 }
 
-function AppLayout() {
+export function AppLayout({ ssr = false }: { ssr?: boolean }) {
   const location = useLocation();
   const isAdmin =
     location.pathname.startsWith("/admin") ||
@@ -204,10 +204,13 @@ function AppLayout() {
       {!hideChrome && <Navbar />}
       <AnimatedRoutes />
       {!hideChrome && <Footer />}
-      {!hideChrome && <MobileBottomBar />}
-      {!hideChrome && <BackToTop />}
-      {!isAdmin && location.pathname !== "/for-shops" && <ChatBot />}
-      {!hideChrome && <CookieConsent />}
+      {/* Interactive-only chrome is skipped in the server prerender: it has
+          no readable content and several pieces read browser storage at
+          render time. The client app mounts all of it as before. */}
+      {!hideChrome && !ssr && <MobileBottomBar />}
+      {!hideChrome && !ssr && <BackToTop />}
+      {!isAdmin && !ssr && location.pathname !== "/for-shops" && <ChatBot />}
+      {!hideChrome && !ssr && <CookieConsent />}
     </>
   );
 }

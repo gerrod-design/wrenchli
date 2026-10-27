@@ -1,212 +1,17 @@
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import fs from "fs";
 
-/** Static content to bake into prerendered HTML for each route. */
-const prerenderRoutes: {
-  path: string;
-  title: string;
-  description: string;
-  /** visible text blocks crawlers will see inside #root */
-  content: string;
-}[] = [
-  {
-    path: "/",
-    title: "Free Vehicle Symptom Assessment | Wrenchli",
-    description:
-      "Describe your car symptom in plain English — get a free instant assessment of likely causes and repair costs. Free, no account required.",
-    content: `
-      <h1>Vehicle Repair Finally Fixed</h1>
-      <p>Affordable vehicle repair — transparent pricing, honest guidance.</p>
-      <p>Assessment always free · DIY tutorials · No account required</p>
-      <a href="/#quote">Get Your Free Assessment</a>
-      <p>This is a symptom assessment, not a professional inspection. Use it to ask better questions at the shop — not to skip one.</p>
-      <h2>Check your vehicle for open safety recalls</h2>
-      <p>Enter your VIN — free, instant, no account required.</p>
-      <h2>Transparent Pricing</h2><p>See real prices upfront. No surprises, no hidden fees.</p>
-    `,
-  },
-  {
-    path: "/for-shops",
-    title: "Free Referral Pilot for Independent Shops | Wrenchli",
-    description:
-      "Free 90-day referral pilot for independent auto repair shops. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range.",
-    content: `
-      <h1>Free Referral Pilot for Independent Shops</h1>
-      <h2>Customers arrive pre-assessed</h2>
-      <p>Vehicle details, symptom description, likely causes, and a fair cost range — before they walk in. Free 90-day pilot for independent shops.</p>
-      <h2>How it works</h2>
-      <ol>
-        <li><strong>Customer describes their symptoms</strong> — A driver in Metro Detroit describes their car problem on Wrenchli and gets a free symptom assessment.</li>
-        <li><strong>We refer them to your shop</strong> — Partner shops receive the referral with the vehicle details, symptom description, likely causes, and a fair cost range attached.</li>
-        <li><strong>The customer arrives prepared</strong> — No 20-minute intake conversation decoding "it makes a noise." Your advisor starts halfway done.</li>
-        <li><strong>You confirm the outcome</strong> — A 2-minute report: what you found, what was done, what it cost. This is the price of admission — and it's what makes every referral smarter.</li>
-      </ol>
-      <h2>Pilot terms</h2>
-      <ul>
-        <li>90 days. Free referrals. No exclusivity, no volume commitments.</li>
-        <li>Outcome report within 7 days for each referral you accept.</li>
-        <li>Either party can end participation at any time.</li>
-      </ul>
-      <h2>After 90 days</h2>
-      <p>Nothing happens automatically. No auto-billing, no contract renewal. We schedule a call to review your results — and pilot shops get founding terms on paid partner tiers before public pricing.</p>
-      <a href="/contact">Join the free pilot</a>
-      <p><em>Wrenchli never charges consumers. The assessment is always free.</em></p>
-    `,
-  },
-
-  {
-    path: "/for-dealers",
-    title: "Wrenchli for Auto Dealers | Free Service Department Partner Program",
-    description:
-      "Help your service advisors prepare for every trade-in, service visit, and CPO inspection. Pre-assessed customers, Tekmetric integration, and a free 90-day pilot for dealerships nationwide.",
-    content: `
-      <h1>Your Service Department, One Step Ahead</h1>
-      <p>Customers who ran a Wrenchli assessment before their visit arrive knowing what's wrong — cutting intake time and increasing RO approval rates.</p>
-      <h2>Faster Trade-In Appraisals</h2>
-      <p>Run a rapid symptom assessment on any trade-in vehicle before setting ACV. Enter the VIN, describe what you observe, and get a probable cause list and cost range in under 60 seconds.</p>
-      <h2>Service Department Integration</h2>
-      <p>Wrenchli integrates directly with Tekmetric. Pre-visit assessment data drops into a new or existing RO — no double entry for your service advisors.</p>
-      <h2>Multi-Location Support</h2>
-      <p>Managing more than one rooftop? Wrenchli supports dealer groups with consolidated reporting across locations. One account, all your stores.</p>
-      <h2>Free 90-day pilot. No strings attached.</h2>
-      <p>No fees, no commission, no auto-billing.</p>
-      <a href="/for-shops/onboarding">Apply for the Dealer Pilot Program</a>
-    `,
-  },
-  {
-    path: "/blog",
-    title: "Vehicle Repair Guides & Symptom Articles | Wrenchli",
-    description:
-      "Plain-language guides on common car symptoms, OBD codes, and DIY repairs — written for vehicle owners.",
-    content: `
-      <h1>Wrenchli Blog</h1>
-      <p>Repair tips, symptom guides, and industry insights.</p>
-    `,
-  },
-  {
-    path: "/about",
-    title: "About Wrenchli | Fixing the Vehicle Repair Experience",
-    description:
-      "Wrenchli helps vehicle owners understand what is likely wrong with their car before paying for a repair. Built in Michigan by Gerrod Parchmon.",
-    content: `
-      <h1>About Wrenchli</h1>
-      <p>Wrenchli helps vehicle owners understand what is likely wrong before paying for a repair. Built in Michigan by Gerrod Parchmon.</p>
-    `,
-  },
-  {
-    path: "/privacy",
-    title: "Privacy Policy | Wrenchli",
-    description:
-      "How Wrenchli collects, uses, and protects your vehicle and assessment data. Your data is never sold.",
-    content: `
-      <h1>Privacy Policy</h1>
-      <p>How Wrenchli collects, uses, and protects your vehicle and assessment data.</p>
-    `,
-  },
-  {
-    path: "/warranty-guide",
-    title: "Manufacturer Warranty Guide | Wrenchli",
-    description:
-      "Understand what your vehicle manufacturer warranty covers before you pay for a repair out of pocket.",
-    content: `
-      <h1>Manufacturer Warranty Guide</h1>
-      <p>Understand what your vehicle manufacturer warranty covers before you pay for a repair out of pocket.</p>
-    `,
-  },
-  {
-    path: "/subprocessors",
-    title: "Subprocessors | Wrenchli",
-    description:
-      "List of third-party services that process Wrenchli user data, including data handling details and compliance certifications.",
-    content: `
-      <h1>Subprocessors</h1>
-      <p>Wrenchli uses the following third-party services to operate our platform. Each service processes user data under a data processing agreement.</p>
-      <table>
-        <tr><th>Service</th><th>Purpose</th><th>Data Sent</th><th>Notes</th></tr>
-        <tr><td>Anthropic PBC</td><td>AI symptom assessment generation</td><td>Symptom description, vehicle year/make/model</td><td>No training use</td></tr>
-        <tr><td>Supabase Inc.</td><td>Database and authentication</td><td>All user account and session data</td><td>SOC 2 Type II certified</td></tr>
-        <tr><td>Vercel Inc.</td><td>Hosting and CDN</td><td>Request logs</td><td>No personal data stored beyond standard logs</td></tr>
-        <tr><td>Google AI (Gemini)</td><td>Audio and video analysis features only</td><td>Audio/video recordings submitted for analysis</td><td>Subject to Google AI terms</td></tr>
-        <tr><td>Stripe Inc.</td><td>Payment processing (Pro subscriptions)</td><td>Payment card data</td><td>PCI DSS compliant, Wrenchli never stores card data</td></tr>
-        <tr><td>NHTSA</td><td>Vehicle recall lookup</td><td>VIN</td><td>US government public API, no data retained</td></tr>
-      </table>
-      <p>Last updated: April 2026</p>
-      <p>Questions about data processing? Email privacy@wrenchli.net</p>
-    `,
-  },
-];
-
-/**
- * Custom prerender plugin: after Vite build, creates route-specific
- * HTML files with real text content baked in for crawlers / link previews.
- * React hydrates over this content on the client.
- */
-function prerenderPlugin(): Plugin {
-  return {
-    name: "wrenchli-prerender",
-    apply: "build",
-    closeBundle() {
-      const dist = path.resolve(__dirname, "dist");
-      const indexPath = path.join(dist, "index.html");
-      if (!fs.existsSync(indexPath)) return;
-
-      const baseHtml = fs.readFileSync(indexPath, "utf-8");
-
-      for (const route of prerenderRoutes) {
-        // Build per-route HTML by replacing title, meta description, and #root content
-        let html = baseHtml;
-
-        // Replace <title>
-        html = html.replace(
-          /<title>[^<]*<\/title>/,
-          `<title>${route.title}</title>`
-        );
-
-        // Upsert meta description (the shell no longer ships a static one —
-        // insert after <title> when there is nothing to replace)
-        const upsertMeta = (source: string, pattern: RegExp, tag: string) =>
-          pattern.test(source)
-            ? source.replace(pattern, tag)
-            : source.replace(/<\/title>/, `</title>\n    ${tag}`);
-        html = upsertMeta(
-          html,
-          /<meta name="description" content="[^"]*"\s*\/?>/,
-          `<meta name="description" content="${route.description}" />`
-        );
-
-        // Replace og:title and og:description
-        html = html.replace(
-          /<meta property="og:title" content="[^"]*"\s*\/?>/,
-          `<meta property="og:title" content="${route.title}" />`
-        );
-        html = upsertMeta(
-          html,
-          /<meta property="og:description" content="[^"]*"\s*\/?>/,
-          `<meta property="og:description" content="${route.description}" />`
-        );
-
-        // Inject content into #root so crawlers see real text
-        html = html.replace(
-          '<div id="root"></div>',
-          `<div id="root">${route.content.trim()}</div>`
-        );
-
-        // Write the file
-        const routePath = route.path === "/" ? "/index.html" : `${route.path}/index.html`;
-        const filePath = path.join(dist, routePath);
-        const dir = path.dirname(filePath);
-        fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(filePath, html, "utf-8");
-        console.log(`[prerender] ${route.path} → ${path.relative(dist, filePath)}`);
-      }
-    },
-  };
-}
+// Prerendering of public routes happens after the Vite build, in
+// scripts/prerender.mjs, which server-renders the real React pages via
+// src/entry-server.tsx (true SSR output). This config previously carried
+// a plugin that baked hand-written stub text into a few route shells;
+// the stubs drifted from the real pages (and one carried a city-specific
+// claim the live copy does not make), so they were removed in favor of
+// rendering the actual pages.
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode, isSsrBuild }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -214,16 +19,30 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
-  plugins: [
-    react(),
-    mode === "production" && prerenderPlugin(),
-  ].filter(Boolean),
+  plugins: [react()],
+  ssr: {
+    // The prerender bundle runs in Node as ESM; react-helmet-async ships
+    // CommonJS whose named exports Node cannot detect, so it must be
+    // bundled rather than externalized.
+    noExternal: ["react-helmet-async"],
+  },
   esbuild: {
     drop: mode === "production" ? ["console", "debugger"] : [],
   },
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+    alias: [
+      { find: "@", replacement: path.resolve(__dirname, "./src") },
+      // Leaflet reads `window` at import time and cannot load in Node.
+      // The SSR (prerender) build swaps in an inert stub; the client
+      // build always bundles the real package.
+      ...(isSsrBuild
+        ? [
+            {
+              find: /^leaflet$/,
+              replacement: path.resolve(__dirname, "./src/ssr/leaflet-stub.ts"),
+            },
+          ]
+        : []),
+    ],
   },
 }));

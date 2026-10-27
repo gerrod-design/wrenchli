@@ -505,6 +505,51 @@ export default function Developers() {
             ))}
           </div>
 
+          {/* Assessment API — OpenAPI document */}
+          <SectionCard icon={Code2} title="Assessment API (api-assess)">
+            <p className="text-muted-foreground mb-4">
+              The symptom assessment endpoint is documented as a machine-readable OpenAPI 3
+              document at{" "}
+              <a href="/openapi.json" className="font-medium text-primary hover:underline">
+                wrenchli.net/openapi.json
+              </a>
+              . Send a vehicle and the symptoms its owner describes; you get back a preliminary
+              symptom assessment — probable issue, urgency, an estimated cost range, and
+              recommended next steps. It is an assessment, not a professional inspection or a
+              repair quote. Requests are authenticated with an{" "}
+              <code className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono">x-api-key</code>{" "}
+              header and rate limited per key.
+            </p>
+            <pre className="rounded-lg bg-muted p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap">{`curl -X POST "https://aunrktvltmyrxtdygykt.supabase.co/functions/v1/api-assess" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "vehicle": { "year": 2019, "make": "Honda", "model": "Civic", "mileage": 67200 },
+    "symptoms": ["Grinding noise when braking"]
+  }'
+
+# 200 response (abridged — the full object also mirrors this under "assessment"
+# and adds "recommendations" and "wrenchli_services" links):
+{
+  "diagnosis": {
+    "probable_issue": "Brake System Issue",
+    "description": "Grinding noises typically indicate worn brake pads that need replacement. This can damage rotors if not addressed promptly.",
+    "urgency": "high",
+    "cost_estimate": { "min": 155, "max": 325 },
+    "rate_source": "wrenchli_editorial_rate_table_v1"
+  },
+  "assessment_title": "Brake System Issue"
+}`}</pre>
+            <p className="text-sm text-muted-foreground mt-4">
+              The legacy name <span className="font-mono text-foreground">POST /api-diagnose</span>{" "}
+              serves the identical contract. Error responses use a single{" "}
+              <code className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono">{`{ "error": "..." }`}</code>{" "}
+              shape: 400 for a missing symptom list or vehicle fields, 401 when the key header is
+              absent, 403 for an unknown or deactivated key, 405 for non-POST calls, and 429 when
+              the key's per-minute limit is reached.
+            </p>
+          </SectionCard>
+
           {/* Pricing & Billing */}
           <SectionCard icon={CreditCard} title="API Pricing">
             <p className="text-muted-foreground mb-6">

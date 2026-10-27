@@ -33,6 +33,9 @@ verify_jwt = false
 [functions.api-assess]
 verify_jwt = false
 
+[functions.mcp]
+verify_jwt = false
+
 [functions.api-estimate-repair]
 verify_jwt = false
 
