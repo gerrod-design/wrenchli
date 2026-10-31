@@ -884,7 +884,11 @@ Deno.serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
     const vehicleContextStr = buildVehicleContext(vehicleContext);
-    const systemContent = SYSTEM_PROMPT + vehicleContextStr + sessionContextStr;
+    const systemSuffix = vehicleContextStr + sessionContextStr;
+    const systemBlocks = [
+      { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
+      ...(systemSuffix ? [{ type: "text", text: systemSuffix }] : []),
+    ];
     const anthropicMessages = sessionStart
       ? [{ role: "user", content: SESSION_START_TURN }]
       : buildAnthropicMessages(messages);
@@ -913,7 +917,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             model: MODEL,
             max_tokens: 2048,
-            system: systemContent + correction,
+            system: [...systemBlocks, { type: "text", text: correction }],
             messages: baseMessages,
           }),
           signal: regenController.signal,
@@ -947,7 +951,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           model: MODEL,
           max_tokens: 2048,
-          system: systemContent,
+          system: systemBlocks,
           messages: anthropicMessages,
           tools,
         }),
@@ -970,7 +974,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             model: MODEL,
             max_tokens: 2048,
-            system: systemContent,
+            system: systemBlocks,
             messages: anthropicMessages,
             stream: true,
           }),
@@ -1098,7 +1102,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           model: MODEL,
           max_tokens: 2048,
-          system: systemContent,
+          system: systemBlocks,
           messages: turn2Messages,
           stream: true,
         }),
