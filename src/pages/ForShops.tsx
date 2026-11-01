@@ -3,6 +3,7 @@ import SEO from "@/components/SEO";
 import { ArrowRight } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 import { Button } from "@/components/ui/button";
+import { trackPlausibleEvent } from "@/lib/analytics";
 
 const steps = [
   {
@@ -143,7 +144,12 @@ export default function ForShops() {
               size="lg"
               className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg"
             >
-              <Link to="/contact">
+              <Link
+                to="/contact"
+                onClick={() =>
+                  trackPlausibleEvent("shop_page_cta_click", { placement: "for_shops_pilot" })
+                }
+              >
                 Join the free pilot <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>

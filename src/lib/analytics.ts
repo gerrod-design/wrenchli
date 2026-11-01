@@ -46,29 +46,105 @@ const getSessionId = (): string => {
   return sessionId;
 };
 
+/* ─── Plausible forwarding (visitor analytics) ───
+ *
+ * The seven funnel events of record (visitor analytics spec, 2026-10-30).
+ * These names are sent to Plausible exactly as written; they are the funnel
+ * read in the Plausible dashboard. The home-built log above stays the system
+ * of record for product behavior — Plausible only ever receives these event
+ * names plus the coarse properties allowlisted below.
+ */
+
+export type PlausibleEventName =
+  | "garage_signup"
+  | "assessment_started"
+  | "assessment_completed"
+  | "handoff_sent"
+  | "shop_page_cta_click"
+  | "diy_guide_open"
+  | "video_play";
+
+// Only these property keys may ever be sent to Plausible, and only as short
+// strings. They are coarse, non-sensitive dimensions (a vehicle make, the
+// page a click happened on, a public content slug). Symptom text, free text
+// of any kind, names, emails, and VINs must NEVER be added here — the
+// sanitizer below drops anything not on this list, by construction.
+const PLAUSIBLE_PROP_KEYS = ["vehicle_make", "source_page", "placement", "guide"] as const;
+
+export type PlausibleProps = Partial<Record<(typeof PLAUSIBLE_PROP_KEYS)[number], string>>;
+
+declare global {
+  interface Window {
+    plausible?: (event: string, options?: { props?: Record<string, string> }) => void;
+  }
+}
+
+function sanitizePlausibleProps(props?: Record<string, unknown>): Record<string, string> | undefined {
+  if (!props) return undefined;
+  const out: Record<string, string> = {};
+  for (const key of PLAUSIBLE_PROP_KEYS) {
+    const value = props[key];
+    if (typeof value === "string" && value.length > 0) {
+      out[key] = value.slice(0, 120);
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+/**
+ * Forward one funnel event to Plausible, when the Plausible script is
+ * present (it queues via the stub in index.html until the script loads, and
+ * stays inert until the wrenchli.net account is activated). Never throws:
+ * analytics must not break the product.
+ */
+export function trackPlausibleEvent(name: PlausibleEventName, props?: PlausibleProps): void {
+  try {
+    if (typeof window === "undefined") return;
+    if (typeof window.plausible !== "function") return;
+    const clean = sanitizePlausibleProps(props);
+    window.plausible(name, clean ? { props: clean } : undefined);
+  } catch {
+    // Analytics failures are silent by design.
+  }
+}
+
 /* ─── Core tracking ─── */
 
-export const trackEvent = async (event: Partial<TrackingEvent>): Promise<void> => {
+export const trackEvent = async (
+  event: Partial<TrackingEvent> & {
+    /** Also forward this funnel event to Plausible (never stored in the home-built row). */
+    plausible_event?: PlausibleEventName;
+    plausible_props?: PlausibleProps;
+  }
+): Promise<void> => {
+  // The plausible_* fields are routing instructions for this layer only.
+  // They are stripped before the row is built so the analytics_events
+  // schema stays exactly as it was.
+  const { plausible_event, plausible_props, ...rest } = event;
   try {
     const fullEvent: TrackingEvent = {
-      event_type: event.event_type || "user_action",
-      category: event.category || "navigation",
-      action: event.action || "unknown",
+      event_type: rest.event_type || "user_action",
+      category: rest.category || "navigation",
+      action: rest.action || "unknown",
       session_id: getSessionId(),
       user_agent: navigator.userAgent,
       page_url: window.location.href,
       page_title: document.title,
       referrer: document.referrer || undefined,
       timestamp: new Date().toISOString(),
-      ...event,
+      ...rest,
     };
 
     const pending: TrackingEvent[] = JSON.parse(localStorage.getItem("pending_analytics") || "[]");
     pending.push(fullEvent);
     localStorage.setItem("pending_analytics", JSON.stringify(pending));
 
+    if (plausible_event) {
+      trackPlausibleEvent(plausible_event, plausible_props);
+    }
+
     // Flush immediately for high-priority events
-    if (event.event_type === "ad_click" || event.event_type === "ad_conversion") {
+    if (rest.event_type === "ad_click" || rest.event_type === "ad_conversion") {
       await flushEvents();
     }
   } catch (error) {

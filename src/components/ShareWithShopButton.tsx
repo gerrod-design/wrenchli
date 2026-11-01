@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Share2, Loader2, CheckCircle, Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { trackPlausibleEvent } from "@/lib/analytics";
 
 interface ShareWithShopProps {
   diagnosisTitle: string;
@@ -83,6 +84,14 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
       const token = (data as any).token;
       const url = `${window.location.origin}/referral/${token}`;
       setShareUrl(url);
+
+      // Funnel event of record: the assessment package was created to hand
+      // to a shop. Only the vehicle make goes to Plausible — never the
+      // token, the diagnosis text, or the VIN.
+      trackPlausibleEvent(
+        "handoff_sent",
+        props.vehicleMake ? { vehicle_make: props.vehicleMake } : undefined
+      );
 
       // Try native share first
       if (navigator.share) {

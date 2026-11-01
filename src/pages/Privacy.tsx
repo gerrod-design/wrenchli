@@ -280,6 +280,7 @@ export default function Privacy() {
               </div>
               <p className="mt-4">Audio and video submitted through our vehicle sound and video analysis features are processed by Google AI. This data is subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google's privacy policy</a>.</p>
               <p className="mt-4">Wrenchli does not sell your personal information to any third party.</p>
+              <p className="mt-4">We use cookieless visitor analytics to count visits and understand how people use Wrenchli. It does not track you across other websites, and we do not sell or share visitor data.</p>
               <p className="mt-4">
                 For a complete list of subprocessors with data handling details and compliance certifications, see our{" "}
                 <a href="/subprocessors" className="text-accent hover:underline font-medium">Subprocessors</a> page.

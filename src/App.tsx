@@ -16,6 +16,7 @@ import MobileBottomBar from "@/components/MobileBottomBar";
 import BackToTop from "@/components/BackToTop";
 import ChatBot from "@/components/ChatBot";
 import ScrollToTop from "@/components/ScrollToTop";
+import PageViewTracker from "@/components/PageViewTracker";
 
 import CookieConsent from "@/components/CookieConsent";
 // Index page replaced by DesignPreview promotion
@@ -201,6 +202,7 @@ export function AppLayout({ ssr = false }: { ssr?: boolean }) {
     <>
       <DefaultMeta />
       <ScrollToTop />
+      <PageViewTracker />
       {!hideChrome && <Navbar />}
       <AnimatedRoutes />
       {!hideChrome && <Footer />}

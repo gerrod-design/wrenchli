@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { trackPlausibleEvent } from "@/lib/analytics";
 import { Link } from "react-router-dom";
 import {
   Search, ClipboardList, GitFork, Wrench, CheckCircle,
@@ -76,6 +77,16 @@ function PathToggle({
 
 export default function HowItWorksVideo() {
   const [isPlaying, setIsPlaying] = useState(false);
+
+  // Funnel event of record: the walkthrough video started playing
+  // (first play only, per mount).
+  const videoPlayLogged = useRef(false);
+  useEffect(() => {
+    if (isPlaying && !videoPlayLogged.current) {
+      videoPlayLogged.current = true;
+      trackPlausibleEvent("video_play", { placement: "how_it_works" });
+    }
+  }, [isPlaying]);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [hasPlayed, setHasPlayed] = useState(false);

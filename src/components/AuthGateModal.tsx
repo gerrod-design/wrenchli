@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Crown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackPlausibleEvent } from "@/lib/analytics";
 
 interface Props {
   open: boolean;
@@ -70,6 +71,8 @@ export default function AuthGateModal({ open, onClose, onAuthenticated }: Props)
     if (result.error) {
       setError(result.error);
     } else if (mode === "signup") {
+      // Funnel event of record: a new garage account was created.
+      trackPlausibleEvent("garage_signup");
       setError("Check your email for a confirmation link, then sign in.");
     } else {
       onAuthenticated();

@@ -23,7 +23,8 @@ import {
   Wrench,
   Package,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { trackPlausibleEvent } from "@/lib/analytics";
 import { Json } from "@/integrations/supabase/types";
 import RelatedVideos from "@/components/diy/RelatedVideos";
 
@@ -128,6 +129,17 @@ export default function DIYTutorialDetail() {
     },
     enabled: !!slug,
   });
+
+  // Funnel event of record: a DIY guide was opened (fires once the guide
+  // has actually loaded, once per guide). The slug is a public content
+  // identifier, safe to send as a dimension.
+  const guideOpenedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (tutorial && slug && guideOpenedRef.current !== slug) {
+      guideOpenedRef.current = slug;
+      trackPlausibleEvent("diy_guide_open", { guide: slug });
+    }
+  }, [tutorial, slug]);
 
   if (isLoading) {
     return (

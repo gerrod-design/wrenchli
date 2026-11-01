@@ -5,6 +5,7 @@ import SymptomStep from "./steps/SymptomStep";
 import DiagnosisStep from "./steps/DiagnosisStep";
 import RecommendationStep from "./steps/RecommendationStep";
 import { logFunnelEvent, flushPendingFunnelEvents } from "@/lib/funnelTracking";
+import { trackPlausibleEvent } from "@/lib/analytics";
 import { buildSnapshotFromWizard, createAssessmentHandoff, setPendingHandoff } from "@/lib/handoff";
 import { resolveStampVehicleId } from "@/lib/handoffLink";
 import { useSearchParams } from "react-router-dom";
@@ -141,14 +142,28 @@ export default function DiagnosticWizard() {
     // (handled below via diagnosis effect)
   }, [step, sessionId]);
 
+  // Funnel event of record: the assessment starts when the wizard opens.
+  const startedLogged = useRef(false);
+  useEffect(() => {
+    if (startedLogged.current) return;
+    startedLogged.current = true;
+    trackPlausibleEvent("assessment_started");
+  }, []);
+
   // Track step 4 when diagnosis result is set
   const diagnosisLogged = useRef(false);
   useEffect(() => {
     if (diagnosis && !diagnosisLogged.current) {
       diagnosisLogged.current = true;
       logFunnelEvent(sessionId, 4, "results_shown");
+      // Funnel event of record: the assessment completed (results shown).
+      // Only the vehicle make goes to Plausible — never symptoms or the VIN.
+      trackPlausibleEvent(
+        "assessment_completed",
+        vehicle?.make ? { vehicle_make: vehicle.make } : undefined
+      );
     }
-  }, [diagnosis, sessionId]);
+  }, [diagnosis, sessionId, vehicle]);
 
   // Flush pending events once sessionId is available
   useEffect(() => {

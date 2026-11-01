@@ -23,6 +23,23 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@wrenchli" />
     <meta name="twitter:image" content="https://wrenchli.net/og-default.png" />
+
+    <!-- Visitor analytics: Plausible (cookieless, no cross-site tracking).
+         This tag is inert until the Plausible account for wrenchli.net is
+         activated separately — activation is an account-side step, not part
+         of this code change. The queue stub below is Plausible's official
+         snippet: it lets product code fire custom events before the script
+         loads; they flush once it does. This tag lives ONLY here — the
+         prerender step reuses this file as its template, so every static
+         page and the SPA shell each carry it exactly once. -->
+    <script defer data-domain="wrenchli.net" src="https://plausible.io/js/script.js"></script>
+    <script>
+      window.plausible =
+        window.plausible ||
+        function () {
+          (window.plausible.q = window.plausible.q || []).push(arguments);
+        };
+    </script>
   </head>
 
   <body>
