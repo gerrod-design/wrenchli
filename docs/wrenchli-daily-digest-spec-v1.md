@@ -76,19 +76,19 @@ hand-wave threshold.
 
 ## 4. Technical Implementation (Augustin Reyes)
 
-**Orchestration:** N8N workflow `daily-digest-orchestrator`, scheduled via N8N cron, 06:30 ET.
+**Orchestration:** scheduled orchestration workflow, 06:30 ET.
 
 **Architecture:**
-1. **06:25 ET — Cron fires.** N8N main workflow starts.
-2. **06:25–06:28 ET — Per-agent contribution nodes** (parallel). Each agent contribution is a separate node calling a dedicated Supabase Edge Function (e.g., `digest-contrib-augustin`, `digest-contrib-keegan`). Each function:
+1. **06:25 ET — Cron fires.** The orchestration workflow starts.
+2. **06:25–06:28 ET — Per-agent contribution nodes** (parallel). Each agent contribution is a separate node calling a dedicated per-agent edge function. Each function:
    - Queries its data source(s) with a 20s timeout.
    - Evaluates trigger criteria from §6.
    - Returns `{ contributor, role, bullets: string[], decisions_awaiting?: string[] }` or `{ contributor, silent: true, reason }`.
    - On internal error, returns `{ contributor, silent: true, reason: "data_source_unavailable" }` (per Lorenzo, §7) — never throws into the orchestrator.
-3. **06:28 ET — Rhett synthesis node** runs after all contribution nodes resolve. Receives the array of non-silent contributions, generates the "What matters most today" synthesis via the existing Lovable AI Gateway (model: `google/gemini-2.5-flash`, capped at 3 lines).
+3. **06:28 ET — Rhett synthesis node** runs after all contribution nodes resolve. Receives the array of non-silent contributions, generates the "What matters most today" synthesis via an AI model call (capped at 3 lines).
 4. **06:29 ET — Assembly node** composes plaintext + HTML, applies the §2 hard limits, fails the digest if any limit is exceeded.
-5. **06:29 ET — Persistence.** Insert row into `public.daily_digest_history`.
-6. **06:30 ET — Send** via Resend (`RESEND_API_KEY` already configured) to `gerrod@wrenchli.net`.
+5. **06:29 ET — Persistence.** Insert a row into the digest history table.
+6. **06:30 ET — Send** via the configured email provider to the founder.
 
 **Why per-agent isolation:** failure in one contribution node never blocks
 the digest. The digest ships with the contributors that succeeded; the
@@ -177,7 +177,7 @@ Format per agent: **trigger criteria** → **bullet content** → **data source*
 **Tobias Wren (CSO)** — strategic / competitive intel
 - *Triggers:* (a) the strategy/sensing workflow's competitor watchlist flags an event; (b) its market signal aggregation crosses threshold; (c) significant external news in auto-repair / consumer-tech / regulatory space.
 - *Bullets:* competitor event summary, market signal, news with single-link citation.
-- *Data source:* external news monitoring (V2 — needs N8N workflow), competitor watchlist (V2).
+- *Data source:* external news monitoring (V2 — needs orchestration plumbing), competitor watchlist (V2).
 - *Status:* **V2** — needs market intel plumbing built.
 
 **Nadia Petrov (CRO)** — shop pipeline
@@ -210,8 +210,8 @@ Format per agent: **trigger criteria** → **bullet content** → **data source*
 
 ## 7. Monitoring (Lorenzo Bianchi)
 
-- **Send failure:** if Resend returns non-2xx or the orchestrator does not write a `sent` row to `daily_digest_history` by 06:45 ET, Lorenzo's monitoring sends a fallback alert to the founder via SMS (using the existing `send-alert-email` + SMS escalation path) with subject `DIGEST FAILURE — YYYY-MM-DD`.
-- **Per-contributor failure:** if a contribution Edge Function throws or times out, Lorenzo logs the failure to `silent_agents` with `reason: "data_source_unavailable"`. The digest still ships with the surviving contributors. No founder alert for single-contributor failure unless three consecutive days fail for the same contributor.
+- **Send failure:** if the email provider returns non-2xx or the orchestrator does not write a `sent` row to the digest history table by 06:45 ET, Lorenzo's monitoring sends a fallback alert to the founder via SMS (using the existing alert escalation path) with subject `DIGEST FAILURE — YYYY-MM-DD`.
+- **Per-contributor failure:** if a contribution function throws or times out, Lorenzo logs the failure to `silent_agents` with `reason: "data_source_unavailable"`. The digest still ships with the surviving contributors. No founder alert for single-contributor failure unless three consecutive days fail for the same contributor.
 - **Anti-silence-rot:** if the digest sends with zero contributors three days in a row, Lorenzo escalates to Rhett — the silence rule may be miscalibrated.
 
 ---
