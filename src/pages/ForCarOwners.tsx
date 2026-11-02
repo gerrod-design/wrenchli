@@ -38,7 +38,7 @@ const faqs = [
   { q: "What about the DIY assessment tool?", a: "Vehicle Insights is our upcoming AI-powered assessment feature. Enter a trouble code or describe symptoms to get plain-English explanations, estimated repair costs, and maintenance schedules. It's currently in development." },
   { q: "Do you use affiliate links for parts?", a: "In the future, we may offer links to purchase parts directly. If we do, we'll always disclose any affiliate relationships transparently. Your trust comes first." },
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program that will include dispute resolution and quality assurance. Details will be announced before launch." },
-  { q: "When is Wrenchli launching?", a: "The symptom assessment is live now and free for any U.S. vehicle owner. Our free 90-day referral pilot is open to independent shops nationally, and referrals are available wherever participating shops have joined." },
+  { q: "When is Wrenchli launching?", a: "The symptom assessment is live now and free for any U.S. vehicle owner. Our free referral pilot is open to independent shops nationally — free for each shop until it completes its first five referred repairs — and referrals are available wherever participating shops have joined." },
 ];
 
 /* ─── Tabbed Walkthrough for Car Owners ─── */

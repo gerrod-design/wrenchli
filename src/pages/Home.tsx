@@ -24,7 +24,7 @@ const userPaths = [
     title: "Repair Shops",
     subtitle: "Want more customers?",
     description:
-      "We're now enrolling independent shops nationally in a free 90-day referral pilot — customers arrive pre-assessed, with symptoms and a fair cost range.",
+      "We're now enrolling independent shops nationally in a free referral pilot — free for each shop until it completes its first five referred repairs. Customers arrive pre-assessed, with symptoms and a fair cost range.",
     href: "/shops",
     tokenBg: "bg-wrenchli-trust-blue/10",
     tokenBorder: "border-wrenchli-trust-blue/20 hover:border-wrenchli-trust-blue/40",

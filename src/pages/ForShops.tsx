@@ -25,7 +25,7 @@ const steps = [
 ];
 
 const terms = [
-  "90 days. Free referrals. No exclusivity, no volume commitments.",
+  "Free referrals until your shop completes its first five referred repairs. No exclusivity, no volume commitments.",
   "Outcome report within 7 days for each referral you accept.",
   "Either party can end participation at any time.",
 ];
@@ -35,7 +35,7 @@ export default function ForShops() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Free Referral Pilot for Independent Shops"
-        description="Free 90-day referral pilot for independent auto repair shops. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range."
+        description="Free referral pilot for independent auto repair shops — free until your shop completes its first five referred repairs. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range."
         path="/for-shops"
       />
 
@@ -59,8 +59,8 @@ export default function ForShops() {
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground md:text-xl">
               Vehicle details, symptom description, likely causes, and a fair
-              cost range — before they walk in. Free 90-day pilot for
-              independent shops.
+              cost range — before they walk in. Free for independent shops
+              until each shop completes its first five referred repairs.
             </p>
           </SectionReveal>
         </div>
@@ -118,18 +118,18 @@ export default function ForShops() {
         </div>
       </section>
 
-      {/* After 90 days */}
+      {/* After the free period */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
             <h2 className="font-heading text-2xl font-bold md:text-4xl">
-              After 90 days
+              After your first five repairs
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
               Nothing happens automatically. No auto-billing, no contract
-              renewal. We schedule a call to review your results — and pilot
-              shops get founding terms on paid partner tiers before public
-              pricing.
+              renewal. Founding shops get their terms in writing before
+              anything is charged — and we schedule a call to review your
+              results before public pricing.
             </p>
           </SectionReveal>
         </div>

@@ -23,7 +23,7 @@ const valueProps = [
   {
     icon: DollarSign,
     title: "No Upfront Fees",
-    desc: "Zero cost to join. The 90-day referral pilot is free — no monthly fees and no setup costs during the pilot.",
+    desc: "Zero cost to join. The referral pilot is free until your shop completes its first five referred repairs — no monthly fees and no setup costs during the pilot.",
   },
   {
     icon: Shield,
@@ -41,7 +41,7 @@ const steps = [
   {
     num: "1",
     title: "Join the Pilot",
-    desc: "Independent shops can join Wrenchli's free 90-day referral pilot now, and the steps below describe how it works.",
+    desc: "Independent shops can join Wrenchli's free referral pilot now — free until your shop completes its first five referred repairs — and the steps below describe how it works.",
   },
   { num: "2", title: "Tell Us About Your Shop", desc: "Share your services, the makes you work on, and the jobs you want." },
   { num: "3", title: "Receive Stage 1 Packages", desc: "Each referral arrives as a Stage 1 package: the vehicle and the concern, with the owner's pre-assessment — never the owner's contact details." },
@@ -55,7 +55,7 @@ export default function Shops() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="For Repair Shops — Wrenchli"
-        description="Wrenchli runs a free 90-day referral pilot for independent repair shops — pre-assessed customers, no upfront fees, no exclusivity."
+        description="Wrenchli runs a free referral pilot for independent repair shops — free until each shop completes its first five referred repairs. Pre-assessed customers, no upfront fees, no exclusivity."
         path="/shops"
       />
 
@@ -67,10 +67,10 @@ export default function Shops() {
               Grow Your Shop with Wrenchli
             </h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-accent-foreground/80 leading-relaxed md:text-xl">
-              Pre-qualified leads. A free 90-day pilot. No upfront fees.
+              Pre-qualified leads. Free until your first five referred repairs. No upfront fees.
             </p>
             <p className="mt-8 mx-auto max-w-2xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
-              Now onboarding — our free 90-day referral pilot for independent
+              Now onboarding — our free referral pilot for independent
               shops is open nationally. Join the pilot.
             </p>
           </SectionReveal>
@@ -112,17 +112,17 @@ export default function Shops() {
         <div className="container-wrenchli max-w-3xl text-center">
           <SectionReveal>
             <h2 className="font-heading text-2xl font-bold md:text-4xl mb-4">
-              Free 90-Day Pilot
+              Free Until Your First Five Repairs
             </h2>
             <p className="text-muted-foreground mb-8">
-              The referral pilot is free for 90 days. No hidden fees.
+              The referral pilot is free until your shop completes its first five referred repairs. No hidden fees.
             </p>
           </SectionReveal>
           <SectionReveal delay={100}>
             <Card className="border-2 border-wrenchli-trust-blue shadow-lg">
               <CardContent className="p-8 md:p-10">
                 <div className="font-heading text-3xl font-bold text-wrenchli-trust-blue md:text-4xl">
-                  $0 for 90 days
+                  $0 for your first five referred repairs
                 </div>
                 <p className="mt-2 text-lg text-muted-foreground">
                   Founding shops get their post-pilot terms{" "}
@@ -192,7 +192,7 @@ export default function Shops() {
               Wrenchli is focused on the free driver assessment right now.
             </p>
             <p className="mt-8 mx-auto max-w-xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
-              Now onboarding — our free 90-day referral pilot for independent
+              Now onboarding — our free referral pilot for independent
               shops is open nationally. Join the pilot.
             </p>
           </SectionReveal>

@@ -34,7 +34,7 @@ const journeys = [
     description:
       "Our free referral pilot is now enrolling independent shops nationally. The vision is simple: customers who arrive already knowing what's wrong.",
     features: [
-      "Free 90-day pilot — now enrolling",
+      "Free pilot until your first five referred repairs",
       "No exclusivity, no auto-billing",
       "Outcome reporting required",
     ],

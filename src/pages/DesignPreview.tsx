@@ -241,7 +241,7 @@ export default function DesignPreview() {
             </h2>
             <p className="text-lg max-w-2xl mx-auto leading-relaxed mb-12" style={{ color: "#6B7280" }}>
               Wrenchli's free symptom assessment is available nationally.
-              Our free 90-day referral pilot for independent repair shops is also open nationally — with referrals available wherever participating shops have joined.
+              Our free referral pilot for independent repair shops is also open nationally — free for each shop until it completes its first five referred repairs, with referrals available wherever participating shops have joined.
             </p>
 
             <div className="grid sm:grid-cols-3 gap-6 text-left">
@@ -249,7 +249,7 @@ export default function DesignPreview() {
                 {
                   icon: Users,
                   title: "Program Status",
-                  desc: "Now onboarding — the free 90-day referral pilot for independent shops is open nationally.",
+                  desc: "Now onboarding — the free referral pilot for independent shops is open nationally, free until each shop completes its first five referred repairs.",
                 },
                 {
                   icon: ClipboardCheck,
