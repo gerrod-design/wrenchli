@@ -199,7 +199,7 @@ export default function FindShops() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Find Auto Repair Shops Near You — Wrenchli"
-        description="Search for trusted auto repair shops in your area. Compare prices, read reviews, and book appointments online."
+        description="Search for auto repair shops in your area, and see where participating shops have joined Wrenchli's free referral pilot."
         path="/find-shops"
       />
 

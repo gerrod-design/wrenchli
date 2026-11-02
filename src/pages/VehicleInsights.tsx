@@ -137,7 +137,7 @@ export default function VehicleInsights() {
               Know What's Wrong. Fix It <span className="text-wrenchli-teal">Your Way.</span>
             </h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-primary-foreground/70 leading-relaxed md:text-xl">
-              Not every vehicle problem needs a trip to the shop. Wrenchli Vehicle Insights helps you understand what might be wrong with your vehicle and gives you real choices — watch a step-by-step video tutorial and order the parts to fix it yourself, or get quotes from trusted local shops if you'd rather leave it to a professional. Either way, you're in control.
+              Not every vehicle problem needs a trip to the shop. Wrenchli Vehicle Insights helps you understand what might be wrong with your vehicle and gives you real choices — watch a step-by-step video tutorial and order the parts to fix it yourself, or share your assessment with a participating shop if you'd rather leave it to a professional. Either way, you're in control.
             </p>
             <BrandCoverageBadge />
 

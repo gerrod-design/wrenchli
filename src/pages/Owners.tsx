@@ -26,7 +26,7 @@ export default function Owners() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="For Vehicle Owners — Wrenchli"
-        description="Get instant quotes from trusted local shops. Compare prices, book with confidence, and finance if you need to."
+        description="Get a free symptom assessment and a fair cost range before you talk to a shop. Free for vehicle owners, no account required."
         path="/owners"
       />
 

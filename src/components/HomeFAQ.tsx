@@ -14,9 +14,9 @@ interface FaqItem {
 const FAQ_ITEMS: FaqItem[] = [
   {
     q: "How does Wrenchli work?",
-    a: "Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly assesses the issue, estimates repair costs, and connects you with trusted local shops or DIY guides.",
+    a: "Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly assesses the issue and estimates repair costs. Where a participating shop has joined our referral pilot, you can share your assessment with that shop — or follow a DIY guide instead.",
     richAnswer: (
-      <>Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly assesses the issue, estimates repair costs, and connects you with <Link to="/find-shops" className="text-primary underline hover:text-primary/80">trusted local shops</Link> or <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY guides</Link>.</>
+      <>Tell our AI advisor what's wrong with your vehicle — describe symptoms, enter a diagnostic code, or upload a photo of damage. Wrenchli instantly assesses the issue and estimates repair costs. Where a <Link to="/find-shops" className="text-primary underline hover:text-primary/80">participating shop</Link> has joined our referral pilot, you can share your assessment with that shop — or follow a <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY guide</Link> instead.</>
     ),
   },
   {

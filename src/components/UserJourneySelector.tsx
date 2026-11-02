@@ -10,7 +10,7 @@ const journeys = [
     title: "Vehicle Owner",
     subtitle: "Need your car fixed?",
     description:
-      "Get a free symptom assessment, compare shop quotes, and explore your repair options—all in one place.",
+      "Get a free symptom assessment and explore your repair options—all in one place.",
     features: [
       "Free symptom assessment in 60 seconds",
       "Understand your repair options",

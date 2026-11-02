@@ -16,29 +16,29 @@ import PhoneMockup from "@/components/PhoneMockup";
 const steps = [
   { step: 1, icon: MessageSquare, title: "Tell Us What's Wrong", desc: "Describe your issue in plain English or enter an OBD-II code from your scanner. No mechanic-speak required." },
   { step: 2, icon: ClipboardList, title: "Get Your Assessment", desc: "See what's likely wrong, how urgent it is, and what it might cost — with plain-English explanations." },
-  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Choose your path: watch a DIY tutorial and order parts, or get quotes from trusted local shops." },
-  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or book a shop appointment with financing if you need it." },
+  { step: 3, icon: GitFork, title: "Explore Your Options", desc: "Choose your path: follow a DIY guide where one is safe for your repair, or share your assessment with a participating shop." },
+  { step: 4, icon: Wrench, title: "Fix It Your Way", desc: "Follow a video guide at your own pace, or contact a participating shop directly to arrange your repair." },
   { step: 5, icon: CheckCircle, title: "Get Back on the Road", desc: "Whether you fixed it yourself or used a shop, you're back in control. Rate your experience and help others." },
 ];
 
 const benefits = [
-  { icon: DollarSign, title: "True Price Transparency", desc: "The price you see is the price you pay. Every quote includes parts, labor, and fees — fully itemized." },
-  { icon: ShieldCheck, title: "Trusted Local Shops", desc: "Every shop is verified for quality, licensing, insurance, and customer satisfaction before joining Wrenchli." },
-  { icon: Star, title: "Real Customer Reviews", desc: "Honest feedback from real customers tied to real repairs. No fake reviews, no gaming the system." },
+  { icon: DollarSign, title: "True Price Transparency", desc: "Your assessment shows a fair cost range for the repair, based on typical parts and labor — before you ever talk to a shop." },
+  { icon: ShieldCheck, title: "Independent Local Shops", desc: "Independent shops enrolled in our free referral pilot. You see your assessment first, and you decide who to contact." },
+  { icon: Star, title: "Outcomes on Record", desc: "Participating shops report the outcome of every referred repair, building a record tied to real work — not advertising." },
   { icon: CreditCard, title: "Financing for Everyone", desc: "Multiple lending partners, all credit profiles welcome. Apply at checkout and get approved in minutes." },
-  { icon: Calendar, title: "Book Online, Anytime", desc: "Schedule your repair 24/7 — no phone tag, no waiting on hold. Pick the time that works for you." },
+  { icon: Calendar, title: "Assess Online, Anytime", desc: "Run your free assessment anytime. Where a participating shop is available, you can share it and reach out when it suits you." },
   { icon: Bell, title: "Status Updates", desc: "Get text and email notifications as your repair progresses. Know exactly when your vehicle will be ready." },
 ];
 
 const faqs = [
-  { q: "Is Wrenchli really free for vehicle owners?", a: "Yes, 100% free. We charge shops a small transaction fee when you book through the platform — you never pay extra. The price you see from each shop is the price you pay." },
-  { q: "How do you verify the shops?", a: "Every shop on Wrenchli must be licensed, insured, and meet our quality standards. We verify credentials, check business history, and continuously monitor customer satisfaction ratings." },
-  { q: "How accurate are the quotes?", a: "Quotes are binding once you accept them. Shops provide itemized breakdowns of parts, labor, and fees based on your vehicle and repair description. If additional work is discovered, the shop must get your approval before proceeding." },
+  { q: "Is Wrenchli really free for vehicle owners?", a: "Yes, 100% free. The assessment is completely free for vehicle owners, and Wrenchli never charges you anything." },
+  { q: "How do you verify the shops?", a: "Shops in our referral pilot are independent shops that have enrolled in the program. Wrenchli doesn't certify or guarantee any shop — check the shop's own credentials and reviews before you authorize work. Shops report the outcome of each referred repair back to Wrenchli." },
+  { q: "How accurate are the quotes?", a: "Wrenchli doesn't provide shop quotes. Your assessment gives you an informational cost range based on typical parts and labor for your vehicle, so you can have an informed conversation. The shop sets its own price after inspecting your vehicle — always confirm the final price with the shop before authorizing work." },
   { q: "What financing options are available?", a: "Repair financing is on the way. We'll announce payment options as soon as they're available." },
   { q: "What about the DIY assessment tool?", a: "Vehicle Insights is our upcoming AI-powered assessment feature. Enter a trouble code or describe symptoms to get plain-English explanations, estimated repair costs, and maintenance schedules. It's currently in development." },
   { q: "Do you use affiliate links for parts?", a: "In the future, we may offer links to purchase parts directly. If we do, we'll always disclose any affiliate relationships transparently. Your trust comes first." },
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program that will include dispute resolution and quality assurance. Details will be announced before launch." },
-  { q: "When is Wrenchli launching?", a: "The symptom assessment is live now and free for any U.S. vehicle owner. We're now enrolling independent shops in a free 90-day referral pilot — join the waitlist and we'll notify you as matching goes live in your area." },
+  { q: "When is Wrenchli launching?", a: "The symptom assessment is live now and free for any U.S. vehicle owner. Our free 90-day referral pilot is open to independent shops nationally, and referrals are available wherever participating shops have joined." },
 ];
 
 /* ─── Tabbed Walkthrough for Car Owners ─── */
@@ -142,7 +142,7 @@ export default function ForCarOwners() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="For Vehicle Owners"
-        description="Know what's wrong before you pay for it. Get a free symptom assessment, compare quotes from trusted local shops, and walk in ready to book. Free for vehicle owners."
+        description="Know what's wrong before you pay for it. Get a free symptom assessment and a fair cost range, and share it with a participating shop where one has joined. Free for vehicle owners."
         path="/for-car-owners"
       />
       {/* Hero */}

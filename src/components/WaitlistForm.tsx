@@ -17,7 +17,7 @@ export default function WaitlistForm({
   source = "home",
   className = "",
   toastTitle = "You're on the list! 🎉",
-  toastDescription = "We'll notify you when Wrenchli launches in your area.",
+  toastDescription = "We'll notify you as participating shops join near you.",
 }: WaitlistFormProps) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");

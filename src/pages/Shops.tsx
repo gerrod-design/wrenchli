@@ -23,17 +23,17 @@ const valueProps = [
   {
     icon: DollarSign,
     title: "No Upfront Fees",
-    desc: "Zero cost to join. You only pay when you earn — $25 per booked appointment or 5% of completed jobs, whichever is lower.",
+    desc: "Zero cost to join. The 90-day referral pilot is free — no monthly fees and no setup costs during the pilot.",
   },
   {
     icon: Shield,
-    title: "Free Digital Tools",
-    desc: "Online booking, digital invoicing, and customer management — all included.",
+    title: "Stage 1 Packages",
+    desc: "Each referral arrives as a Stage 1 package: the vehicle and the concern, with the owner's pre-assessment — never the owner's name or contact details.",
   },
   {
     icon: Star,
-    title: "Build Your Reputation",
-    desc: "Verified reviews, trust badges, and featured placement for top-rated shops.",
+    title: "Report Outcomes",
+    desc: "After each referred repair, send back a short outcome report. Completed work builds your record in the program.",
   },
 ];
 
@@ -43,9 +43,9 @@ const steps = [
     title: "Join the Pilot",
     desc: "Independent shops can join Wrenchli's free 90-day referral pilot now, and the steps below describe how it works.",
   },
-  { num: "2", title: "Set Up Your Profile", desc: "Add services, pricing, photos, and availability." },
-  { num: "3", title: "Receive Leads", desc: "Pre-qualified customers in your area request quotes." },
-  { num: "4", title: "Win the Job", desc: "Compete on price, reviews, and availability — not ad spend." },
+  { num: "2", title: "Tell Us About Your Shop", desc: "Share your services, the makes you work on, and the jobs you want." },
+  { num: "3", title: "Receive Stage 1 Packages", desc: "Each referral arrives as a Stage 1 package: the vehicle and the concern, with the owner's pre-assessment — never the owner's contact details." },
+  { num: "4", title: "Accept and Report", desc: "Accept the jobs you want — the owner then contacts you directly. After the repair, send back a short outcome report." },
   { num: "5", title: "Get Paid", desc: "Financing isn't available yet — it's coming soon." },
 ];
 
@@ -67,7 +67,7 @@ export default function Shops() {
               Grow Your Shop with Wrenchli
             </h1>
             <p className="mt-5 max-w-2xl mx-auto text-lg text-accent-foreground/80 leading-relaxed md:text-xl">
-              Pre-qualified leads. Free tools. No upfront fees.
+              Pre-qualified leads. A free 90-day pilot. No upfront fees.
             </p>
             <p className="mt-8 mx-auto max-w-2xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
               Now onboarding — our free 90-day referral pilot for independent
@@ -112,30 +112,30 @@ export default function Shops() {
         <div className="container-wrenchli max-w-3xl text-center">
           <SectionReveal>
             <h2 className="font-heading text-2xl font-bold md:text-4xl mb-4">
-              Simple, Transparent Pricing
+              Free 90-Day Pilot
             </h2>
             <p className="text-muted-foreground mb-8">
-              You only pay when you earn. No subscriptions. No hidden fees.
+              The referral pilot is free for 90 days. No hidden fees.
             </p>
           </SectionReveal>
           <SectionReveal delay={100}>
             <Card className="border-2 border-wrenchli-trust-blue shadow-lg">
               <CardContent className="p-8 md:p-10">
                 <div className="font-heading text-3xl font-bold text-wrenchli-trust-blue md:text-4xl">
-                  $25 per booked appointment
+                  $0 for 90 days
                 </div>
                 <p className="mt-2 text-lg text-muted-foreground">
-                  OR 5% of completed jobs —{" "}
+                  Founding shops get their post-pilot terms{" "}
                   <span className="font-semibold text-foreground">
-                    whichever is lower
+                    in writing before anything is charged
                   </span>
                 </p>
                 <div className="mt-6 grid gap-3 text-left max-w-md mx-auto">
                   {[
-                    "No monthly fees",
-                    "No setup costs",
+                    "No monthly fees during the pilot",
+                    "No setup costs during the pilot",
                     "No long-term contracts",
-                    "Cancel anytime",
+                    "Nothing is automatic — continuing after the pilot is your choice",
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-2">
                       <CheckCircle className="h-5 w-5 text-wrenchli-green flex-shrink-0" />

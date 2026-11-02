@@ -117,7 +117,7 @@ const REPAIRS: Record<string, RepairData> = {
       "Physical damage from road debris",
     ],
     diyFeasibility: (
-      <>Catalytic converter replacement is generally a professional-level repair requiring welding or specialized tools. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a trusted shop near you</Link> or explore <Link to="/financing-options" className="text-primary underline hover:text-primary/80">financing options</Link> for this higher-cost repair.</>
+      <>Catalytic converter replacement is generally a professional-level repair requiring welding or specialized tools. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a shop near you</Link> or explore <Link to="/financing-options" className="text-primary underline hover:text-primary/80">financing options</Link> for this higher-cost repair.</>
     ),
     chatPrompt: "I need a catalytic converter replacement",
     relatedLinks: [

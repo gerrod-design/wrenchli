@@ -259,7 +259,7 @@ export default function DesignPreview() {
                 {
                   icon: DollarSign,
                   title: "Future Updates",
-                  desc: "Program details will be shared when shop partnerships reopen.",
+                  desc: "Shop partnerships are onboarding now — program details are on the For Shops page.",
                 },
               ].map((b) => (
                 <div key={b.title} className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
