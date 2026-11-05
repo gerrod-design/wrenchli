@@ -4,14 +4,20 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import ShareWithShopButton from "@/components/ShareWithShopButton";
+import { NOT_IN_BOOK_MESSAGE } from "@/lib/priceBook";
 
 export interface RepairOption {
   option: string;
   description: string;
-  estimated_cost_low: number;
-  estimated_cost_high: number;
+  // R-68 book-only pricing: null when the option matched no price-book
+  // entry (price_status "not_in_book"); the card then shows the honest
+  // no-price state instead of a figure.
+  estimated_cost_low: number | null;
+  estimated_cost_high: number | null;
   difficulty: "DIY" | "Professional" | "Body Shop";
   time_estimate: string;
+  rate_source?: string | null;
+  price_status?: "book" | "not_in_book";
 }
 
 export interface DamageDiagnosis {
@@ -118,10 +124,14 @@ export default function DamageAnalysisResult({ diagnosis, imageUrls, vehicleInfo
                   </Badge>
                 </div>
                 <div className="flex items-center gap-4 mt-3 text-sm">
-                  <span className="flex items-center gap-1 font-medium text-foreground">
-                    <DollarSign className="h-4 w-4 text-accent" />
-                    ${opt.estimated_cost_low.toLocaleString()} – ${opt.estimated_cost_high.toLocaleString()}
-                  </span>
+                  {opt.estimated_cost_low != null && opt.estimated_cost_high != null ? (
+                    <span className="flex items-center gap-1 font-medium text-foreground">
+                      <DollarSign className="h-4 w-4 text-accent" />
+                      ${opt.estimated_cost_low.toLocaleString()} – ${opt.estimated_cost_high.toLocaleString()}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">{NOT_IN_BOOK_MESSAGE}</span>
+                  )}
                   <span className="flex items-center gap-1 text-muted-foreground">
                     <Clock className="h-4 w-4" />
                     {opt.time_estimate}

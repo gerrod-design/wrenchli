@@ -412,3 +412,70 @@ export function formatMoneyRange(range: [number, number]): string {
   const [low, high] = range;
   return `$${low.toLocaleString("en-US")}–$${high.toLocaleString("en-US")}`;
 }
+
+/**
+ * R-68 (book-only pricing): every priced result carries an explicit
+ * price_status so no surface has to guess where a number came from.
+ *   "book"        — figures were taken from this table (rate_source set).
+ *   "not_in_book" — the repair matched no entry; NO price may be shown.
+ * On a miss, pipelines must withhold the model's invented figures rather
+ * than pass them through (the pre-R-68 "no match, no pin" precedent let
+ * invented numbers render as if they were book prices).
+ */
+export type PriceStatus = "book" | "not_in_book";
+export const PRICE_STATUS_BOOK: PriceStatus = "book";
+export const PRICE_STATUS_NOT_IN_BOOK: PriceStatus = "not_in_book";
+
+/** Plain-language honest state shown wherever a price block would go. */
+export const NOT_IN_BOOK_MESSAGE =
+  "This repair isn't in our price book yet, so we won't guess a price. A shop can price it after a hands-on look.";
+
+/** String cost fields carried by a diagnose-style result object. */
+export interface DiagnosisCostFields {
+  diy_cost: string;
+  shop_parts_cost: string;
+  shop_labor_cost: string;
+  shop_cost: string;
+  diy_time?: string;
+  shop_time?: string;
+  rate_source?: string | null;
+  price_status?: PriceStatus;
+}
+
+/**
+ * Pin a diagnose-style result to the book, or strip its prices honestly.
+ * On a match, ALL cost figures are replaced with book figures and the
+ * result is stamped with rate_source + price_status "book". On a miss,
+ * every cost figure is blanked and the result is stamped
+ * price_status "not_in_book" with rate_source null, so renderers show
+ * NOT_IN_BOOK_MESSAGE instead of a guessed price. The assessment itself
+ * (title, causes, urgency, DIY guidance) is never touched.
+ */
+export function pinDiagnosisCosts<T extends DiagnosisCostFields>(
+  diagnosis: T,
+  entry: RepairRateEntry | null,
+): T {
+  if (entry) {
+    const figures = rateFigures(entry);
+    diagnosis.shop_parts_cost = formatMoneyRange(figures.shopParts);
+    diagnosis.shop_labor_cost = formatMoneyRange(figures.shopLabor);
+    diagnosis.shop_cost = formatMoneyRange(figures.shopTotal);
+    if (figures.diyParts) {
+      diagnosis.diy_cost = formatMoneyRange(figures.diyParts);
+    }
+    if (entry.diyTime) {
+      diagnosis.diy_time = entry.diyTime;
+    }
+    diagnosis.shop_time = entry.shopTime;
+    diagnosis.rate_source = RATE_SOURCE_ID;
+    diagnosis.price_status = PRICE_STATUS_BOOK;
+  } else {
+    diagnosis.diy_cost = "";
+    diagnosis.shop_parts_cost = "";
+    diagnosis.shop_labor_cost = "";
+    diagnosis.shop_cost = "";
+    diagnosis.rate_source = null;
+    diagnosis.price_status = PRICE_STATUS_NOT_IN_BOOK;
+  }
+  return diagnosis;
+}

@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useSmartRepairIntel } from "@/hooks/useSmartRepairIntel";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
 import { isSafetyCriticalCause } from "@/lib/diyVisibility";
+import { isBookPriced, NOT_IN_BOOK_MESSAGE } from "@/lib/priceBook";
 
 /** Extract numeric value from cost string like "$120–$250" → 120 */
 function parseCost(cost: string): number | null {
@@ -57,6 +58,11 @@ interface DiagnosisCardProps {
 }
 
 export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps) {
+  // R-68: prices render only when the result was pinned to the price book
+  // (rate_source set / price_status "book"). On a miss the functions blank
+  // the cost fields and stamp price_status "not_in_book"; the price block
+  // then renders the honest no-price state instead of a guessed figure.
+  const bookPriced = isBookPriced(diagnosis);
   const diy = diyConfig[diagnosis.diy_feasibility];
   const DiyIcon = diy.icon;
   const isAdvanced = diagnosis.diy_feasibility === "advanced";
@@ -385,12 +391,12 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             </h4>
           </div>
 
-          {!diyAllowed && <div className="space-y-1 text-sm mb-4">
+          {!diyAllowed && (bookPriced ? <div className="space-y-1 text-sm mb-4">
             <p><span className="text-muted-foreground">Parts:</span> <span className="font-semibold">{diagnosis.shop_parts_cost}</span></p>
             <p><span className="text-muted-foreground">Labor:</span> <span className="font-semibold">{diagnosis.shop_labor_cost}</span></p>
             <p><span className="text-muted-foreground">Estimated total:</span> <span className="font-semibold">{diagnosis.shop_cost}</span></p>
             <p><span className="text-muted-foreground">Shop time:</span> <span className="font-semibold">{diagnosis.shop_time}</span></p>
-          </div>}
+          </div> : <p className="text-sm leading-relaxed mb-4">{NOT_IN_BOOK_MESSAGE}</p>)}
 
           <ul className="space-y-2 text-sm mb-4 flex-1">
             <li className="flex items-center gap-2">

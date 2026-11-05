@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import CostOfOwnership from "@/components/quote/CostOfOwnership";
 import type { RecommendationLevel } from "@/components/quote/VehicleValueAnalyzer";
 import FinancePrescreen from "@/components/FinancePrescreen";
+import { NOT_IN_BOOK_MESSAGE } from "@/lib/priceBook";
 import ContextualAdvertising from "@/components/ContextualAdvertising";
 import { captureReferralToken, getReferralToken, trackReferralPageVisit, trackReferralConversion } from "@/lib/referralTracking";
 
@@ -24,14 +25,19 @@ const ESTIMATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate
 
 interface CostEstimate {
   metro_area: string;
-  cost_low: number;
-  cost_high: number;
-  parts_estimate: string;
-  labor_estimate: string;
-  labor_hours: string;
+  // R-68 book-only pricing: cost fields are null when the repair matched no
+  // price-book entry (price_status "not_in_book"); the page then shows the
+  // honest no-price state and hides price-dependent sections.
+  cost_low: number | null;
+  cost_high: number | null;
+  parts_estimate: string | null;
+  labor_estimate: string | null;
+  labor_hours: string | null;
   regional_notes: string;
   what_to_expect: string;
   warranty_note: string;
+  rate_source?: string | null;
+  price_status?: "book" | "not_in_book";
 }
 
 export default function GetQuote() {
@@ -332,6 +338,7 @@ export default function GetQuote() {
                   <span>{estimate.metro_area}</span>
                 </div>
 
+                {estimate.cost_low != null && estimate.cost_high != null ? (<>
                 <div className="text-center py-4">
                   <p className="text-sm text-muted-foreground mb-1">Estimated Repair Cost</p>
                   <p className="font-heading text-4xl md:text-5xl font-extrabold text-accent">
@@ -356,6 +363,9 @@ export default function GetQuote() {
                     <p className="font-semibold text-sm">{estimate.labor_hours}</p>
                   </div>
                 </div>
+                </>) : (
+                  <p className="text-center text-base leading-relaxed py-4">{NOT_IN_BOOK_MESSAGE}</p>
+                )}
 
                 <div className="space-y-3 text-sm">
                   <div className="rounded-lg border border-border p-3">
@@ -372,10 +382,12 @@ export default function GetQuote() {
                   </div>
                 </div>
 
+                {estimate.cost_low != null && estimate.cost_high != null && (
                 <div className="rounded-lg bg-accent/5 border border-accent/20 p-3 text-xs text-muted-foreground text-center">
                   <Shield className="inline h-3.5 w-3.5 mr-1 text-accent" />
                   This estimate is transparent — any shop you're referred to will see these same numbers.
                 </div>
+                )}
 
                 {/* Financing interest — post-estimate */}
                 <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 flex items-start gap-3">
@@ -398,7 +410,8 @@ export default function GetQuote() {
               </div>
             </SectionReveal>
 
-            {/* Finance Options */}
+            {/* Finance Options — only when a book price exists (R-68) */}
+            {estimate.cost_low != null && estimate.cost_high != null && (
             <SectionReveal delay={150}>
               <FinancePrescreen
                 repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
@@ -426,8 +439,10 @@ export default function GetQuote() {
                 }}
               />
             </SectionReveal>
+            )}
 
-            {/* Cost of Ownership comparison */}
+            {/* Cost of Ownership comparison — only when a book price exists (R-68) */}
+            {estimate.cost_low != null && estimate.cost_high != null && (
             <SectionReveal delay={200}>
               <CostOfOwnership
                 currentVehicle={vehicleStr}
@@ -441,8 +456,10 @@ export default function GetQuote() {
                 onRecommendation={setValueRec}
               />
             </SectionReveal>
+            )}
 
-            {/* Financing CTA */}
+            {/* Financing CTA — the link carries the repair cost, so it only renders when priced (R-68) */}
+            {estimate.cost_low != null && estimate.cost_high != null && (
             <SectionReveal delay={210}>
               <div className="rounded-2xl border-2 border-primary bg-primary/5 p-6 md:p-8">
                 <h3 className="font-heading text-xl font-bold mb-2">💳 Need Help Paying?</h3>
@@ -456,6 +473,7 @@ export default function GetQuote() {
                 </Button>
               </div>
             </SectionReveal>
+            )}
 
             {/* Contextual Advertising */}
             <SectionReveal delay={250}>
@@ -463,7 +481,7 @@ export default function GetQuote() {
                 diagnosis={diagnosis}
                 diagnosisCode={code}
                 vehicleInfo={{ year, make, model, trim }}
-                repairCost={Math.round((estimate.cost_low + estimate.cost_high) / 2)}
+                repairCost={estimate.cost_low != null && estimate.cost_high != null ? Math.round((estimate.cost_low + estimate.cost_high) / 2) : 0}
                 repairRecommendation={
                   valueRec
                     ? ["repair_and_replace", "replace_emphasis"].includes(valueRec.type)

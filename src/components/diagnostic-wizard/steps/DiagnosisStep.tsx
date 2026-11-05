@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
 import AssessmentDisclaimer from "@/components/diagnosis/AssessmentDisclaimer";
 import { isSafetyCriticalCause, showDIY } from "@/lib/diyVisibility";
+import { NOT_IN_BOOK_MESSAGE } from "@/lib/priceBook";
 
 
 interface Props {
@@ -125,13 +126,19 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
 
       {diyEligible && topDIYCause && (() => {
         const top = topDIYCause;
+        // R-68: on a price-book miss the function nulls every cost field;
+        // render the honest no-price state instead of "$null" figures.
+        const topPriced = top.estimated_cost_low != null && top.estimated_cost_high != null;
         return (
           <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #2A2D37" }}>
             <div className="px-4 py-2 text-xs font-mono" style={{ background: "#141720", color: "#E07B39" }}>DIY VS. SHOP — ESTIMATED COSTS</div>
+            {!topPriced ? (
+              <p className="p-4 text-sm leading-relaxed" style={{ color: "#9CA3AF" }}>{NOT_IN_BOOK_MESSAGE}</p>
+            ) : (
             <div className="grid grid-cols-2 divide-x" style={{ borderColor: "#2A2D37" }}>
               <div className="p-4 space-y-2">
                 <p className="text-sm font-semibold" style={{ color: "#22C55E" }}>DIY</p>
-                <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>${top.diy_parts_cost_low}–${top.diy_parts_cost_high}</span></p>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>{top.diy_parts_cost_low != null && top.diy_parts_cost_high != null ? `$${top.diy_parts_cost_low}–$${top.diy_parts_cost_high}` : "Not available"}</span></p>
                 <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{top.diy_time}</span></p>
               </div>
               <div className="p-4 space-y-2">
@@ -142,6 +149,7 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
                 <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{top.shop_time}</span></p>
               </div>
             </div>
+            )}
           </div>
         );
       })()}
@@ -166,7 +174,7 @@ export default function DiagnosisStep({ diagnosis, vehicle, sessionId, onNext, o
             </div>
             <div className="flex justify-between text-xs" style={{ color: "#6B7280" }}>
               <span>{Math.round(cause.probability * 100)}% likely</span>
-              <span>{cause.diy_difficulty === "professional_only" || isSafetyCriticalCause(`${cause.name} ${cause.notes ?? ""}`) ? `Estimated shop total: $${cause.estimated_cost_low}–$${cause.estimated_cost_high}` : "See comparison above"}</span>
+              <span>{cause.diy_difficulty === "professional_only" || isSafetyCriticalCause(`${cause.name} ${cause.notes ?? ""}`) ? (cause.estimated_cost_low != null && cause.estimated_cost_high != null ? `Estimated shop total: $${cause.estimated_cost_low}–$${cause.estimated_cost_high}` : "Not in our price book yet") : "See comparison above"}</span>
             </div>
           </div>
         ))}

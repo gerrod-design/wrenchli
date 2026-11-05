@@ -34,18 +34,23 @@ export interface SymptomData {
 export interface PossibleCause {
   name: string;
   probability: number;
-  estimated_cost_low: number;
-  estimated_cost_high: number;
+  // R-68 book-only pricing: cost fields are null when the cause matched no
+  // price-book entry (price_status "not_in_book"); renderers then show the
+  // honest no-price state instead of a figure.
+  estimated_cost_low: number | null;
+  estimated_cost_high: number | null;
   diy_parts_cost_low: number | null;
   diy_parts_cost_high: number | null;
   diy_time: string | null;
-  shop_parts_cost_low: number;
-  shop_parts_cost_high: number;
-  shop_labor_cost_low: number;
-  shop_labor_cost_high: number;
+  shop_parts_cost_low: number | null;
+  shop_parts_cost_high: number | null;
+  shop_labor_cost_low: number | null;
+  shop_labor_cost_high: number | null;
   shop_time: string;
   diy_difficulty: "easy" | "moderate" | "professional_only";
   notes?: string;
+  rate_source?: string | null;
+  price_status?: "book" | "not_in_book";
 }
 
 export interface DiagnosisResult {

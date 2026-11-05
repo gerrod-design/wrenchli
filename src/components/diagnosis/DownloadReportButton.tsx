@@ -1,6 +1,7 @@
 import { FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Diagnosis } from "./types";
+import { isBookPriced, NOT_IN_BOOK_MESSAGE } from "@/lib/priceBook";
 
 interface DownloadReportProps {
   vehicle: string;
@@ -211,8 +212,8 @@ function buildPrintContent(props: DownloadReportProps) {
       <span class="cause-name">${i + 1}. ${d.title}${d.code ? ` (${d.code})` : ""}</span>
     </div>
     <div class="cause-details">
-      <span><strong>DIY Cost:</strong> ${d.diy_cost}</span>
-      <span><strong>Shop Cost:</strong> ${d.shop_cost}</span>
+      ${isBookPriced(d) ? `<span><strong>DIY Cost:</strong> ${d.diy_cost}</span>
+      <span><strong>Shop Cost:</strong> ${d.shop_cost}</span>` : `<span><strong>Cost:</strong> ${NOT_IN_BOOK_MESSAGE}</span>`}
       <span><strong>DIY Level:</strong> ${d.diy_feasibility}</span>
     </div>
     <div class="cause-desc">${d.whats_happening}</div>

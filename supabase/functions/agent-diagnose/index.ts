@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
-import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
+import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID, PRICE_STATUS_BOOK, PRICE_STATUS_NOT_IN_BOOK } from "../_shared/repair-rates.ts";
+import { logRateMatch } from "../_shared/rate-match-log.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
@@ -146,9 +147,17 @@ ${historicalLine}`;
     // the primary assessment matches an entry, so this path quotes the same
     // figure as the consumer pipelines for the same repair. Runs before the
     // diagnosis_records insert below, so the stored estimate is the figure
-    // the user was shown. No match: the model estimate stands, visibly
-    // lacking rate_source (Batch 6 matcher precedent).
+    // the user was shown.
+    // R-68: book-only pricing. No match: the model estimate is withheld
+    // (costEstimate null, price_status "not_in_book") instead of standing
+    // unlabeled. Every outcome is logged (fire-and-forget).
     const rateEntry = findRepairRate(diagnosis.primaryDiagnosis ?? "");
+    logRateMatch({
+      pipeline: "agent-diagnose",
+      repairText: diagnosis.primaryDiagnosis ?? "",
+      matched: !!rateEntry,
+      rateEntryId: rateEntry?.id ?? null,
+    });
     if (rateEntry) {
       const figures = rateFigures(rateEntry);
       diagnosis.costEstimate = {
@@ -158,6 +167,10 @@ ${historicalLine}`;
           `${rateEntry.label} — parts ${formatMoneyRange(figures.shopParts)} + labor ${formatMoneyRange(figures.shopLabor)} (shared rate table)`,
       };
       (diagnosis as any).rate_source = RATE_SOURCE_ID;
+      (diagnosis as any).price_status = PRICE_STATUS_BOOK;
+    } else {
+      diagnosis.costEstimate = null;
+      (diagnosis as any).price_status = PRICE_STATUS_NOT_IN_BOOK;
     }
 
     // ── Session linkage (Outcomes agent dependency, 2026-09-25) ──
@@ -230,8 +243,10 @@ ${historicalLine}`;
           primary_confidence: diagnosis.primaryConfidence,
           rationale: diagnosis.rationale,
           alternative_diagnoses: diagnosis.alternativeDiagnoses,
-          cost_estimate_low: diagnosis.costEstimate.min,
-          cost_estimate_high: diagnosis.costEstimate.max,
+          // Null when the repair is not in the rate table (R-68): the
+          // record stores no price rather than an invented one.
+          cost_estimate_low: diagnosis.costEstimate?.min ?? null,
+          cost_estimate_high: diagnosis.costEstimate?.max ?? null,
           recommended_action: diagnosis.recommendedAction,
           ai_model_used: MODEL,
           historical_total_cases: historicalData.totalCases,

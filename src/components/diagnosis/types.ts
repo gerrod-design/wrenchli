@@ -16,6 +16,14 @@ export interface Diagnosis {
   shop_time?: string;
   diy_parts?: string[];
   diy_steps_by_part?: { part_name: string; steps: string[] }[];
+  /**
+   * R-68 book-only pricing signal, emitted by the assessment functions.
+   * rate_source is the book stamp ("wrenchli_editorial_rate_table_v1") on a
+   * match and null on a miss; price_status is "book" | "not_in_book".
+   * Renderers show prices only when pinned; absent/miss → honest state.
+   */
+  rate_source?: string | null;
+  price_status?: "book" | "not_in_book";
   category?: DtcCategory;
   tools_required?: ToolItem[];
 }

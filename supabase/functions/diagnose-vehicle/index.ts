@@ -6,7 +6,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
-import { findRepairRate, rateFigures, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
+import { findRepairRate, rateFigures, RATE_SOURCE_ID, PRICE_STATUS_BOOK, PRICE_STATUS_NOT_IN_BOOK, type PriceStatus } from "../_shared/repair-rates.ts";
+import { logRateMatch } from "../_shared/rate-match-log.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
@@ -34,19 +35,24 @@ interface SymptomReport {
 interface PossibleCause {
   name: string;
   probability: number;
-  estimated_cost_low: number;
-  estimated_cost_high: number;
+  // Cost fields are null when the cause matched no rate-table entry
+  // (R-68 book-only pricing): no price exists to show for that cause.
+  estimated_cost_low: number | null;
+  estimated_cost_high: number | null;
   diy_parts_cost_low: number | null;
   diy_parts_cost_high: number | null;
   diy_time: string | null;
-  shop_parts_cost_low: number;
-  shop_parts_cost_high: number;
-  shop_labor_cost_low: number;
-  shop_labor_cost_high: number;
+  shop_parts_cost_low: number | null;
+  shop_parts_cost_high: number | null;
+  shop_labor_cost_low: number | null;
+  shop_labor_cost_high: number | null;
   shop_time: string;
   diy_difficulty: "easy" | "moderate" | "professional_only";
   diy_steps?: string[] | null;
   notes?: string;
+  /** RATE_SOURCE_ID when priced from the shared rate table; null on a miss. */
+  rate_source?: string | null;
+  price_status?: PriceStatus;
 }
 
 interface Diagnosis {
@@ -265,7 +271,18 @@ Assess this vehicle issue and return the JSON schema.`.trim();
       // matches an entry, so the wizard quotes the same figures as every
       // other surface. DIY fields are only overwritten for DIY-eligible
       // causes; professional_only causes keep their null DIY fields.
+      // R-68: book-only pricing. On a matcher miss every cost field is
+      // nulled and the cause is stamped price_status "not_in_book", so
+      // the wizard renders the honest no-price state instead of the
+      // model's invented figures. Every outcome is logged
+      // (fire-and-forget) so the miss rate is a counted fact.
       const rateEntry = findRepairRate(cause.name ?? "");
+      logRateMatch({
+        pipeline: "diagnose-vehicle",
+        repairText: cause.name ?? "",
+        matched: !!rateEntry,
+        rateEntryId: rateEntry?.id ?? null,
+      });
       if (rateEntry) {
         const figures = rateFigures(rateEntry);
         cause.shop_parts_cost_low = figures.shopParts[0];
@@ -284,7 +301,19 @@ Assess this vehicle issue and return the JSON schema.`.trim();
             cause.diy_time = rateEntry.diyTime;
           }
         }
-        (cause as any).rate_source = RATE_SOURCE_ID;
+        cause.rate_source = RATE_SOURCE_ID;
+        cause.price_status = PRICE_STATUS_BOOK;
+      } else {
+        cause.shop_parts_cost_low = null;
+        cause.shop_parts_cost_high = null;
+        cause.shop_labor_cost_low = null;
+        cause.shop_labor_cost_high = null;
+        cause.estimated_cost_low = null;
+        cause.estimated_cost_high = null;
+        cause.diy_parts_cost_low = null;
+        cause.diy_parts_cost_high = null;
+        cause.rate_source = null;
+        cause.price_status = PRICE_STATUS_NOT_IN_BOOK;
       }
     }
 

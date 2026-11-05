@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
-import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
+import { findRepairRate, pinDiagnosisCosts } from "../_shared/repair-rates.ts";
+import { logRateMatch } from "../_shared/rate-match-log.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
@@ -241,21 +242,19 @@ SAFETY HARD BLOCK: Any assessment involving brakes, steering, airbags, or fuel m
       // matches an entry (title first, then common causes). Runs before the
       // safety override below, which still owns the DIY fields for
       // safety-critical items.
+      // R-68: book-only pricing. On a matcher miss the model's invented
+      // figures are stripped and the result is stamped
+      // price_status "not_in_book" so surfaces render the honest
+      // no-price state instead of a guessed price. Every outcome is
+      // logged (fire-and-forget) so the miss rate is a counted fact.
       const rateEntry = findRepairRate(diagnosis.title ?? "") ?? findRepairRate((diagnosis.common_causes ?? []).join(" "));
-      if (rateEntry) {
-        const figures = rateFigures(rateEntry);
-        diagnosis.shop_parts_cost = formatMoneyRange(figures.shopParts);
-        diagnosis.shop_labor_cost = formatMoneyRange(figures.shopLabor);
-        diagnosis.shop_cost = formatMoneyRange(figures.shopTotal);
-        if (figures.diyParts) {
-          diagnosis.diy_cost = formatMoneyRange(figures.diyParts);
-        }
-        if (rateEntry.diyTime) {
-          diagnosis.diy_time = rateEntry.diyTime;
-        }
-        diagnosis.shop_time = rateEntry.shopTime;
-        diagnosis.rate_source = RATE_SOURCE_ID;
-      }
+      logRateMatch({
+        pipeline: "diagnose",
+        repairText: diagnosis.title ?? "",
+        matched: !!rateEntry,
+        rateEntryId: rateEntry?.id ?? null,
+      });
+      pinDiagnosisCosts(diagnosis, rateEntry);
 
       if (safetyCritical) {
         diagnosis.diy_feasibility = "advanced";

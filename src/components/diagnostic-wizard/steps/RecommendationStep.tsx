@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { CheckCircle2, ChevronRight, RotateCcw, Wrench, Clock, ShoppingCart, AlertTriangle, MapPin } from "lucide-react";
 import type { VehicleData, DiagnosisResult, RecommendationResult } from "../DiagnosticWizard";
 import { showDIY } from "@/lib/diyVisibility";
+import { NOT_IN_BOOK_MESSAGE } from "@/lib/priceBook";
 import { buildAmazonSearchLink } from "@/data/adRecommendations";
 import { trackAdClick } from "@/lib/adClickTracker";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
@@ -76,10 +77,14 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
       {diyEligible && topDIYCause && (
         <div className="rounded-lg overflow-hidden" style={{ border: "1px solid #2A2D37" }}>
           <div className="px-4 py-2 text-xs font-mono" style={{ background: "#141720", color: "#E07B39" }}>DIY VS. SHOP</div>
+          {/* R-68: cost fields are null on a price-book miss; show the honest state. */}
+          {topDIYCause.estimated_cost_low == null || topDIYCause.estimated_cost_high == null ? (
+            <p className="p-4 text-sm leading-relaxed" style={{ color: "#9CA3AF" }}>{NOT_IN_BOOK_MESSAGE}</p>
+          ) : (
           <div className="grid grid-cols-2 divide-x" style={{ borderColor: "#2A2D37" }}>
             <div className="p-4 space-y-2">
               <p className="text-sm font-semibold" style={{ color: "#22C55E" }}>DIY</p>
-              <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>${topDIYCause.diy_parts_cost_low}–${topDIYCause.diy_parts_cost_high}</span></p>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>Parts: <span style={{ color: "#F5F5F5" }}>{topDIYCause.diy_parts_cost_low != null && topDIYCause.diy_parts_cost_high != null ? `$${topDIYCause.diy_parts_cost_low}–$${topDIYCause.diy_parts_cost_high}` : "Not available"}</span></p>
               <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{topDIYCause.diy_time}</span></p>
             </div>
             <div className="p-4 space-y-2">
@@ -90,6 +95,7 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
               <p className="text-xs" style={{ color: "#9CA3AF" }}>Time: <span style={{ color: "#F5F5F5" }}>{topDIYCause.shop_time}</span></p>
             </div>
           </div>
+          )}
         </div>
       )}
 

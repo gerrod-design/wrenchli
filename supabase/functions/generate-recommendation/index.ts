@@ -128,7 +128,7 @@ serve(async (req) => {
       .slice(0, 3)
       .map(
         (c) =>
-          `- ${c.name} (${Math.round(c.probability * 100)}% likely, ${c.diy_difficulty})\n  DIY parts: ${c.diy_parts_cost_low == null || c.diy_parts_cost_high == null ? "not available" : `$${c.diy_parts_cost_low}–$${c.diy_parts_cost_high}`}\n  DIY time: ${c.diy_time ?? "not available"}\n  Shop parts: $${c.shop_parts_cost_low ?? 0}–$${c.shop_parts_cost_high ?? 0}\n  Shop labor: $${c.shop_labor_cost_low ?? 0}–$${c.shop_labor_cost_high ?? 0}\n  Shop total: $${c.estimated_cost_low}–$${c.estimated_cost_high}\n  Shop time: ${c.shop_time ?? "not available"}`
+          `- ${c.name} (${Math.round(c.probability * 100)}% likely, ${c.diy_difficulty})\n  DIY parts: ${c.diy_parts_cost_low == null || c.diy_parts_cost_high == null ? "not available" : `$${c.diy_parts_cost_low}–$${c.diy_parts_cost_high}`}\n  DIY time: ${c.diy_time ?? "not available"}\n  Shop parts: ${c.shop_parts_cost_low == null || c.shop_parts_cost_high == null ? "not available" : `$${c.shop_parts_cost_low}–$${c.shop_parts_cost_high}`}\n  Shop labor: ${c.shop_labor_cost_low == null || c.shop_labor_cost_high == null ? "not available" : `$${c.shop_labor_cost_low}–$${c.shop_labor_cost_high}`}\n  Shop total: ${c.estimated_cost_low == null || c.estimated_cost_high == null ? "not available — this repair is not in the Wrenchli price book, so no price may be stated for it" : `$${c.estimated_cost_low}–$${c.estimated_cost_high}`}\n  Shop time: ${c.shop_time ?? "not available"}`
       )
       .join("\n");
 

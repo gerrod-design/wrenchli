@@ -5,6 +5,14 @@ import type { SymptomMatch } from "@/data/symptomLibrary";
 import DiagnosisCard from "./DiagnosisCard";
 import type { Diagnosis } from "./types";
 import { getToolsForDiagnosis } from "@/data/toolsLibrary";
+import {
+  findRepairRate,
+  rateFigures,
+  formatMoneyRange,
+  RATE_SOURCE_ID,
+  PRICE_STATUS_BOOK,
+  PRICE_STATUS_NOT_IN_BOOK,
+} from "@/lib/priceBook";
 
 interface SymptomMatchResultsProps {
   matches: SymptomMatch[];
@@ -13,6 +21,27 @@ interface SymptomMatchResultsProps {
 }
 
 function entryToDiagnosis(entry: SymptomMatch["entry"]): Diagnosis {
+  // R-68 book-only pricing: the symptom library's own costRange strings are
+  // no longer displayed. The entry title is matched against the shared
+  // price book; on a match the card shows book figures stamped with
+  // rate_source, on a miss the card renders the honest no-price state.
+  const rateEntry = findRepairRate(entry.diagnosis);
+  if (!rateEntry) {
+    return {
+      title: entry.diagnosis,
+      code: "",
+      urgency: entry.urgency,
+      whats_happening: entry.description,
+      common_causes: entry.commonCauses,
+      diy_feasibility: entry.diyFeasibility,
+      diy_cost: "",
+      shop_cost: "",
+      rate_source: null,
+      price_status: PRICE_STATUS_NOT_IN_BOOK,
+      tools_required: getToolsForDiagnosis(undefined, entry.diyFeasibility),
+    };
+  }
+  const figures = rateFigures(rateEntry);
   return {
     title: entry.diagnosis,
     code: "",
@@ -20,8 +49,14 @@ function entryToDiagnosis(entry: SymptomMatch["entry"]): Diagnosis {
     whats_happening: entry.description,
     common_causes: entry.commonCauses,
     diy_feasibility: entry.diyFeasibility,
-    diy_cost: entry.costRange.diy,
-    shop_cost: entry.costRange.professional,
+    diy_cost: figures.diyParts ? formatMoneyRange(figures.diyParts) : "",
+    diy_time: rateEntry.diyTime ?? undefined,
+    shop_parts_cost: formatMoneyRange(figures.shopParts),
+    shop_labor_cost: formatMoneyRange(figures.shopLabor),
+    shop_cost: formatMoneyRange(figures.shopTotal),
+    shop_time: rateEntry.shopTime,
+    rate_source: RATE_SOURCE_ID,
+    price_status: PRICE_STATUS_BOOK,
     tools_required: getToolsForDiagnosis(undefined, entry.diyFeasibility),
   };
 }

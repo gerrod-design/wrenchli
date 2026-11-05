@@ -5,7 +5,12 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
-import { findRepairRate, rateFigures, RATE_SOURCE_ID } from "./repair-rates.ts";
+import { analyzeSymptoms } from "./api-diagnose-analysis.ts";
+import { logRateMatch } from "./rate-match-log.ts";
+
+// Re-exported for compatibility with existing import sites; the pure
+// analysis lives in api-diagnose-analysis.ts (R-68).
+export { analyzeSymptoms };
 
 // API endpoints keep CORS open (* via getCorsHeaders fallback) since they're
 // consumed by third-party integrations authenticated via x-api-key.
@@ -19,60 +24,6 @@ interface DiagnoseRequest {
     mileage?: number;
   };
   location?: string;
-}
-
-function analyzeSymptomsRaw(symptoms: string[], vehicle: { year: number; make: string; model: string }) {
-  const text = symptoms.join(" ").toLowerCase();
-
-  if (text.includes("grinding") || text.includes("brake")) {
-    return { issue: "Brake System Issue", description: "Grinding noises typically indicate worn brake pads that need replacement. This can damage rotors if not addressed promptly.", urgency: "high" as const, cost_estimate: { min: 200, max: 600 }, action: "Schedule brake inspection within 48 hours", safety: "Avoid heavy braking and increase following distance", diy_possible: false };
-  }
-  if (text.includes("check engine") || text.includes("engine light")) {
-    return { issue: "Engine Assessment Needed", description: "Check engine light indicates a system malfunction. Could range from a loose gas cap to serious engine issues.", urgency: "medium" as const, cost_estimate: { min: 100, max: 800 }, action: "Get a professional scan to identify the specific issue", safety: "Safe to drive short distances, avoid hard acceleration", diy_possible: true };
-  }
-  if (text.includes("oil") || text.includes("leak")) {
-    return { issue: "Oil System Issue", description: "Oil leaks can lead to engine damage if oil levels drop too low. Check oil level immediately.", urgency: "medium" as const, cost_estimate: { min: 50, max: 300 }, action: "Check oil level and look for leak source", safety: "Check oil level before driving", diy_possible: true };
-  }
-  if (text.includes("overheat") || text.includes("temperature") || text.includes("coolant") || text.includes("steam")) {
-    return { issue: "Engine Overheating", description: "Your engine is running hotter than it should. This can cause permanent engine damage if not addressed immediately.", urgency: "high" as const, cost_estimate: { min: 150, max: 800 }, action: "Pull over safely and turn off the engine. Do not drive until resolved.", safety: "Do NOT open the radiator cap while hot. Let engine cool completely.", diy_possible: false };
-  }
-  if (text.includes("noise") || text.includes("sound") || text.includes("rattle") || text.includes("knock")) {
-    return { issue: "Mechanical Issue — Assessment Needed", description: "Unusual noises can indicate various mechanical issues. A professional inspection is recommended to identify the source.", urgency: "medium" as const, cost_estimate: { min: 100, max: 500 }, action: "Schedule professional inspection", safety: "Monitor for changes in noise intensity", diy_possible: false };
-  }
-  if (text.includes("battery") || text.includes("won't start") || text.includes("click") || text.includes("crank")) {
-    return { issue: "Battery or Starting System Issue", description: "If your vehicle won't start or you hear clicking, the most common cause is a dead or weak battery.", urgency: "high" as const, cost_estimate: { min: 100, max: 500 }, action: "Test battery voltage or jump-start the vehicle", safety: "Ensure the vehicle is in park and on a level surface before jump-starting", diy_possible: true };
-  }
-  if (text.includes("transmission") || text.includes("shifting") || text.includes("slipping")) {
-    return { issue: "Transmission Issue", description: "Transmission problems can range from low fluid to serious internal damage. Address promptly to prevent costly repairs.", urgency: "high" as const, cost_estimate: { min: 150, max: 3000 }, action: "Check transmission fluid level and schedule inspection", safety: "Avoid aggressive driving and heavy loads", diy_possible: false };
-  }
-
-  return { issue: "Professional Inspection Recommended", description: "Multiple symptoms or unclear issue. A professional inspection will identify the specific problem.", urgency: "medium" as const, cost_estimate: { min: 100, max: 400 }, action: "Schedule an inspection appointment with a local mechanic", safety: "Safe to drive short distances unless symptoms worsen", diy_possible: false };
-}
-
-// R-56 (Batch 9): buckets whose definition names one specific repair that
-// exists in the shared rate table derive their cost_estimate from the
-// table, so the public API quotes the same figure as every other surface
-// for the same repair. Buckets spanning several repairs (overheating,
-// transmission) or lacking a table entry keep their bucket range and
-// visibly lack rate_source (Batch 6 matcher precedent: no match, no pin,
-// no invented rates).
-const BUCKET_RATE_LABELS: Record<string, string> = {
-  "Brake System Issue": "Brake Pads Replacement",
-  "Battery or Starting System Issue": "Battery Replacement",
-};
-
-export function analyzeSymptoms(symptoms: string[], vehicle: { year: number; make: string; model: string }) {
-  const result = analyzeSymptomsRaw(symptoms, vehicle);
-  const label = BUCKET_RATE_LABELS[result.issue];
-  if (label) {
-    const entry = findRepairRate(label);
-    if (entry) {
-      const figures = rateFigures(entry);
-      result.cost_estimate = { min: figures.shopTotal[0], max: figures.shopTotal[1] };
-      (result as any).rate_source = RATE_SOURCE_ID;
-    }
-  }
-  return result as any;
 }
 
 async function hashApiKey(key: string): Promise<string> {
@@ -145,9 +96,19 @@ export async function handleApiDiagnose(req: Request, endpoint: string): Promise
     const diagnosis = analyzeSymptoms(symptoms, vehicle);
     const baseUrl = "https://wrenchli.net";
 
+    // R-68: log the matcher outcome (fire-and-forget). cost_estimate is
+    // null with price_status "not_in_book" when the bucket has no rate
+    // table entry; rate_source is present only for book-priced results.
+    logRateMatch({
+      pipeline: endpoint,
+      repairText: symptoms.join(" "),
+      matched: !!diagnosis.rate_source,
+      rateEntryId: diagnosis.rate_entry_id ?? null,
+    });
+
     const response = {
-      diagnosis: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate, ...(diagnosis.rate_source ? { rate_source: diagnosis.rate_source } : {}) },
-      assessment: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate, ...(diagnosis.rate_source ? { rate_source: diagnosis.rate_source } : {}) },
+      diagnosis: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate, price_status: diagnosis.price_status, ...(diagnosis.rate_source ? { rate_source: diagnosis.rate_source } : {}) },
+      assessment: { probable_issue: diagnosis.issue, description: diagnosis.description, urgency: diagnosis.urgency, cost_estimate: diagnosis.cost_estimate, price_status: diagnosis.price_status, ...(diagnosis.rate_source ? { rate_source: diagnosis.rate_source } : {}) },
       assessment_title: diagnosis.issue,
       recommendations: { immediate_action: diagnosis.action, safety_advice: diagnosis.safety, diy_feasible: diagnosis.diy_possible },
       wrenchli_services: {
@@ -160,7 +121,7 @@ export async function handleApiDiagnose(req: Request, endpoint: string): Promise
       endpoint, key_hash: keyHash, diagnosis_title: diagnosis.issue,
       vehicle_year: String(vehicle.year), vehicle_make: vehicle.make, vehicle_model: vehicle.model,
       zip_code: location || null, response_status: 200, response_time_ms: Date.now() - requestStart,
-      cost_low: diagnosis.cost_estimate.min, cost_high: diagnosis.cost_estimate.max,
+      cost_low: diagnosis.cost_estimate?.min ?? null, cost_high: diagnosis.cost_estimate?.max ?? null,
     }).then(() => {});
 
     return new Response(JSON.stringify(response), { headers: { ...securityHeaders, "Content-Type": "application/json" } });

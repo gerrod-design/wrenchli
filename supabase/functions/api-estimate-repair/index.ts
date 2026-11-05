@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
+import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID, PRICE_STATUS_BOOK, PRICE_STATUS_NOT_IN_BOOK } from "../_shared/repair-rates.ts";
+import { logRateMatch } from "../_shared/rate-match-log.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
@@ -131,7 +133,39 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unexpected AI response format" }), { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } });
     }
 
-    return new Response(JSON.stringify(toolUse.input), { headers: { ...securityHeaders, "Content-Type": "application/json" } });
+    // R-68: book-only pricing. This endpoint previously returned the
+    // model's figures with no rate-table pin at all. Now it behaves like
+    // estimate-repair: pin on a match (rate_source + price_status
+    // "book"); on a miss, withhold the figures and stamp
+    // price_status "not_in_book". Every outcome is logged
+    // (fire-and-forget).
+    const estimate = toolUse.input;
+    const rateEntry = findRepairRate(safeTitle);
+    logRateMatch({
+      pipeline: "api-estimate-repair",
+      repairText: safeTitle,
+      matched: !!rateEntry,
+      rateEntryId: rateEntry?.id ?? null,
+    });
+    if (rateEntry) {
+      const figures = rateFigures(rateEntry);
+      estimate.parts_estimate = formatMoneyRange(figures.shopParts);
+      estimate.labor_estimate = formatMoneyRange(figures.shopLabor);
+      estimate.labor_hours = `${figures.laborHours[0]}–${figures.laborHours[1]} hours`;
+      estimate.cost_low = figures.shopTotal[0];
+      estimate.cost_high = figures.shopTotal[1];
+      estimate.rate_source = RATE_SOURCE_ID;
+      estimate.price_status = PRICE_STATUS_BOOK;
+    } else {
+      estimate.parts_estimate = null;
+      estimate.labor_estimate = null;
+      estimate.labor_hours = null;
+      estimate.cost_low = null;
+      estimate.cost_high = null;
+      estimate.price_status = PRICE_STATUS_NOT_IN_BOOK;
+    }
+
+    return new Response(JSON.stringify(estimate), { headers: { ...securityHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("api-estimate-repair error:", e);
     return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { ...securityHeaders, "Content-Type": "application/json" } });

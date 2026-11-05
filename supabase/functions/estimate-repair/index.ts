@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMITS } from "../_shared/rate-limit.ts";
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
-import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID } from "../_shared/repair-rates.ts";
+import { findRepairRate, rateFigures, formatMoneyRange, RATE_SOURCE_ID, PRICE_STATUS_BOOK, PRICE_STATUS_NOT_IN_BOOK } from "../_shared/repair-rates.ts";
+import { logRateMatch } from "../_shared/rate-match-log.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
@@ -197,7 +198,18 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
     // R-56: pin cost figures to the shared rate table when the repair
     // title matches an entry. Narrative fields stay model-generated; the
     // numbers come from the one shared source every surface reads.
+    // R-68: book-only pricing. On a matcher miss the model's figures are
+    // withheld (nulled) and the result is stamped
+    // price_status "not_in_book"; narrative fields (what to expect,
+    // warranty, regional notes) still return so the assessment completes.
+    // Every outcome is logged (fire-and-forget).
     const rateEntry = findRepairRate(safeTitle);
+    logRateMatch({
+      pipeline: "estimate-repair",
+      repairText: safeTitle,
+      matched: !!rateEntry,
+      rateEntryId: rateEntry?.id ?? null,
+    });
     if (rateEntry) {
       const figures = rateFigures(rateEntry);
       (estimate as any).parts_estimate = formatMoneyRange(figures.shopParts);
@@ -206,6 +218,14 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
       (estimate as any).cost_low = figures.shopTotal[0];
       (estimate as any).cost_high = figures.shopTotal[1];
       (estimate as any).rate_source = RATE_SOURCE_ID;
+      (estimate as any).price_status = PRICE_STATUS_BOOK;
+    } else {
+      (estimate as any).parts_estimate = null;
+      (estimate as any).labor_estimate = null;
+      (estimate as any).labor_hours = null;
+      (estimate as any).cost_low = null;
+      (estimate as any).cost_high = null;
+      (estimate as any).price_status = PRICE_STATUS_NOT_IN_BOOK;
     }
 
     (estimate as any).general_estimate = isGeneralEstimate;
