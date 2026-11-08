@@ -11,6 +11,7 @@ import { getAllPosts } from "@/lib/blog";
 export const STATIC_PRERENDER_PATHS = [
   "/",
   "/for-shops",
+  "/for-shops/talk",
   "/for-dealers",
   "/faq",
   "/blog",

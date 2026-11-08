@@ -140,3 +140,9 @@ verify_jwt = false
 
 [functions.check-proactive-events]
 verify_jwt = false
+
+[functions.shop-talk]
+verify_jwt = false
+
+[functions.shop-booking-request]
+verify_jwt = false
