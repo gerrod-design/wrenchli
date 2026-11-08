@@ -9,7 +9,8 @@
 // - No promise of continuous recall monitoring: E3/E8 state only what a
 //   check actually found.
 // - No implication that shops are being matched, are waiting, or can be
-//   booked. Shop matching is paused.
+//   booked. The referral pilot is open nationally; there is no general
+//   matching product.
 // - No city names, no coverage claims.
 // - Mileage figures come only from sourced readings on the record; these
 //   builders never invent a number — callers pass only sourced values.

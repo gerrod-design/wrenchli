@@ -1,7 +1,8 @@
 import { UserX, ShieldCheck, FileText } from "lucide-react";
 import SectionReveal from "@/components/SectionReveal";
 
-// NOTE (2026-09-17): Shop-matching track is paused with zero partner shops.
+// NOTE (updated 2026-11-08): The referral pilot is open nationally;
+// there is no general matching product.
 // Previous version listed "founding partner" shops and a shop-database stat;
 // both removed. This section now states only verifiable consumer facts.
 export default function HomeSocialProof() {

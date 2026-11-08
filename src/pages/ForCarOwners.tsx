@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import heroCarOwners from "@/assets/hero-car-owners.jpg";
 import {
-  ShieldCheck, DollarSign, Star, CreditCard, Calendar, Bell,
+  ShieldCheck, DollarSign, Star, Calendar, Bell,
   Car, Search, ClipboardList, GitFork, Wrench, CheckCircle, ArrowRight, MessageSquare, Tv
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,6 @@ const benefits = [
   { icon: DollarSign, title: "True Price Transparency", desc: "Your assessment shows a fair cost range for the repair, based on typical parts and labor — before you ever talk to a shop." },
   { icon: ShieldCheck, title: "Independent Local Shops", desc: "Independent shops enrolled in our free referral pilot. You see your assessment first, and you decide who to contact." },
   { icon: Star, title: "Outcomes on Record", desc: "Participating shops report the outcome of every referred repair, building a record tied to real work — not advertising." },
-  { icon: CreditCard, title: "Financing for Everyone", desc: "Multiple lending partners, all credit profiles welcome. Apply at checkout and get approved in minutes." },
   { icon: Calendar, title: "Assess Online, Anytime", desc: "Run your free assessment anytime. Where a participating shop is available, you can share it and reach out when it suits you." },
   { icon: Bell, title: "Status Updates", desc: "Get text and email notifications as your repair progresses. Know exactly when your vehicle will be ready." },
 ];

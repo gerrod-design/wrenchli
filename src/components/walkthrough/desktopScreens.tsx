@@ -146,7 +146,7 @@ export const desktopSharedScreens = [
             </div>
             <div className="rounded-xl border-2 border-accent bg-accent/5 p-4">
               <p className="text-sm font-bold text-accent mb-2">👨‍🔧 Get It Fixed Professionally</p>
-              <span className="rounded bg-accent/10 px-2 py-1 text-[10px] text-accent">Get Shop Quotes</span>
+              <span className="rounded bg-accent/10 px-2 py-1 text-[10px] text-accent">Share With a Shop</span>
             </div>
           </div>
         </div>
@@ -420,7 +420,7 @@ export const desktopShopScreens = [
         <div className="flex-1 px-8 py-5">
           <div className="max-w-sm mx-auto space-y-3">
             <p className="text-sm font-bold text-foreground">Ready to Connect with a Shop?</p>
-            <p className="text-[10px] text-muted-foreground">Share your info and we'll connect you with a trusted local shop. They'll see your assessment and cost estimate — no surprises.</p>
+            <p className="text-[10px] text-muted-foreground">Share your assessment with a participating shop. They'll see your vehicle and your concern — never your contact details.</p>
             <div className="space-y-2">
               <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-foreground">John Doe</div>
               <div className="rounded-lg bg-muted px-3 py-2.5 text-xs text-foreground">john@email.com</div>

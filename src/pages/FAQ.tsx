@@ -58,7 +58,7 @@ export default function FAQ() {
           <SectionReveal>
             <h2 className="font-heading text-2xl font-bold md:text-4xl">Still have questions?</h2>
             <p className="mt-3 text-primary-foreground/70">
-              <Link to="/contact" className="text-accent underline hover:no-underline">Contact us</Link> or join the waitlist below.
+              <Link to="/contact" className="text-accent underline hover:no-underline">Contact us</Link> or join the early access list below.
             </p>
             <div className="mx-auto mt-8 max-w-xl">
               <WaitlistForm source="faq" />

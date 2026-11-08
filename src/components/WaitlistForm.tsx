@@ -65,7 +65,7 @@ export default function WaitlistForm({
         disabled={loading}
         className="h-12 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-8 text-base whitespace-nowrap"
       >
-        {loading ? "Joining..." : "Join the Waitlist"}
+        {loading ? "Joining..." : "Join the Early Access List"}
       </Button>
     </form>
   );

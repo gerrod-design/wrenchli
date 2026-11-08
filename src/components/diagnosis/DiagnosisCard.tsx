@@ -405,10 +405,6 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(204 64% 44%)" }} />
-              <span>Financing available</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(204 64% 44%)" }} />
               <span>A fair cost range before you talk to a shop</span>
             </li>
           </ul>

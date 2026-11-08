@@ -21,9 +21,9 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "Is the assessment really free?",
-    a: "Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse DIY tutorials without paying a thing. If you take your vehicle to a shop for repair, you pay the shop directly — Wrenchli never takes a cut.",
+    a: "Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse DIY tutorials without paying a thing. If you take your vehicle to a shop for repair, you pay the shop directly for your repair — Wrenchli never charges you.",
     richAnswer: (
-      <>Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link> without paying a thing. If you take your vehicle to a shop for repair, you pay the shop directly — Wrenchli never takes a cut.</>
+      <>Yes, 100% free. You can assess unlimited vehicle issues, get cost estimates, and browse <Link to="/diy" className="text-primary underline hover:text-primary/80">DIY tutorials</Link> without paying a thing. If you take your vehicle to a shop for repair, you pay the shop directly for your repair — Wrenchli never charges you.</>
     ),
   },
   {

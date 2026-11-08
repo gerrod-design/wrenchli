@@ -175,7 +175,7 @@ export default function FindShops() {
       setExpandedRadius(data.expanded_radius_miles || 0);
       setResolvedCity(data.city || "");
       if (merged.length === 0) {
-        toast.info(`No partner shops yet near ${zip}. Join the waitlist to be notified.`);
+        toast.info(`No partner shops yet near ${zip}. We'll notify you as participating shops join near you.`);
       } else if (data.expanded_radius_miles) {
         toast.success(`Showing ${merged.length} shops within ${data.expanded_radius_miles} miles of ${zip}`);
       } else {
@@ -209,7 +209,7 @@ export default function FindShops() {
           <SectionReveal>
             <div className="max-w-2xl mx-auto text-center">
               <h1 className="font-heading text-3xl md:text-5xl font-bold mb-4">
-                Find Trusted Auto Repair Shops
+                Find Auto Repair Shops Near You
               </h1>
               <p className="text-lg text-primary-foreground/80 mb-8">
                 Search by ZIP code to discover verified repair shops near you. Compare ratings, prices, and availability.
@@ -312,7 +312,7 @@ export default function FindShops() {
                   <MapPin className="h-16 w-16 text-accent mx-auto mb-4" />
                   <h2 className="font-heading text-2xl font-semibold mb-3">Ready to Find Your Shop?</h2>
                   <p className="text-muted-foreground mb-6">
-                    Enter your ZIP code above to see trusted auto repair shops in your area.
+                    Enter your ZIP code above to see auto repair shops in your area. Shops marked as partners have joined Wrenchli's referral pilot; other listings are reference-only.
                   </p>
                   <div className="grid gap-3 text-sm text-muted-foreground">
                     {["Verified shop ratings and reviews", "Transparent pricing tiers", "Quick response times"].map((t) => (
