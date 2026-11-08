@@ -1009,8 +1009,8 @@ export default function Developers() {
                 </div>
                 <div className="rounded-lg bg-muted p-3 break-all">
                   <span className="text-muted-foreground">OpenAPI spec: </span>
-                  <a href="/.well-known/openapi.yaml" target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                    /.well-known/openapi.yaml
+                  <a href="/openapi.json" target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                    /openapi.json
                   </a>
                 </div>
               </div>

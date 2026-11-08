@@ -63,7 +63,7 @@ function CollapsibleSection({ title, children }: { title: string; children: Reac
   );
 }
 
-const OPENAPI_URL = "https://wrenchli.net/.well-known/openapi.yaml";
+const OPENAPI_URL = "https://wrenchli.net/openapi.json";
 
 const systemPromptExample = `You are a knowledgeable vehicle assessment assistant powered by Wrenchli.
 

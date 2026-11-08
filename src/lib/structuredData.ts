@@ -61,6 +61,50 @@ const assessmentService = {
   },
 };
 
+// Describes the referral pilot offered on /for-shops, in the page's own
+// words ("Free Referral Pilot for Independent Shops... free until your
+// shop completes its first five referred repairs. Customers arrive
+// pre-assessed with symptoms, likely causes, and a fair cost range.").
+// The pilot is free through a shop's first five completed referred
+// repairs; no post-pilot rate is stated on the page, so none is stated
+// here either.
+const shopPilotService = {
+  "@type": "Service",
+  "@id": `${SITE_BASE}/for-shops#pilot`,
+  name: "Free Referral Pilot for Independent Repair Shops",
+  serviceType: "Repair shop referral pilot",
+  provider: { "@id": `${SITE_BASE}/#organization` },
+  url: `${SITE_BASE}/for-shops`,
+  description:
+    "Free referral pilot for independent auto repair shops: free until your shop completes its first five referred repairs. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range. No exclusivity and no volume commitments.",
+  areaServed: { "@type": "Country", name: "United States" },
+  audience: { "@type": "Audience", audienceType: "Independent auto repair shops" },
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+    description: "Free until the shop completes its first five referred repairs.",
+  },
+};
+
+// The /about page describes the company itself (its own summary:
+// "Wrenchli helps vehicle owners understand what is likely wrong before
+// paying for a repair. Built in Michigan by Gerrod Parchmon."), so the
+// page is typed AboutPage about the same Organization the homepage
+// publishes.
+const aboutPage = {
+  "@type": "AboutPage",
+  "@id": `${SITE_BASE}/about#webpage`,
+  url: `${SITE_BASE}/about`,
+  name: "About Wrenchli",
+  description:
+    "Wrenchli helps vehicle owners understand what is likely wrong before paying for a repair. Built in Michigan by Gerrod Parchmon.",
+  about: { "@id": `${SITE_BASE}/#organization` },
+  publisher: { "@id": `${SITE_BASE}/#organization` },
+  inLanguage: "en-US",
+};
+
 function faqPage() {
   return {
     "@type": "FAQPage",
@@ -107,6 +151,15 @@ export function jsonLdForRoute(path: string): Record<string, unknown>[] {
   }
   if (path === "/faq") {
     return [{ "@context": "https://schema.org", ...faqPage() }];
+  }
+  if (path === "/for-shops") {
+    return [{ "@context": "https://schema.org", ...shopPilotService }];
+  }
+  if (path === "/about") {
+    return [
+      { "@context": "https://schema.org", ...organization },
+      { "@context": "https://schema.org", ...aboutPage },
+    ];
   }
   if (path.startsWith("/blog/")) {
     const post = getPostBySlug(path.slice("/blog/".length));
