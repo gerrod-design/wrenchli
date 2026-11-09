@@ -34,12 +34,35 @@ interface ReferralData {
   audio_clip_url: string | null;
   video_frame_urls: string[] | null;
   chat_summary: string | null;
-  customer_name: string | null;
-  customer_email: string | null;
-  customer_phone: string | null;
   customer_notes: string | null;
   view_count: number;
   pdf_download_count: number;
+  // Referral Lifecycle Phase 1: the token RPC never returns the owner's
+  // name, email, or phone. It does return the currently addressed
+  // shop_referrals hop (if any) and that shop's name.
+  referral_count?: number;
+  active_referral?: ActiveReferral | null;
+  shop?: { id: string; name: string } | null;
+}
+
+interface ActiveReferral {
+  id: string;
+  shop_id: string;
+  status: string;
+  preference_order: number;
+  sent_at: string;
+  viewed_at: string | null;
+  responded_at: string | null;
+  window_expires_at: string | null;
+  outcome_found: string | null;
+  outcome_did: string | null;
+  outcome_cost: number | null;
+  outcome_reported_at: string | null;
+  outcome_reported_by: string | null;
+  completion_confirmed_by: string | null;
+  completion_confirmed_at: string | null;
+  founder_flagged: boolean;
+  disputed_at: string | null;
 }
 
 const urgencyColors: Record<string, string> = {
@@ -56,21 +79,36 @@ export default function ReferralPackage() {
   const [showChat, setShowChat] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  // Phase 1 shop actions (token-scoped)
+  const [actionBusy, setActionBusy] = useState(false);
+  const [justDeclined, setJustDeclined] = useState(false);
+  const [outcomeFound, setOutcomeFound] = useState("");
+  const [outcomeDid, setOutcomeDid] = useState("");
+  const [outcomeCost, setOutcomeCost] = useState("");
+
+  const fetchPackage = async (): Promise<ReferralData | null> => {
+    if (!token) return null;
+    const { data: pkg, error: err } = await supabase
+      .rpc("get_referral_package_by_token", { p_token: token });
+    if (err || !pkg) return null;
+    return pkg as any as ReferralData;
+  };
 
   useEffect(() => {
     if (!token) return;
     (async () => {
       try {
-        const { data: pkg, error: err } = await supabase
-          .rpc("get_referral_package_by_token", { p_token: token });
+        // Run the escalation/fallback processor on access first, so an
+        // expired acceptance window escalates before we render.
+        await supabase.rpc("process_referral_escalations");
 
-        if (err || !pkg) {
+        let p = await fetchPackage();
+        if (!p) {
           setError("This referral link is invalid or has expired.");
           setLoading(false);
           return;
         }
 
-        const p = pkg as any as ReferralData;
         if (new Date(p.expires_at) < new Date()) {
           setError("This referral package has expired.");
           setLoading(false);
@@ -81,13 +119,102 @@ export default function ReferralPackage() {
 
         // Increment view count via secure RPC
         await supabase.rpc("increment_referral_view", { p_token: token });
+
+        // Mark the addressed referral viewed (first view only), then
+        // refresh so the rendered status is current.
+        if (p.active_referral && p.active_referral.status === "sent") {
+          await supabase.rpc("mark_referral_viewed", { p_token: token });
+          const refreshed = await fetchPackage();
+          if (refreshed) {
+            p = refreshed;
+            setData(refreshed);
+          }
+        }
       } catch {
         setError("Failed to load referral package.");
       } finally {
         setLoading(false);
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  const handleRespond = async (accept: boolean) => {
+    if (!token) return;
+    setActionBusy(true);
+    try {
+      const { data: result, error: err } = await supabase.rpc("respond_to_referral", {
+        p_token: token,
+        p_accept: accept,
+      });
+      if (err) throw err;
+      const r = result as any;
+      if (!r?.ok) {
+        toast.error("This referral is no longer awaiting a response.");
+        const refreshed = await fetchPackage();
+        if (refreshed) setData(refreshed);
+        return;
+      }
+      if (accept) {
+        toast.success("Referral accepted. You can file the outcome report after the repair.");
+        const refreshed = await fetchPackage();
+        if (refreshed) setData(refreshed);
+      } else {
+        // Do NOT refetch here: a refetch would surface the next hop in
+        // the owner's chain under the same package token. This shop
+        // sees only the neutral passed-on state for this session.
+        setJustDeclined(true);
+      }
+    } catch (e) {
+      console.error("Respond error:", e);
+      toast.error("Failed to record your response.");
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const handleSubmitOutcome = async () => {
+    if (!token) return;
+    if (!outcomeFound.trim() || !outcomeDid.trim()) {
+      toast.error("Please tell us what you found and what you did.");
+      return;
+    }
+    const cost = outcomeCost.trim() ? Number(outcomeCost) : null;
+    if (cost != null && (Number.isNaN(cost) || cost < 0)) {
+      toast.error("Please enter a valid cost.");
+      return;
+    }
+    setActionBusy(true);
+    try {
+      const { data: result, error: err } = await supabase.rpc(
+        "submit_referral_outcome" as any,
+        {
+          p_token: token,
+          p_found: outcomeFound.trim(),
+          p_did: outcomeDid.trim(),
+          p_cost: cost,
+        } as any
+      );
+      if (err) throw err;
+      const r = result as any;
+      if (!r?.ok) {
+        toast.error(
+          r?.reason === "outcome_window_closed"
+            ? "The outcome window for this referral has closed."
+            : "This referral is not awaiting an outcome report."
+        );
+        return;
+      }
+      toast.success("Outcome reported. The vehicle owner will be asked to confirm completion.");
+      const refreshed = await fetchPackage();
+      if (refreshed) setData(refreshed);
+    } catch (e) {
+      console.error("Outcome submit error:", e);
+      toast.error("Failed to submit the outcome report.");
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   const handleDownloadPdf = async () => {
     if (!data) return;
@@ -156,24 +283,18 @@ export default function ReferralPackage() {
         y += 6;
       }
 
-      // Customer info
-      if (data.customer_name || data.customer_email || data.customer_phone) {
+      // Owner notes for the shop. The owner's name, email, and phone are
+      // never part of this package or its PDF export (Phase 1 privacy).
+      if (data.customer_notes) {
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.text("Customer Information", margin, y);
+        doc.text("Notes for the Shop", margin, y);
         y += 8;
         doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
-        if (data.customer_name) { doc.text(`Name: ${data.customer_name}`, margin, y); y += 6; }
-        if (data.customer_email) { doc.text(`Email: ${data.customer_email}`, margin, y); y += 6; }
-        if (data.customer_phone) { doc.text(`Phone: ${data.customer_phone}`, margin, y); y += 6; }
-        if (data.customer_notes) {
-          y += 2;
-          doc.text("Notes:", margin, y); y += 6;
-          const noteLines = doc.splitTextToSize(data.customer_notes, 170 - margin);
-          doc.text(noteLines, margin, y);
-          y += noteLines.length * 5 + 4;
-        }
+        const noteLines = doc.splitTextToSize(data.customer_notes, 170 - margin);
+        doc.text(noteLines, margin, y);
+        y += noteLines.length * 5 + 4;
         y += 6;
       }
 
@@ -335,9 +456,139 @@ export default function ReferralPackage() {
           )}
         </div>
 
-        {/* Vehicle & Customer Info */}
+        {/* Shop actions for an addressed referral (Phase 1). Legacy
+            unaddressed packages (no shop_referrals rows) render the
+            package only, with no buttons. */}
+        {justDeclined ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center space-y-2">
+            <CheckCircle className="h-8 w-8 text-accent mx-auto" />
+            <h2 className="font-heading text-lg font-bold">Thanks — this referral has been passed on</h2>
+            <p className="text-sm text-muted-foreground">
+              No action is needed. The vehicle owner will take it from here.
+            </p>
+          </div>
+        ) : data.active_referral ? (
+          <div className="rounded-xl border border-accent/30 bg-accent/5 p-6 space-y-4">
+            {data.shop && (
+              <p className="text-sm text-muted-foreground">
+                This package was sent to <span className="font-semibold text-foreground">{data.shop.name}</span>.
+              </p>
+            )}
+            {(data.active_referral.status === "sent" || data.active_referral.status === "viewed") && (
+              <>
+                <div>
+                  <h2 className="font-heading text-lg font-bold">Can your shop take this repair?</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Accept to let the owner know you will handle it, or pass and the owner
+                    will be notified — no penalty either way.
+                    {data.active_referral.window_expires_at && (
+                      <> Please respond by {new Date(data.active_referral.window_expires_at).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}.</>
+                    )}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    onClick={() => void handleRespond(true)}
+                    disabled={actionBusy}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+                  >
+                    {actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
+                    Accept this repair
+                  </Button>
+                  <Button
+                    onClick={() => void handleRespond(false)}
+                    disabled={actionBusy}
+                    variant="outline"
+                  >
+                    Pass on this repair
+                  </Button>
+                </div>
+              </>
+            )}
+            {data.active_referral.status === "accepted" && (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="font-heading text-lg font-bold">You accepted this repair</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    After the work is done, file the 2-minute outcome report below. The
+                    repair counts as a completed referred repair once the vehicle owner
+                    confirms it.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="outcome-found" className="block text-sm font-medium mb-1">What did you find?</label>
+                    <textarea
+                      id="outcome-found"
+                      value={outcomeFound}
+                      onChange={(e) => setOutcomeFound(e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[70px]"
+                      placeholder="e.g. Front brake pads worn to 2mm, rotors scored"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="outcome-did" className="block text-sm font-medium mb-1">What did you do?</label>
+                    <textarea
+                      id="outcome-did"
+                      value={outcomeDid}
+                      onChange={(e) => setOutcomeDid(e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[70px]"
+                      placeholder="e.g. Replaced front pads and rotors, road tested"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="outcome-cost" className="block text-sm font-medium mb-1">What did it cost? (USD)</label>
+                    <input
+                      id="outcome-cost"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={outcomeCost}
+                      onChange={(e) => setOutcomeCost(e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                      placeholder="e.g. 425"
+                    />
+                  </div>
+                  <Button
+                    onClick={() => void handleSubmitOutcome()}
+                    disabled={actionBusy}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+                  >
+                    {actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
+                    Submit outcome report
+                  </Button>
+                </div>
+              </div>
+            )}
+            {data.active_referral.status === "outcome_reported" && (
+              <div className="space-y-2">
+                <h2 className="font-heading text-lg font-bold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-accent" /> Outcome reported
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Thanks — your report is on file. The vehicle owner has been asked to
+                  confirm the repair was completed.
+                </p>
+                {(data.active_referral.outcome_found || data.active_referral.outcome_did || data.active_referral.outcome_cost != null) && (
+                  <dl className="space-y-1 text-sm">
+                    {data.active_referral.outcome_found && <div className="flex gap-2"><dt className="text-muted-foreground">Found</dt><dd className="font-medium">{data.active_referral.outcome_found}</dd></div>}
+                    {data.active_referral.outcome_did && <div className="flex gap-2"><dt className="text-muted-foreground">Did</dt><dd className="font-medium">{data.active_referral.outcome_did}</dd></div>}
+                    {data.active_referral.outcome_cost != null && <div className="flex gap-2"><dt className="text-muted-foreground">Cost</dt><dd className="font-medium">${Number(data.active_referral.outcome_cost).toLocaleString()}</dd></div>}
+                  </dl>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (data.referral_count ?? 0) > 0 ? (
+          <div className="rounded-xl border border-border bg-card p-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              This referral is no longer awaiting a response.
+            </p>
+          </div>
+        ) : null}
+
+        {/* Vehicle Details */}
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Vehicle Details */}
           <div className="rounded-xl border border-border bg-card p-6 space-y-3">
             <h2 className="font-heading text-lg font-bold flex items-center gap-2">
               <Car className="h-5 w-5 text-accent" /> Vehicle Details
@@ -351,33 +602,13 @@ export default function ReferralPackage() {
             </dl>
           </div>
 
-          {/* Customer Contact */}
-          {(data.customer_name || data.customer_email || data.customer_phone) && (
+          {/* Owner notes for the shop (never name, email, or phone) */}
+          {data.customer_notes && (
             <div className="rounded-xl border border-border bg-card p-6 space-y-3">
               <h2 className="font-heading text-lg font-bold flex items-center gap-2">
-                <FileText className="h-5 w-5 text-accent" /> Customer Information
+                <FileText className="h-5 w-5 text-accent" /> Notes for the Shop
               </h2>
-              <dl className="space-y-2 text-sm">
-                {data.customer_name && <div className="flex justify-between"><dt className="text-muted-foreground">Name</dt><dd className="font-medium">{data.customer_name}</dd></div>}
-                {data.customer_email && (
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Email</dt>
-                    <dd><a href={`mailto:${data.customer_email}`} className="font-medium text-accent hover:underline">{data.customer_email}</a></dd>
-                  </div>
-                )}
-                {data.customer_phone && (
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Phone</dt>
-                    <dd><a href={`tel:${data.customer_phone}`} className="font-medium text-accent hover:underline">{data.customer_phone}</a></dd>
-                  </div>
-                )}
-              </dl>
-              {data.customer_notes && (
-                <div className="mt-3 rounded-lg bg-muted/50 p-3">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Customer Notes</p>
-                  <p className="text-sm">{data.customer_notes}</p>
-                </div>
-              )}
+              <p className="text-sm">{data.customer_notes}</p>
             </div>
           )}
         </div>

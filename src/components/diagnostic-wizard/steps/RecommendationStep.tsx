@@ -7,6 +7,7 @@ import { buildAmazonSearchLink } from "@/data/adRecommendations";
 import { trackAdClick } from "@/lib/adClickTracker";
 import AffiliateDisclosure from "@/components/AffiliateDisclosure";
 import DIYOutcomePrompt from "./DIYOutcomePrompt";
+import ShareWithShopButton from "@/components/ShareWithShopButton";
 import SaveAssessmentPrompt from "@/components/diagnosis/SaveAssessmentPrompt";
 import RecallEmailCapture from "@/components/diagnosis/RecallEmailCapture";
 import AssessmentDisclaimer from "@/components/diagnosis/AssessmentDisclaimer";
@@ -164,6 +165,27 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
           </p>
         </div>
       )}
+
+      {/* Send to a shop — Referral Lifecycle Phase 1 pilot control.
+          Addressed, sequential send: the owner picks an ordered list of
+          up to 3 shops; the package goes to one shop at a time. */}
+      <ShareWithShopButton
+        pilot
+        diagnosisTitle={diagnosis.possible_causes[0]?.name ?? "Vehicle assessment"}
+        diagnosisUrgency={diagnosis.urgency}
+        diagnosisDetails={{
+          explanation: diagnosis.explanation,
+          confidence: diagnosis.confidence,
+          possible_causes: diagnosis.possible_causes,
+        }}
+        vehicleYear={String(vehicle.year)}
+        vehicleMake={vehicle.make}
+        vehicleModel={vehicle.model}
+        vehicleTrim={vehicle.trim ?? null}
+        vin={vehicle.vin ?? null}
+        estimatedCostLow={diagnosis.possible_causes[0]?.estimated_cost_low ?? null}
+        estimatedCostHigh={diagnosis.possible_causes[0]?.estimated_cost_high ?? null}
+      />
 
       {/* Parts needed */}
       {recommendation.parts_likely_needed.length > 0 && (

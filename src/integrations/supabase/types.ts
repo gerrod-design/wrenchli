@@ -2627,6 +2627,109 @@ export type Database = {
           },
         ]
       }
+      shop_referrals: {
+        Row: {
+          chain_id: string
+          completion_confirmed_at: string | null
+          completion_confirmed_by: string | null
+          created_at: string
+          disputed_at: string | null
+          escalated_from: string | null
+          founder_flagged: boolean
+          id: string
+          outcome_cost: number | null
+          outcome_did: string | null
+          outcome_found: string | null
+          outcome_reported_at: string | null
+          outcome_reported_by: string | null
+          owner_user_id: string
+          package_id: string
+          preference_order: number
+          responded_at: string | null
+          sent_at: string
+          shop_chain: Json
+          shop_id: string
+          status: string
+          updated_at: string
+          viewed_at: string | null
+          window_expires_at: string | null
+        }
+        Insert: {
+          chain_id: string
+          completion_confirmed_at?: string | null
+          completion_confirmed_by?: string | null
+          created_at?: string
+          disputed_at?: string | null
+          escalated_from?: string | null
+          founder_flagged?: boolean
+          id?: string
+          outcome_cost?: number | null
+          outcome_did?: string | null
+          outcome_found?: string | null
+          outcome_reported_at?: string | null
+          outcome_reported_by?: string | null
+          owner_user_id: string
+          package_id: string
+          preference_order: number
+          responded_at?: string | null
+          sent_at?: string
+          shop_chain: Json
+          shop_id: string
+          status?: string
+          updated_at?: string
+          viewed_at?: string | null
+          window_expires_at?: string | null
+        }
+        Update: {
+          chain_id?: string
+          completion_confirmed_at?: string | null
+          completion_confirmed_by?: string | null
+          created_at?: string
+          disputed_at?: string | null
+          escalated_from?: string | null
+          founder_flagged?: boolean
+          id?: string
+          outcome_cost?: number | null
+          outcome_did?: string | null
+          outcome_found?: string | null
+          outcome_reported_at?: string | null
+          outcome_reported_by?: string | null
+          owner_user_id?: string
+          package_id?: string
+          preference_order?: number
+          responded_at?: string | null
+          sent_at?: string
+          shop_chain?: Json
+          shop_id?: string
+          status?: string
+          updated_at?: string
+          viewed_at?: string | null
+          window_expires_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_referrals_escalated_from_fkey"
+            columns: ["escalated_from"]
+            isOneToOne: false
+            referencedRelation: "shop_referrals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_referrals_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "referral_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_referrals_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_performance_metrics: {
         Row: {
           avg_consumer_satisfaction: number | null
@@ -3718,6 +3821,34 @@ export type Database = {
         Returns: undefined
       }
       increment_referral_view: { Args: { p_token: string }; Returns: undefined }
+      confirm_referral_completion: {
+        Args: { p_referral_id: string }
+        Returns: Json
+      }
+      dispute_referral_completion: {
+        Args: { p_referral_id: string }
+        Returns: Json
+      }
+      escalate_shop_referral: {
+        Args: { p_referral_id: string }
+        Returns: string
+      }
+      mark_referral_viewed: { Args: { p_token: string }; Returns: undefined }
+      process_referral_escalations: { Args: never; Returns: undefined }
+      referral_response_report: { Args: never; Returns: Json }
+      referral_window_expiry: { Args: { p_from: string }; Returns: string }
+      respond_to_referral: {
+        Args: { p_accept: boolean; p_token: string }
+        Returns: Json
+      }
+      stop_referral_chain: {
+        Args: { p_referral_id: string }
+        Returns: Json
+      }
+      submit_referral_outcome: {
+        Args: { p_cost: number; p_did: string; p_found: string; p_token: string }
+        Returns: Json
+      }
       resolve_security_alert: { Args: { alert_id: string }; Returns: undefined }
     }
     Enums: {

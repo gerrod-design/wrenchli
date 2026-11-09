@@ -16,6 +16,8 @@ import MileageLedgerSection, { type OdometerPhotoResult } from "@/components/gar
 import JourneyPlanSection from "@/components/garage/JourneyPlanSection";
 import { VehicleRecordProvider, useVehicleRecordContext } from "@/contexts/VehicleRecordContext";
 import VehicleAssessmentsSection from "@/components/garage/VehicleAssessmentsSection";
+import ShareWithShopButton from "@/components/ShareWithShopButton";
+import OwnerReferralStatus from "@/components/OwnerReferralStatus";
 import ScanReportsSection from "@/components/garage/ScanReportsSection";
 import type { HandoffSnapshot } from "@/lib/handoff";
 import { supabase } from "@/integrations/supabase/client";
@@ -431,6 +433,41 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
         <DrivingProfileCard vehicle={vehicle} onSave={record.saveProfileFields} />
 
         <VehicleAssessmentsSection handoffs={linkedAssessments} />
+
+        {/* Referral Lifecycle Phase 1: addressed send control for the
+            newest linked assessment, plus the owner's referral status
+            list with confirm / dispute actions. */}
+        {linkedAssessments[0] && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Send the latest assessment to a shop</CardTitle>
+              <CardDescription>
+                Addressed to the shop you choose first, one shop at a time. Your name and
+                contact details are never included in the package.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ShareWithShopButton
+                pilot
+                diagnosisTitle={
+                  linkedAssessments[0].snapshot.assessment.possible_causes[0]?.name ||
+                  "Vehicle assessment"
+                }
+                diagnosisUrgency={linkedAssessments[0].snapshot.assessment.urgency ?? null}
+                diagnosisDetails={linkedAssessments[0].snapshot.assessment}
+                vehicleYear={String(linkedAssessments[0].snapshot.vehicle.year)}
+                vehicleMake={linkedAssessments[0].snapshot.vehicle.make}
+                vehicleModel={linkedAssessments[0].snapshot.vehicle.model}
+                vehicleTrim={linkedAssessments[0].snapshot.vehicle.trim ?? null}
+                vin={linkedAssessments[0].snapshot.vehicle.vin ?? vehicle.vin ?? null}
+                estimatedCostLow={linkedAssessments[0].snapshot.assessment.cost_range?.low ?? null}
+                estimatedCostHigh={linkedAssessments[0].snapshot.assessment.cost_range?.high ?? null}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        <OwnerReferralStatus />
 
         {vehicleId && <ScanReportsSection vehicleId={vehicleId} />}
 

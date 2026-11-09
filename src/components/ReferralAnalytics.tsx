@@ -9,6 +9,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { Link2, ArrowRight, RefreshCw, Loader2, TrendingUp, MousePointerClick, Eye, FileText, CalendarIcon } from "lucide-react";
+import ReferralResponseReport from "@/components/ReferralResponseReport";
 
 interface ReferralEvent {
   id: string;
@@ -311,6 +312,9 @@ export default function ReferralAnalytics() {
           </table>
         </div>
       </div>
+
+      {/* Phase 1: per-shop response-time report (admin-gated RPC) */}
+      <ReferralResponseReport />
     </div>
   );
 }
