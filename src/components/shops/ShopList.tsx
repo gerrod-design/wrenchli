@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Building2, Wrench, LayoutGrid } from "lucide-react";
+import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 
 export type ShopFilter = "all" | "shops" | "dealers";
 
@@ -19,6 +20,7 @@ interface ShopListProps {
 }
 
 export default function ShopList({ shops, loading, onShopSelect, searchedZip, filter = "all", onFilterChange }: ShopListProps) {
+  const [recommendOpen, setRecommendOpen] = useState(false);
   // Declared shop capabilities (loaner cars, shuttle, pickup & delivery,
   // mobile service) — fetched per shop; a shop shows a capability badge only
   // when it has actually declared that capability.
@@ -58,12 +60,11 @@ export default function ShopList({ shops, loading, onShopSelect, searchedZip, fi
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
-          <Link to="/contact?subject=recommend-shop">
-            <Button variant="default" className="gap-2">
-              <MessageSquarePlus className="h-4 w-4" />
-              Recommend a Shop
-            </Button>
-          </Link>
+          <Button variant="default" className="gap-2" onClick={() => setRecommendOpen(true)}>
+            <MessageSquarePlus className="h-4 w-4" />
+            Recommend a Shop
+          </Button>
+          <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
           <Link to="/vehicle-insights">
             <Button variant="outline" className="gap-2">
               Get a Quote Instead

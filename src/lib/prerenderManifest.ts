@@ -19,6 +19,7 @@ export const STATIC_PRERENDER_PATHS = [
   "/privacy",
   "/warranty-guide",
   "/shops",
+  "/nominate",
   "/partners/journey",
   "/subprocessors",
   "/developers",

@@ -2780,30 +2780,51 @@ export type Database = {
       shop_recommendations: {
         Row: {
           created_at: string
+          email_consent: boolean
+          email_consent_at: string | null
           id: string
+          intake_batch: string | null
+          joined_at: string | null
+          joined_shop_id: string | null
+          processed_at: string | null
           recommendation_reason: string | null
           recommender_email: string | null
           recommender_name: string | null
+          share_identity: boolean
           shop_location: string
           shop_name: string
           specializations: string[] | null
         }
         Insert: {
           created_at?: string
+          email_consent?: boolean
+          email_consent_at?: string | null
           id?: string
+          intake_batch?: string | null
+          joined_at?: string | null
+          joined_shop_id?: string | null
+          processed_at?: string | null
           recommendation_reason?: string | null
           recommender_email?: string | null
           recommender_name?: string | null
+          share_identity?: boolean
           shop_location: string
           shop_name: string
           specializations?: string[] | null
         }
         Update: {
           created_at?: string
+          email_consent?: boolean
+          email_consent_at?: string | null
           id?: string
+          intake_batch?: string | null
+          joined_at?: string | null
+          joined_shop_id?: string | null
+          processed_at?: string | null
           recommendation_reason?: string | null
           recommender_email?: string | null
           recommender_name?: string | null
+          share_identity?: boolean
           shop_location?: string
           shop_name?: string
           specializations?: string[] | null

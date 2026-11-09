@@ -75,6 +75,13 @@ interface ShopRecommendation {
   recommender_name: string | null;
   recommender_email: string | null;
   specializations: string[] | null;
+  processed_at: string | null;
+  intake_batch: string | null;
+  email_consent: boolean;
+  email_consent_at: string | null;
+  share_identity: boolean;
+  joined_at: string | null;
+  joined_shop_id: string | null;
 }
 
 interface ContactSubmission {
@@ -230,6 +237,16 @@ export default function AdminDashboard() {
 
   const financingInterested = quoteRequests.filter((q) => q.financing_interested).length;
 
+  // Nomination Campaign metrics (computed from shop_recommendations)
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const nominationsLast7Days = shopRecs.filter((s) => new Date(s.created_at).getTime() >= sevenDaysAgo).length;
+  const uniqueShops = new Set(
+    shopRecs.map((s) => `${s.shop_name.trim().toLowerCase()}|${s.shop_location.trim().toLowerCase()}`)
+  ).size;
+  const nominationsInBatch = shopRecs.filter((s) => s.intake_batch).length;
+  const shopsJoined = shopRecs.filter((s) => s.joined_at).length;
+  const nominatorsWithConsent = shopRecs.filter((s) => s.email_consent).length;
+
   const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
 
   const renderContent = () => {
@@ -296,6 +313,19 @@ export default function AdminDashboard() {
           <StatCard icon={Users} label="Waitlist Signups" value={waitlist.length} />
           <StatCard icon={Store} label="Shop Recommendations" value={shopRecs.length} />
           <StatCard icon={Mail} label="Contact Submissions" value={contacts.length} />
+        </div>
+
+        {/* Nomination Campaign */}
+        <div className="space-y-3">
+          <h2 className="font-heading text-lg font-semibold">Nomination Campaign</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <StatCard icon={Store} label="Total Nominations" value={shopRecs.length} />
+            <StatCard icon={TrendingUp} label="Nominations (Last 7 Days)" value={nominationsLast7Days} />
+            <StatCard icon={Store} label="Unique Shops" value={uniqueShops} />
+            <StatCard icon={FileText} label="In Approved Batch" value={nominationsInBatch} />
+            <StatCard icon={Users} label="Shops Joined" value={shopsJoined} />
+            <StatCard icon={Mail} label="Nominators With Email Consent" value={nominatorsWithConsent} />
+          </div>
         </div>
 
         <Tabs defaultValue="finance" className="w-full">

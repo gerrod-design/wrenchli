@@ -13,6 +13,7 @@ import { type Shop } from "@/components/shops/ShopCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import WaitlistForm from "@/components/WaitlistForm";
+import RecommendShopModal from "@/components/recommend/RecommendShopModal";
 import { BellRing } from "lucide-react";
 
 const SERVICE_TYPES = [
@@ -62,6 +63,7 @@ export default function FindShops() {
   const [shopFilter, setShopFilter] = useState<ShopFilter>("all");
   const [expandedRadius, setExpandedRadius] = useState(0);
   const [resolvedCity, setResolvedCity] = useState<string>("");
+  const [recommendOpen, setRecommendOpen] = useState(false);
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
@@ -375,12 +377,14 @@ export default function FindShops() {
             <p className="text-muted-foreground mb-6">
               Know a great repair shop we should add to Wrenchli? Let us know and we'll reach out to them.
             </p>
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
-              <a href="/contact?subject=recommend-shop">Recommend a Shop</a>
+            <Button onClick={() => setRecommendOpen(true)} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
+              Recommend a Shop
             </Button>
           </SectionReveal>
         </div>
       </section>
+
+      <RecommendShopModal open={recommendOpen} onClose={() => setRecommendOpen(false)} />
     </main>
   );
 }

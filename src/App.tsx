@@ -45,6 +45,7 @@ import NotificationSettings from "./pages/NotificationSettings";
 import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
 import FindShops from "./pages/FindShops";
+import Nominate from "./pages/Nominate";
 import DamageDiagnosis from "./pages/DamageDiagnosis";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
@@ -122,6 +123,7 @@ function AnimatedRoutes() {
           {/* Retired 2026-10-18 (audit R-19): the Michigan-only paid pilot page contradicted the live national free referral pilot — one offer only, at /for-shops */}
           <Route path="/pilot" element={<PreserveNavigate to="/for-shops" />} />
           <Route path="/find-shops" element={<FindShops />} />
+          <Route path="/nominate" element={<Nominate />} />
           <Route path="/damage-assessment" element={<DamageDiagnosis />} />
           <Route path="/damage-diagnosis" element={<PreserveNavigate to="/damage-assessment" />} />
           <Route path="/privacy" element={<Privacy />} />
