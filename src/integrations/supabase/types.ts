@@ -2247,7 +2247,11 @@ export type Database = {
           last_refreshed_at: string | null
           lat: number | null
           lng: number | null
+          mobility_notes: string | null
           name: string
+          offers_loaner: boolean
+          offers_pickup_delivery: boolean
+          offers_shuttle: boolean
           phone: string | null
           price_tier: string | null
           quote_url: string | null
@@ -2278,7 +2282,11 @@ export type Database = {
           last_refreshed_at?: string | null
           lat?: number | null
           lng?: number | null
+          mobility_notes?: string | null
           name: string
+          offers_loaner?: boolean
+          offers_pickup_delivery?: boolean
+          offers_shuttle?: boolean
           phone?: string | null
           price_tier?: string | null
           quote_url?: string | null
@@ -2309,7 +2317,11 @@ export type Database = {
           last_refreshed_at?: string | null
           lat?: number | null
           lng?: number | null
+          mobility_notes?: string | null
           name?: string
+          offers_loaner?: boolean
+          offers_pickup_delivery?: boolean
+          offers_shuttle?: boolean
           phone?: string | null
           price_tier?: string | null
           quote_url?: string | null

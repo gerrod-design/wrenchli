@@ -5,6 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Ban, CheckCircle, Flag, Loader2, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import TransportationPanel, { MobilityAttributeChips } from "@/components/TransportationPanel";
+import {
+  chainShowsHomeDirections,
+  pickPanelShop,
+  type MobilityShop,
+} from "@/lib/transportationLinks";
 
 interface OwnerReferralRow {
   id: string;
@@ -100,6 +106,11 @@ interface OwnerReferralStatusProps {
 export default function OwnerReferralStatus({ packageId, className }: OwnerReferralStatusProps) {
   const [rows, setRows] = useState<OwnerReferralRow[] | null>(null);
   const [shopNames, setShopNames] = useState<Record<string, string>>({});
+  // Mobility Brief 1: full provider rows (address + mobility
+  // attributes) for the per-hop chips and the transportation panel,
+  // and each package's ZIP for the panel's directions-home variant.
+  const [shopDetails, setShopDetails] = useState<Record<string, MobilityShop>>({});
+  const [packageZips, setPackageZips] = useState<Record<string, string | null>>({});
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -138,11 +149,29 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
     if (shopIds.length > 0) {
       const { data: shops } = await supabase
         .from("service_providers")
-        .select("id, name")
+        .select(
+          "id, name, address, city, state, zip_code, lat, lng, offers_loaner, offers_shuttle, offers_pickup_delivery, mobility_notes"
+        )
         .in("id", shopIds);
       if (shops) {
         setShopNames(
           Object.fromEntries((shops as { id: string; name: string }[]).map((s) => [s.id, s.name]))
+        );
+        setShopDetails(
+          Object.fromEntries((shops as MobilityShop[]).map((s) => [s.id, s]))
+        );
+      }
+    }
+
+    const packageIds = Array.from(new Set(referrals.map((r) => r.package_id)));
+    if (packageIds.length > 0) {
+      const { data: packages } = await supabase
+        .from("referral_packages")
+        .select("id, zip_code")
+        .in("id", packageIds);
+      if (packages) {
+        setPackageZips(
+          Object.fromEntries(packages.map((p) => [p.id, p.zip_code]))
         );
       }
     }
@@ -250,6 +279,13 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
               const activeHop = chain.hops.find(
                 (h) => h.status === "sent" || h.status === "viewed"
               );
+              // Mobility Brief 1: the chain's transportation panel
+              // points at the accepted hop's shop (falling back per
+              // pickPanelShop) and gains the directions-home variant
+              // once an outcome is reported or completed.
+              const panelShop = pickPanelShop(chain.hops, shopDetails);
+              const showHome = chainShowsHomeDirections(chain.hops);
+              const homeZip = packageZips[chain.hops[0].package_id] ?? null;
               return (
               <li key={chain.chainId} className="rounded-lg border border-border p-3 space-y-3">
                 {chain.hops.length > 1 && (
@@ -285,6 +321,15 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
                     Sent {new Date(r.sent_at).toLocaleDateString("en-US")}
                   </span>
                 </div>
+
+                {shopDetails[r.shop_id] && (
+                  <MobilityAttributeChips shop={shopDetails[r.shop_id]} />
+                )}
+                {shopDetails[r.shop_id]?.mobility_notes?.trim() && (
+                  <p className="text-xs text-muted-foreground">
+                    {shopDetails[r.shop_id].mobility_notes}
+                  </p>
+                )}
 
                 {r.outcome_reported_at && (
                   <div className="text-sm space-y-1">
@@ -390,6 +435,11 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
                 )}
               </div>
                 ))}
+                <TransportationPanel
+                  shop={panelShop}
+                  homeZip={homeZip}
+                  showHomeDirections={showHome}
+                />
               </li>
               );
             })}

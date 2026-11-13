@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Share2, Loader2, CheckCircle, Copy, ExternalLink, Send } from "lucide-react";
 import { toast } from "sonner";
 import { trackPlausibleEvent } from "@/lib/analytics";
+import TransportationPanel, { MobilityAttributeChips } from "@/components/TransportationPanel";
+import type { MobilityShop } from "@/lib/transportationLinks";
 
 interface ShareWithShopProps {
   diagnosisTitle: string;
@@ -40,7 +42,9 @@ interface ShareWithShopProps {
   pilot?: boolean;
 }
 
-interface ShopOption {
+/** Picker option: the provider row plus Brief 1's mobility
+ *  attributes, rendered as shop-reported chips when set. */
+interface ShopOption extends MobilityShop {
   id: string;
   name: string;
 }
@@ -63,7 +67,9 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
     (async () => {
       const { data, error } = await supabase
         .from("service_providers")
-        .select("id, name")
+        .select(
+          "id, name, address, city, state, zip_code, lat, lng, offers_loaner, offers_shuttle, offers_pickup_delivery, mobility_notes"
+        )
         .order("name", { ascending: true });
       if (cancelled) return;
       if (error) {
@@ -258,6 +264,11 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
             </a>
           </Button>
         </div>
+        {props.pilot && (
+          <TransportationPanel
+            shop={shops?.find((s) => s.id === selectedShopIds[0]) ?? null}
+          />
+        )}
       </div>
     );
   }
@@ -315,9 +326,12 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
                       >
                         {selected ? orderIndex + 1 : "•"}
                       </span>
-                      <span className="font-medium">{shop.name}</span>
+                      <span className="min-w-0">
+                        <span className="font-medium block">{shop.name}</span>
+                        <MobilityAttributeChips shop={shop} className="mt-1" />
+                      </span>
                       {selected && (
-                        <span className="ml-auto text-xs text-muted-foreground">
+                        <span className="ml-auto shrink-0 text-xs text-muted-foreground">
                           Choice {orderIndex + 1}
                         </span>
                       )}
@@ -340,6 +354,13 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
             </Button>
           </>
         )}
+
+        {/* Mobility Brief 1: the transportation panel sits alongside
+            the send control — unprefilled until the owner picks a
+            shop, then pointed at their first choice. */}
+        <TransportationPanel
+          shop={shops?.find((s) => s.id === selectedShopIds[0]) ?? null}
+        />
       </div>
     );
   }
