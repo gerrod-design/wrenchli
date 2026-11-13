@@ -11,6 +11,14 @@ import {
   pickPanelShop,
   type MobilityShop,
 } from "@/lib/transportationLinks";
+import {
+  TRANSPORT_LIABILITY_LINE,
+  TRANSPORT_SAFETY_LINE,
+  TRANSPORT_STATUS_LABELS,
+  chainExhausted,
+  chainTransportCharge,
+  chainTransportStatus,
+} from "@/lib/referralTransport";
 
 interface OwnerReferralRow {
   id: string;
@@ -26,6 +34,9 @@ interface OwnerReferralRow {
   outcome_found: string | null;
   outcome_did: string | null;
   outcome_cost: number | null;
+  outcome_transport_cost: number | null;
+  transport_status: string | null;
+  transport_charge_stated: number | null;
   outcome_reported_at: string | null;
   completion_confirmed_by: string | null;
   completion_confirmed_at: string | null;
@@ -85,6 +96,85 @@ function hopOutcomeTime(row: OwnerReferralRow): string {
   });
 }
 
+/**
+ * Brief 3: add the pickup/delivery request after the shop has
+ * accepted (immobility is sometimes discovered at drop-off time).
+ * Calls the owner RPC request_referral_transport; the request then
+ * rides on the package like a send-time request.
+ */
+function AddTransportRequest({
+  referralId,
+  onDone,
+}: {
+  referralId: string;
+  onDone: () => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    setBusy(true);
+    try {
+      const { data, error } = await supabase.rpc(
+        "request_referral_transport" as any,
+        { p_referral_id: referralId, p_note: note.trim() } as any
+      );
+      if (error) throw error;
+      const result = data as any;
+      if (result && result.ok === false) {
+        toast.error(
+          `Could not add the pickup and delivery request (${result.reason || "unknown error"}).`
+        );
+      } else {
+        toast.success("Pickup and delivery requested.");
+        await onDone();
+      }
+    } catch (e) {
+      console.error("Request referral transport failed:", e);
+      toast.error("Failed to add the pickup and delivery request.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!open) {
+    return (
+      <div className="space-y-1.5">
+        <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+          This car can&rsquo;t be driven — request pickup and delivery
+        </Button>
+        <p className="text-xs text-muted-foreground">{TRANSPORT_LIABILITY_LINE}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2 rounded-md border border-border p-3">
+      <p className="text-sm font-medium">Request pickup and delivery</p>
+      <p className="text-xs text-muted-foreground">{TRANSPORT_LIABILITY_LINE}</p>
+      <label className="block text-xs text-muted-foreground">
+        Where the car sits, and anything the driver should know (optional)
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={2}
+          className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+        />
+      </label>
+      <div className="flex gap-2">
+        <Button size="sm" onClick={() => void submit()} disabled={busy}>
+          {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Request pickup and delivery
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 interface OwnerReferralStatusProps {
   /** When set, only referrals for this package are listed. */
   packageId?: string;
@@ -111,6 +201,11 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
   // and each package's ZIP for the panel's directions-home variant.
   const [shopDetails, setShopDetails] = useState<Record<string, MobilityShop>>({});
   const [packageZips, setPackageZips] = useState<Record<string, string | null>>({});
+  // Mobility Brief 3: each package's transport request (flag + the
+  // owner's note), shown alongside the chain it rides on.
+  const [packageTransport, setPackageTransport] = useState<
+    Record<string, { requested: boolean; note: string | null }>
+  >({});
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -131,7 +226,7 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
     let query = supabase
       .from("shop_referrals" as any)
       .select(
-        "id, package_id, shop_id, chain_id, preference_order, escalated_from, status, sent_at, responded_at, window_expires_at, outcome_found, outcome_did, outcome_cost, outcome_reported_at, completion_confirmed_by, completion_confirmed_at, founder_flagged, disputed_at, created_at, updated_at"
+        "id, package_id, shop_id, chain_id, preference_order, escalated_from, status, sent_at, responded_at, window_expires_at, outcome_found, outcome_did, outcome_cost, outcome_transport_cost, transport_status, transport_charge_stated, outcome_reported_at, completion_confirmed_by, completion_confirmed_at, founder_flagged, disputed_at, created_at, updated_at"
       )
       .order("created_at", { ascending: false });
     if (packageId) query = query.eq("package_id", packageId);
@@ -167,11 +262,22 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
     if (packageIds.length > 0) {
       const { data: packages } = await supabase
         .from("referral_packages")
-        .select("id, zip_code")
+        .select("id, zip_code, transport_requested, transport_note")
         .in("id", packageIds);
       if (packages) {
         setPackageZips(
           Object.fromEntries(packages.map((p) => [p.id, p.zip_code]))
+        );
+        setPackageTransport(
+          Object.fromEntries(
+            packages.map((p) => [
+              p.id,
+              {
+                requested: p.transport_requested === true,
+                note: p.transport_note ?? null,
+              },
+            ])
+          )
         );
       }
     }
@@ -211,8 +317,13 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
 
   const stopChain = async (referral: OwnerReferralRow) => {
     const shop = shopNames[referral.shop_id] || "the current shop";
+    // Brief 3: stopping the chain cancels the transport request
+    // with it; say so before the owner confirms.
+    const transportSentence = packageTransport[referral.package_id]?.requested
+      ? " This also cancels your pickup and delivery request."
+      : "";
     const confirmed = window.confirm(
-      `Stop this referral chain? The package will not stay with ${shop} and will not be sent to any other shops on your list.`
+      `Stop this referral chain? The package will not stay with ${shop} and will not be sent to any other shops on your list.${transportSentence}`
     );
     if (!confirmed) return;
     setBusyId(referral.id);
@@ -286,6 +397,18 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
               const panelShop = pickPanelShop(chain.hops, shopDetails);
               const showHome = chainShowsHomeDirections(chain.hops);
               const homeZip = packageZips[chain.hops[0].package_id] ?? null;
+              // Mobility Brief 3: the chain's transport thread. The
+              // request lives on the package; the status and the
+              // shop's stated charge come from the hop that carries
+              // them (accepted / outcome / completed first).
+              const transport = packageTransport[chain.hops[0].package_id];
+              const transportRequested = transport?.requested === true;
+              const tStatus = chainTransportStatus(chain.hops, transportRequested);
+              const tCharge = transportRequested
+                ? chainTransportCharge(chain.hops)
+                : null;
+              const exhausted = transportRequested && chainExhausted(chain.hops);
+              const acceptedHop = chain.hops.find((h) => h.status === "accepted");
               return (
               <li key={chain.chainId} className="rounded-lg border border-border p-3 space-y-3">
                 {chain.hops.length > 1 && (
@@ -338,8 +461,30 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
                     </p>
                     {r.outcome_found && <p>Found: {r.outcome_found}</p>}
                     {r.outcome_did && <p>Did: {r.outcome_did}</p>}
-                    {r.outcome_cost != null && (
-                      <p>Cost: ${Number(r.outcome_cost).toLocaleString()}</p>
+                    {r.outcome_transport_cost != null ? (
+                      <>
+                        {r.outcome_cost != null && (
+                          <p>Repair cost: ${Number(r.outcome_cost).toLocaleString()}</p>
+                        )}
+                        <p>
+                          Pickup/delivery: $
+                          {Number(r.outcome_transport_cost).toLocaleString()} (charge
+                          set by the shop)
+                        </p>
+                        {r.outcome_cost != null && (
+                          <p className="font-medium">
+                            Total: $
+                            {(
+                              Number(r.outcome_cost) +
+                              Number(r.outcome_transport_cost)
+                            ).toLocaleString()}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      r.outcome_cost != null && (
+                        <p>Cost: ${Number(r.outcome_cost).toLocaleString()}</p>
+                      )
                     )}
                   </div>
                 )}
@@ -435,6 +580,54 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
                 )}
               </div>
                 ))}
+                {transportRequested && (
+                  <div className="rounded-md border border-border bg-muted/30 p-3 space-y-1.5">
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                      Pickup and delivery
+                    </p>
+                    {tStatus && (
+                      <p className="text-sm font-medium">
+                        {TRANSPORT_STATUS_LABELS[tStatus]}
+                      </p>
+                    )}
+                    {transport?.note && (
+                      <p className="text-sm text-muted-foreground">
+                        Your note for the shop: {transport.note}
+                      </p>
+                    )}
+                    {tCharge != null && (
+                      <p className="text-sm">
+                        Pickup/delivery charge set by the shop: $
+                        {Number(tCharge).toLocaleString()}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {TRANSPORT_LIABILITY_LINE}
+                    </p>
+                    {tStatus === "arranged" && (
+                      <p className="text-xs text-muted-foreground">
+                        {TRANSPORT_SAFETY_LINE}
+                      </p>
+                    )}
+                    {tStatus === "unable" && (
+                      <p className="text-sm">
+                        The shop could not arrange pickup and delivery. Your repair
+                        referral is still in place.
+                      </p>
+                    )}
+                    {exhausted && (
+                      <p className="text-sm">
+                        Your pickup and delivery request could not be fulfilled by
+                        the shops on your list. You can send your assessment to
+                        another shop — shops that offer pickup and delivery are
+                        shown first in the shop list — or arrange your own tow.
+                      </p>
+                    )}
+                  </div>
+                )}
+                {!transportRequested && acceptedHop && (
+                  <AddTransportRequest referralId={acceptedHop.id} onDone={load} />
+                )}
                 <TransportationPanel
                   shop={panelShop}
                   homeZip={homeZip}

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { trackPlausibleEvent } from "@/lib/analytics";
 import TransportationPanel, { MobilityAttributeChips } from "@/components/TransportationPanel";
 import type { MobilityShop } from "@/lib/transportationLinks";
+import { TRANSPORT_LIABILITY_LINE } from "@/lib/referralTransport";
 
 interface ShareWithShopProps {
   diagnosisTitle: string;
@@ -61,6 +62,13 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
   const [shopsError, setShopsError] = useState(false);
   const [selectedShopIds, setSelectedShopIds] = useState<string[]>([]);
 
+  // Mobility Brief 3 (Option A): the owner can ask for pickup and
+  // delivery of a car that can't be driven. The request lives on the
+  // package; the shop arranges the tow or flatbed itself.
+  const [needsTransport, setNeedsTransport] = useState(false);
+  const [transportNote, setTransportNote] = useState("");
+  const [onlyPickupShops, setOnlyPickupShops] = useState(false);
+
   useEffect(() => {
     if (!props.pilot) return;
     let cancelled = false;
@@ -92,13 +100,54 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
     });
   };
 
-  const createPackage = async (userId: string) => {
+  // Brief 3 picker behavior: when the owner needs pickup and
+  // delivery, shops that offer it surface first (stable sort — the
+  // directory's name order is kept within each group), and the
+  // owner can narrow the list to just those shops. Filtering is
+  // display-only; an already-picked shop stays picked.
+  const selectedShops = (shops ?? []).filter((s) =>
+    selectedShopIds.includes(s.id)
+  );
+  const anySelectedOffersPickup = selectedShops.some(
+    (s) => s.offers_pickup_delivery === true
+  );
+  const showNoOfferNotice =
+    needsTransport && selectedShopIds.length > 0 && !anySelectedOffersPickup;
+  const displayShops = (() => {
+    if (!shops) return [];
+    let list = shops;
+    if (needsTransport) {
+      list = [...list].sort(
+        (a, b) =>
+          Number(b.offers_pickup_delivery === true) -
+          Number(a.offers_pickup_delivery === true)
+      );
+      if (onlyPickupShops) {
+        list = list.filter((s) => s.offers_pickup_delivery === true);
+      }
+    }
+    return list;
+  })();
+
+  const createPackage = async (
+    userId: string,
+    transport?: { requested: boolean; note: string | null }
+  ) => {
     // Privacy (Phase 1, locked): customer_name / customer_email /
     // customer_phone are never written to referral_packages here.
     const { data, error } = await supabase
       .from("referral_packages" as any)
       .insert({
         user_id: userId,
+        // Brief 3: the pickup/delivery request rides on the package
+        // so every shop in the chain sees it. Only the pilot send
+        // passes it; the legacy share path leaves the defaults.
+        ...(transport
+          ? {
+              transport_requested: transport.requested,
+              transport_note: transport.note,
+            }
+          : {}),
         diagnosis_title: props.diagnosisTitle,
         diagnosis_code: props.diagnosisCode || null,
         diagnosis_urgency: props.diagnosisUrgency || null,
@@ -186,7 +235,10 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
         return;
       }
 
-      const pkg = await createPackage(user.id);
+      const pkg = await createPackage(user.id, {
+        requested: needsTransport,
+        note: needsTransport ? transportNote.trim() || null : null,
+      });
 
       // Addressed, sequential send: exactly ONE shop_referrals row is
       // created now (the owner's first choice). The remaining shops
@@ -202,6 +254,10 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
           chain_id: crypto.randomUUID(),
           shop_chain: selectedShopIds,
           preference_order: 1,
+          // Brief 3: start this hop's transport thread. (A database
+          // trigger does the same from the package flag, including
+          // for escalation-created hops.)
+          ...(needsTransport ? { transport_status: "requested" } : {}),
         } as any);
 
       const url = `${window.location.origin}/referral/${pkg.token}`;
@@ -246,6 +302,13 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
           <span className="font-semibold text-sm">Referral Package Created!</span>
         </div>
         {addressedNote && <p className="text-xs text-muted-foreground">{addressedNote}</p>}
+        {props.pilot && needsTransport && (
+          <p className="text-xs text-muted-foreground">
+            {anySelectedOffersPickup
+              ? `Pickup and delivery requested. ${TRANSPORT_LIABILITY_LINE}`
+              : "None of the shops you chose has said it offers pickup and delivery. Your pickup and delivery request still goes with your package, and each shop will see it."}
+          </p>
+        )}
         <p className="text-xs text-muted-foreground">
           Share this link with a repair shop — they'll see your full assessment, photos, audio, and cost estimate.
         </p>
@@ -299,7 +362,7 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
         ) : (
           <>
             <ul className="space-y-2">
-              {shops.map((shop) => {
+              {displayShops.map((shop) => {
                 const orderIndex = selectedShopIds.indexOf(shop.id);
                 const selected = orderIndex >= 0;
                 const disabled =
@@ -340,6 +403,55 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
                 );
               })}
             </ul>
+            {needsTransport && onlyPickupShops && displayShops.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No shops in the list have said they offer pickup and delivery.
+              </p>
+            )}
+            <div className="space-y-2 rounded-lg border border-border p-3">
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={needsTransport}
+                  onChange={(e) => setNeedsTransport(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <span className="font-medium">
+                  This car can&rsquo;t be driven — I need pickup and delivery
+                </span>
+              </label>
+              {needsTransport && (
+                <>
+                  <p className="text-xs text-muted-foreground">
+                    {TRANSPORT_LIABILITY_LINE}
+                  </p>
+                  <label className="block text-xs text-muted-foreground">
+                    Where the car sits, and anything the driver should know
+                    (optional)
+                    <textarea
+                      value={transportNote}
+                      onChange={(e) => setTransportNote(e.target.value)}
+                      rows={2}
+                      className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                    />
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={onlyPickupShops}
+                      onChange={(e) => setOnlyPickupShops(e.target.checked)}
+                    />
+                    Only show shops that offer pickup and delivery
+                  </label>
+                  {showNoOfferNotice && (
+                    <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                      None of the shops you chose has said it offers pickup and
+                      delivery.
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
             <Button
               onClick={handlePilotSend}
               disabled={loading || selectedShopIds.length === 0}

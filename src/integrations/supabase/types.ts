@@ -1909,6 +1909,8 @@ export type Database = {
           photo_urls: string[] | null
           quote_request_id: string | null
           token: string
+          transport_note: string | null
+          transport_requested: boolean
           user_id: string | null
           vehicle_make: string | null
           vehicle_model: string | null
@@ -1942,6 +1944,8 @@ export type Database = {
           photo_urls?: string[] | null
           quote_request_id?: string | null
           token?: string
+          transport_note?: string | null
+          transport_requested?: boolean
           user_id?: string | null
           vehicle_make?: string | null
           vehicle_model?: string | null
@@ -1975,6 +1979,8 @@ export type Database = {
           photo_urls?: string[] | null
           quote_request_id?: string | null
           token?: string
+          transport_note?: string | null
+          transport_requested?: boolean
           user_id?: string | null
           vehicle_make?: string | null
           vehicle_model?: string | null
@@ -2654,6 +2660,7 @@ export type Database = {
           outcome_found: string | null
           outcome_reported_at: string | null
           outcome_reported_by: string | null
+          outcome_transport_cost: number | null
           owner_user_id: string
           package_id: string
           preference_order: number
@@ -2662,6 +2669,8 @@ export type Database = {
           shop_chain: Json
           shop_id: string
           status: string
+          transport_charge_stated: number | null
+          transport_status: string | null
           updated_at: string
           viewed_at: string | null
           window_expires_at: string | null
@@ -2680,6 +2689,7 @@ export type Database = {
           outcome_found?: string | null
           outcome_reported_at?: string | null
           outcome_reported_by?: string | null
+          outcome_transport_cost?: number | null
           owner_user_id: string
           package_id: string
           preference_order: number
@@ -2688,6 +2698,8 @@ export type Database = {
           shop_chain: Json
           shop_id: string
           status?: string
+          transport_charge_stated?: number | null
+          transport_status?: string | null
           updated_at?: string
           viewed_at?: string | null
           window_expires_at?: string | null
@@ -2706,6 +2718,7 @@ export type Database = {
           outcome_found?: string | null
           outcome_reported_at?: string | null
           outcome_reported_by?: string | null
+          outcome_transport_cost?: number | null
           owner_user_id?: string
           package_id?: string
           preference_order?: number
@@ -2714,6 +2727,8 @@ export type Database = {
           shop_chain?: Json
           shop_id?: string
           status?: string
+          transport_charge_stated?: number | null
+          transport_status?: string | null
           updated_at?: string
           viewed_at?: string | null
           window_expires_at?: string | null
@@ -3870,8 +3885,16 @@ export type Database = {
       process_referral_escalations: { Args: never; Returns: undefined }
       referral_response_report: { Args: never; Returns: Json }
       referral_window_expiry: { Args: { p_from: string }; Returns: string }
+      request_referral_transport: {
+        Args: { p_note: string; p_referral_id: string }
+        Returns: Json
+      }
       respond_to_referral: {
         Args: { p_accept: boolean; p_token: string }
+        Returns: Json
+      }
+      set_referral_transport: {
+        Args: { p_charge_stated: number; p_status: string; p_token: string }
         Returns: Json
       }
       stop_referral_chain: {
@@ -3879,7 +3902,13 @@ export type Database = {
         Returns: Json
       }
       submit_referral_outcome: {
-        Args: { p_cost: number; p_did: string; p_found: string; p_token: string }
+        Args: {
+          p_cost: number
+          p_did: string
+          p_found: string
+          p_token: string
+          p_transport_cost: number
+        }
         Returns: Json
       }
       resolve_security_alert: { Args: { alert_id: string }; Returns: undefined }

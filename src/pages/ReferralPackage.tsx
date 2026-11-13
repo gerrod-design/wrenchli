@@ -9,6 +9,7 @@ import {
   Shield, ChevronDown, ChevronUp, Loader2, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
+import { TRANSPORT_STATUS_LABELS } from "@/lib/referralTransport";
 
 interface ReferralData {
   id: string;
@@ -37,12 +38,16 @@ interface ReferralData {
   customer_notes: string | null;
   view_count: number;
   pdf_download_count: number;
+  // Mobility Brief 3: the owner's pickup/delivery request rides on
+  // the package, visible to the addressed shop before it decides.
+  transport_requested?: boolean;
+  transport_note?: string | null;
   // Referral Lifecycle Phase 1: the token RPC never returns the owner's
   // name, email, or phone. It does return the currently addressed
   // shop_referrals hop (if any) and that shop's name.
   referral_count?: number;
   active_referral?: ActiveReferral | null;
-  shop?: { id: string; name: string } | null;
+  shop?: { id: string; name: string; offers_pickup_delivery?: boolean } | null;
 }
 
 interface ActiveReferral {
@@ -57,6 +62,9 @@ interface ActiveReferral {
   outcome_found: string | null;
   outcome_did: string | null;
   outcome_cost: number | null;
+  outcome_transport_cost: number | null;
+  transport_status: string | null;
+  transport_charge_stated: number | null;
   outcome_reported_at: string | null;
   outcome_reported_by: string | null;
   completion_confirmed_by: string | null;
@@ -85,6 +93,26 @@ export default function ReferralPackage() {
   const [outcomeFound, setOutcomeFound] = useState("");
   const [outcomeDid, setOutcomeDid] = useState("");
   const [outcomeCost, setOutcomeCost] = useState("");
+  const [outcomeTransportCost, setOutcomeTransportCost] = useState("");
+  // Brief 3 transport management (after acceptance)
+  const [transportStatus, setTransportStatus] = useState("arranged");
+  const [transportCharge, setTransportCharge] = useState("");
+
+  // Keep the transport controls in sync with the addressed hop
+  // whenever the package (re)loads.
+  useEffect(() => {
+    const ar = data?.active_referral;
+    if (!ar) return;
+    if (
+      ar.transport_status &&
+      ["arranged", "picked_up", "delivered", "unable"].includes(ar.transport_status)
+    ) {
+      setTransportStatus(ar.transport_status);
+    }
+    if (ar.transport_charge_stated != null) {
+      setTransportCharge(String(ar.transport_charge_stated));
+    }
+  }, [data]);
 
   const fetchPackage = async (): Promise<ReferralData | null> => {
     if (!token) return null;
@@ -173,6 +201,44 @@ export default function ReferralPackage() {
     }
   };
 
+  const handleSetTransport = async () => {
+    if (!token) return;
+    const charge = transportCharge.trim() ? Number(transportCharge) : null;
+    if (charge != null && (Number.isNaN(charge) || charge < 0)) {
+      toast.error("Please enter a valid charge, or leave it blank.");
+      return;
+    }
+    setActionBusy(true);
+    try {
+      const { data: result, error: err } = await supabase.rpc(
+        "set_referral_transport" as any,
+        {
+          p_token: token,
+          p_status: transportStatus,
+          p_charge_stated: charge,
+        } as any
+      );
+      if (err) throw err;
+      const r = result as any;
+      if (!r?.ok) {
+        toast.error(
+          r?.reason === "pickup_delivery_not_offered"
+            ? "Your shop has not told Wrenchli it offers pickup and delivery, so pickup and delivery can't be arranged here."
+            : "Transport could not be updated."
+        );
+        return;
+      }
+      toast.success("Transport status updated.");
+      const refreshed = await fetchPackage();
+      if (refreshed) setData(refreshed);
+    } catch (e) {
+      console.error("Set transport error:", e);
+      toast.error("Failed to update transport.");
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
   const handleSubmitOutcome = async () => {
     if (!token) return;
     if (!outcomeFound.trim() || !outcomeDid.trim()) {
@@ -184,6 +250,13 @@ export default function ReferralPackage() {
       toast.error("Please enter a valid cost.");
       return;
     }
+    const transportCost = outcomeTransportCost.trim()
+      ? Number(outcomeTransportCost)
+      : null;
+    if (transportCost != null && (Number.isNaN(transportCost) || transportCost < 0)) {
+      toast.error("Please enter a valid pickup/delivery cost, or leave it blank.");
+      return;
+    }
     setActionBusy(true);
     try {
       const { data: result, error: err } = await supabase.rpc(
@@ -193,6 +266,7 @@ export default function ReferralPackage() {
           p_found: outcomeFound.trim(),
           p_did: outcomeDid.trim(),
           p_cost: cost,
+          p_transport_cost: transportCost,
         } as any
       );
       if (err) throw err;
@@ -388,6 +462,11 @@ export default function ReferralPackage() {
 
   const vehicleStr = [data.vehicle_year, data.vehicle_make, data.vehicle_model, data.vehicle_trim].filter(Boolean).join(" ");
   const details = data.cost_estimate_details || {};
+  const transportLabel = data.active_referral?.transport_status
+    ? TRANSPORT_STATUS_LABELS[
+        data.active_referral.transport_status as keyof typeof TRANSPORT_STATUS_LABELS
+      ]
+    : undefined;
 
   return (
     <main className="pb-[60px] md:pb-0">
@@ -474,6 +553,83 @@ export default function ReferralPackage() {
                 This package was sent to <span className="font-semibold text-foreground">{data.shop.name}</span>.
               </p>
             )}
+            {/* Brief 3: the pickup/delivery request is visible BEFORE
+                the shop decides, so a shop that cannot arrange a tow
+                can pass with full information. After acceptance the
+                shop manages the transport status here. */}
+            {data.transport_requested && data.active_referral.status !== "outcome_reported" && (
+              <div className="rounded-lg border border-border bg-background p-4 space-y-2">
+                <h3 className="font-heading text-base font-bold">Pickup and delivery requested</h3>
+                <p className="text-sm text-muted-foreground">
+                  This car can&rsquo;t be driven. The owner is asking your shop to
+                  arrange pickup and delivery.
+                </p>
+                {data.transport_note && (
+                  <p className="text-sm">Owner&rsquo;s note: {data.transport_note}</p>
+                )}
+                {data.active_referral.status === "accepted" &&
+                  (data.shop?.offers_pickup_delivery === false ? (
+                    <p className="text-sm text-muted-foreground">
+                      Your shop has not told Wrenchli it offers pickup and delivery,
+                      so pickup and delivery can&rsquo;t be arranged here.
+                    </p>
+                  ) : (
+                    <div className="space-y-3 pt-1">
+                      <p className="text-sm">
+                        Transport status:{" "}
+                        <span className="font-medium">
+                          {transportLabel ?? "Pickup requested"}
+                        </span>
+                        {data.active_referral.transport_charge_stated != null && (
+                          <>
+                            {" "}· Your stated charge: $
+                            {Number(data.active_referral.transport_charge_stated).toLocaleString()}
+                          </>
+                        )}
+                      </p>
+                      <div>
+                        <label htmlFor="transport-status" className="block text-sm font-medium mb-1">
+                          Update transport status
+                        </label>
+                        <select
+                          id="transport-status"
+                          value={transportStatus}
+                          onChange={(e) => setTransportStatus(e.target.value)}
+                          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                        >
+                          <option value="arranged">Arranged</option>
+                          <option value="picked_up">Picked up</option>
+                          <option value="delivered">Delivered to the shop</option>
+                          <option value="unable">Unable to arrange</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label htmlFor="transport-charge" className="block text-sm font-medium mb-1">
+                          Your pickup/delivery charge (USD, optional)
+                        </label>
+                        <input
+                          id="transport-charge"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={transportCharge}
+                          onChange={(e) => setTransportCharge(e.target.value)}
+                          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                          placeholder="e.g. 75"
+                        />
+                      </div>
+                      <Button
+                        onClick={() => void handleSetTransport()}
+                        disabled={actionBusy}
+                        variant="outline"
+                      >
+                        {actionBusy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Update transport status
+                      </Button>
+                    </div>
+                  ))}
+              </div>
+            )}
             {(data.active_referral.status === "sent" || data.active_referral.status === "viewed") && (
               <>
                 <div>
@@ -549,6 +705,21 @@ export default function ReferralPackage() {
                       placeholder="e.g. 425"
                     />
                   </div>
+                  {data.transport_requested && (
+                    <div>
+                      <label htmlFor="outcome-transport-cost" className="block text-sm font-medium mb-1">Pickup/delivery cost (USD, optional)</label>
+                      <input
+                        id="outcome-transport-cost"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={outcomeTransportCost}
+                        onChange={(e) => setOutcomeTransportCost(e.target.value)}
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                        placeholder="e.g. 75"
+                      />
+                    </div>
+                  )}
                   <Button
                     onClick={() => void handleSubmitOutcome()}
                     disabled={actionBusy}
@@ -569,11 +740,12 @@ export default function ReferralPackage() {
                   Thanks — your report is on file. The vehicle owner has been asked to
                   confirm the repair was completed.
                 </p>
-                {(data.active_referral.outcome_found || data.active_referral.outcome_did || data.active_referral.outcome_cost != null) && (
+                {(data.active_referral.outcome_found || data.active_referral.outcome_did || data.active_referral.outcome_cost != null || data.active_referral.outcome_transport_cost != null) && (
                   <dl className="space-y-1 text-sm">
                     {data.active_referral.outcome_found && <div className="flex gap-2"><dt className="text-muted-foreground">Found</dt><dd className="font-medium">{data.active_referral.outcome_found}</dd></div>}
                     {data.active_referral.outcome_did && <div className="flex gap-2"><dt className="text-muted-foreground">Did</dt><dd className="font-medium">{data.active_referral.outcome_did}</dd></div>}
                     {data.active_referral.outcome_cost != null && <div className="flex gap-2"><dt className="text-muted-foreground">Cost</dt><dd className="font-medium">${Number(data.active_referral.outcome_cost).toLocaleString()}</dd></div>}
+                    {data.active_referral.outcome_transport_cost != null && <div className="flex gap-2"><dt className="text-muted-foreground">Pickup/delivery</dt><dd className="font-medium">${Number(data.active_referral.outcome_transport_cost).toLocaleString()}</dd></div>}
                   </dl>
                 )}
               </div>
