@@ -9,12 +9,16 @@ interface SEOProps {
   ogDescription?: string;
 }
 
-const SITE = "https://wrenchli.net";
+const SITE = "https://www.wrenchli.net";
 const DEFAULT_OG = `${SITE}/og-default.png`;
 
 export default function SEO({ title, description, path, ogImage, ogTitle, ogDescription }: SEOProps) {
   const url = `${SITE}${path}`;
-  const fullTitle = path === "/" ? title : `${title} | Wrenchli`;
+  // Some pages pass a title that already ends with the brand name;
+  // appending the suffix again produced "| Wrenchli | Wrenchli"
+  // (front-door fix 9).
+  const fullTitle =
+    path === "/" || title.trimEnd().endsWith("Wrenchli") ? title : `${title} | Wrenchli`;
   const image = ogImage || DEFAULT_OG;
 
   return (

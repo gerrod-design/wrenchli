@@ -30,7 +30,44 @@ export const STATIC_PRERENDER_PATHS = [
   // the homepage shell for it. The client still boots over it exactly
   // as before, so signed-in behavior is unchanged.
   "/garage",
+  // Front-door fix 2 (Nov 13, 2026 review): these public routes were
+  // missing from the prerender list, so no-JS fetchers received the
+  // homepage shell for them. They are real content pages and are now
+  // rendered to static HTML like the rest.
+  "/terms",
+  "/accessibility",
+  "/investors",
+  "/vehicle-insights",
 ] as const;
+
+/**
+ * Primary source files behind each sitemap route, used by the prerender
+ * step to stamp the sitemap with each page's real last-changed date
+ * (the newest commit touching any of its source files) instead of the
+ * build date (front-door fix 6). Blog routes are handled from the blog
+ * content source itself, so they are not listed here.
+ */
+export const SITEMAP_SOURCE_FILES: Record<string, string[]> = {
+  "/": ["src/pages/DesignPreview.tsx"],
+  "/for-shops": ["src/pages/ForShops.tsx"],
+  "/for-shops/talk": ["src/pages/ForShopsTalk.tsx"],
+  "/for-dealers": ["src/pages/ForDealers.tsx"],
+  "/faq": ["src/pages/FAQ.tsx", "src/data/faq.ts"],
+  "/about": ["src/pages/About.tsx"],
+  "/privacy": ["src/pages/Privacy.tsx"],
+  "/warranty-guide": ["src/pages/WarrantyGuide.tsx"],
+  "/shops": ["src/pages/Shops.tsx"],
+  "/nominate": ["src/pages/Nominate.tsx"],
+  "/partners/journey": ["src/pages/PartnersJourney.tsx"],
+  "/subprocessors": ["src/pages/Subprocessors.tsx"],
+  "/developers": ["src/pages/Developers.tsx"],
+  "/diy": ["src/pages/DIYTutorials.tsx"],
+  "/garage": ["src/pages/Garage.tsx"],
+  "/terms": ["src/pages/Terms.tsx"],
+  "/accessibility": ["src/pages/Accessibility.tsx"],
+  "/investors": ["src/pages/Investors.tsx"],
+  "/vehicle-insights": ["src/pages/VehicleInsights.tsx"],
+};
 
 /**
  * Routes whose app behavior is a client-side redirect. The prerendered

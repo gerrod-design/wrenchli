@@ -21,6 +21,7 @@ const organization = {
   "@id": `${SITE_BASE}/#organization`,
   name: "Wrenchli",
   legalName: "Wrenchli, Inc.",
+  founder: { "@type": "Person", name: "Gerrod Parchmon" },
   url: `${SITE_BASE}/`,
   logo: `${SITE_BASE}/icon-512.png`,
   email: "support@wrenchli.net",

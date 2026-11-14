@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { ArrowLeft, ArrowRight, CheckCircle2, Store, Copy, ExternalLink } from "lucide-react";
 import wrenchliLogo from "@/assets/wrenchli-logo-dark.png";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,6 +105,10 @@ export default function ShopOnboardingPreview() {
 
   return (
     <div className="min-h-screen" style={{ fontFamily: FONT, background: "#F8F8F6" }}>
+      {/* Concept preview — keep it out of search (front-door fix 11). */}
+      <Helmet>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: "#E0DDD8", background: "#FFFFFF" }}>
         <Link to="/design-preview/for-shops" className="flex items-center gap-2">

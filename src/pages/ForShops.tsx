@@ -139,20 +139,37 @@ export default function ForShops() {
       <section id="apply" className="section-padding bg-wrenchli-trust-blue text-accent-foreground">
         <div className="container-wrenchli max-w-3xl text-center">
           <SectionReveal>
-            <Button
-              asChild
-              size="lg"
-              className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg"
-            >
-              <Link
-                to="/contact"
-                onClick={() =>
-                  trackPlausibleEvent("shop_page_cta_click", { placement: "for_shops_pilot" })
-                }
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button
+                asChild
+                size="lg"
+                className="h-14 px-10 bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-lg"
               >
-                Join the free pilot <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+                <Link
+                  to="/contact"
+                  onClick={() =>
+                    trackPlausibleEvent("shop_page_cta_click", { placement: "for_shops_pilot" })
+                  }
+                >
+                  Join the free pilot <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="h-14 px-10 bg-transparent font-bold text-lg text-accent-foreground border-accent-foreground/50 hover:bg-white/10 hover:text-accent-foreground"
+              >
+                <Link
+                  to="/for-shops/talk"
+                  onClick={() =>
+                    trackPlausibleEvent("shop_page_cta_click", { placement: "for_shops_talk" })
+                  }
+                >
+                  Talk, type, or book a call
+                </Link>
+              </Button>
+            </div>
             <p className="mt-6 text-sm italic text-accent-foreground/80">
               Wrenchli never charges consumers. The assessment is always free.
             </p>

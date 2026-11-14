@@ -13,14 +13,23 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const ssrEntry = path.join(root, "dist-ssr", "entry-server.js");
 
-const { render, getPrerenderPaths, getSitemapPaths, REDIRECT_PRERENDER_PATHS, jsonLdForRoute, SITE_BASE } =
-  await import(pathToFileURL(ssrEntry).href);
+const {
+  render,
+  getPrerenderPaths,
+  getSitemapPaths,
+  REDIRECT_PRERENDER_PATHS,
+  SITEMAP_SOURCE_FILES,
+  getAllPosts,
+  jsonLdForRoute,
+  SITE_BASE,
+} = await import(pathToFileURL(ssrEntry).href);
 
 const template = fs.readFileSync(path.join(dist, "index.html"), "utf-8");
 if (!template.includes('<div id="root"></div>')) {
@@ -35,6 +44,11 @@ function applyHead(tpl, headHtml) {
   const extra = [];
   for (const tag of tags) {
     let replaced = false;
+    // An unset helmet title stringifies to an empty <title data-rh="true">
+    // (emitted whenever a page renders Helmet children, e.g. JSON-LD
+    // scripts, without declaring a title). Never let it blank out the
+    // template's title (front-door fix 1).
+    if (tag.startsWith("<title") && !tag.replace(/<[^>]*>/g, "").trim()) continue;
     if (tag.startsWith("<title")) {
       if (/<title>[\s\S]*?<\/title>/.test(out)) {
         out = out.replace(/<title>[\s\S]*?<\/title>/, tag);
@@ -92,10 +106,51 @@ for (const routePath of getPrerenderPaths()) {
 }
 
 // Sitemap, generated from the same manifest (routes + blog content source).
-const lastmod = new Date().toISOString().slice(0, 10);
+// Each URL's <lastmod> is that page's real last-changed date (front-door
+// fix 6): blog posts carry their content date, other routes use the
+// newest commit touching their source files. A route whose date cannot
+// be determined (e.g. git history unavailable in the build environment)
+// omits <lastmod> rather than stamping a fabricated build date.
+function gitLastChanged(files) {
+  let best = null;
+  for (const file of files) {
+    try {
+      const out = execFileSync("git", ["log", "-1", "--format=%cs", "--", file], {
+        cwd: root,
+        stdio: ["ignore", "pipe", "ignore"],
+      })
+        .toString()
+        .trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(out) && (!best || out > best)) best = out;
+    } catch {
+      // git unavailable for this file — fall through with no date.
+    }
+  }
+  return best;
+}
+
+const blogDates = new Map(getAllPosts().map((post) => [`/blog/${post.slug}`, post.date]));
+const newestBlogDate = [...blogDates.values()].sort().at(-1) ?? null;
+
+function sitemapLastmod(p) {
+  if (blogDates.has(p)) return blogDates.get(p) || null;
+  if (p === "/blog") return newestBlogDate;
+  const sourcePath = REDIRECT_PRERENDER_PATHS[p] ?? p;
+  const files = SITEMAP_SOURCE_FILES[sourcePath];
+  return files ? gitLastChanged(files) : null;
+}
+
+let datedCount = 0;
 const urls = getSitemapPaths()
-  .map((p) => `  <url><loc>${SITE_BASE}${p === "/" ? "/" : p}</loc><lastmod>${lastmod}</lastmod></url>`)
+  .map((p) => {
+    const lastmod = sitemapLastmod(p);
+    if (lastmod) datedCount += 1;
+    const lm = lastmod ? `<lastmod>${lastmod}</lastmod>` : "";
+    return `  <url><loc>${SITE_BASE}${p === "/" ? "/" : p}</loc>${lm}</url>`;
+  })
   .join("\n");
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 fs.writeFileSync(path.join(dist, "sitemap.xml"), sitemap, "utf-8");
-console.log(`[prerender] sitemap.xml -> ${getSitemapPaths().length} URLs`);
+console.log(
+  `[prerender] sitemap.xml -> ${getSitemapPaths().length} URLs (${datedCount} with lastmod)`
+);

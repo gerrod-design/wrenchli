@@ -13,7 +13,10 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-User-agent: Claude-Web
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
 Allow: /
 
 User-agent: Google-Extended
@@ -39,5 +42,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /design-preview
 
 Sitemap: https://www.wrenchli.net/sitemap.xml

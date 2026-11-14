@@ -1,4 +1,5 @@
 import { JOURNEY_STAGES, HANDOFF_LABEL, FEATURE_TITLES, JourneyStage } from '@/lib/journeyMap';
+import SEO from '@/components/SEO';
 import JourneyPlanCard from '@/components/journey/JourneyPlanCard';
 import type { JourneySituationInput } from '@/lib/journeyPlan';
 import { Card } from '@/components/ui/card';
@@ -63,6 +64,14 @@ export default function PartnersJourney() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+      {/* This page declared no title of its own, so its static HTML
+          carried the homepage's (front-door fix 1). Title and
+          description are the page's own headline and intro text. */}
+      <SEO
+        title="The complete Wrenchli journey — partner preview"
+        description="This page walks the whole journey a Wrenchli customer and shop take together. Every stage is labeled honestly."
+        path="/partners/journey"
+      />
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">The complete Wrenchli journey — partner preview</h1>
         <p className="text-sm font-medium">

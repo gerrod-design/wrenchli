@@ -55,5 +55,11 @@ export function render(url: string): { html: string; head: string } {
   return { html, head };
 }
 
-export { getPrerenderPaths, getSitemapPaths, REDIRECT_PRERENDER_PATHS } from "@/lib/prerenderManifest";
+export {
+  getPrerenderPaths,
+  getSitemapPaths,
+  REDIRECT_PRERENDER_PATHS,
+  SITEMAP_SOURCE_FILES,
+} from "@/lib/prerenderManifest";
 export { jsonLdForRoute, SITE_BASE } from "@/lib/structuredData";
+export { getAllPosts } from "@/lib/blog";

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Shield, Zap, ChevronRight, AlertTriangle, CheckCircle2, Activity, Store, ArrowRight, Users, ClipboardCheck, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import DiagnosticWizard from "@/components/diagnostic-wizard/DiagnosticWizard";
+import SEO from "@/components/SEO";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import heroShop from "@/assets/hero-shop.jpg";
@@ -46,6 +47,15 @@ export default function DesignPreview() {
 
   return (
     <div className="min-h-screen" style={{ fontFamily: FONT }}>
+      {/* The homepage previously declared no title/description/canonical,
+          so its static HTML carried an empty <title> (front-door fix 1)
+          and no canonical (fix 4). Title and description are the site's
+          established strings (shell template title, App default meta). */}
+      <SEO
+        title="Free Vehicle Symptom Assessment | Wrenchli"
+        description="Describe your car symptom in plain English — get a free instant assessment of likely causes, cost ranges, and exactly what to ask your shop. Free, no account required."
+        path="/"
+      />
 
       {/* Nav — shared site header (same navigation model as every other
           page; this page previously rendered a reduced custom nav, R-30) */}
@@ -291,7 +301,7 @@ export default function DesignPreview() {
             </div>
 
             <Link
-              to="/design-preview/for-shops"
+              to="/for-shops"
               className="inline-flex items-center gap-2 mt-10 px-8 py-3.5 rounded-lg font-semibold text-base transition-opacity hover:opacity-90"
               style={{ background: "#E07B39", color: "#FFFFFF" }}
             >
