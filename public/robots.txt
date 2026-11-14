@@ -3,42 +3,55 @@
 
 User-agent: GPTBot
 Allow: /
+Disallow: /design-preview
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /design-preview
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /design-preview
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /design-preview
 
 User-agent: Claude-SearchBot
 Allow: /
+Disallow: /design-preview
 
 User-agent: Claude-User
 Allow: /
+Disallow: /design-preview
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /design-preview
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /design-preview
 
 User-agent: Perplexity-User
 Allow: /
+Disallow: /design-preview
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /design-preview
 
 User-agent: CCBot
 Allow: /
+Disallow: /design-preview
 
 User-agent: Meta-ExternalAgent
 Allow: /
+Disallow: /design-preview
 
 User-agent: cohere-ai
 Allow: /
+Disallow: /design-preview
 
 User-agent: *
 Content-Signal: ai-train=no, search=yes, ai-input=yes

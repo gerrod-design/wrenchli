@@ -225,7 +225,7 @@ export default function DesignPreview() {
             {[
               { icon: Shield, title: "Transparent Pricing", desc: "See real cost ranges before you visit a shop. No surprises." },
               { icon: Zap, title: "Instant Assessment", desc: "Structured symptom assessment in seconds, with confidence-scored likely causes." },
-              { icon: Activity, title: "Accuracy Tracked", desc: "We track our symptom-to-repair match rate — and publish the results." },
+              { icon: Activity, title: "Accuracy Tracked", desc: "We track our symptom-to-repair match rate." },
             ].map((v) => (
               <div key={v.title} className="rounded-xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E0DDD8" }}>
                 <div className="h-10 w-10 rounded-lg flex items-center justify-center mb-4" style={{ background: "#FEF3E2" }}>

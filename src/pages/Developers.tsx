@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/SEO";
 import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign, Wrench, MapPin, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -471,10 +471,11 @@ export default function Developers() {
   const { user, isAdmin } = useAuth();
   return (
     <>
-      <Helmet>
-        <title>API Documentation — Wrenchli Developers</title>
-        <meta name="description" content="Integrate Wrenchli's AI-powered vehicle assessment into your app. Code examples in Python, JavaScript, and curl." />
-      </Helmet>
+      <SEO
+        title="API Documentation — Wrenchli Developers"
+        description="Integrate Wrenchli's AI-powered vehicle assessment into your app. Code examples in Python, JavaScript, and curl."
+        path="/developers"
+      />
 
       <main className="min-h-screen bg-background pt-24 pb-20">
         <div className="container max-w-4xl mx-auto px-4">

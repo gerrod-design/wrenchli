@@ -1,6 +1,7 @@
 ---
 title: "Car Shakes or Vibrates While Driving — Causes, Costs, and What to Check First"
 date: "2026-04-12"
+figures_verified: "2026-11-09"
 excerpt: "A shaking car isn't just annoying — it's a warning. Here are the most common causes of vibration while driving, what repairs cost, and how to describe the problem to your mechanic."
 author: "Wrenchli Team"
 tags: ["vibration", "shaking", "tires", "alignment", "suspension"]

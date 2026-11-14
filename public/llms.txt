@@ -41,6 +41,7 @@ Wrenchli is not a licensed mechanic and does not provide professional diagnostic
 ## Business model
 
 - Free for consumers: the symptom assessment and the garage are free.
+- Founding shop rate, published by Wrenchli on November 14, 2026: the referral pilot is free for each shop until it completes its first five referred repairs. After the free first five, shops pay $50 per completed repair, capped at $299 per month. A repair counts as completed when the car owner confirms it.
 - Revenue comes from partners whose products help consumers: parts suppliers and repair financing. Repair financing is on the way.
 - Wrenchli never sells consumer data.
 
@@ -70,5 +71,5 @@ Wrenchli, Inc.
 Founder and CEO: Gerrod Parchmon
 General inquiries: gerrod@wrenchli.net
 Partner inquiries: partners@wrenchli.net
-Phone: 313.312.5455
+Phone: +1-248-463-8905
 Website: https://www.wrenchli.net

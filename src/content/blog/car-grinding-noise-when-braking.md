@@ -1,6 +1,7 @@
 ---
 title: "Car Makes Grinding Noise When Braking — Causes, Costs, and What to Do Next"
 date: "2026-04-12"
+figures_verified: "2026-11-09"
 excerpt: "Grinding brakes mean something is wearing down — and ignoring it gets expensive fast. Here are the likely causes, what repairs cost, and when you need to act."
 author: "Wrenchli Team"
 tags: ["brakes", "grinding noise", "brake pads", "rotors", "car noise"]

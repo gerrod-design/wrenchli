@@ -127,9 +127,11 @@ export default function ForShops() {
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
               Nothing happens automatically. No auto-billing, no contract
-              renewal. Founding shops get their terms in writing before
-              anything is charged — and we schedule a call to review your
-              results before public pricing.
+              renewal. The founding rate is $50 per completed repair,
+              capped at $299 a month, and a repair counts as completed
+              when the car owner confirms it. Founding shops get their
+              terms in writing before anything is charged — and we
+              schedule a call to review your results first.
             </p>
           </SectionReveal>
         </div>

@@ -1,6 +1,7 @@
 ---
 title: "Car Won't Start, Clicking Noise — Causes, Costs, and What to Try First"
 date: "2026-04-12"
+figures_verified: "2026-11-09"
 excerpt: "You turn the key and hear rapid clicking but nothing happens. Here's what that clicking means, what to check before calling a tow truck, and what the repair will cost."
 author: "Wrenchli Team"
 tags: ["won't start", "clicking noise", "battery", "starter", "no crank"]

@@ -26,7 +26,7 @@ const organization = {
   sameAs: ["https://linkedin.com/company/wrenchli"],
   url: `${SITE_BASE}/`,
   logo: `${SITE_BASE}/icon-512.png`,
-  email: "support@wrenchli.net",
+  email: "gerrod@wrenchli.net",
   description:
     "Wrenchli is a free vehicle symptom assessment platform for vehicle owners across the United States, providing likely causes, urgency levels, and fair cost ranges before they visit a repair shop.",
 };
@@ -69,8 +69,10 @@ const assessmentService = {
 // shop completes its first five referred repairs. Customers arrive
 // pre-assessed with symptoms, likely causes, and a fair cost range.").
 // The pilot is free through a shop's first five completed referred
-// repairs; no post-pilot rate is stated on the page, so none is stated
-// here either.
+// repairs. The page also states the settled founding rate after the free
+// first five ($50 per completed repair, $299 monthly cap; outside-in
+// OI-007); this object describes the free pilot offer itself, whose
+// terms are unchanged.
 const shopPilotService = {
   "@type": "Service",
   "@id": `${SITE_BASE}/for-shops#pilot`,
@@ -129,6 +131,22 @@ function article(post: BlogPost) {
     headline: post.title,
     description: post.excerpt,
     datePublished: post.date,
+    // Price provenance (outside-in OI-004; price credibility rule): when a
+    // post's figures_verified frontmatter date is set, the cost figures in
+    // the article come from Wrenchli's shared repair-rate table (the same
+    // table the assessment API names as wrenchli_editorial_rate_table_v1),
+    // and the date is when those figures were last verified under the
+    // price-data credibility methodology. No date, no provenance claim.
+    ...(post.figuresVerified
+      ? {
+          dateModified: post.figuresVerified,
+          isBasedOn: {
+            "@type": "CreativeWork",
+            name: "Wrenchli shared repair-rate table",
+            identifier: "wrenchli_editorial_rate_table_v1",
+          },
+        }
+      : {}),
     author: { "@type": "Organization", name: post.author },
     publisher: {
       "@type": "Organization",

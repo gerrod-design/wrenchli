@@ -9,6 +9,9 @@ export interface BlogPost {
   tags: string[];
   content: string;
   readingTime: number;
+  /** Date the article's cost figures were last verified against the
+   *  shared repair-rate table (frontmatter: figures_verified). */
+  figuresVerified?: string;
 }
 
 function parseFrontmatter(raw: string): { meta: Record<string, string>; content: string } {
@@ -64,6 +67,7 @@ export function getAllPosts(): BlogPost[] {
         excerpt: meta.excerpt || "",
         author: meta.author || "Wrenchli Team",
         tags: parseTags(meta.tags),
+        figuresVerified: meta.figures_verified || undefined,
         content,
         readingTime: estimateReadingTime(content),
       };

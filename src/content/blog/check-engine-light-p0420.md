@@ -1,6 +1,7 @@
 ---
 title: "Check Engine Light P0420 — What It Means, What It Costs, and What to Ask Your Mechanic"
 date: "2026-04-05"
+figures_verified: "2026-11-09"
 excerpt: "P0420 is one of the most common check engine codes — and one of the most misassessed. Here's what it actually means and how to avoid overpaying for a fix you might not need."
 author: "Wrenchli Team"
 tags: ["check engine light", "P0420", "catalytic converter", "diagnostics", "OBD-II"]
