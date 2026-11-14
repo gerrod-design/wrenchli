@@ -22,6 +22,8 @@ const organization = {
   name: "Wrenchli",
   legalName: "Wrenchli, Inc.",
   founder: { "@type": "Person", name: "Gerrod Parchmon" },
+  telephone: "+1-248-463-8905",
+  sameAs: ["https://linkedin.com/company/wrenchli"],
   url: `${SITE_BASE}/`,
   logo: `${SITE_BASE}/icon-512.png`,
   email: "support@wrenchli.net",

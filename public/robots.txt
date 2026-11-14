@@ -41,6 +41,7 @@ User-agent: cohere-ai
 Allow: /
 
 User-agent: *
+Content-Signal: ai-train=no, search=yes, ai-input=yes
 Allow: /
 Disallow: /design-preview
 

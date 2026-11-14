@@ -13,7 +13,8 @@ export function HomeJsonLd() {
       logo: `${SITE}/favicon.png`,
       description:
         "Wrenchli is a free vehicle symptom assessment platform. Describe your car symptom in plain English and get likely causes, fair cost ranges, and exactly what to ask your shop — no account required.",
-      sameAs: [],
+      telephone: "+1-248-463-8905",
+      sameAs: ["https://linkedin.com/company/wrenchli"],
       contactPoint: {
         "@type": "ContactPoint",
         email: "info@wrenchli.net",
