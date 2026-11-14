@@ -187,6 +187,27 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
         estimatedCostHigh={diagnosis.possible_causes[0]?.estimated_cost_high ?? null}
       />
 
+      {/* Mobile inspection — Mobility Brief 2. Same assessment,
+          sent to a mobile inspector instead of a shop. */}
+      <ShareWithShopButton
+        pilot
+        mode="inspection"
+        diagnosisTitle={diagnosis.possible_causes[0]?.name ?? "Vehicle assessment"}
+        diagnosisUrgency={diagnosis.urgency}
+        diagnosisDetails={{
+          explanation: diagnosis.explanation,
+          confidence: diagnosis.confidence,
+          possible_causes: diagnosis.possible_causes,
+        }}
+        vehicleYear={String(vehicle.year)}
+        vehicleMake={vehicle.make}
+        vehicleModel={vehicle.model}
+        vehicleTrim={vehicle.trim ?? null}
+        vin={vehicle.vin ?? null}
+        estimatedCostLow={diagnosis.possible_causes[0]?.estimated_cost_low ?? null}
+        estimatedCostHigh={diagnosis.possible_causes[0]?.estimated_cost_high ?? null}
+      />
+
       {/* Parts needed */}
       {recommendation.parts_likely_needed.length > 0 && (
         <div className="rounded-lg p-4" style={{ background: "#0F1117", border: "1px solid #2A2D37" }}>

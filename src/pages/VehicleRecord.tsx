@@ -463,6 +463,25 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
                 estimatedCostLow={linkedAssessments[0].snapshot.assessment.cost_range?.low ?? null}
                 estimatedCostHigh={linkedAssessments[0].snapshot.assessment.cost_range?.high ?? null}
               />
+              <div className="mt-4">
+                <ShareWithShopButton
+                  pilot
+                  mode="inspection"
+                  diagnosisTitle={
+                    linkedAssessments[0].snapshot.assessment.possible_causes[0]?.name ||
+                    "Vehicle assessment"
+                  }
+                  diagnosisUrgency={linkedAssessments[0].snapshot.assessment.urgency ?? null}
+                  diagnosisDetails={linkedAssessments[0].snapshot.assessment}
+                  vehicleYear={String(linkedAssessments[0].snapshot.vehicle.year)}
+                  vehicleMake={linkedAssessments[0].snapshot.vehicle.make}
+                  vehicleModel={linkedAssessments[0].snapshot.vehicle.model}
+                  vehicleTrim={linkedAssessments[0].snapshot.vehicle.trim ?? null}
+                  vin={linkedAssessments[0].snapshot.vehicle.vin ?? vehicle.vin ?? null}
+                  estimatedCostLow={linkedAssessments[0].snapshot.assessment.cost_range?.low ?? null}
+                  estimatedCostHigh={linkedAssessments[0].snapshot.assessment.cost_range?.high ?? null}
+                />
+              </div>
             </CardContent>
           </Card>
         )}

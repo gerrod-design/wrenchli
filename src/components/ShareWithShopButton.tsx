@@ -7,6 +7,7 @@ import { trackPlausibleEvent } from "@/lib/analytics";
 import TransportationPanel, { MobilityAttributeChips } from "@/components/TransportationPanel";
 import type { MobilityShop } from "@/lib/transportationLinks";
 import { TRANSPORT_LIABILITY_LINE } from "@/lib/referralTransport";
+import { INSPECTION_PRIVACY_DISCLOSURE } from "@/config/inspection";
 
 interface ShareWithShopProps {
   diagnosisTitle: string;
@@ -32,6 +33,15 @@ interface ShareWithShopProps {
   quoteRequestId?: string | null;
   className?: string;
   /**
+   * Mobility Brief 2: "inspection" renders the mobile-inspector
+   * variant of this pilot send — a kind-filtered picker (service
+   * area and radius instead of an address, the inspector's own
+   * agreed fee when one is set), the visit-details form, and the
+   * pre-send privacy disclosure. The default "repair" is the
+   * Phase 1 / Brief 1 / Brief 3 send, unchanged.
+   */
+  mode?: "repair" | "inspection";
+  /**
    * Pilot mode (Referral Lifecycle Phase 1): the owner picks an ordered
    * preference list of 1 to 3 shops and the package is addressed to the
    * first shop only. Routing is SEQUENTIAL — the package escalates to
@@ -48,6 +58,10 @@ interface ShareWithShopProps {
 interface ShopOption extends MobilityShop {
   id: string;
   name: string;
+  provider_kind?: string | null;
+  service_area_label?: string | null;
+  service_radius_miles?: number | null;
+  inspection_fee?: number | null;
 }
 
 const MAX_PILOT_SHOPS = 3;
@@ -69,6 +83,23 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
   const [transportNote, setTransportNote] = useState("");
   const [onlyPickupShops, setOnlyPickupShops] = useState(false);
 
+  // Mobility Brief 2 (inspection mode): the visit details and the
+  // three minimum items. The minimum items are written ONLY to
+  // inspection_details at send time; the token RPC serves them to
+  // the inspector only after acceptance.
+  const isInspection = props.mode === "inspection";
+  const [firstName, setFirstName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [vehicleLocation, setVehicleLocation] = useState("");
+  const [locationDescriptor, setLocationDescriptor] = useState("");
+  const [locationZip, setLocationZip] = useState("");
+  const [preferredWindows, setPreferredWindows] = useState("");
+  const inspectionDetailsValid =
+    !isInspection ||
+    (firstName.trim() !== "" &&
+      phone.trim() !== "" &&
+      vehicleLocation.trim() !== "");
+
   useEffect(() => {
     if (!props.pilot) return;
     let cancelled = false;
@@ -76,7 +107,7 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
       const { data, error } = await supabase
         .from("service_providers")
         .select(
-          "id, name, address, city, state, zip_code, lat, lng, offers_loaner, offers_shuttle, offers_pickup_delivery, mobility_notes"
+          "id, name, address, city, state, zip_code, lat, lng, offers_loaner, offers_shuttle, offers_pickup_delivery, mobility_notes, provider_kind, service_area_label, service_radius_miles, inspection_fee"
         )
         .order("name", { ascending: true });
       if (cancelled) return;
@@ -85,12 +116,21 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
         setShops([]);
         return;
       }
-      setShops((data as ShopOption[] | null) ?? []);
+      // Mobility Brief 2: the picker is kind-filtered. The filter
+      // runs client-side over the (small) provider list so the
+      // query shape stays the one Phase 1 established; a missing
+      // provider_kind reads as the column default, 'shop'.
+      const wantKind = isInspection ? "mobile_inspector" : "shop";
+      setShops(
+        ((data as ShopOption[] | null) ?? []).filter(
+          (shop) => (shop.provider_kind ?? "shop") === wantKind
+        )
+      );
     })();
     return () => {
       cancelled = true;
     };
-  }, [props.pilot]);
+  }, [props.pilot, isInspection]);
 
   const toggleShop = (shopId: string) => {
     setSelectedShopIds((prev) => {
@@ -235,30 +275,63 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
         return;
       }
 
-      const pkg = await createPackage(user.id, {
-        requested: needsTransport,
-        note: needsTransport ? transportNote.trim() || null : null,
-      });
+      const pkg = await createPackage(
+        user.id,
+        isInspection
+          ? undefined
+          : {
+              requested: needsTransport,
+              note: needsTransport ? transportNote.trim() || null : null,
+            }
+      );
 
       // Addressed, sequential send: exactly ONE shop_referrals row is
       // created now (the owner's first choice). The remaining shops
       // live only in shop_chain and are reached one at a time by the
       // escalation engine (decline or end-of-next-business-day expiry).
       const firstShopId = selectedShopIds[0];
+      const chainId = crypto.randomUUID();
       const { error: referralError } = await supabase
         .from("shop_referrals" as any)
         .insert({
           package_id: pkg.id,
           shop_id: firstShopId,
           owner_user_id: user.id,
-          chain_id: crypto.randomUUID(),
+          chain_id: chainId,
           shop_chain: selectedShopIds,
           preference_order: 1,
+          referral_kind: isInspection ? "inspection" : "repair",
           // Brief 3: start this hop's transport thread. (A database
           // trigger does the same from the package flag, including
           // for escalation-created hops.)
           ...(needsTransport ? { transport_status: "requested" } : {}),
         } as any);
+
+      // Mobility Brief 2: the inspection chain's details row —
+      // the only place the visit minimum is written. It is keyed
+      // by the chain so every hop of this chain resolves to the
+      // same record, and it is never written to referral_packages.
+      if (isInspection && !referralError) {
+        const { error: detailsError } = await supabase
+          .from("inspection_details" as any)
+          .insert({
+            chain_id: chainId,
+            package_id: pkg.id,
+            owner_user_id: user.id,
+            vehicle_location_text: vehicleLocation.trim(),
+            location_descriptor: locationDescriptor.trim() || null,
+            location_zip: locationZip.trim() || props.zipCode || null,
+            preferred_windows: preferredWindows.trim() || null,
+            consumer_first_name: firstName.trim(),
+            consumer_phone: phone.trim(),
+          } as any);
+        if (detailsError) {
+          console.error("Inspection details insert failed:", detailsError);
+          toast.error(
+            "Your inspection request was sent, but the visit details could not be saved. Please contact Wrenchli support before the inspector accepts."
+          );
+        }
+      }
 
       const url = `${window.location.origin}/referral/${pkg.token}`;
       setShareUrl(url);
@@ -271,11 +344,16 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
         setAddressedNote(null);
       } else {
         const firstShopName =
-          shops?.find((s) => s.id === firstShopId)?.name || "your first-choice shop";
+          shops?.find((s) => s.id === firstShopId)?.name ||
+          (isInspection ? "your first-choice inspector" : "your first-choice shop");
         setAddressedNote(
-          selectedShopIds.length > 1
-            ? `Sent to ${firstShopName} first. If they pass or do not respond by the end of the next business day, it goes to your next choice automatically.`
-            : `Sent to ${firstShopName}. They have until the end of the next business day to respond.`
+          isInspection
+            ? selectedShopIds.length > 1
+              ? `Sent to ${firstShopName} first. If they pass or do not respond by the end of the next business day, it goes to your next choice automatically. The inspector who accepts will see your first name, phone number, and the car's location — nobody sees them before that.`
+              : `Sent to ${firstShopName}. They have until the end of the next business day to respond. When they accept, they will see your first name, phone number, and the car's location — nobody sees them before that.`
+            : selectedShopIds.length > 1
+              ? `Sent to ${firstShopName} first. If they pass or do not respond by the end of the next business day, it goes to your next choice automatically.`
+              : `Sent to ${firstShopName}. They have until the end of the next business day to respond.`
         );
       }
 
@@ -327,7 +405,7 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
             </a>
           </Button>
         </div>
-        {props.pilot && (
+        {props.pilot && !isInspection && (
           <TransportationPanel
             shop={shops?.find((s) => s.id === selectedShopIds[0]) ?? null}
           />
@@ -340,24 +418,45 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
     return (
       <div className={`rounded-xl border border-border bg-card p-4 space-y-3 ${props.className || ""}`}>
         <div>
-          <p className="font-semibold text-sm">Send this assessment to a shop</p>
+          <p className="font-semibold text-sm">
+            {isInspection
+              ? "Have a mobile inspector look at it"
+              : "Send this assessment to a shop"}
+          </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Pick up to {MAX_PILOT_SHOPS} shops in the order you prefer. Your package goes to
-            one shop at a time — if the first shop passes or does not respond by the end of
-            the next business day, it moves to your next choice. Your name and contact
-            details are never included.
+            {isInspection ? (
+              <>
+                Pick up to {MAX_PILOT_SHOPS} mobile inspectors in the order you
+                prefer. Your request goes to one inspector at a time — if the
+                first one passes or does not respond by the end of the next
+                business day, it moves to your next choice. The fee shown is
+                that inspector&rsquo;s own fee, paid to the inspector.
+              </>
+            ) : (
+              <>
+                Pick up to {MAX_PILOT_SHOPS} shops in the order you prefer. Your package goes to
+                one shop at a time — if the first shop passes or does not respond by the end of
+                the next business day, it moves to your next choice. Your name and contact
+                details are never included.
+              </>
+            )}
           </p>
         </div>
 
         {shops === null ? (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading shops…
+            <Loader2 className="h-4 w-4 animate-spin" />{" "}
+            {isInspection ? "Loading inspectors…" : "Loading shops…"}
           </p>
         ) : shops.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             {shopsError
-              ? "The shop directory could not be loaded right now. Please try again later."
-              : "No participating shops are available to send to yet. Check back soon — pilot shops are being added."}
+              ? isInspection
+                ? "The inspector directory could not be loaded right now. Please try again later."
+                : "The shop directory could not be loaded right now. Please try again later."
+              : isInspection
+                ? "No mobile inspectors are available to send to yet. Check back soon — pilot inspectors are being added."
+                : "No participating shops are available to send to yet. Check back soon — pilot shops are being added."}
           </p>
         ) : (
           <>
@@ -391,7 +490,27 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
                       </span>
                       <span className="min-w-0">
                         <span className="font-medium block">{shop.name}</span>
-                        <MobilityAttributeChips shop={shop} className="mt-1" />
+                        {isInspection ? (
+                          <span className="mt-1 block space-y-0.5 text-xs text-muted-foreground">
+                            {shop.service_area_label && (
+                              <span className="block">{shop.service_area_label}</span>
+                            )}
+                            {shop.service_radius_miles != null && (
+                              <span className="block">
+                                Travels up to {shop.service_radius_miles} miles
+                              </span>
+                            )}
+                            {shop.inspection_fee != null && (
+                              <span className="block font-medium text-foreground">
+                                Inspection fee: $
+                                {Number(shop.inspection_fee).toLocaleString()} —
+                                this inspector&rsquo;s fee, paid to the inspector
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          <MobilityAttributeChips shop={shop} className="mt-1" />
+                        )}
                       </span>
                       {selected && (
                         <span className="ml-auto shrink-0 text-xs text-muted-foreground">
@@ -408,6 +527,7 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
                 No shops in the list have said they offer pickup and delivery.
               </p>
             )}
+            {!isInspection && (
             <div className="space-y-2 rounded-lg border border-border p-3">
               <label className="flex items-start gap-2 text-sm">
                 <input
@@ -452,9 +572,83 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
                 </>
               )}
             </div>
+            )}
+            {isInspection && (
+              <div className="space-y-3 rounded-lg border border-border p-3">
+                <p className="text-xs text-muted-foreground">
+                  {INSPECTION_PRIVACY_DISCLOSURE}
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block text-xs text-muted-foreground">
+                    Your first name *
+                    <input
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                      autoComplete="given-name"
+                    />
+                  </label>
+                  <label className="block text-xs text-muted-foreground">
+                    Your phone number *
+                    <input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                      autoComplete="tel"
+                    />
+                  </label>
+                </div>
+                <label className="block text-xs text-muted-foreground">
+                  Where the car will be — the exact location for the visit *
+                  <input
+                    value={vehicleLocation}
+                    onChange={(e) => setVehicleLocation(e.target.value)}
+                    className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                    placeholder="Street address or a precise description"
+                  />
+                </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block text-xs text-muted-foreground">
+                    What kind of place is it?
+                    <input
+                      value={locationDescriptor}
+                      onChange={(e) => setLocationDescriptor(e.target.value)}
+                      className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                      placeholder="Driveway, street parking, workplace lot…"
+                    />
+                  </label>
+                  <label className="block text-xs text-muted-foreground">
+                    ZIP code for the visit
+                    <input
+                      value={locationZip}
+                      onChange={(e) => setLocationZip(e.target.value)}
+                      className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                      placeholder={props.zipCode || "ZIP"}
+                    />
+                  </label>
+                </div>
+                <label className="block text-xs text-muted-foreground">
+                  When works for you? (preferred times)
+                  <textarea
+                    value={preferredWindows}
+                    onChange={(e) => setPreferredWindows(e.target.value)}
+                    rows={2}
+                    className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                    placeholder="e.g. Weekday mornings, or Saturday after 10"
+                  />
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  Before an inspector accepts, they see only the car, your
+                  concern, the ZIP, the kind of place, and your preferred
+                  times.
+                </p>
+              </div>
+            )}
             <Button
               onClick={handlePilotSend}
-              disabled={loading || selectedShopIds.length === 0}
+              disabled={
+                loading || selectedShopIds.length === 0 || !inspectionDetailsValid
+              }
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
             >
               {loading ? (
@@ -462,7 +656,9 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
               ) : (
                 <Send className="mr-2 h-4 w-4" />
               )}
-              Send to {selectedShopIds.length > 0 ? "first-choice shop" : "a shop"}
+              {isInspection
+                ? `Send to ${selectedShopIds.length > 0 ? "first-choice inspector" : "an inspector"}`
+                : `Send to ${selectedShopIds.length > 0 ? "first-choice shop" : "a shop"}`}
             </Button>
           </>
         )}
@@ -470,9 +666,11 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
         {/* Mobility Brief 1: the transportation panel sits alongside
             the send control — unprefilled until the owner picks a
             shop, then pointed at their first choice. */}
-        <TransportationPanel
-          shop={shops?.find((s) => s.id === selectedShopIds[0]) ?? null}
-        />
+        {!isInspection && (
+          <TransportationPanel
+            shop={shops?.find((s) => s.id === selectedShopIds[0]) ?? null}
+          />
+        )}
       </div>
     );
   }

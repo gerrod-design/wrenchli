@@ -10,6 +10,37 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { TRANSPORT_STATUS_LABELS } from "@/lib/referralTransport";
+import {
+  COMPARISON_VERDICTS,
+  INSPECTION_CHECKLIST_VERSION,
+  INSPECTION_DEPENDENCY_PROMPTS,
+  INSPECTION_ITEM_STATUSES,
+  INSPECTION_LIMITS,
+  INSPECTION_LIMITS_INTRO,
+  INSPECTION_SECTIONS,
+  INSPECTION_SEVERITIES,
+  KNOWN_ISSUE_MARKS,
+  KNOWN_ISSUES_EMPTY_STATEMENT,
+  NOT_INSPECTED_REASONS,
+  ONSITE_ELIGIBLE_JOBS,
+  ONSITE_ELIGIBLE_RULE,
+  deriveSectionSeverity,
+  inspectionItemLabel,
+  inspectionSection,
+  knownIssuesHeader,
+  notInspectedEntries,
+  safetyGateTriggers,
+  type ComparisonVerdict,
+  type ComparisonVerdictEntry,
+  type InspectionFinding,
+  type InspectionItemResult,
+  type InspectionItemStatus,
+  type InspectionSeverity,
+  type KnownIssueMark,
+  type KnownIssueResult,
+  type NotInspectedReason,
+  type SuspectedCause,
+} from "@/config/inspection";
 
 interface ReferralData {
   id: string;
@@ -47,7 +78,64 @@ interface ReferralData {
   // shop_referrals hop (if any) and that shop's name.
   referral_count?: number;
   active_referral?: ActiveReferral | null;
-  shop?: { id: string; name: string; offers_pickup_delivery?: boolean } | null;
+  shop?: {
+    id: string;
+    name: string;
+    offers_pickup_delivery?: boolean;
+    provider_kind?: string | null;
+    service_area_label?: string | null;
+    service_radius_miles?: number | null;
+    inspection_fee?: number | null;
+  } | null;
+  // Mobility Brief 2: present only for inspection referrals.
+  // `inspection` carries pre-accept-safe context only;
+  // `visit_minimum` is non-null ONLY after acceptance and carries
+  // exactly the three approved items.
+  inspection?: {
+    location_zip: string | null;
+    location_descriptor: string | null;
+    preferred_windows: string | null;
+    // Checklist v3: the chain's known-issues block (job-pack
+    // data; the inspector's marks ride on the same objects once
+    // filed) and whether stage-1 findings are on file.
+    known_issues?: KnownIssueResult[] | null;
+    findings_filed?: boolean;
+  } | null;
+  // Checklist v3, section 6: the pre-assessment comparison
+  // block. NULL while sealed — the server serves it only after
+  // the stage-1 findings are filed, and never with likelihoods.
+  pre_assessment?: {
+    run_id: string;
+    run_at: string;
+    causes: SuspectedCause[];
+  } | null;
+  visit_minimum?: {
+    consumer_first_name: string;
+    consumer_phone: string;
+    vehicle_location_text: string;
+    revealed_at: string | null;
+  } | null;
+  inspection_report?: InspectionReport | null;
+}
+
+interface InspectionReport {
+  id: string;
+  referral_id: string;
+  checklist_version: string;
+  findings: InspectionFinding[];
+  summary: string;
+  safe_to_drive: boolean;
+  recommended_next_step: string | null;
+  photo_urls: string[] | null;
+  onsite_eligible: boolean;
+  onsite_performed: boolean;
+  onsite_did: string | null;
+  onsite_cost: number | null;
+  filed_at: string;
+  // Checklist v3: when the stage-1 findings were filed, and the
+  // comparison verdicts with likelihoods attached as issued.
+  findings_filed_at?: string | null;
+  comparison_verdicts?: ComparisonVerdictEntry[] | null;
 }
 
 interface ActiveReferral {
@@ -65,6 +153,7 @@ interface ActiveReferral {
   outcome_transport_cost: number | null;
   transport_status: string | null;
   transport_charge_stated: number | null;
+  referral_kind?: string;
   outcome_reported_at: string | null;
   outcome_reported_by: string | null;
   completion_confirmed_by: string | null;
@@ -97,6 +186,136 @@ export default function ReferralPackage() {
   // Brief 3 transport management (after acceptance)
   const [transportStatus, setTransportStatus] = useState("arranged");
   const [transportCharge, setTransportCharge] = useState("");
+  // Mobility Brief 2 / checklist v3: the structured inspection
+  // report form. Per-item results against the 137 general items;
+  // a section's grade is derived from its worst item. The form
+  // works in the checklist's order: general checklist, then the
+  // vehicle-specific known-issues block, then — only after the
+  // findings are filed and the server unseals it — the
+  // pre-assessment comparison block.
+  const [itemById, setItemById] = useState<
+    Record<
+      string,
+      {
+        status: InspectionItemStatus;
+        severity: InspectionSeverity;
+        measurement: string;
+        note: string;
+        reason: NotInspectedReason | "";
+      }
+    >
+  >({});
+  const [sectionNote, setSectionNote] = useState<Record<string, string>>({});
+  const [knownIssueById, setKnownIssueById] = useState<
+    Record<string, { mark: KnownIssueMark | ""; note: string }>
+  >({});
+  const [verdictByCause, setVerdictByCause] = useState<
+    Record<string, { verdict: ComparisonVerdict | ""; note: string; basis: string }>
+  >({});
+  const [safeDriveReason, setSafeDriveReason] = useState("");
+  const [stageBusy, setStageBusy] = useState(false);
+  const [reportSummary, setReportSummary] = useState("");
+  const [reportSafeToDrive, setReportSafeToDrive] = useState<"" | "yes" | "no">("");
+  const [reportNextStep, setReportNextStep] = useState("");
+  const [reportPhotoUrls, setReportPhotoUrls] = useState("");
+  const [onsiteJobKey, setOnsiteJobKey] = useState("");
+  const [onsitePerformed, setOnsitePerformed] = useState(false);
+  const [onsiteDid, setOnsiteDid] = useState("");
+  const [onsiteCost, setOnsiteCost] = useState("");
+
+  // --- Checklist v3 form model --------------------------------
+  const servedKnownIssues: KnownIssueResult[] =
+    data?.inspection?.known_issues ?? [];
+  const comparisonCauses: SuspectedCause[] =
+    data?.pre_assessment?.causes ?? [];
+
+  const itemState = (itemId: string) =>
+    itemById[itemId] ?? {
+      status: "checked_ok" as InspectionItemStatus,
+      severity: "needs_attention" as InspectionSeverity,
+      measurement: "",
+      note: "",
+      reason: "" as NotInspectedReason | "",
+    };
+
+  const setItemState = (
+    itemId: string,
+    patch: Partial<ReturnType<typeof itemState>>,
+  ) =>
+    setItemById((prev) => ({
+      ...prev,
+      [itemId]: { ...itemState(itemId), ...patch },
+    }));
+
+  const buildFindings = (): InspectionFinding[] =>
+    INSPECTION_SECTIONS.map((section) => {
+      const items: InspectionItemResult[] = section.items.map((def) => {
+        const st = itemState(def.id);
+        const result: InspectionItemResult = { item: def.id, status: st.status };
+        if (st.status === "concern") result.severity = st.severity;
+        if (st.measurement.trim()) result.measurement = st.measurement.trim();
+        if (st.note.trim()) result.note = st.note.trim();
+        if (st.status === "not_inspected" && st.reason) {
+          result.notInspectedReason = st.reason;
+        }
+        return result;
+      });
+      return {
+        system: section.key,
+        severity: deriveSectionSeverity(section, items),
+        note: (sectionNote[section.key] ?? "").trim(),
+        items,
+      };
+    });
+
+  const knownIssueState = (check: KnownIssueResult) =>
+    knownIssueById[check.id] ?? {
+      mark: (check.mark ?? "") as KnownIssueMark | "",
+      note: check.evidenceNote ?? "",
+    };
+
+  const buildKnownIssueResults = (): KnownIssueResult[] =>
+    servedKnownIssues.map((check) => {
+      const st = knownIssueState(check);
+      return {
+        ...check,
+        mark: st.mark || undefined,
+        evidenceNote: st.note.trim() || undefined,
+      };
+    });
+
+  const knownIssuesValid = () =>
+    servedKnownIssues.length === 0 ||
+    buildKnownIssueResults().every(
+      (r) => r.mark != null && (r.evidenceNote ?? "").trim() !== "",
+    );
+
+  const buildVerdicts = (): ComparisonVerdictEntry[] =>
+    comparisonCauses.map((cause) => {
+      const st = verdictByCause[cause.id];
+      return {
+        causeId: cause.id,
+        name: cause.name,
+        verdict: (st?.verdict || "could_not_check") as ComparisonVerdict,
+        evidenceNote: (st?.note ?? "").trim(),
+        ...(st?.basis.trim() ? { basis: st.basis.trim() } : {}),
+      };
+    });
+
+  const verdictsValid = () =>
+    comparisonCauses.length === 0 ||
+    comparisonCauses.every((cause) => {
+      const st = verdictByCause[cause.id];
+      return st != null && st.verdict !== "" && st.note.trim() !== "";
+    });
+
+  // Whole-car rule 1, live: a safety-concern grade on a gated
+  // system (or an active fuel leak / cabin fumes) plus "safe to
+  // drive: yes" requires the inspector's written reason.
+  const liveGateTriggers =
+    reportSafeToDrive === "yes"
+      ? safetyGateTriggers(buildFindings(), true)
+      : [];
 
   // Keep the transport controls in sync with the addressed hop
   // whenever the package (re)loads.
@@ -290,6 +509,153 @@ export default function ReferralPackage() {
     }
   };
 
+  // Checklist v3, stage 1: file the general + known-issues
+  // findings. The staging row this creates is what unseals the
+  // pre-assessment comparison block — the server serves the
+  // suspected causes only after this succeeds.
+  const handleFileFindings = async () => {
+    if (!token) return;
+    if (!knownIssuesValid()) {
+      toast.error(
+        "Every vehicle-specific check needs a mark and an evidence note (or the reason it could not be checked)."
+      );
+      return;
+    }
+    setStageBusy(true);
+    try {
+      const { data: result, error: err } = await supabase.rpc(
+        "file_inspection_findings" as any,
+        {
+          p_token: token,
+          p_checklist_version: INSPECTION_CHECKLIST_VERSION,
+          p_findings: buildFindings(),
+          p_known_issues:
+            servedKnownIssues.length > 0 ? buildKnownIssueResults() : null,
+        } as any
+      );
+      if (err) throw err;
+      const r = result as any;
+      if (!r?.ok) {
+        toast.error(
+          r?.reason === "outcome_window_closed"
+            ? "The report window for this inspection has closed."
+            : r?.reason === "known_issues_incomplete"
+              ? "Every vehicle-specific check needs a mark and an evidence note."
+              : "The findings could not be filed."
+        );
+        return;
+      }
+      toast.success(
+        "Findings filed. If a pre-assessment was made for this car, its comparison block is now open below."
+      );
+      const refreshed = await fetchPackage();
+      if (refreshed) setData(refreshed);
+    } catch (e) {
+      console.error("Inspection findings submit error:", e);
+      toast.error("Failed to file the findings.");
+    } finally {
+      setStageBusy(false);
+    }
+  };
+
+  const handleSubmitInspectionReport = async () => {
+    if (!token) return;
+    if (!reportSummary.trim()) {
+      toast.error("Please add an overall summary.");
+      return;
+    }
+    if (reportSafeToDrive === "") {
+      toast.error("Please say whether the vehicle is safe to drive.");
+      return;
+    }
+    if (!knownIssuesValid()) {
+      toast.error(
+        "Every vehicle-specific check needs a mark and an evidence note (or the reason it could not be checked)."
+      );
+      return;
+    }
+    if (data?.inspection?.findings_filed && !verdictsValid()) {
+      toast.error(
+        "Every suspected cause in the comparison block needs a verdict and an evidence note before the report can be filed."
+      );
+      return;
+    }
+    if (liveGateTriggers.length > 0 && !safeDriveReason.trim()) {
+      toast.error(
+        "A safety concern was graded, so \"safe to drive: yes\" needs your written reason."
+      );
+      return;
+    }
+    const cost = onsiteCost.trim() ? Number(onsiteCost) : null;
+    if (cost != null && (Number.isNaN(cost) || cost < 0)) {
+      toast.error("Please enter a valid onsite cost, or leave it blank.");
+      return;
+    }
+    const findings = buildFindings();
+    // Whole-car rule 1: the written safe-to-drive reason joins
+    // the owner's summary, in the open — never buried in a note.
+    const summary =
+      liveGateTriggers.length > 0
+        ? `${reportSummary.trim()}\n\nSafe to drive, because: ${safeDriveReason.trim()}`
+        : reportSummary.trim();
+    const onsiteJob = ONSITE_ELIGIBLE_JOBS.find((j) => j.key === onsiteJobKey);
+    setActionBusy(true);
+    try {
+      const { data: result, error: err } = await supabase.rpc(
+        "submit_inspection_report" as any,
+        {
+          p_token: token,
+          p_checklist_version: INSPECTION_CHECKLIST_VERSION,
+          p_findings: findings,
+          p_summary: summary,
+          p_safe_to_drive: reportSafeToDrive === "yes",
+          p_recommended_next_step: reportNextStep.trim() || null,
+          p_photo_urls: reportPhotoUrls
+            .split(/\n|,/)
+            .map((u) => u.trim())
+            .filter(Boolean),
+          p_onsite_eligible: Boolean(onsiteJob),
+          p_onsite_performed: onsitePerformed,
+          p_onsite_did:
+            [onsiteJob?.label, onsiteDid.trim()].filter(Boolean).join(" — ") ||
+            null,
+          p_onsite_cost: cost,
+          p_known_issues:
+            servedKnownIssues.length > 0 ? buildKnownIssueResults() : null,
+          p_comparison_verdicts:
+            comparisonCauses.length > 0 ? buildVerdicts() : null,
+        } as any
+      );
+      if (err) throw err;
+      const r = result as any;
+      if (!r?.ok) {
+        toast.error(
+          r?.reason === "outcome_window_closed"
+            ? "The report window for this inspection has closed."
+            : r?.reason === "comparison_required" ||
+                r?.reason === "comparison_requires_findings_first"
+              ? "File your findings first — the comparison block opens after that, and its verdicts are part of the report."
+              : r?.reason === "comparison_incomplete"
+                ? "Every suspected cause needs exactly one verdict with an evidence note."
+                : r?.reason === "known_issues_incomplete"
+                  ? "Every vehicle-specific check needs a mark and an evidence note."
+                  : "This inspection is not awaiting a report."
+        );
+        return;
+      }
+      toast.success(
+        "Inspection report filed. The vehicle owner will be asked to confirm the visit."
+      );
+      const refreshed = await fetchPackage();
+      if (refreshed) setData(refreshed);
+    } catch (e) {
+      console.error("Inspection report submit error:", e);
+      toast.error("Failed to submit the inspection report.");
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
   const handleDownloadPdf = async () => {
     if (!data) return;
     setPdfLoading(true);
@@ -461,6 +827,8 @@ export default function ReferralPackage() {
   }
 
   const vehicleStr = [data.vehicle_year, data.vehicle_make, data.vehicle_model, data.vehicle_trim].filter(Boolean).join(" ");
+  const isInspection =
+    data.active_referral?.referral_kind === "inspection" || data.inspection != null;
   const details = data.cost_estimate_details || {};
   const transportLabel = data.active_referral?.transport_status
     ? TRANSPORT_STATUS_LABELS[
@@ -483,7 +851,11 @@ export default function ReferralPackage() {
             <div>
               <div className="flex items-center gap-2 text-primary-foreground/60 text-sm mb-2">
                 <Shield className="h-4 w-4" />
-                <span>Wrenchli Shop Referral Package</span>
+                <span>
+                  {isInspection
+                    ? "Wrenchli Mobile Inspection Request"
+                    : "Wrenchli Shop Referral Package"}
+                </span>
               </div>
               <h1 className="font-heading text-2xl md:text-3xl font-bold">{data.diagnosis_title}</h1>
               {vehicleStr && (
@@ -552,6 +924,56 @@ export default function ReferralPackage() {
               <p className="text-sm text-muted-foreground">
                 This package was sent to <span className="font-semibold text-foreground">{data.shop.name}</span>.
               </p>
+            )}
+            {isInspection && data.inspection && (
+              <div className="rounded-lg border border-border bg-background p-4 space-y-2">
+                <h3 className="font-heading text-base font-bold">
+                  Inspection visit
+                </h3>
+                <dl className="space-y-1 text-sm">
+                  {data.inspection.location_zip && (
+                    <div className="flex gap-2">
+                      <dt className="text-muted-foreground">Area (ZIP)</dt>
+                      <dd className="font-medium">{data.inspection.location_zip}</dd>
+                    </div>
+                  )}
+                  {data.inspection.location_descriptor && (
+                    <div className="flex gap-2">
+                      <dt className="text-muted-foreground">Where the car sits</dt>
+                      <dd className="font-medium">{data.inspection.location_descriptor}</dd>
+                    </div>
+                  )}
+                  {data.inspection.preferred_windows && (
+                    <div className="flex gap-2">
+                      <dt className="text-muted-foreground">Preferred times</dt>
+                      <dd className="font-medium">{data.inspection.preferred_windows}</dd>
+                    </div>
+                  )}
+                  {data.shop?.inspection_fee != null && (
+                    <div className="flex gap-2">
+                      <dt className="text-muted-foreground">Your inspection fee</dt>
+                      <dd className="font-medium">
+                        ${Number(data.shop.inspection_fee).toLocaleString()} — paid
+                        to you by the driver
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+                {data.visit_minimum ? (
+                  <div className="rounded-md border border-accent/30 bg-accent/5 p-3 space-y-1 text-sm">
+                    <p className="font-medium">For the visit (shared when you accepted)</p>
+                    <p>First name: {data.visit_minimum.consumer_first_name}</p>
+                    <p>Phone: {data.visit_minimum.consumer_phone}</p>
+                    <p>Car location: {data.visit_minimum.vehicle_location_text}</p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    The driver&rsquo;s first name, phone number, and the
+                    car&rsquo;s exact location are shared only when you accept,
+                    so you can make the visit.
+                  </p>
+                )}
+              </div>
             )}
             {/* Brief 3: the pickup/delivery request is visible BEFORE
                 the shop decides, so a shop that cannot arrange a tow
@@ -633,7 +1055,11 @@ export default function ReferralPackage() {
             {(data.active_referral.status === "sent" || data.active_referral.status === "viewed") && (
               <>
                 <div>
-                  <h2 className="font-heading text-lg font-bold">Can your shop take this repair?</h2>
+                  <h2 className="font-heading text-lg font-bold">
+                    {isInspection
+                      ? "Can you take this inspection?"
+                      : "Can your shop take this repair?"}
+                  </h2>
                   <p className="text-sm text-muted-foreground mt-1">
                     Accept to let the owner know you will handle it, or pass and the owner
                     will be notified — no penalty either way.
@@ -649,19 +1075,19 @@ export default function ReferralPackage() {
                     className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
                   >
                     {actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
-                    Accept this repair
+                    {isInspection ? "Accept this inspection" : "Accept this repair"}
                   </Button>
                   <Button
                     onClick={() => void handleRespond(false)}
                     disabled={actionBusy}
                     variant="outline"
                   >
-                    Pass on this repair
+                    {isInspection ? "Pass on this inspection" : "Pass on this repair"}
                   </Button>
                 </div>
               </>
             )}
-            {data.active_referral.status === "accepted" && (
+            {data.active_referral.status === "accepted" && !isInspection && (
               <div className="space-y-4">
                 <div>
                   <h2 className="font-heading text-lg font-bold">You accepted this repair</h2>
@@ -731,6 +1157,513 @@ export default function ReferralPackage() {
                 </div>
               </div>
             )}
+            {data.active_referral.status === "accepted" && isInspection && (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="font-heading text-lg font-bold">You accepted this inspection</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    After the visit, file the inspection report below against
+                    Wrenchli&rsquo;s checklist. Work it in the
+                    checklist&rsquo;s order: the general checklist first, then
+                    the checks built for this car, then the comparison block,
+                    which opens once your findings are filed. The inspection
+                    counts as completed once the vehicle owner confirms the
+                    visit happened.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {INSPECTION_SECTIONS.map((section) => {
+                    const derived = deriveSectionSeverity(
+                      section,
+                      section.items.map((def) => {
+                        const st = itemState(def.id);
+                        return {
+                          item: def.id,
+                          status: st.status,
+                          ...(st.status === "concern"
+                            ? { severity: st.severity }
+                            : {}),
+                          ...(st.status === "not_inspected" && st.reason
+                            ? { notInspectedReason: st.reason }
+                            : {}),
+                        };
+                      }),
+                    );
+                    const prompts = INSPECTION_DEPENDENCY_PROMPTS[section.key] ?? [];
+                    return (
+                      <div
+                        key={section.key}
+                        className="rounded-md border border-border p-3 space-y-2"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-medium flex-1">
+                            {section.label}
+                            {section.approxMinutes != null && (
+                              <span className="text-xs text-muted-foreground">
+                                {" "}· about {section.approxMinutes} min
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-xs font-medium rounded-full border border-border px-2 py-0.5">
+                            Grade:{" "}
+                            {INSPECTION_SEVERITIES.find((s) => s.value === derived)
+                              ?.label ?? derived}
+                          </span>
+                        </div>
+                        {section.items.map((def, idx) => {
+                          const st = itemState(def.id);
+                          return (
+                            <div
+                              key={def.id}
+                              className="border-t border-border/60 pt-2 space-y-1.5"
+                            >
+                              <p className="text-sm">
+                                {idx + 1}. {def.text}
+                              </p>
+                              {def.measurement && (
+                                <p className="text-xs text-muted-foreground">
+                                  Record: {def.measurement}
+                                </p>
+                              )}
+                              {def.standingNotInspected && (
+                                <p className="text-xs text-muted-foreground">
+                                  {def.standingNotInspected}
+                                </p>
+                              )}
+                              <div className="flex flex-wrap gap-2">
+                                <select
+                                  aria-label={`${def.id} result`}
+                                  value={st.status}
+                                  onChange={(e) =>
+                                    setItemState(def.id, {
+                                      status: e.target
+                                        .value as InspectionItemStatus,
+                                    })
+                                  }
+                                  className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                                >
+                                  {INSPECTION_ITEM_STATUSES.map((s) => (
+                                    <option key={s.value} value={s.value}>
+                                      {s.label}
+                                    </option>
+                                  ))}
+                                </select>
+                                {st.status === "concern" && (
+                                  <select
+                                    aria-label={`${def.id} severity`}
+                                    value={st.severity}
+                                    onChange={(e) =>
+                                      setItemState(def.id, {
+                                        severity: e.target
+                                          .value as InspectionSeverity,
+                                      })
+                                    }
+                                    className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                                  >
+                                    {INSPECTION_SEVERITIES.filter(
+                                      (s) => s.value !== "ok",
+                                    ).map((s) => (
+                                      <option key={s.value} value={s.value}>
+                                        {s.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                )}
+                                {st.status === "not_inspected" && (
+                                  <select
+                                    aria-label={`${def.id} reason`}
+                                    value={st.reason}
+                                    onChange={(e) =>
+                                      setItemState(def.id, {
+                                        reason: e.target
+                                          .value as NotInspectedReason | "",
+                                      })
+                                    }
+                                    className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                                  >
+                                    <option value="">Why not inspected…</option>
+                                    {NOT_INSPECTED_REASONS.map((r) => (
+                                      <option key={r.value} value={r.value}>
+                                        {r.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                )}
+                                {def.measurement && (
+                                  <input
+                                    aria-label={`${def.id} measurement`}
+                                    value={st.measurement}
+                                    onChange={(e) =>
+                                      setItemState(def.id, {
+                                        measurement: e.target.value,
+                                      })
+                                    }
+                                    className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                                    placeholder={def.measurement}
+                                  />
+                                )}
+                              </div>
+                              <input
+                                aria-label={`${def.id} note`}
+                                value={st.note}
+                                onChange={(e) =>
+                                  setItemState(def.id, { note: e.target.value })
+                                }
+                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                                placeholder="Note — what you saw, measured, or heard (optional)"
+                              />
+                            </div>
+                          );
+                        })}
+                        {prompts.length > 0 && (
+                          <div className="rounded bg-muted/40 p-2 space-y-1">
+                            <p className="text-xs font-medium">
+                              Before you move on — did you look there?
+                            </p>
+                            <ul className="list-disc pl-4 text-xs text-muted-foreground space-y-0.5">
+                              {prompts.map((p, i) => (
+                                <li key={i}>{p}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        <input
+                          aria-label={`${section.label} note`}
+                          value={sectionNote[section.key] ?? ""}
+                          onChange={(e) =>
+                            setSectionNote((prev) => ({
+                              ...prev,
+                              [section.key]: e.target.value,
+                            }))
+                          }
+                          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                          placeholder={`${section.label} note (optional)`}
+                        />
+                      </div>
+                    );
+                  })}
+                  <div className="rounded-md border border-border p-3 space-y-3">
+                    <p className="text-sm font-medium">
+                      Vehicle-specific checks for this car
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {knownIssuesHeader(servedKnownIssues)}
+                    </p>
+                    {servedKnownIssues.length === 0 ? (
+                      <p className="text-sm">{KNOWN_ISSUES_EMPTY_STATEMENT}</p>
+                    ) : (
+                      servedKnownIssues.map((check) => {
+                        const st = knownIssueState(check);
+                        return (
+                          <div
+                            key={check.id}
+                            className="border-t border-border/60 pt-2 space-y-1.5"
+                          >
+                            <p className="text-sm font-medium">
+                              {check.title}{" "}
+                              <span className="text-xs font-normal text-muted-foreground">
+                                ({check.kind === "recall" ? "Recall" : "Pattern check"})
+                              </span>
+                            </p>
+                            <p className="text-sm">{check.pattern}</p>
+                            {check.whereToLook && (
+                              <p className="text-xs text-muted-foreground">
+                                Where to look: {check.whereToLook}
+                              </p>
+                            )}
+                            {check.evidenceSigns && (
+                              <p className="text-xs text-muted-foreground">
+                                What counts as evidence: {check.evidenceSigns}
+                              </p>
+                            )}
+                            {check.canCannot && (
+                              <p className="text-xs text-muted-foreground">
+                                {check.canCannot}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              Source: {check.source}
+                            </p>
+                            <select
+                              aria-label={`${check.id} mark`}
+                              value={st.mark}
+                              onChange={(e) =>
+                                setKnownIssueById((prev) => ({
+                                  ...prev,
+                                  [check.id]: {
+                                    mark: e.target.value as KnownIssueMark | "",
+                                    note: st.note,
+                                  },
+                                }))
+                              }
+                              className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                            >
+                              <option value="">Mark…</option>
+                              {KNOWN_ISSUE_MARKS.map((m) => (
+                                <option key={m.value} value={m.value}>
+                                  {m.label}
+                                </option>
+                              ))}
+                            </select>
+                            <input
+                              aria-label={`${check.id} evidence`}
+                              value={st.note}
+                              onChange={(e) =>
+                                setKnownIssueById((prev) => ({
+                                  ...prev,
+                                  [check.id]: { mark: st.mark, note: e.target.value },
+                                }))
+                              }
+                              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                              placeholder="Evidence found, or the reason it could not be checked"
+                            />
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                  <div className="rounded-md border border-border p-3 space-y-3">
+                    {data.pre_assessment ? (
+                      <>
+                        <p className="text-sm font-medium">
+                          Pre-assessment comparison
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Your findings are filed, so this block is open. Mark
+                          each suspected cause against the evidence you already
+                          gathered — a cause you gathered no evidence on is
+                          honestly &ldquo;could not check,&rdquo; never a guess.
+                          The pre-assessment&rsquo;s likelihood figures join the
+                          record only after your verdicts are filed.
+                        </p>
+                        {comparisonCauses.length === 0 ? (
+                          <p className="text-sm">
+                            The pre-assessment for this car named no suspected
+                            causes, so there is nothing to mark.
+                          </p>
+                        ) : (
+                          comparisonCauses.map((cause) => {
+                            const st = verdictByCause[cause.id] ?? {
+                              verdict: "" as ComparisonVerdict | "",
+                              note: "",
+                              basis: "",
+                            };
+                            return (
+                              <div
+                                key={cause.id}
+                                className="border-t border-border/60 pt-2 space-y-1.5"
+                              >
+                                <p className="text-sm font-medium">{cause.name}</p>
+                                <div className="flex flex-wrap gap-2">
+                                  <select
+                                    aria-label={`${cause.id} verdict`}
+                                    value={st.verdict}
+                                    onChange={(e) =>
+                                      setVerdictByCause((prev) => ({
+                                        ...prev,
+                                        [cause.id]: {
+                                          ...st,
+                                          verdict: e.target
+                                            .value as ComparisonVerdict | "",
+                                        },
+                                      }))
+                                    }
+                                    className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                                  >
+                                    <option value="">Verdict…</option>
+                                    {COMPARISON_VERDICTS.map((v) => (
+                                      <option key={v.value} value={v.value}>
+                                        {v.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <input
+                                    aria-label={`${cause.id} basis`}
+                                    value={st.basis}
+                                    onChange={(e) =>
+                                      setVerdictByCause((prev) => ({
+                                        ...prev,
+                                        [cause.id]: { ...st, basis: e.target.value },
+                                      }))
+                                    }
+                                    className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                                    placeholder="Rests on — checklist section or check (optional)"
+                                  />
+                                </div>
+                                <input
+                                  aria-label={`${cause.id} evidence`}
+                                  value={st.note}
+                                  onChange={(e) =>
+                                    setVerdictByCause((prev) => ({
+                                      ...prev,
+                                      [cause.id]: { ...st, note: e.target.value },
+                                    }))
+                                  }
+                                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                                  placeholder="Evidence note — what you saw, measured, scanned, or where you looked"
+                                />
+                              </div>
+                            );
+                          })
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm font-medium">
+                          Pre-assessment comparison — sealed
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {data.inspection?.findings_filed
+                            ? "Your findings are filed. The pre-assessment for this car named no suspected causes, so there is nothing to mark."
+                            : "This block stays sealed until you file your findings, so the pre-assessment's prediction cannot steer what you find. File the findings and it opens."}
+                        </p>
+                      </>
+                    )}
+                    <Button
+                      onClick={() => void handleFileFindings()}
+                      disabled={stageBusy || actionBusy}
+                      variant="outline"
+                      className="font-semibold"
+                    >
+                      {stageBusy ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <FileText className="mr-2 h-4 w-4" />
+                      )}
+                      {data.inspection?.findings_filed
+                        ? "Re-file findings (corrections)"
+                        : "File findings"}
+                    </Button>
+                  </div>
+                  <div>
+                    <label htmlFor="report-summary" className="block text-sm font-medium mb-1">Overall summary</label>
+                    <textarea
+                      id="report-summary"
+                      value={reportSummary}
+                      onChange={(e) => setReportSummary(e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[70px]"
+                      placeholder="e.g. Front brakes worn to metal; the rest of the car is sound"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="report-safe" className="block text-sm font-medium mb-1">Is the vehicle safe to drive?</label>
+                    <select
+                      id="report-safe"
+                      value={reportSafeToDrive}
+                      onChange={(e) => setReportSafeToDrive(e.target.value as "" | "yes" | "no")}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Choose…</option>
+                      <option value="yes">Yes, safe to drive</option>
+                      <option value="no">No, not safe to drive</option>
+                    </select>
+                  </div>
+                  {liveGateTriggers.length > 0 && (
+                    <div>
+                      <label htmlFor="report-safe-reason" className="block text-sm font-medium mb-1">
+                        Why is this car safe to drive anyway? (required — a safety
+                        concern was graded; this reason appears in the
+                        owner&rsquo;s summary)
+                      </label>
+                      <textarea
+                        id="report-safe-reason"
+                        value={safeDriveReason}
+                        onChange={(e) => setSafeDriveReason(e.target.value)}
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[50px]"
+                        placeholder="In your own words — e.g. the concern is the rear pads only; the front brakes measure 8mm and the pedal is firm"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <label htmlFor="report-next-step" className="block text-sm font-medium mb-1">Recommended next step</label>
+                    <textarea
+                      id="report-next-step"
+                      value={reportNextStep}
+                      onChange={(e) => setReportNextStep(e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[50px]"
+                      placeholder="e.g. Send to a repair shop for front pads and rotors"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="report-photos" className="block text-sm font-medium mb-1">Photo links (optional, one per line)</label>
+                    <textarea
+                      id="report-photos"
+                      value={reportPhotoUrls}
+                      onChange={(e) => setReportPhotoUrls(e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[50px]"
+                      placeholder="https://…"
+                    />
+                  </div>
+                  <div className="rounded-md border border-border p-3 space-y-3">
+                    <p className="text-sm font-medium">Onsite repair</p>
+                    <p className="text-xs text-muted-foreground">{ONSITE_ELIGIBLE_RULE}</p>
+                    <div>
+                      <label htmlFor="onsite-job" className="block text-sm font-medium mb-1">
+                        Was a job on the approved onsite-eligible list part of this visit?
+                      </label>
+                      <select
+                        id="onsite-job"
+                        value={onsiteJobKey}
+                        onChange={(e) => setOnsiteJobKey(e.target.value)}
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                      >
+                        <option value="">No onsite-eligible job</option>
+                        {ONSITE_ELIGIBLE_JOBS.map((job) => (
+                          <option key={job.key} value={job.key}>
+                            {job.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {onsiteJobKey && (
+                      <>
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={onsitePerformed}
+                            onChange={(e) => setOnsitePerformed(e.target.checked)}
+                          />
+                          I performed this job on site
+                        </label>
+                        {onsitePerformed && (
+                          <>
+                            <div>
+                              <label htmlFor="onsite-did" className="block text-sm font-medium mb-1">What was done</label>
+                              <textarea
+                                id="onsite-did"
+                                value={onsiteDid}
+                                onChange={(e) => setOnsiteDid(e.target.value)}
+                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[50px]"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="onsite-cost" className="block text-sm font-medium mb-1">What it cost the driver (USD)</label>
+                              <input
+                                id="onsite-cost"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={onsiteCost}
+                                onChange={(e) => setOnsiteCost(e.target.value)}
+                                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </div>
+                  <Button
+                    onClick={() => void handleSubmitInspectionReport()}
+                    disabled={actionBusy}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+                  >
+                    {actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
+                    Submit inspection report
+                  </Button>
+                </div>
+              </div>
+            )}
             {data.active_referral.status === "outcome_reported" && (
               <div className="space-y-2">
                 <h2 className="font-heading text-lg font-bold flex items-center gap-2">
@@ -758,6 +1691,156 @@ export default function ReferralPackage() {
             </p>
           </div>
         ) : null}
+
+        {data.inspection_report && (
+          <div className="rounded-xl border border-border bg-card p-6 space-y-3">
+            <h2 className="font-heading text-lg font-bold flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-accent" /> Inspection report
+            </h2>
+            <p className="text-sm">{data.inspection_report.summary}</p>
+            <dl className="space-y-1 text-sm">
+              <div className="flex gap-2">
+                <dt className="text-muted-foreground">Safe to drive</dt>
+                <dd className="font-medium">
+                  {data.inspection_report.safe_to_drive ? "Yes" : "No"}
+                </dd>
+              </div>
+              {data.inspection_report.recommended_next_step && (
+                <div className="flex gap-2">
+                  <dt className="text-muted-foreground">Next step</dt>
+                  <dd className="font-medium">{data.inspection_report.recommended_next_step}</dd>
+                </div>
+              )}
+              {data.inspection_report.onsite_performed && (
+                <div className="flex gap-2">
+                  <dt className="text-muted-foreground">Done on site</dt>
+                  <dd className="font-medium">
+                    {data.inspection_report.onsite_did || "Onsite work performed"}
+                    {data.inspection_report.onsite_cost != null &&
+                      ` — $${Number(data.inspection_report.onsite_cost).toLocaleString()}`}
+                  </dd>
+                </div>
+              )}
+            </dl>
+            {Array.isArray(data.inspection_report.findings) &&
+              data.inspection_report.findings.length > 0 && (
+                <ul className="space-y-2 text-sm">
+                  {data.inspection_report.findings.map((f, i) => (
+                    <li key={i}>
+                      <span className="font-medium">
+                        {inspectionSection(f.system)?.label ?? f.system}
+                      </span>
+                      {": "}
+                      {INSPECTION_SEVERITIES.find((sev) => sev.value === f.severity)?.label ?? f.severity}
+                      {f.note ? ` — ${f.note}` : ""}
+                      {Array.isArray(f.items) && f.items.length > 0 && (
+                        <ul className="mt-1 space-y-0.5 pl-4 text-xs text-muted-foreground">
+                          {f.items
+                            .filter(
+                              (r) =>
+                                r.status !== "checked_ok" ||
+                                r.measurement != null ||
+                                (r.note ?? "") !== "",
+                            )
+                            .map((r, j) => (
+                              <li key={j}>
+                                {inspectionItemLabel(r.item) ?? r.item}
+                                {" — "}
+                                {r.status === "not_inspected"
+                                  ? `Not inspected (${
+                                      NOT_INSPECTED_REASONS.find(
+                                        (x) => x.value === r.notInspectedReason,
+                                      )?.label ?? "no reason given"
+                                    })`
+                                  : r.status === "concern"
+                                    ? `Concern: ${
+                                        INSPECTION_SEVERITIES.find(
+                                          (s) => s.value === r.severity,
+                                        )?.label ?? r.severity ?? ""
+                                      }`
+                                    : "Checked, fine"}
+                                {r.measurement ? ` · ${r.measurement}` : ""}
+                                {r.note ? ` · ${r.note}` : ""}
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            {notInspectedEntries(data.inspection_report.findings ?? [])
+              .length > 0 && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Not inspected on this visit</p>
+                <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-0.5">
+                  {notInspectedEntries(data.inspection_report.findings ?? []).map(
+                    (entry, i) => (
+                      <li key={i}>
+                        {entry.section}: {entry.item} ({entry.reason})
+                      </li>
+                    ),
+                  )}
+                </ul>
+              </div>
+            )}
+            {servedKnownIssues.some((c) => c.mark != null) && (
+              <div className="space-y-1">
+                <p className="text-sm font-medium">
+                  {knownIssuesHeader(servedKnownIssues)}
+                </p>
+                <ul className="space-y-0.5 text-sm">
+                  {servedKnownIssues.map((check) => (
+                    <li key={check.id}>
+                      <span className="font-medium">{check.title}</span>
+                      {": "}
+                      {check.mark === "no_evidence_found"
+                        ? "No evidence of this problem was found on this visit"
+                        : (KNOWN_ISSUE_MARKS.find((m) => m.value === check.mark)
+                            ?.label ?? check.mark)}
+                      {check.evidenceNote ? ` — ${check.evidenceNote}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {Array.isArray(data.inspection_report.comparison_verdicts) &&
+              data.inspection_report.comparison_verdicts.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">
+                    Pre-assessment comparison — what was suspected, what the
+                    visit found
+                  </p>
+                  <ul className="space-y-0.5 text-sm">
+                    {data.inspection_report.comparison_verdicts.map((v, i) => (
+                      <li key={i}>
+                        <span className="font-medium">{v.name}</span>
+                        {": "}
+                        {COMPARISON_VERDICTS.find((x) => x.value === v.verdict)
+                          ?.label ?? v.verdict}
+                        {v.likelihood != null &&
+                          ` · the pre-assessment rated this ${Math.round(v.likelihood * 100)}% likely`}
+                        {v.evidenceNote ? ` — ${v.evidenceNote}` : ""}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            <div className="space-y-1">
+              <p className="text-sm font-medium">What this inspection cannot tell you</p>
+              <p className="text-xs text-muted-foreground">{INSPECTION_LIMITS_INTRO}</p>
+              <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-0.5">
+                {INSPECTION_LIMITS.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Filed {new Date(data.inspection_report.filed_at).toLocaleDateString()} ·
+              Checklist {data.inspection_report.checklist_version}
+            </p>
+          </div>
+        )}
 
         {/* Vehicle Details */}
         <div className="grid gap-6 md:grid-cols-2">

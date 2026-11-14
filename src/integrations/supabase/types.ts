@@ -1103,6 +1103,171 @@ export type Database = {
           },
         ]
       }
+      inspection_details: {
+        Row: {
+          chain_id: string
+          consumer_first_name: string
+          consumer_phone: string
+          created_at: string
+          id: string
+          known_issues: Json | null
+          location_descriptor: string | null
+          location_zip: string | null
+          owner_user_id: string
+          package_id: string
+          preferred_windows: string | null
+          revealed_at: string | null
+          updated_at: string
+          vehicle_location_text: string
+        }
+        Insert: {
+          chain_id: string
+          consumer_first_name: string
+          consumer_phone: string
+          created_at?: string
+          id?: string
+          known_issues?: Json | null
+          location_descriptor?: string | null
+          location_zip?: string | null
+          owner_user_id: string
+          package_id: string
+          preferred_windows?: string | null
+          revealed_at?: string | null
+          updated_at?: string
+          vehicle_location_text: string
+        }
+        Update: {
+          chain_id?: string
+          consumer_first_name?: string
+          consumer_phone?: string
+          created_at?: string
+          id?: string
+          known_issues?: Json | null
+          location_descriptor?: string | null
+          location_zip?: string | null
+          owner_user_id?: string
+          package_id?: string
+          preferred_windows?: string | null
+          revealed_at?: string | null
+          updated_at?: string
+          vehicle_location_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_details_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "referral_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_findings_staging: {
+        Row: {
+          chain_id: string
+          checklist_version: string
+          created_at: string
+          filed_at: string
+          findings: Json
+          id: string
+          referral_id: string
+        }
+        Insert: {
+          chain_id: string
+          checklist_version: string
+          created_at?: string
+          filed_at?: string
+          findings?: Json
+          id?: string
+          referral_id: string
+        }
+        Update: {
+          chain_id?: string
+          checklist_version?: string
+          created_at?: string
+          filed_at?: string
+          findings?: Json
+          id?: string
+          referral_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_findings_staging_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: true
+            referencedRelation: "shop_referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_reports: {
+        Row: {
+          chain_id: string
+          checklist_version: string
+          comparison_verdicts: Json | null
+          created_at: string
+          filed_at: string
+          findings: Json
+          findings_filed_at: string | null
+          id: string
+          onsite_cost: number | null
+          onsite_did: string | null
+          onsite_eligible: boolean
+          onsite_performed: boolean
+          photo_urls: string[]
+          recommended_next_step: string | null
+          referral_id: string
+          safe_to_drive: boolean
+          summary: string
+        }
+        Insert: {
+          chain_id: string
+          checklist_version: string
+          comparison_verdicts?: Json | null
+          created_at?: string
+          filed_at?: string
+          findings?: Json
+          findings_filed_at?: string | null
+          id?: string
+          onsite_cost?: number | null
+          onsite_did?: string | null
+          onsite_eligible?: boolean
+          onsite_performed?: boolean
+          photo_urls?: string[]
+          recommended_next_step?: string | null
+          referral_id: string
+          safe_to_drive: boolean
+          summary: string
+        }
+        Update: {
+          chain_id?: string
+          checklist_version?: string
+          comparison_verdicts?: Json | null
+          created_at?: string
+          filed_at?: string
+          findings?: Json
+          findings_filed_at?: string | null
+          id?: string
+          onsite_cost?: number | null
+          onsite_did?: string | null
+          onsite_eligible?: boolean
+          onsite_performed?: boolean
+          photo_urls?: string[]
+          recommended_next_step?: string | null
+          referral_id?: string
+          safe_to_drive?: boolean
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_reports_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "shop_referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_alerts: {
         Row: {
           created_at: string
@@ -2236,7 +2401,7 @@ export type Database = {
       }
       service_providers: {
         Row: {
-          address: string
+          address: string | null
           availability: string | null
           booking_url: string | null
           city: string | null
@@ -2246,6 +2411,7 @@ export type Database = {
           dealer_brands: string[] | null
           external_id: string | null
           id: string
+          inspection_fee: number | null
           is_active: boolean | null
           is_dealer: boolean | null
           is_franchise: boolean
@@ -2260,10 +2426,13 @@ export type Database = {
           offers_shuttle: boolean
           phone: string | null
           price_tier: string | null
+          provider_kind: string
           quote_url: string | null
           rating: number | null
           response_time: string | null
           review_count: number | null
+          service_area_label: string | null
+          service_radius_miles: number | null
           specialties: string[] | null
           state: string | null
           updated_at: string
@@ -2271,7 +2440,7 @@ export type Database = {
           zip_code: string
         }
         Insert: {
-          address: string
+          address?: string | null
           availability?: string | null
           booking_url?: string | null
           city?: string | null
@@ -2281,6 +2450,7 @@ export type Database = {
           dealer_brands?: string[] | null
           external_id?: string | null
           id?: string
+          inspection_fee?: number | null
           is_active?: boolean | null
           is_dealer?: boolean | null
           is_franchise?: boolean
@@ -2295,10 +2465,13 @@ export type Database = {
           offers_shuttle?: boolean
           phone?: string | null
           price_tier?: string | null
+          provider_kind?: string
           quote_url?: string | null
           rating?: number | null
           response_time?: string | null
           review_count?: number | null
+          service_area_label?: string | null
+          service_radius_miles?: number | null
           specialties?: string[] | null
           state?: string | null
           updated_at?: string
@@ -2316,6 +2489,7 @@ export type Database = {
           dealer_brands?: string[] | null
           external_id?: string | null
           id?: string
+          inspection_fee?: number | null
           is_active?: boolean | null
           is_dealer?: boolean | null
           is_franchise?: boolean
@@ -2330,10 +2504,13 @@ export type Database = {
           offers_shuttle?: boolean
           phone?: string | null
           price_tier?: string | null
+          provider_kind?: string
           quote_url?: string | null
           rating?: number | null
           response_time?: string | null
           review_count?: number | null
+          service_area_label?: string | null
+          service_radius_miles?: number | null
           specialties?: string[] | null
           state?: string | null
           updated_at?: string
@@ -2664,6 +2841,7 @@ export type Database = {
           owner_user_id: string
           package_id: string
           preference_order: number
+          referral_kind: string
           responded_at: string | null
           sent_at: string
           shop_chain: Json
@@ -2693,6 +2871,7 @@ export type Database = {
           owner_user_id: string
           package_id: string
           preference_order: number
+          referral_kind?: string
           responded_at?: string | null
           sent_at?: string
           shop_chain: Json
@@ -2722,6 +2901,7 @@ export type Database = {
           owner_user_id?: string
           package_id?: string
           preference_order?: number
+          referral_kind?: string
           responded_at?: string | null
           sent_at?: string
           shop_chain?: Json
@@ -3853,6 +4033,15 @@ export type Database = {
       cleanup_edge_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_youtube_cache: { Args: never; Returns: undefined }
+      file_inspection_findings: {
+        Args: {
+          p_checklist_version: string
+          p_findings: Json
+          p_known_issues: Json
+          p_token: string
+        }
+        Returns: Json
+      }
       get_referral_package_by_token: {
         Args: { p_token: string }
         Returns: Json
@@ -3895,6 +4084,24 @@ export type Database = {
       }
       set_referral_transport: {
         Args: { p_charge_stated: number; p_status: string; p_token: string }
+        Returns: Json
+      }
+      submit_inspection_report: {
+        Args: {
+          p_checklist_version: string
+          p_comparison_verdicts: Json
+          p_findings: Json
+          p_known_issues: Json
+          p_onsite_cost: number
+          p_onsite_did: string
+          p_onsite_eligible: boolean
+          p_onsite_performed: boolean
+          p_photo_urls: string[]
+          p_recommended_next_step: string
+          p_safe_to_drive: boolean
+          p_summary: string
+          p_token: string
+        }
         Returns: Json
       }
       stop_referral_chain: {

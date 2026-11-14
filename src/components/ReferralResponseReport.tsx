@@ -6,8 +6,13 @@ import { Clock, Loader2, RefreshCw } from "lucide-react";
 interface ShopResponseRow {
   shop_id: string;
   shop_name: string;
+  // Mobility Brief 2: rows are segmented per shop per kind, and
+  // completions are counted per kind. Inspection completions never
+  // touch the repair totals.
+  referral_kind: string;
   sends: number;
   responses: number;
+  completions: number;
   median_response_minutes: number | null;
   responded_within_window_share: number | null;
   never_responded_share: number | null;
@@ -21,9 +26,21 @@ interface OverallResponseRow {
   never_responded_share: number | null;
 }
 
+// Mobility Brief 2: the same figures segmented by referral kind.
+// A kind with no referrals is absent from by_kind.
+interface KindTotals {
+  sends: number;
+  responses: number;
+  completions: number;
+  median_response_minutes: number | null;
+  responded_within_window_share: number | null;
+  never_responded_share: number | null;
+}
+
 interface ResponseReport {
   shops: ShopResponseRow[];
   overall: OverallResponseRow;
+  by_kind?: Partial<Record<"repair" | "inspection", KindTotals>>;
 }
 
 function formatMinutes(minutes: number | null): string {
@@ -136,11 +153,62 @@ export default function ReferralResponseReport() {
             </div>
           </div>
 
+          {report.by_kind && Object.keys(report.by_kind).length > 0 && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {(
+                [
+                  ["repair", "Repair referrals"],
+                  ["inspection", "Inspection referrals"],
+                ] as const
+              )
+                .filter(([kind]) => report.by_kind![kind])
+                .map(([kind, label]) => {
+                  const k = report.by_kind![kind]!;
+                  return (
+                    <div
+                      key={kind}
+                      className="rounded-lg bg-muted/50 p-4 space-y-2"
+                    >
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider">
+                        {label}
+                      </p>
+                      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                        <span>
+                          Sends: <strong>{k.sends}</strong>
+                        </span>
+                        <span>
+                          Responses: <strong>{k.responses}</strong>
+                        </span>
+                        <span>
+                          Completed: <strong>{k.completions}</strong>
+                        </span>
+                        <span>
+                          Median response:{" "}
+                          <strong>{formatMinutes(k.median_response_minutes)}</strong>
+                        </span>
+                        <span>
+                          In window:{" "}
+                          <strong>{formatShare(k.responded_within_window_share)}</strong>
+                        </span>
+                      </div>
+                      {kind === "inspection" && (
+                        <p className="text-xs text-muted-foreground">
+                          Inspection completions are counted separately from
+                          repairs. They never touch the repair totals, the free
+                          first five, or the founding rate.
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+
           <div className="overflow-x-auto rounded-lg border border-border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-muted/50">
-                  {["Shop", "Sends", "Responses", "Median response", "In window", "Never responded"].map(
+                  {["Shop", "Kind", "Sends", "Responses", "Completed", "Median response", "In window", "Never responded"].map(
                     (col) => (
                       <th
                         key={col}
@@ -154,10 +222,17 @@ export default function ReferralResponseReport() {
               </thead>
               <tbody>
                 {report.shops.map((s) => (
-                  <tr key={s.shop_id} className="border-t border-border hover:bg-muted/30">
+                  <tr
+                    key={`${s.shop_id}-${s.referral_kind}`}
+                    className="border-t border-border hover:bg-muted/30"
+                  >
                     <td className="px-4 py-3 font-medium">{s.shop_name}</td>
+                    <td className="px-4 py-3">
+                      {s.referral_kind === "inspection" ? "Inspection" : "Repair"}
+                    </td>
                     <td className="px-4 py-3">{s.sends}</td>
                     <td className="px-4 py-3">{s.responses}</td>
+                    <td className="px-4 py-3">{s.completions}</td>
                     <td className="px-4 py-3">{formatMinutes(s.median_response_minutes)}</td>
                     <td className="px-4 py-3">{formatShare(s.responded_within_window_share)}</td>
                     <td className="px-4 py-3">{formatShare(s.never_responded_share)}</td>

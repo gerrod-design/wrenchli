@@ -12,6 +12,21 @@ import {
   type MobilityShop,
 } from "@/lib/transportationLinks";
 import {
+  COMPARISON_VERDICTS,
+  INSPECTION_LIMITS,
+  INSPECTION_LIMITS_INTRO,
+  INSPECTION_SEVERITIES,
+  KNOWN_ISSUE_MARKS,
+  NOT_INSPECTED_REASONS,
+  inspectionItemLabel,
+  inspectionSection,
+  knownIssuesHeader,
+  notInspectedEntries,
+  type ComparisonVerdictEntry,
+  type InspectionFinding,
+  type KnownIssueResult,
+} from "@/config/inspection";
+import {
   TRANSPORT_LIABILITY_LINE,
   TRANSPORT_SAFETY_LINE,
   TRANSPORT_STATUS_LABELS,
@@ -37,6 +52,7 @@ interface OwnerReferralRow {
   outcome_transport_cost: number | null;
   transport_status: string | null;
   transport_charge_stated: number | null;
+  referral_kind?: string;
   outcome_reported_at: string | null;
   completion_confirmed_by: string | null;
   completion_confirmed_at: string | null;
@@ -60,6 +76,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 /** Plain-words outcome for one hop of a chain, for the hop history. */
 function hopOutcome(row: OwnerReferralRow): string {
+  const inspection = row.referral_kind === "inspection";
   switch (row.status) {
     case "sent":
       return "Sent — awaiting the shop's response";
@@ -74,9 +91,11 @@ function hopOutcome(row: OwnerReferralRow): string {
     case "cancelled":
       return "You stopped the chain here";
     case "outcome_reported":
-      return "Shop reported the outcome — awaiting your confirmation";
+      return inspection
+        ? "Inspector filed the report — awaiting your confirmation"
+        : "Shop reported the outcome — awaiting your confirmation";
     case "completed":
-      return "Repair completed";
+      return inspection ? "Inspection completed" : "Repair completed";
     case "not_completed":
       return "Not completed";
     default:
@@ -175,6 +194,225 @@ function AddTransportRequest({
   );
 }
 
+interface InspectionReportRow {
+  id: string;
+  referral_id: string;
+  checklist_version: string;
+  findings: InspectionFinding[];
+  summary: string;
+  safe_to_drive: boolean;
+  recommended_next_step: string | null;
+  photo_urls: string[] | null;
+  onsite_eligible: boolean;
+  onsite_performed: boolean;
+  onsite_did: string | null;
+  onsite_cost: number | null;
+  filed_at: string;
+  // Checklist v3: stage-1 filing time and the comparison
+  // verdicts (likelihoods attached as issued, post-filing).
+  findings_filed_at?: string | null;
+  comparison_verdicts?: ComparisonVerdictEntry[] | null;
+}
+
+/**
+ * Mobility Brief 2: the "Send for repair" conversion. One action
+ * creates a repair referral package prefilled from the inspection
+ * findings (diagnosis fields from the report, photos carried
+ * over), then the owner picks the ordered shop list exactly as in
+ * Phase 1 and the addressed repair send starts. The inspector
+ * gets no automatic place in the chain.
+ */
+function SendForRepair({
+  report,
+  sourcePackage,
+  onDone,
+}: {
+  report: InspectionReportRow;
+  sourcePackage: any;
+  onDone: () => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [shops, setShops] = useState<{ id: string; name: string }[] | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [sentNote, setSentNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open || shops !== null) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("service_providers")
+        .select("id, name")
+        .eq("provider_kind", "shop")
+        .order("name", { ascending: true });
+      if (!cancelled) setShops((data as { id: string; name: string }[]) ?? []);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [open, shops]);
+
+  const send = async () => {
+    if (selected.length === 0 || !sourcePackage) return;
+    setBusy(true);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please sign in to send to a shop.");
+        return;
+      }
+      const titleSeed =
+        report.recommended_next_step?.trim() ||
+        report.summary?.trim() ||
+        "Repair follow-up to mobile inspection";
+      const photos = Array.from(
+        new Set([
+          ...((report.photo_urls ?? []) as string[]),
+          ...((sourcePackage.photo_urls ?? []) as string[]),
+        ])
+      );
+      const { data: pkg, error: pkgError } = await supabase
+        .from("referral_packages" as any)
+        .insert({
+          user_id: user.id,
+          diagnosis_title:
+            titleSeed.length > 120 ? `${titleSeed.slice(0, 117)}…` : titleSeed,
+          diagnosis_code: sourcePackage.diagnosis_code ?? null,
+          diagnosis_urgency: sourcePackage.diagnosis_urgency ?? null,
+          diagnosis_details: {
+            source: "inspection_conversion",
+            inspection_report_id: report.id,
+            checklist_version: report.checklist_version,
+            findings: report.findings,
+            summary: report.summary,
+            safe_to_drive: report.safe_to_drive,
+            recommended_next_step: report.recommended_next_step,
+          },
+          diy_feasibility: sourcePackage.diy_feasibility ?? null,
+          vehicle_year: sourcePackage.vehicle_year ?? null,
+          vehicle_make: sourcePackage.vehicle_make ?? null,
+          vehicle_model: sourcePackage.vehicle_model ?? null,
+          vehicle_trim: sourcePackage.vehicle_trim ?? null,
+          vin: sourcePackage.vin ?? null,
+          estimated_cost_low: sourcePackage.estimated_cost_low ?? null,
+          estimated_cost_high: sourcePackage.estimated_cost_high ?? null,
+          cost_estimate_details: sourcePackage.cost_estimate_details ?? {},
+          metro_area: sourcePackage.metro_area ?? null,
+          zip_code: sourcePackage.zip_code ?? null,
+          photo_urls: photos,
+          audio_clip_url: sourcePackage.audio_clip_url ?? null,
+          video_frame_urls: sourcePackage.video_frame_urls ?? [],
+          chat_summary: sourcePackage.chat_summary ?? null,
+          customer_notes: sourcePackage.customer_notes ?? null,
+        } as any)
+        .select("id, token")
+        .single();
+      if (pkgError) throw pkgError;
+      const { error: refError } = await supabase
+        .from("shop_referrals" as any)
+        .insert({
+          package_id: (pkg as any).id,
+          shop_id: selected[0],
+          owner_user_id: user.id,
+          chain_id: crypto.randomUUID(),
+          shop_chain: selected,
+          preference_order: 1,
+          referral_kind: "repair",
+        } as any);
+      if (refError) throw refError;
+      const firstName =
+        shops?.find((sh) => sh.id === selected[0])?.name || "your first-choice shop";
+      setSentNote(
+        `Repair referral sent to ${firstName} first, prefilled from the inspection findings.`
+      );
+      toast.success("Repair referral sent.");
+      await onDone();
+    } catch (e) {
+      console.error("Send for repair failed:", e);
+      toast.error("Failed to create the repair referral.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (sentNote) {
+    return <p className="text-sm text-muted-foreground">{sentNote}</p>;
+  }
+  if (!open) {
+    return (
+      <Button size="sm" onClick={() => setOpen(true)}>
+        Send for repair
+      </Button>
+    );
+  }
+  return (
+    <div className="space-y-2 rounded-md border border-border p-3">
+      <p className="text-sm font-medium">Send these findings to a repair shop</p>
+      <p className="text-xs text-muted-foreground">
+        A new repair package is created from the inspection report — findings
+        and photos included — and goes to one shop at a time, in the order you
+        pick.
+      </p>
+      {shops === null ? (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading shops…
+        </p>
+      ) : shops.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          No participating shops are available yet.
+        </p>
+      ) : (
+        <>
+          <ul className="space-y-1">
+            {shops.map((shop) => {
+              const idx = selected.indexOf(shop.id);
+              const isSel = idx >= 0;
+              return (
+                <li key={shop.id}>
+                  <button
+                    type="button"
+                    disabled={!isSel && selected.length >= 3}
+                    onClick={() =>
+                      setSelected((prev) =>
+                        isSel
+                          ? prev.filter((id) => id !== shop.id)
+                          : [...prev, shop.id]
+                      )
+                    }
+                    aria-pressed={isSel}
+                    className={`flex w-full items-center gap-2 rounded-md border px-2 py-1.5 text-left text-sm ${
+                      isSel ? "border-accent bg-accent/10" : "border-border"
+                    } ${!isSel && selected.length >= 3 ? "opacity-50" : ""}`}
+                  >
+                    <span className="font-medium">{shop.name}</span>
+                    {isSel && (
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        Choice {idx + 1}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => void send()} disabled={busy || selected.length === 0}>
+              {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send to first-choice shop
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
+              Cancel
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 interface OwnerReferralStatusProps {
   /** When set, only referrals for this package are listed. */
   packageId?: string;
@@ -206,6 +444,18 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
   const [packageTransport, setPackageTransport] = useState<
     Record<string, { requested: boolean; note: string | null }>
   >({});
+  // Mobility Brief 2: inspection reports by referral id, and the
+  // full package rows (the conversion action prefills a repair
+  // package from the inspection findings).
+  const [inspectionReports, setInspectionReports] = useState<
+    Record<string, InspectionReportRow>
+  >({});
+  // Checklist v3: the known-issues block (with the inspector's
+  // marks) per chain, read from the owner's own details rows.
+  const [knownIssuesByChain, setKnownIssuesByChain] = useState<
+    Record<string, KnownIssueResult[]>
+  >({});
+  const [packageFull, setPackageFull] = useState<Record<string, any>>({});
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -226,7 +476,7 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
     let query = supabase
       .from("shop_referrals" as any)
       .select(
-        "id, package_id, shop_id, chain_id, preference_order, escalated_from, status, sent_at, responded_at, window_expires_at, outcome_found, outcome_did, outcome_cost, outcome_transport_cost, transport_status, transport_charge_stated, outcome_reported_at, completion_confirmed_by, completion_confirmed_at, founder_flagged, disputed_at, created_at, updated_at"
+        "id, package_id, shop_id, chain_id, preference_order, escalated_from, status, sent_at, responded_at, window_expires_at, outcome_found, outcome_did, outcome_cost, outcome_transport_cost, transport_status, transport_charge_stated, referral_kind, outcome_reported_at, completion_confirmed_by, completion_confirmed_at, founder_flagged, disputed_at, created_at, updated_at"
       )
       .order("created_at", { ascending: false });
     if (packageId) query = query.eq("package_id", packageId);
@@ -258,12 +508,61 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
       }
     }
 
+    // Mobility Brief 2: filed inspection reports for these
+    // referrals (owner-readable under the report table's RLS).
+    const referralIds = referrals.map((r) => r.id);
+    if (referralIds.length > 0) {
+      const { data: reports } = await supabase
+        .from("inspection_reports" as any)
+        .select(
+          "id, referral_id, checklist_version, findings, summary, safe_to_drive, recommended_next_step, photo_urls, onsite_eligible, onsite_performed, onsite_did, onsite_cost, filed_at, findings_filed_at, comparison_verdicts"
+        )
+        .in("referral_id", referralIds);
+      if (reports) {
+        setInspectionReports(
+          Object.fromEntries(
+            (reports as any[]).map((rep) => [rep.referral_id, rep])
+          )
+        );
+      }
+    }
+
+    // Checklist v3: the known-issues blocks for these chains
+    // (the owner's own rows; the filed marks ride on them).
+    const chainIds = Array.from(
+      new Set(
+        referrals
+          .filter((r) => r.referral_kind === "inspection")
+          .map((r) => r.chain_id)
+      )
+    );
+    if (chainIds.length > 0) {
+      const { data: details } = await supabase
+        .from("inspection_details" as any)
+        .select("chain_id, known_issues")
+        .in("chain_id", chainIds);
+      if (details) {
+        setKnownIssuesByChain(
+          Object.fromEntries(
+            (details as any[])
+              .filter((d) => Array.isArray(d.known_issues))
+              .map((d) => [d.chain_id, d.known_issues])
+          )
+        );
+      }
+    }
+
     const packageIds = Array.from(new Set(referrals.map((r) => r.package_id)));
     if (packageIds.length > 0) {
       const { data: packages } = await supabase
         .from("referral_packages")
-        .select("id, zip_code, transport_requested, transport_note")
+        .select("id, zip_code, transport_requested, transport_note, vehicle_year, vehicle_make, vehicle_model, vehicle_trim, vin, diagnosis_title, diagnosis_code, diagnosis_urgency, diagnosis_details, diy_feasibility, estimated_cost_low, estimated_cost_high, cost_estimate_details, metro_area, photo_urls, audio_clip_url, video_frame_urls, chat_summary, customer_notes")
         .in("id", packageIds);
+      if (packages) {
+        setPackageFull(
+          Object.fromEntries(packages.map((pkg: any) => [pkg.id, pkg]))
+        );
+      }
       if (packages) {
         setPackageZips(
           Object.fromEntries(packages.map((p) => [p.id, p.zip_code]))
@@ -430,8 +729,14 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
               <div key={r.id} className="space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-medium text-sm">
-                    {shopNames[r.shop_id] || "Repair shop"}
+                    {shopNames[r.shop_id] ||
+                      (r.referral_kind === "inspection"
+                        ? "Mobile inspector"
+                        : "Repair shop")}
                   </span>
+                  <Badge variant="secondary" className="text-xs">
+                    {r.referral_kind === "inspection" ? "Inspection" : "Repair"}
+                  </Badge>
                   {chain.hops.length > 1 && (
                     <span className="text-xs text-muted-foreground">
                       Hop {r.preference_order}
@@ -489,12 +794,208 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
                   </div>
                 )}
 
+                {inspectionReports[r.id] && (
+                  <div className="text-sm space-y-1.5 rounded-md border border-border bg-muted/30 p-3">
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                      Inspection report — observed condition for this vehicle
+                    </p>
+                    <p>{inspectionReports[r.id].summary}</p>
+                    <p>
+                      Safe to drive:{" "}
+                      {inspectionReports[r.id].safe_to_drive ? "Yes" : "No"}
+                    </p>
+                    {inspectionReports[r.id].recommended_next_step && (
+                      <p>
+                        Recommended next step:{" "}
+                        {inspectionReports[r.id].recommended_next_step}
+                      </p>
+                    )}
+                    {Array.isArray(inspectionReports[r.id].findings) &&
+                      inspectionReports[r.id].findings.length > 0 && (
+                        <ul className="space-y-0.5">
+                          {inspectionReports[r.id].findings.map((f, i) => (
+                            <li key={i}>
+                              <span className="font-medium">
+                                {inspectionSection(f.system)?.label ?? f.system}
+                              </span>
+                              {": "}
+                              {INSPECTION_SEVERITIES.find(
+                                (sev) => sev.value === f.severity
+                              )?.label ?? f.severity}
+                              {f.note ? ` — ${f.note}` : ""}
+                              {Array.isArray(f.items) &&
+                                f.items.some(
+                                  (it) =>
+                                    it.status !== "checked_ok" ||
+                                    it.measurement != null,
+                                ) && (
+                                  <ul className="pl-4 text-xs text-muted-foreground space-y-0.5">
+                                    {f.items
+                                      .filter(
+                                        (it) =>
+                                          it.status !== "checked_ok" ||
+                                          it.measurement != null,
+                                      )
+                                      .map((it, j) => (
+                                        <li key={j}>
+                                          {inspectionItemLabel(it.item) ?? it.item}
+                                          {" — "}
+                                          {it.status === "not_inspected"
+                                            ? `Not inspected (${
+                                                NOT_INSPECTED_REASONS.find(
+                                                  (x) =>
+                                                    x.value ===
+                                                    it.notInspectedReason,
+                                                )?.label ?? "no reason given"
+                                              })`
+                                            : it.status === "concern"
+                                              ? `Concern: ${
+                                                  INSPECTION_SEVERITIES.find(
+                                                    (s) =>
+                                                      s.value === it.severity,
+                                                  )?.label ??
+                                                  it.severity ??
+                                                  ""
+                                                }`
+                                              : "Checked, fine"}
+                                          {it.measurement
+                                            ? ` · ${it.measurement}`
+                                            : ""}
+                                          {it.note ? ` · ${it.note}` : ""}
+                                        </li>
+                                      ))}
+                                  </ul>
+                                )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    {notInspectedEntries(inspectionReports[r.id].findings ?? [])
+                      .length > 0 && (
+                      <div>
+                        <p className="font-medium">Not inspected on this visit</p>
+                        <ul className="list-disc pl-5 text-muted-foreground space-y-0.5">
+                          {notInspectedEntries(
+                            inspectionReports[r.id].findings ?? [],
+                          ).map((entry, i) => (
+                            <li key={i}>
+                              {entry.section}: {entry.item} ({entry.reason})
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {(knownIssuesByChain[r.chain_id] ?? []).some(
+                      (c) => c.mark != null,
+                    ) && (
+                      <div>
+                        <p className="font-medium">
+                          {knownIssuesHeader(knownIssuesByChain[r.chain_id] ?? [])}
+                        </p>
+                        <ul className="space-y-0.5">
+                          {(knownIssuesByChain[r.chain_id] ?? []).map((check) => (
+                            <li key={check.id}>
+                              <span className="font-medium">{check.title}</span>
+                              {": "}
+                              {check.mark === "no_evidence_found"
+                                ? "No evidence of this problem was found on this visit"
+                                : (KNOWN_ISSUE_MARKS.find(
+                                    (m) => m.value === check.mark,
+                                  )?.label ?? check.mark)}
+                              {check.evidenceNote
+                                ? ` — ${check.evidenceNote}`
+                                : ""}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {Array.isArray(
+                      inspectionReports[r.id].comparison_verdicts,
+                    ) &&
+                      (inspectionReports[r.id].comparison_verdicts?.length ??
+                        0) > 0 && (
+                        <div>
+                          <p className="font-medium">
+                            Pre-assessment comparison — what was suspected, what
+                            the visit found
+                          </p>
+                          <ul className="space-y-0.5">
+                            {inspectionReports[r.id].comparison_verdicts!.map(
+                              (v, i) => (
+                                <li key={i}>
+                                  <span className="font-medium">{v.name}</span>
+                                  {": "}
+                                  {COMPARISON_VERDICTS.find(
+                                    (x) => x.value === v.verdict,
+                                  )?.label ?? v.verdict}
+                                  {v.likelihood != null &&
+                                    ` · the pre-assessment rated this ${Math.round(v.likelihood * 100)}% likely`}
+                                  {v.evidenceNote
+                                    ? ` — ${v.evidenceNote}`
+                                    : ""}
+                                </li>
+                              ),
+                            )}
+                          </ul>
+                        </div>
+                      )}
+                    {inspectionReports[r.id].onsite_performed && (
+                      <p>
+                        Done on site: {inspectionReports[r.id].onsite_did || "Onsite work"}
+                        {inspectionReports[r.id].onsite_cost != null &&
+                          ` — $${Number(inspectionReports[r.id].onsite_cost).toLocaleString()}`}
+                      </p>
+                    )}
+                    {(inspectionReports[r.id].photo_urls?.length ?? 0) > 0 && (
+                      <p>
+                        {inspectionReports[r.id].photo_urls!.map((url, i) => (
+                          <a
+                            key={i}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mr-2 text-accent hover:underline"
+                          >
+                            Photo {i + 1}
+                          </a>
+                        ))}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Filed{" "}
+                      {new Date(inspectionReports[r.id].filed_at).toLocaleDateString("en-US")}{" "}
+                      · Checklist {inspectionReports[r.id].checklist_version}
+                    </p>
+                    <details className="text-xs text-muted-foreground">
+                      <summary className="cursor-pointer font-medium text-foreground">
+                        What this inspection cannot tell you
+                      </summary>
+                      <p className="mt-1">{INSPECTION_LIMITS_INTRO}</p>
+                      <ul className="list-disc pl-5 space-y-0.5 mt-1">
+                        {INSPECTION_LIMITS.map((line, i) => (
+                          <li key={i}>{line}</li>
+                        ))}
+                      </ul>
+                    </details>
+                    <SendForRepair
+                      report={inspectionReports[r.id]}
+                      sourcePackage={packageFull[r.package_id]}
+                      onDone={load}
+                    />
+                  </div>
+                )}
+
                 {r.status === "completed" && (
                   <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <CheckCircle className="h-4 w-4 text-accent" />
                     {r.completion_confirmed_by === "owner"
-                      ? "You confirmed this repair was completed."
-                      : "Counted from the shop's report because no confirmation or dispute arrived within 14 days."}
+                      ? r.referral_kind === "inspection"
+                        ? "You confirmed this inspection took place."
+                        : "You confirmed this repair was completed."
+                      : r.referral_kind === "inspection"
+                        ? "Counted from the inspector's report because no confirmation or dispute arrived within 14 days."
+                        : "Counted from the shop's report because no confirmation or dispute arrived within 14 days."}
                   </p>
                 )}
 
@@ -517,7 +1018,7 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
                     <XCircle className="h-4 w-4" />
                     You disputed this outcome on{" "}
                     {new Date(r.disputed_at).toLocaleDateString("en-US")}. It is not counted
-                    as a completed repair.
+                    as a completed {r.referral_kind === "inspection" ? "inspection" : "repair"}.
                   </p>
                 )}
 
