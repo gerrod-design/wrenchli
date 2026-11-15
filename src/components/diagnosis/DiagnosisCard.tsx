@@ -422,6 +422,20 @@ export default function DiagnosisCard({ diagnosis, vehicle }: DiagnosisCardProps
             estimatedCostHigh={parseCost(diagnosis.shop_cost)}
             className="w-full text-xs mt-1"
           />
+
+          {bookPriced && parseCost(diagnosis.shop_cost) !== null && (
+            <p className="mt-2 text-xs">
+              {/* Plain anchor on purpose: DiagnosisCard also renders
+                  outside a Router (tests, previews), so it must not
+                  depend on react-router context. */}
+              <a
+                href={`/financing?repair=${parseCost(diagnosis.shop_cost)}&diagnosis=${encodeURIComponent(diagnosis.title)}`}
+                className="text-primary underline hover:text-primary/80"
+              >
+                Need to spread the cost? See how repair financing works
+              </a>
+            </p>
+          )}
         </div>
       </div>
 

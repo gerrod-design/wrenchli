@@ -41,6 +41,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminAudit from "./pages/AdminAudit";
 import AdminDigestSpec from "./pages/AdminDigestSpec";
+import FinancingSimulation from "./pages/FinancingSimulation";
 import NotificationSettings from "./pages/NotificationSettings";
 import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
@@ -51,6 +52,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Accessibility from "./pages/Accessibility";
 import FinancingOptions from "./pages/FinancingOptions";
+import Financing from "./pages/Financing";
 // MI Affordable Loan pages disabled per Financial Services 7-Gate Protocol
 // (no financing copy live until all gates close). Routes redirect to /financing-options.
 import DIYTutorials from "./pages/DIYTutorials";
@@ -83,6 +85,7 @@ function AnimatedRoutes() {
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/audit" element={<ProtectedRoute><AdminAudit /></ProtectedRoute>} />
         <Route path="/admin/digest-spec" element={<ProtectedRoute><AdminDigestSpec /></ProtectedRoute>} />
+        <Route path="/admin/financing-simulation" element={<ProtectedRoute><FinancingSimulation /></ProtectedRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     );
@@ -130,6 +133,7 @@ function AnimatedRoutes() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/financing-options" element={<FinancingOptions />} />
+          <Route path="/financing" element={<Financing />} />
           <Route path="/mi-affordable-loan" element={<PreserveNavigate to="/financing-options" />} />
           <Route path="/mi-loan-eligibility" element={<PreserveNavigate to="/financing-options" />} />
           <Route path="/mi-loan-application" element={<PreserveNavigate to="/financing-options" />} />

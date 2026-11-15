@@ -14,7 +14,7 @@ import {
   LogOut, CreditCard, FileText, Users, Store, TrendingUp,
   Loader2, RefreshCw, DollarSign, Mail, BarChart3, Activity, Link2, MousePointerClick, Youtube, Heart, MapPin,
 } from "lucide-react";
-import { Key, Wrench } from "lucide-react";
+import { Key, Wrench, HandCoins } from "lucide-react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import OptimizationEngine from "@/components/OptimizationEngine";
 import ApiKeyManager from "@/components/ApiKeyManager";
@@ -26,6 +26,7 @@ import KnownIssuesManager from "@/components/KnownIssuesManager";
 import YouTubeEngagement from "@/components/YouTubeEngagement";
 import ShopInterestAnalytics from "@/components/ShopInterestAnalytics";
 import ZipDemandHeatmap from "@/components/ZipDemandHeatmap";
+import FinancingPartnerReport from "@/components/FinancingPartnerReport";
 
 interface FinanceSelection {
   id: string;
@@ -346,11 +347,26 @@ export default function AdminDashboard() {
             <TabsTrigger value="shop-interest"><Heart className="h-4 w-4 mr-1.5 hidden sm:inline" />Shop Interest</TabsTrigger>
             <TabsTrigger value="zip-demand"><MapPin className="h-4 w-4 mr-1.5 hidden sm:inline" />ZIP Demand</TabsTrigger>
             <TabsTrigger value="known-issues"><Wrench className="h-4 w-4 mr-1.5 hidden sm:inline" />Known Issues</TabsTrigger>
+            <TabsTrigger value="financing-partners"><HandCoins className="h-4 w-4 mr-1.5 hidden sm:inline" />Financing</TabsTrigger>
           </TabsList>
 
           {/* YouTube Engagement Tab */}
           <TabsContent value="youtube" className="mt-6">
             <YouTubeEngagement />
+          </TabsContent>
+
+          {/* Financing Partners Tab */}
+          <TabsContent value="financing-partners" className="mt-6">
+            <div className="space-y-4">
+              <FinancingPartnerReport />
+              <p className="text-sm text-muted-foreground">
+                Mock provider simulation harness:{" "}
+                <a href="/admin/financing-simulation" className="text-primary underline hover:text-primary/80">
+                  /admin/financing-simulation
+                </a>{" "}
+                (simulation only — mock partners, no real applications).
+              </p>
+            </div>
           </TabsContent>
 
           {/* Known Issues Tab */}

@@ -38,6 +38,11 @@ export const STATIC_PRERENDER_PATHS = [
   "/accessibility",
   "/investors",
   "/vehicle-insights",
+  // Repair financing partner surface (shipped Nov 14, 2026): a real
+  // public content page, registry-driven, rendered to static HTML and
+  // advertised in the sitemap like the other public routes. Before this
+  // ship the route answered 404 (outside-in problem item OI-002).
+  "/financing",
 ] as const;
 
 /**
@@ -67,6 +72,7 @@ export const SITEMAP_SOURCE_FILES: Record<string, string[]> = {
   "/accessibility": ["src/pages/Accessibility.tsx"],
   "/investors": ["src/pages/Investors.tsx"],
   "/vehicle-insights": ["src/pages/VehicleInsights.tsx"],
+  "/financing": ["src/pages/Financing.tsx"],
 };
 
 /**
