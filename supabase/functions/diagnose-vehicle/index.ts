@@ -29,6 +29,9 @@ interface SymptomReport {
   when_it_happens?: string;
   severity?: "minor" | "moderate" | "urgent" | "do_not_drive";
   warning_lights?: string[];
+  // Brief 5, Item 2: OBD codes the owner entered in the wizard
+  // (format-validated client-side: P/B/C/U + 4 characters).
+  codes?: string[];
   raw_description?: string;
 }
 
@@ -171,6 +174,7 @@ ${symptom.symptom_location ? `- Location: ${symptom.symptom_location}` : ""}
 ${symptom.when_it_happens ? `- When it happens: ${symptom.when_it_happens}` : ""}
 ${symptom.severity ? `- Severity: ${symptom.severity}` : ""}
 ${symptom.warning_lights?.length ? `- Warning lights: ${symptom.warning_lights.join(", ")}` : ""}
+${symptom.codes?.length ? `- Fault codes reported by the owner: ${symptom.codes.join(", ")}` : ""}
 ${symptom.raw_description ? `- User description: "${symptom.raw_description}"` : ""}
 
 Assess this vehicle issue and return the JSON schema.`.trim();

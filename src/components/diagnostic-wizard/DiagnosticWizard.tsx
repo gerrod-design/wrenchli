@@ -28,6 +28,8 @@ export interface SymptomData {
   when_it_happens?: string;
   severity?: "minor" | "moderate" | "urgent" | "do_not_drive";
   warning_lights?: string[];
+  /** Brief 5: OBD codes the owner already has (scanner / parts store), format-validated in the symptom step. */
+  codes?: string[];
   raw_description?: string;
 }
 

@@ -27,29 +27,16 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 
     const vehicleStr = [year, make, model, trim].filter(Boolean).join(" ");
 
-    // Query historical outcomes from diagnosis_records for accuracy data
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    let historicalData = { totalCases: 0, similarSymptoms: 0, mostCommonDiagnosis: "", successRate: null as number | null };
-    try {
-      const histResp = await fetch(
-        `${SUPABASE_URL}/rest/v1/repair_outcomes?select=diagnosis_match,diagnosis_record_id(primary_diagnosis,symptoms)&limit=500`,
-        { headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` } }
-      );
-      if (histResp.ok) {
-        const outcomes = await histResp.json();
-        historicalData.totalCases = outcomes.length;
-        const matchCount = outcomes.filter((o: any) => o.diagnosis_match === true).length;
-        if (historicalData.totalCases > 0) {
-          historicalData.successRate = Math.round((matchCount / historicalData.totalCases) * 100);
-        }
-      }
-    } catch { /* non-critical, proceed with defaults */ }
-
-    const historicalLine = historicalData.totalCases > 0 && historicalData.successRate !== null
-      ? `Historical network data: ${historicalData.totalCases} total repair cases tracked, ${historicalData.successRate}% assessment match rate.`
-      : `No historical outcome data available yet — do not cite any accuracy rate, match percentage, or success statistic.`;
+    // Brief 5, Item 3 (2026-11-14): the repair_outcomes match-rate read is
+    // RETIRED, not repaired. That table has no writer anywhere in the
+    // codebase, so the "historical network data" line could only ever cite
+    // no data — or, if rows ever appeared from an unknown source, a rate
+    // with no provenance. The honest replacement is the shop-referral hit
+    // rate from diagnostic_accuracy (Brief 4), cited with its N, under a
+    // separate future decision. Do not reintroduce a network-rate line here.
 
     const systemPrompt = `You are Wrenchli's AI assessment engine. You analyze vehicle symptoms and provide transparent, data-driven symptom assessments. This is an informational assessment only, not a diagnosis.
 
@@ -63,8 +50,7 @@ CRITICAL RULES:
 - Cross-reference with common issues for the specific make/model/year
 - NEVER use the words "diagnosis", "diagnose", or "diagnostic" in your output — always say "assessment" and "likely causes"
 
-Vehicle: ${vehicleStr || "Not specified"}
-${historicalLine}`;
+Vehicle: ${vehicleStr || "Not specified"}`;
 
     const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
@@ -249,8 +235,8 @@ ${historicalLine}`;
           cost_estimate_high: diagnosis.costEstimate?.max ?? null,
           recommended_action: diagnosis.recommendedAction,
           ai_model_used: MODEL,
-          historical_total_cases: historicalData.totalCases,
-          historical_success_rate: historicalData.successRate,
+          // The record's historical-case columns are no longer written:
+          // they carried the retired readout (Brief 5, Item 3) and stay null.
           tracking_number: trackingNumber,
           status: "diagnosis_complete",
         }),
@@ -263,7 +249,6 @@ ${historicalLine}`;
       ...diagnosis,
       trackingNumber,
       sessionId,
-      historicalData,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
