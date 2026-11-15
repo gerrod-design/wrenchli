@@ -1,7 +1,7 @@
 ---
 title: "Check Engine Light P0420 — What It Means, What It Costs, and What to Ask Your Mechanic"
 date: "2026-04-05"
-figures_verified: "2026-11-09"
+figures_verified: "2026-11-14"
 excerpt: "P0420 is one of the most common check engine codes — and one of the most misassessed. Here's what it actually means and how to avoid overpaying for a fix you might not need."
 author: "Wrenchli Team"
 tags: ["check engine light", "P0420", "catalytic converter", "diagnostics", "OBD-II"]
@@ -23,7 +23,7 @@ Here's the problem: P0420 points at a *system*, not a specific part. The code te
 
 **A failing catalytic converter** is the most common cause and what most shops will quote you first. But before assuming that's the answer, consider these alternatives that are significantly cheaper to fix:
 
-**A faulty oxygen sensor** — either the upstream or downstream O2 sensor — can send incorrect readings that trigger P0420 even when the catalytic converter is perfectly functional. Replacing a sensor costs $150–$300 versus $800–$2,500 for a converter.
+**A faulty oxygen sensor** — either the upstream or downstream O2 sensor — can send incorrect readings that trigger P0420 even when the catalytic converter is perfectly functional. Replacing a sensor costs $150–$300 versus $645–$1,675 for a single converter unit — and a job that replaces both units, or fits a CARB-compliant unit, can price above that range.
 
 **An exhaust leak** near the oxygen sensor can cause false readings. A mechanic with a smoke machine can rule this out in 15 minutes.
 
@@ -37,7 +37,7 @@ Repair costs vary significantly depending on what's actually causing the code:
 
 - **Oxygen sensor replacement:** $150–$350 parts and labor
 - **Exhaust leak repair:** $100–$400 depending on location and severity
-- **Catalytic converter replacement:** $800–$2,500 depending on whether OEM or aftermarket, and your vehicle make and model
+- **Catalytic converter replacement:** $645–$1,675 for a single converter unit in Wrenchli's price book — the low end is an independent shop fitting a quality aftermarket part, the high end a franchised dealer fitting an OEM part. A job that replaces both converter units, or fits a CARB-compliant unit, prices above that range, and your vehicle make and model move the figure within it
 - **Misfire assessment and repair:** $150–$600 depending on cause
 
 The most important thing to know: a shop that quotes you a catalytic converter replacement without first ruling out the cheaper causes is either cutting corners or not being thorough. A proper assessment takes time and equipment.

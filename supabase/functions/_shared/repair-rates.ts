@@ -29,17 +29,36 @@
  * consistent ballpark. They are NOT vehicle-specific in v1 (no trim,
  * engine, drivetrain, or regional labor-rate variation yet) and must not
  * be presented to users as a quote, bid, or guaranteed price.
+ *
+ * 2026-11-14 ADDENDUM (founder-approved 2026-11-14): four entries —
+ * catalytic_converter, thermostat, radiator, fuel_pump — were re-derived
+ * from named parts sources on the channel-spanning basis (price-book
+ * methodology Section 3A): the low end is an independent shop (quality
+ * aftermarket part at the published markup tier, labor in the independent
+ * corridor $100–$132/hr) and the high end is a franchised dealer (OEM part
+ * at manufacturer list, labor in the dealer corridor $140–$200/hr). Those
+ * entries carry `spanning`, `basisNote`, and `provenance` fields and
+ * derive through the spanning path in `rateFigures`. All other entries
+ * still use the v1 blended derivation described above. Full derivation
+ * record: price-book-parts-rederivation-2026-11-14.md (Wrenchli agent
+ * operating cadence goal files).
  * ---------------------------------------------------------------------------
  */
 
 /** Rate table schema/content version. Bump when entries or figures change. */
-export const RATE_TABLE_VERSION = "v1";
+export const RATE_TABLE_VERSION = "v2";
 
 /** Stable identifier for this rate source, for logging/analytics/provenance tags. */
 export const RATE_SOURCE_ID = "wrenchli_editorial_rate_table_v1";
 
 /** Blended independent-shop labor rate used to derive shop labor dollars, in USD/hour. */
 export const LABOR_RATE_PER_HOUR = 130;
+
+/** Independent-shop labor corridor, USD/hour. Standing corridors, never blended. */
+export const INDEPENDENT_LABOR_RATE_PER_HOUR: [number, number] = [100, 132];
+
+/** Franchised-dealer labor corridor, USD/hour. Standing corridors, never blended. */
+export const DEALER_LABOR_RATE_PER_HOUR: [number, number] = [140, 200];
 
 export interface RepairRateEntry {
   id: string;
@@ -56,6 +75,28 @@ export interface RepairRateEntry {
   diyTime: string | null;
   /** Human-readable shop time estimate. */
   shopTime: string;
+  /**
+   * Channel-spanning derivation (methodology Section 3A) for entries
+   * re-derived on that basis. When present, `rateFigures` derives the
+   * entry's figures from the two channel ends instead of the v1 blended
+   * derivation: the low end is an independent shop (quality aftermarket
+   * part at the published markup tier, labor at the independent corridor
+   * floor) and the high end is a franchised dealer (OEM part at
+   * manufacturer list, labor at the dealer corridor ceiling). For such
+   * entries the legacy `shopParts` field carries the cross-channel span
+   * [independentParts low, dealerParts] for readers that do not call
+   * `rateFigures`.
+   */
+  spanning?: {
+    /** Shop-charged parts range at the independent end, in USD. */
+    independentParts: [number, number];
+    /** OEM part at manufacturer list price at the dealer end, in USD. No markup step. */
+    dealerParts: number;
+  };
+  /** Basis note that must travel with this entry's figures wherever they are published. */
+  basisNote?: string;
+  /** Per-entry provenance: the named sources behind the figures and the date they were checked. */
+  provenance?: string;
 }
 
 /** Fully derived dollar figures for one rate-table entry (see rateFigures). */
@@ -182,11 +223,16 @@ export const REPAIR_RATES: RepairRateEntry[] = [
     id: "catalytic_converter",
     label: "Catalytic Converter Replacement",
     match: [/\bcatalytic\s*converters?\b/i, /\bcat\s*converter\b/i, /\bcatalytic\b/i],
-    diyParts: [400, 1200],
-    shopParts: [400, 1200],
+    diyParts: [340, 387],
+    shopParts: [495, 1075],
     laborHours: [1.5, 3.0],
     diyTime: "2–4 hours",
     shopTime: "2–4 hours",
+    spanning: { independentParts: [495, 620], dealerParts: 1075 },
+    basisNote:
+      "Single converter unit. A job that replaces both converter units, or fits a CARB-compliant unit, prices above the top of this range.",
+    provenance:
+      "Re-derived 2026-11-14 from named sources (founder-approved 2026-11-14): PartsGeek (Evan Fischer direct-fit Federal $339.98–$386.98 street; MagnaFlow OEM-grade $812.99); OEM list via Longo Toyota / Toyota OEM Parts Online (OE 17141F0010 $1,047.90 + manifold gasket $26.10, carried as $1,075). Independent parts = street price x published markup tier (45–60% on $200–$500 parts). Labor 1.5–3.0h (book; ConsumerAffairs ~1–3h). Representative vehicle: 2019 Toyota Camry 2.5L.",
   },
   {
     id: "water_pump",
@@ -202,11 +248,16 @@ export const REPAIR_RATES: RepairRateEntry[] = [
     id: "thermostat",
     label: "Thermostat Replacement",
     match: [/\bthermostats?\b/i],
-    diyParts: [25, 80],
-    shopParts: [25, 80],
+    diyParts: [36, 62],
+    shopParts: [60, 137],
     laborHours: [1.0, 2.0],
     diyTime: "1–2 hours",
     shopTime: "1–2 hours",
+    spanning: { independentParts: [60, 120], dealerParts: 137 },
+    basisNote:
+      "The service part is the thermostat housing assembly (thermostat integrated), not a bare thermostat.",
+    provenance:
+      "Re-derived 2026-11-14 from named sources (founder-approved 2026-11-14): PartsGeek (Replacement $35.95 / Aisin $51.97 / NTC-TAMA $61.97 housing assemblies, street); AutoZone (Duralast housing assemblies $31.99–$63.99); Cars245 (genuine Toyota 16031-25010 at $137.38 retail, carried as $137). Independent parts = street price x published markup tier (65–90% under $200). Labor 1.0–2.0h (book; AutoZone 1–2h). Representative vehicle: 2019 Toyota Camry 2.5L.",
   },
   {
     id: "serpentine_belt",
@@ -262,21 +313,31 @@ export const REPAIR_RATES: RepairRateEntry[] = [
     id: "fuel_pump",
     label: "Fuel Pump Replacement",
     match: [/\bfuel\s*pumps?\b/i],
-    diyParts: [200, 500],
-    shopParts: [200, 500],
+    diyParts: [187, 277],
+    shopParts: [400, 724],
     laborHours: [2.0, 4.0],
     diyTime: "3–5 hours",
     shopTime: "3–5 hours",
+    spanning: { independentParts: [400, 445], dealerParts: 724 },
+    basisNote:
+      "Prices the in-tank pump module assembly (pump, sending unit, screen, tank seal), not a bare pump.",
+    provenance:
+      "Re-derived 2026-11-14 from named sources (founder-approved 2026-11-14): PartsGeek (Delphi module $277 street); Advance Auto Parts (module assemblies from $452.99 retail counter); Toyota OEM Parts Online (OE 77020-06520 MSRP $723.54, carried as $724). Independent parts = street price x published markup tier (45–60% on $200–$500 parts). Labor 2.0–4.0h (book; AAA 2–4h). Dealer end corroborated by the RepairPal / KBB / AAA estimator convergence ($1,116–$1,513). Representative vehicle: 2019 Toyota Camry 2.5L.",
   },
   {
     id: "radiator",
     label: "Radiator Replacement",
     match: [/\bradiator\b(?!\s*hose)/i],
-    diyParts: [150, 350],
-    shopParts: [150, 350],
+    diyParts: [77, 211],
+    shopParts: [155, 395],
     laborHours: [2.0, 3.5],
     diyTime: "2–4 hours",
     shopTime: "2–4 hours",
+    spanning: { independentParts: [155, 155], dealerParts: 395 },
+    basisNote:
+      "Parts figures include a coolant allowance ($30 independent / $40 dealer). The 3.5h labor top exceeds the Tier 1 public figure (2–3h for most cars) and is retained from the book, flagged.",
+    provenance:
+      "Re-derived 2026-11-14 from named sources (founder-approved 2026-11-14): PartsGeek (CSF $76.97 / TRQ $91.95 street); Go-Parts (OE-style $210.95 street); AutoPartsPrime (genuine Toyota 16400-25130 MSRP $355.93). Independent parts = CSF street price x published markup tier (65–90% on $50–$200) + $30 coolant allowance (single anchor, carried as a point figure); dealer parts = OEM list + $40 coolant allowance. Labor 2.0–3.5h (book). Grade SUSPECT under the credibility standard (sole published estimator irreconcilable): held from new publication; see the benchmark record. Representative vehicle: 2019 Toyota Camry 2.5L.",
   },
   {
     id: "ac_compressor",
@@ -389,6 +450,31 @@ export function findRepairRate(text: string): RepairRateEntry | null {
 }
 
 export function rateFigures(entry: RepairRateEntry): RateFigures {
+  if (entry.spanning) {
+    // Channel-spanning derivation (methodology Section 3A): parts and
+    // labor figures are the cross-channel spans; totals are the corner
+    // sums (independent low + dealer high), rounded to the nearest $5.
+    const spanningParts: [number, number] = [
+      entry.spanning.independentParts[0],
+      entry.spanning.dealerParts,
+    ];
+    const spanningLabor: [number, number] = [
+      Math.round((entry.laborHours[0] * INDEPENDENT_LABOR_RATE_PER_HOUR[0]) / 5) * 5,
+      Math.round((entry.laborHours[1] * DEALER_LABOR_RATE_PER_HOUR[1]) / 5) * 5,
+    ];
+    const spanningTotal: [number, number] = [
+      Math.round((spanningParts[0] + spanningLabor[0]) / 5) * 5,
+      Math.round((spanningParts[1] + spanningLabor[1]) / 5) * 5,
+    ];
+    return {
+      diyParts: entry.diyParts ? [entry.diyParts[0], entry.diyParts[1]] : null,
+      shopParts: spanningParts,
+      shopLabor: spanningLabor,
+      shopTotal: spanningTotal,
+      laborHours: [entry.laborHours[0], entry.laborHours[1]],
+    };
+  }
+
   const shopLabor: [number, number] = [
     Math.round((entry.laborHours[0] * LABOR_RATE_PER_HOUR) / 5) * 5,
     Math.round((entry.laborHours[1] * LABOR_RATE_PER_HOUR) / 5) * 5,
