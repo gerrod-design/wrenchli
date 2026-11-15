@@ -78,7 +78,7 @@ export default function ForShopsTalk() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Questions About the Shop Pilot? Talk, Type, or Book a Call"
-        description="Three ways to learn about Wrenchli's referral pilot for independent shops, free for your first five completed referred repairs: talk, type to an assistant, or book a call with a person."
+        description="Three ways to learn about Wrenchli's referral pilot for independent shops and dealership service departments, free for your first five completed referred repairs: talk, type to an assistant, or book a call with a person."
         path="/for-shops/talk"
       />
 

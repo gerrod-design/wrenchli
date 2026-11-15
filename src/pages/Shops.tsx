@@ -41,7 +41,7 @@ const steps = [
   {
     num: "1",
     title: "Join the Pilot",
-    desc: "Independent shops can join Wrenchli's free referral pilot now — free until your shop completes its first five referred repairs — and the steps below describe how it works.",
+    desc: "Independent shops and dealership service departments can join Wrenchli's free referral pilot now — free until your shop completes its first five referred repairs — and the steps below describe how it works.",
   },
   { num: "2", title: "Tell Us About Your Shop", desc: "Share your services, the makes you work on, and the jobs you want." },
   { num: "3", title: "Receive Stage 1 Packages", desc: "Each referral arrives as a Stage 1 package: the vehicle and the concern, with the owner's pre-assessment — never the owner's contact details." },
@@ -55,7 +55,7 @@ export default function Shops() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="For Repair Shops — Wrenchli"
-        description="Wrenchli runs a free referral pilot for independent repair shops — free until each shop completes its first five referred repairs. Pre-assessed customers, no upfront fees, no exclusivity."
+        description="Wrenchli runs a free referral pilot for repair shops — independent shops and dealership service departments are welcome on the same terms — free until each shop completes its first five referred repairs. Pre-assessed customers, no upfront fees, no exclusivity."
         path="/shops"
       />
 
@@ -71,7 +71,7 @@ export default function Shops() {
             </p>
             <p className="mt-8 mx-auto max-w-2xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
               Now onboarding — our free referral pilot for independent
-              shops is open nationally. Join the pilot.
+              shops and dealership service departments is open nationally. Join the pilot.
             </p>
           </SectionReveal>
         </div>
@@ -193,7 +193,7 @@ export default function Shops() {
             </p>
             <p className="mt-8 mx-auto max-w-xl rounded-xl border border-accent/40 bg-accent/10 px-6 py-4 text-lg font-semibold leading-relaxed">
               Now onboarding — our free referral pilot for independent
-              shops is open nationally. Join the pilot.
+              shops and dealership service departments is open nationally. Join the pilot.
             </p>
           </SectionReveal>
         </div>

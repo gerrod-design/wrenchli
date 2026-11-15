@@ -8,7 +8,8 @@
 // Copy rules (standing): Wrenchli performs a preliminary symptom
 // assessment — never "diagnose"; the assessment is always free; the
 // service is available nationally; the referral pilot is open nationally
-// to independent shops. Wrenchli is not a repair shop, so no
+// to independent shops and dealership service departments. Wrenchli
+// is not a repair shop, so no
 // LocalBusiness / AutoRepair types are used.
 
 import { consumerFaqs, shopFaqs } from "@/data/faq";
@@ -65,7 +66,8 @@ const assessmentService = {
 };
 
 // Describes the referral pilot offered on /for-shops, in the page's own
-// words ("Free Referral Pilot for Independent Shops... free until your
+// words ("Free Referral Pilot for Independent Shops and Dealership
+// Service Departments... free until your
 // shop completes its first five referred repairs. Customers arrive
 // pre-assessed with symptoms, likely causes, and a fair cost range.").
 // The pilot is free through a shop's first five completed referred
@@ -76,14 +78,14 @@ const assessmentService = {
 const shopPilotService = {
   "@type": "Service",
   "@id": `${SITE_BASE}/for-shops#pilot`,
-  name: "Free Referral Pilot for Independent Repair Shops",
+  name: "Free Referral Pilot for Independent Shops and Dealership Service Departments",
   serviceType: "Repair shop referral pilot",
   provider: { "@id": `${SITE_BASE}/#organization` },
   url: `${SITE_BASE}/for-shops`,
   description:
-    "Free referral pilot for independent auto repair shops: free until your shop completes its first five referred repairs. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range. No exclusivity and no volume commitments.",
+    "Free referral pilot for independent auto repair shops and dealership service departments: free until your shop completes its first five referred repairs. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range. No exclusivity and no volume commitments.",
   areaServed: { "@type": "Country", name: "United States" },
-  audience: { "@type": "Audience", audienceType: "Independent auto repair shops" },
+  audience: { "@type": "Audience", audienceType: "Independent auto repair shops and dealership service departments" },
   offers: {
     "@type": "Offer",
     price: "0",

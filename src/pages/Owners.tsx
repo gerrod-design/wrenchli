@@ -64,7 +64,7 @@ export default function Owners() {
               Be the First to Know
             </h2>
             <p className="mt-3 text-muted-foreground leading-relaxed">
-              Wrenchli's free symptom assessment is live now for drivers everywhere — and we're enrolling independent shops nationally in our free referral pilot. Join the early access list for updates as partner shops join near you.
+              Wrenchli's free symptom assessment is live now for drivers everywhere — and we're enrolling independent shops and dealership service departments nationally in our free referral pilot. Join the early access list for updates as partner shops join near you.
             </p>
             <div className="mt-8">
               <WaitlistForm source="owners-waitlist" />

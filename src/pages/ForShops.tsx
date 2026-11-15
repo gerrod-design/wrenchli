@@ -34,8 +34,8 @@ export default function ForShops() {
   return (
     <main className="pb-[60px] md:pb-0">
       <SEO
-        title="Free Referral Pilot for Independent Shops"
-        description="Free referral pilot for independent auto repair shops — free until your shop completes its first five referred repairs. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range."
+        title="Free Referral Pilot for Independent Shops and Dealership Service Departments"
+        description="Free referral pilot for independent auto repair shops and dealership service departments — free until your shop completes its first five referred repairs. Customers arrive pre-assessed with symptoms, likely causes, and a fair cost range."
         path="/for-shops"
       />
 
@@ -44,7 +44,7 @@ export default function ForShops() {
         <div className="container-wrenchli max-w-3xl">
           <SectionReveal>
             <h1 className="font-heading text-3xl font-extrabold leading-tight md:text-5xl">
-              Free Referral Pilot for Independent Shops
+              Free Referral Pilot for Independent Shops and Dealership Service Departments
             </h1>
           </SectionReveal>
         </div>
@@ -59,7 +59,7 @@ export default function ForShops() {
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground md:text-xl">
               Vehicle details, symptom description, likely causes, and a fair
-              cost range — before they walk in. Free for independent shops
+              cost range — before they walk in. Free for independent shops and dealership service departments
               until each shop completes its first five referred repairs.
             </p>
           </SectionReveal>

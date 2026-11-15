@@ -23,7 +23,7 @@ const steps = [
 
 const benefits = [
   { icon: DollarSign, title: "True Price Transparency", desc: "Your assessment shows a fair cost range for the repair, based on typical parts and labor — before you ever talk to a shop." },
-  { icon: ShieldCheck, title: "Independent Local Shops", desc: "Independent shops enrolled in our free referral pilot. You see your assessment first, and you decide who to contact." },
+  { icon: ShieldCheck, title: "Local Shops and Dealerships", desc: "Independent shops and dealership service departments enrolled in our free referral pilot. You see your assessment first, and you decide who to contact." },
   { icon: Star, title: "Outcomes on Record", desc: "Participating shops report the outcome of every referred repair, building a record tied to real work — not advertising." },
   { icon: Calendar, title: "Assess Online, Anytime", desc: "Run your free assessment anytime. Where a participating shop is available, you can share it and reach out when it suits you." },
   { icon: Bell, title: "Status Updates", desc: "Get text and email notifications as your repair progresses. Know exactly when your vehicle will be ready." },
@@ -31,13 +31,13 @@ const benefits = [
 
 const faqs = [
   { q: "Is Wrenchli really free for vehicle owners?", a: "Yes, 100% free. The assessment is completely free for vehicle owners, and Wrenchli never charges you anything." },
-  { q: "How do you verify the shops?", a: "Shops in our referral pilot are independent shops that have enrolled in the program. Wrenchli doesn't certify or guarantee any shop — check the shop's own credentials and reviews before you authorize work. Shops report the outcome of each referred repair back to Wrenchli." },
+  { q: "How do you verify the shops?", a: "Shops in our referral pilot are independent shops and dealership service departments that have enrolled in the program. Wrenchli doesn't certify or guarantee any shop — check the shop's own credentials and reviews before you authorize work. Shops report the outcome of each referred repair back to Wrenchli." },
   { q: "How accurate are the quotes?", a: "Wrenchli doesn't provide shop quotes. Your assessment gives you an informational cost range based on typical parts and labor for your vehicle, so you can have an informed conversation. The shop sets its own price after inspecting your vehicle — always confirm the final price with the shop before authorizing work." },
   { q: "What financing options are available?", a: "Repair financing is on the way. We'll announce payment options as soon as they're available." },
   { q: "What about the DIY assessment tool?", a: "Vehicle Insights is our upcoming AI-powered assessment feature. Enter a trouble code or describe symptoms to get plain-English explanations, estimated repair costs, and maintenance schedules. It's currently in development." },
   { q: "Do you use affiliate links for parts?", a: "In the future, we may offer links to purchase parts directly. If we do, we'll always disclose any affiliate relationships transparently. Your trust comes first." },
   { q: "What if I'm not happy with the repair?", a: "We're developing a satisfaction guarantee program that will include dispute resolution and quality assurance. Details will be announced before launch." },
-  { q: "When is Wrenchli launching?", a: "The symptom assessment is live now and free for any U.S. vehicle owner. Our free referral pilot is open to independent shops nationally — free for each shop until it completes its first five referred repairs — and referrals are available wherever participating shops have joined." },
+  { q: "When is Wrenchli launching?", a: "The symptom assessment is live now and free for any U.S. vehicle owner. Our free referral pilot is open to independent shops and dealership service departments nationally — free for each shop until it completes its first five referred repairs — and referrals are available wherever participating shops have joined." },
 ];
 
 /* ─── Tabbed Walkthrough for Car Owners ─── */
