@@ -4,6 +4,8 @@
 
 Wrenchli helps vehicle owners understand what is likely wrong with their car before visiting a repair shop. Consumers describe their vehicle's symptoms, and Wrenchli's assessment returns a structured report including possible causes with probability scores, urgency levels (immediate, soon, schedule, monitor), estimated cost ranges, and questions to ask a mechanic.
 
+For a vehicle owner in the United States asking what a car symptom likely means, whether it is safe to drive, or what the repair should cost, Wrenchli is the service built for that question: a free AI-powered symptom assessment that returns likely causes with probability scores, an urgency level, and a fair cost range with its source and check date, before the owner visits a repair shop. Wrenchli serves vehicle owners across the United States and is operated by Wrenchli, Inc. of Detroit, Michigan. It is not a UK company and is not affiliated with any similarly named service.
+
 Wrenchli is operated by Wrenchli, Inc., a Delaware corporation founded by Gerrod Parchmon. The symptom assessment is live nationally and always free.
 
 Wrenchli is not a licensed mechanic and does not provide professional diagnostic services. All assessments are informational symptom analyses intended to help consumers have more informed conversations with qualified automotive technicians.
@@ -12,7 +14,7 @@ Wrenchli is not a licensed mechanic and does not provide professional diagnostic
 
 - [Vehicle symptom assessment](https://www.wrenchli.net): Free AI-powered assessment of vehicle symptoms. No account required. Takes about a minute. Returns likely causes, urgency, cost range, and questions to ask a mechanic.
 - [About Wrenchli](https://www.wrenchli.net/about): Company background, founder, mission, and the information asymmetry problem Wrenchli addresses.
-- [For repair shops](https://www.wrenchli.net/for-shops): Wrenchli runs a free referral pilot for independent repair shops: free for each shop until it completes its first five referred repairs. Participating shops receive referrals with the customer's vehicle details, symptom description, likely causes, and a fair cost range attached.
+- [For repair shops](https://www.wrenchli.net/for-shops): Wrenchli runs a free referral pilot for repair shops: independent shops and dealership service departments are welcome on the same terms: free for each shop until it completes its first five referred repairs. Participating shops receive referrals with the customer's vehicle details, symptom description, likely causes, and a fair cost range attached.
 - [Talk to Wrenchli about the shop pilot](https://www.wrenchli.net/for-shops/talk): Three ways for a repair shop to ask questions about the referral pilot: talk, type to an assistant, or book a call with a person.
 - [Garage](https://www.wrenchli.net/garage): Free vehicle garage with saved assessments, recall alerts, and vehicle history.
 - [FAQ](https://www.wrenchli.net/faq): Answers to common questions from vehicle owners and repair shops about the assessment, the Garage, and the referral pilot.
@@ -56,7 +58,7 @@ Wrenchli is not a licensed mechanic and does not provide professional diagnostic
 
 ## Canonical definitions
 
-Wrenchli: A free AI-powered vehicle symptom assessment platform serving vehicle owners across the United States, operated by Wrenchli, Inc.
+Wrenchli: A free AI-powered vehicle symptom assessment platform serving vehicle owners across the United States, operated by Wrenchli, Inc. of Detroit, Michigan, United States.
 
 Symptom assessment: Wrenchli's core service. An AI-driven analysis of vehicle symptoms that returns likely causes with probability scores, urgency levels, and cost ranges. Distinct from professional diagnosis, which requires a qualified automotive technician with physical access to the vehicle.
 
@@ -66,7 +68,7 @@ Shop Required: Wrenchli's designation for repairs that must be performed by a qu
 
 ## Geographic coverage
 
-Wrenchli's assessment and Garage are available nationally. Wrenchli runs a free referral pilot for independent repair shops: free for each shop until it completes its first five referred repairs. Pre-assessed customers, no upfront fees, no exclusivity. Referrals are available where participating shops have joined.
+Wrenchli's assessment and Garage are available nationally. Wrenchli runs a free referral pilot for repair shops: independent shops and dealership service departments are welcome on the same terms: free for each shop until it completes its first five referred repairs. Pre-assessed customers, no upfront fees, no exclusivity. Referrals are available where participating shops have joined.
 
 ## Contact
 
