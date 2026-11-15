@@ -105,6 +105,33 @@ for (const routePath of getPrerenderPaths()) {
   console.log(`[prerender] ${routePath} -> ${rel} (${written[written.length - 1].bytes} bytes)`);
 }
 
+// /design-preview static shell with a noindex meta (leftover from the
+// Nov 14, 2026 ships, carried at the Brief 5 gate). The SPA redirects
+// /design-preview to /, and production's rewrite serves it the prerendered
+// homepage file, so the preview surface presented itself to crawlers as an
+// indexable copy of the homepage (robots.txt already Disallows it; this is
+// the belt-and-braces meta the ship note asked for). Writing the homepage's
+// prerendered file under design-preview/ with the meta injected gives the
+// route its own shell: the static file wins over the rewrite, browsers
+// still boot the SPA and redirect exactly as before, and the homepage
+// itself is untouched. Deliberately excluded from the sitemap.
+{
+  const homeShell = fs.readFileSync(path.join(dist, "index.html"), "utf-8");
+  const previewShell = homeShell.replace(
+    "</head>",
+    '<meta name="robots" content="noindex">\n</head>'
+  );
+  if (previewShell === homeShell) {
+    throw new Error("prerender: could not inject noindex meta into the /design-preview shell");
+  }
+  const previewFile = path.join(dist, "design-preview", "index.html");
+  fs.mkdirSync(path.dirname(previewFile), { recursive: true });
+  fs.writeFileSync(previewFile, previewShell, "utf-8");
+  console.log(
+    `[prerender] /design-preview -> design-preview/index.html (${Buffer.byteLength(previewShell, "utf8")} bytes, noindex)`
+  );
+}
+
 // Sitemap, generated from the same manifest (routes + blog content source).
 // Each URL's <lastmod> is that page's real last-changed date (front-door
 // fix 6): blog posts carry their content date, other routes use the

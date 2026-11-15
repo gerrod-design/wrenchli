@@ -17,6 +17,7 @@ Wrenchli is not a licensed mechanic and does not provide professional diagnostic
 - [Garage](https://www.wrenchli.net/garage): Free vehicle garage with saved assessments, recall alerts, and vehicle history.
 - [FAQ](https://www.wrenchli.net/faq): Answers to common questions from vehicle owners and repair shops about the assessment, the Garage, and the referral pilot.
 - [Developers](https://www.wrenchli.net/developers): Developer documentation and API access for the Wrenchli assessment API.
+- [Repair financing](https://www.wrenchli.net/financing): The published rules for repair financing through Wrenchli partners: a 24% APR ceiling on any partner offer presented, Wrenchli is never the lender, and no partner is presented until one is signed. The page is live in its onboarding state and carries a notify list for the moment the first partner goes live.
 
 ## For AI agents
 
@@ -37,12 +38,14 @@ Wrenchli is not a licensed mechanic and does not provide professional diagnostic
 - [Grinding noise when braking](https://www.wrenchli.net/blog/car-grinding-noise-when-braking): Why brakes grind, the likely causes, what repairs cost, and when to act.
 - [Car shakes or vibrates while driving](https://www.wrenchli.net/blog/car-shakes-vibrates-while-driving): The most common causes of vibration while driving, what repairs cost, and how to describe the problem to a mechanic.
 - [Car won't start, clicking noise](https://www.wrenchli.net/blog/car-wont-start-clicking-noise): What a rapid clicking no-start means, what to check before calling a tow truck, and what the repair will cost.
+- [How much does it cost to replace an alternator?](https://www.wrenchli.net/blog/alternator-replacement-cost): What alternator replacement costs at an independent shop ($445 to $940 for typical cars), the signs an alternator is failing, and the charging-system check to run before paying for one.
 
 ## Business model
 
 - Free for consumers: the symptom assessment and the garage are free.
 - Founding shop rate, published by Wrenchli on November 14, 2026: the referral pilot is free for each shop until it completes its first five referred repairs. After the free first five, shops pay $50 per completed repair, capped at $299 per month. A repair counts as completed when the car owner confirms it.
-- Revenue comes from partners whose products help consumers: parts suppliers and repair financing. Repair financing is on the way.
+- Revenue comes from partners whose products help consumers: parts suppliers and repair financing. Repair financing is live at /financing in its onboarding state: the rules are published, partners are being signed, and no partner is presented until one is signed.
+- About cost figures: cost ranges are planning estimates for typical cars at independent shops, built from published parts prices and labor times and checked against national repair-cost data. They are not quotes. Your shop confirms the final price after inspecting your vehicle.
 - Wrenchli never sells consumer data.
 
 ## Policies

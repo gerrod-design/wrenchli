@@ -714,6 +714,70 @@ export default function Garage() {
             </div>
           </div>
         </section>
+        {/* What the Garage holds — static explainer in the signed-out
+            state. The signed-out page is the route's honest raw HTML for
+            no-JS fetchers (see prerenderManifest), so it describes the
+            Garage's real, shipped features instead of stopping at the
+            sign-in prompt. Every item below is a live Garage feature. */}
+        <section className="section-padding pt-0" style={{ backgroundColor: "#F8F8F6" }}>
+          <div className="container-wrenchli max-w-2xl">
+            <h2 className="font-heading text-xl font-bold md:text-2xl text-center mb-6">
+              What your Garage holds
+            </h2>
+            <div className="space-y-3 text-left">
+              <div className="rounded-xl border border-border bg-white p-5">
+                <h3 className="font-heading text-base font-bold mb-1">Your cars, in one place</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Save each vehicle by VIN or by hand, with photos. There is
+                  no charge and no limit on the cars you keep.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-5">
+                <h3 className="font-heading text-base font-bold mb-1">Assessments that stay with the car</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Every assessment you save is attached to that vehicle's
+                  record, so the car's history builds in one place instead of
+                  scattering across visits.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-5">
+                <h3 className="font-heading text-base font-bold mb-1">Safety recall alerts</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Open safety recalls for your saved cars are surfaced in the
+                  Garage and on each car's record, so a recall does not depend
+                  on a letter reaching you.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-5">
+                <h3 className="font-heading text-base font-bold mb-1">A mileage ledger</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Log odometer readings by hand, or read the mileage from a
+                  photo of the dashboard. The ledger keeps the readings in
+                  order for every car.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-5">
+                <h3 className="font-heading text-base font-bold mb-1">Maintenance on the horizon</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Each car's record shows what service is due and what is
+                  coming up, based on its mileage, alongside a guided baseline
+                  health check that sets the starting record for the car.
+                </p>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-5">
+                <h3 className="font-heading text-base font-bold mb-1">Shop and scanner reports, filed</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Import a shop or OBD scan report and have it read and filed
+                  to the car's record, and get heads-up cards in the Garage
+                  when something on a car needs attention.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground text-center mt-6">
+              The Garage is free. Sign in above to start yours.
+            </p>
+          </div>
+        </section>
         <AuthGateModal
           open={showAuthGate}
           onClose={() => setShowAuthGate(false)}

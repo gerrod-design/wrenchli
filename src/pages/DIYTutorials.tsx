@@ -62,6 +62,47 @@ export default function DIYTutorials() {
         </div>
       </section>
 
+      {/* How DIY guidance works — static explainer. This section is part of
+          the page's prerendered content: it states Wrenchli's standing DIY
+          safety policy (the same policy llms.txt publishes) so the page
+          carries real, checkable content even before the tutorial library
+          fills. It makes no claim about how many guides exist. */}
+      <section className="section-padding bg-muted/40">
+        <div className="container-wrenchli max-w-3xl">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-3xl mb-6">
+              How DIY guidance works at Wrenchli
+            </h2>
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
+              <p>
+                Every Wrenchli assessment weighs whether the likely repairs
+                are jobs an owner can safely do at home. When a cause
+                qualifies, the assessment results include guidance for the
+                job with an honest difficulty rating, so the do-it-yourself
+                decision is made with the work in plain view.
+              </p>
+              <p>
+                Guidance is shown only when it is safe: the problem's urgency
+                is "monitor" or "schedule," and the job is easy or moderate
+                difficulty. Some work is never presented as do-it-yourself at
+                Wrenchli. Brakes, steering, airbags, and fuel systems always
+                show "Shop Required," whatever the urgency, because those
+                jobs belong with a qualified technician.
+              </p>
+              <p>
+                The guides collected on this page are the library form of
+                that same guidance. Each published guide carries a parts
+                list, the tools needed, a difficulty rating, and the steps
+                in order. The library is still being built and guides appear
+                here as they are published. In the meantime, a free Wrenchli
+                assessment gives the same do-it-yourself-or-shop read for
+                your specific car, before you spend anything.
+              </p>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
+
       {/* Tutorial Grid */}
       <section className="section-padding bg-background">
         <div className="container-wrenchli">
