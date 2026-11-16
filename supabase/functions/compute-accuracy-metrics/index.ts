@@ -7,6 +7,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
+// Brief 4 (2026-11-15): the shop-referral series is computed by
+// the shared counting-rules module and returned alongside the
+// persisted self-report series. It is deliberately NOT written
+// to accuracy_metrics: the counting rules require counts from
+// current referral state at read time (a dispute un-counts a
+// completion), and a frozen rollup row would go stale.
+import {
+  computeShopReferralReadout,
+  type AccuracyGradeRow,
+  type ReferralRow,
+} from "../_shared/shop-referral-accuracy.ts";
 
 
 // ── Types ────────────────────────────────────────────────────
@@ -172,6 +183,11 @@ serve(async (req) => {
         .select(
           "accuracy_score, match_label, predicted_confidence, confidence_was_correct, vehicle_make, symptom_category, predicted_top_cause, computed_at"
         )
+        // Brief 4: the persisted overall / by-make / by-category
+        // series are the CONSUMER SELF-REPORT series. Shop grades
+        // are computed separately below and never pooled into
+        // these rollups.
+        .eq("source", "consumer_self_report")
         .gte("computed_at", periodStartISO)
         .lte("computed_at", referenceDate.toISOString())
         .neq("match_label", "unverified");
@@ -244,6 +260,29 @@ serve(async (req) => {
       if (upsertError) throw upsertError;
     }
 
+    // ── SHOP-REFERRAL series (Brief 4, separate by source) ──
+    // Computed live from current state per the counting rules in
+    // _shared/shop-referral-accuracy.ts and returned alongside
+    // the persisted self-report rollups — never merged with them.
+    const [{ data: shopGrades }, { data: shopReferrals }] = await Promise.all([
+      supabase
+        .from("diagnostic_accuracy")
+        .select(
+          "session_id, source, accuracy_score, match_label, match_explanation, predicted_top_cause"
+        )
+        .eq("source", "shop_referral"),
+      supabase
+        .from("shop_referrals")
+        .select(
+          "id, package_id, status, referral_kind, outcome_found, completion_confirmed_by, disputed_at"
+        )
+        .eq("referral_kind", "repair"),
+    ]);
+    const shopReferral = computeShopReferralReadout(
+      (shopGrades ?? []) as AccuracyGradeRow[],
+      (shopReferrals ?? []) as ReferralRow[],
+    );
+
     // ── Return summary ─────────────────────────────────────
     return new Response(
       JSON.stringify({
@@ -251,6 +290,7 @@ serve(async (req) => {
         rows_computed: upsertRows.length,
         periods_processed: periods,
         reference_date: referenceDate.toISOString(),
+        shop_referral: shopReferral,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

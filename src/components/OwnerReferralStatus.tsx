@@ -431,6 +431,20 @@ interface OwnerReferralStatusProps {
  * is listed in order (shop, outcome, time), and the owner can stop
  * an active chain at any time via stop_referral_chain.
  */
+/**
+ * Brief 4 (trust loop): ask grade-referral-outcome to grade this
+ * referral's shop-reported outcome against the session's
+ * predicted causes. Best-effort and fire-and-forget: grading
+ * never blocks or breaks the owner's confirmation flow, the
+ * function is idempotent, and its backfill sweep recovers any
+ * missed invocation.
+ */
+function triggerReferralGrade(referralId: string) {
+  void supabase.functions
+    .invoke("grade-referral-outcome", { body: { referral_id: referralId } })
+    .catch(() => undefined);
+}
+
 export default function OwnerReferralStatus({ packageId, className }: OwnerReferralStatusProps) {
   const [rows, setRows] = useState<OwnerReferralRow[] | null>(null);
   const [shopNames, setShopNames] = useState<Record<string, string>>({});
@@ -489,6 +503,17 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
     }
     const referrals = (data as any as OwnerReferralRow[]) ?? [];
     setRows(referrals);
+
+    // Brief 4: referrals already in the counted state get an
+    // (idempotent) grade invocation. This is also how completions
+    // counted by the 14-day owner-unconfirmed fallback — applied
+    // by the escalation processor at the top of this load — get
+    // graded at that state.
+    for (const r of referrals) {
+      if (r.status === "completed" && r.completion_confirmed_by) {
+        triggerReferralGrade(r.id);
+      }
+    }
 
     const shopIds = Array.from(new Set(referrals.map((r) => r.shop_id)));
     if (shopIds.length > 0) {
@@ -604,6 +629,9 @@ export default function OwnerReferralStatus({ packageId, className }: OwnerRefer
             ? "Completion confirmed. Thank you!"
             : "Dispute recorded. This completion will not be counted."
         );
+        // Brief 4: confirmation is the counting trigger (Phase 1),
+        // so it is also the grading moment for the trust loop.
+        if (action === "confirm") triggerReferralGrade(referralId);
       }
       await load();
     } catch (e) {

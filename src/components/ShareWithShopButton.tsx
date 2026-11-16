@@ -31,6 +31,17 @@ interface ShareWithShopProps {
   chatSummary?: string | null;
   customerNotes?: string | null;
   quoteRequestId?: string | null;
+  /**
+   * Brief 4 (trust loop): the diagnostic_sessions row this
+   * package's assessment came from, when the caller knows it.
+   * Written to referral_packages.session_id at package creation
+   * so a shop's referral outcome can later be graded against
+   * the session's predicted causes. Omit (or pass null) when
+   * the origin session cannot be resolved; the package's
+   * session_id then stays null and grading falls back to the
+   * diagnosis_details snapshot.
+   */
+  sessionId?: string | null;
   className?: string;
   /**
    * Mobility Brief 2: "inspection" renders the mobile-inspector
@@ -179,6 +190,9 @@ export default function ShareWithShopButton(props: ShareWithShopProps) {
       .from("referral_packages" as any)
       .insert({
         user_id: userId,
+        // Brief 4: carry the origin session id when the caller
+        // resolved one (see the sessionId prop). Null otherwise.
+        session_id: props.sessionId ?? null,
         // Brief 3: the pickup/delivery request rides on the package
         // so every shop in the chain sees it. Only the pilot send
         // passes it; the legacy share path leaves the defaults.

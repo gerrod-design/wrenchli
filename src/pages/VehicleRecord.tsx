@@ -177,7 +177,7 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
 
   // R-70 Tier 2: assessments linked to this vehicle (user_vehicle_id).
   const [linkedAssessments, setLinkedAssessments] = useState<
-    Array<{ id: string; snapshot: HandoffSnapshot }>
+    Array<{ id: string; snapshot: HandoffSnapshot; sessionId: string | null }>
   >([]);
   
   useEffect(() => {
@@ -192,7 +192,7 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
   
     supabase
       .from("assessment_handoffs")
-      .select("id, snapshot, created_at")
+      .select("id, snapshot, source_assessment_id, created_at")
       .eq("user_vehicle_id", vehicleId)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
@@ -207,6 +207,18 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
           data.map((row) => ({
             id: row.id,
             snapshot: row.snapshot as unknown as HandoffSnapshot,
+            // Brief 4: the handoff is session-keyed by
+            // source_assessment_id (the diagnostic_sessions id).
+            // Carry it only when it is a well-formed session id;
+            // when the origin session cannot be resolved, pass
+            // nothing and the package's session_id stays null.
+            sessionId:
+              typeof row.source_assessment_id === "string" &&
+              /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+                row.source_assessment_id
+              )
+                ? row.source_assessment_id
+                : null,
           }))
         );
       });
@@ -449,6 +461,7 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
             <CardContent>
               <ShareWithShopButton
                 pilot
+                sessionId={linkedAssessments[0].sessionId}
                 diagnosisTitle={
                   linkedAssessments[0].snapshot.assessment.possible_causes[0]?.name ||
                   "Vehicle assessment"
@@ -467,6 +480,7 @@ function VehicleRecordView({ vehicleId }: { vehicleId?: string }) {
                 <ShareWithShopButton
                   pilot
                   mode="inspection"
+                  sessionId={linkedAssessments[0].sessionId}
                   diagnosisTitle={
                     linkedAssessments[0].snapshot.assessment.possible_causes[0]?.name ||
                     "Vehicle assessment"

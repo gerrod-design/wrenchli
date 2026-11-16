@@ -7,9 +7,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
-
-const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+// The MATCH rubric is single-sourced in _shared/accuracy-match.ts
+// (extracted verbatim from this function in Brief 4, 2026-11-15)
+// and shared with grade-referral-outcome. Never copy it back here.
+import {
+  scoreDiagnosisMatch,
+  unverifiedMatchResult,
+  type SemanticMatchResult,
+} from "../_shared/accuracy-match.ts";
 
 
 // ── Types ────────────────────────────────────────────────────
@@ -26,42 +31,6 @@ interface OutcomeInput {
   no_visit_reason?: string;
   diy_notes?: string;
 }
-
-interface SemanticMatchResult {
-  accuracy_score: number;
-  match_label: "exact" | "close" | "partial" | "miss" | "unverified";
-  match_explanation: string;
-  confidence_was_correct: boolean;
-  symptom_category: string;
-}
-
-// ── Semantic Match System Prompt ─────────────────────────────
-
-const MATCH_SYSTEM_PROMPT = `You are an automotive diagnostic expert evaluating how accurately a predicted diagnosis matched the actual shop finding.
-
-Return ONLY valid JSON. No explanation, no markdown:
-
-{
-  "accuracy_score": 0.0 to 1.0,
-  "match_label": "exact" | "close" | "partial" | "miss" | "unverified",
-  "match_explanation": "One plain-English sentence explaining the match.",
-  "confidence_was_correct": true | false,
-  "symptom_category": "brakes" | "engine" | "electrical" | "transmission" | "suspension" | "cooling" | "fuel" | "exhaust" | "tires" | "ac_heating" | "body" | "other"
-}
-
-Scoring rules:
-- 1.0 (exact): Same root cause. "Worn brake pads" vs "Brake pads needed replacement" = 1.0
-- 0.75-0.99 (close): Same system, related component. "Battery" vs "Alternator" = 0.80 (both charging system). "Brake pads" vs "Brake rotors" = 0.75 (same repair event).
-- 0.40-0.74 (partial): Same general area but different issue. "Transmission fluid" vs "Transmission slipping" = 0.50.
-- 0.0-0.39 (miss): Different system entirely. "Brake pads" vs "Alternator" = 0.05.
-- unverified: No shop visit or no actual_diagnosis provided. Score = null, confidence_was_correct = false.
-
-confidence_was_correct: true if predicted_confidence was "high" AND accuracy_score >= 0.75, OR if predicted_confidence was "low"/"medium" (lower bar, any result is acceptable). false if predicted_confidence was "high" but accuracy_score < 0.75.
-
-symptom_category: categorize based on the PREDICTED diagnosis (or actual if no prediction), not the symptom.
-
-match_explanation example: "Wrenchli predicted worn brake pads. Shop confirmed brake pad and rotor replacement. Strong match — same repair event."
-Another: "Wrenchli predicted a battery issue. Shop found a failing alternator. Close match — both are charging system components."`;
 
 // ── Main Handler ─────────────────────────────────────────────
 
@@ -217,79 +186,25 @@ serve(async (req) => {
       const topCause = sortedCauses[0]?.name ?? "Unknown";
       const allCauseNames = sortedCauses.map((c: any) => c.name);
 
-      const matchPrompt = `
-Predicted diagnosis:
-- Top predicted cause: ${topCause}
-- All predicted causes: ${allCauseNames.join(", ")}
-- Prediction confidence: ${diagnosis.confidence}
-- Wrenchli explanation: ${diagnosis.explanation}
-
-Actual shop finding:
-- What the shop found: ${outcome.actual_diagnosis}
-- Problem fixed: ${outcome.problem_fixed}
-
-Vehicle: ${vehicle?.year} ${vehicle?.make} ${vehicle?.model}
-
-Score this diagnostic accuracy.`.trim();
-
-      const aiResponse = await fetch(ANTHROPIC_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": Deno.env.get("ANTHROPIC_API_KEY") ?? "",
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          max_tokens: 400,
-          system: MATCH_SYSTEM_PROMPT,
-          messages: [{ role: "user", content: matchPrompt }],
-        }),
+      // Single-source rubric: prompt, scoring call, and response
+      // parsing all live in _shared/accuracy-match.ts.
+      matchResult = await scoreDiagnosisMatch({
+        topCause,
+        allCauseNames,
+        confidence: diagnosis.confidence,
+        explanation: diagnosis.explanation,
+        actualDiagnosis: outcome.actual_diagnosis,
+        problemFixed: outcome.problem_fixed,
+        vehicleYear: vehicle?.year,
+        vehicleMake: vehicle?.make,
+        vehicleModel: vehicle?.model,
       });
-
-      if (!aiResponse.ok) throw new Error(`AI service error: ${aiResponse.status}`);
-
-      const aiData = await aiResponse.json();
-      // The model's reply may sit in a later content block, arrive wrapped in
-      // markdown fences, or carry prose around the JSON — the previous strict
-      // JSON.parse(content[0].text) silently put every scored outcome on the
-      // 0.5 fallback (measured in Batch 7's live acceptance proofs).
-      const rawText = (aiData.content ?? [])
-        .filter((b: any) => b?.type === "text")
-        .map((b: any) => b.text ?? "")
-        .join("");
-
-      try {
-        matchResult = JSON.parse(rawText);
-      } catch {
-        const start = rawText.indexOf("{");
-        const end = rawText.lastIndexOf("}");
-        let extracted: SemanticMatchResult | null = null;
-        if (start >= 0 && end > start) {
-          try {
-            extracted = JSON.parse(rawText.slice(start, end + 1));
-          } catch {
-            extracted = null;
-          }
-        }
-        matchResult = extracted ?? {
-          accuracy_score: 0.5,
-          match_label: "unverified",
-          match_explanation: "Outcome recorded. Accuracy scoring unavailable.",
-          confidence_was_correct: false,
-          symptom_category: "other",
-        };
-      }
     } else {
-      matchResult = {
-        accuracy_score: 0,
-        match_label: "unverified",
-        match_explanation: outcome.shop_visit
+      matchResult = unverifiedMatchResult(
+        outcome.shop_visit
           ? "Outcome recorded without a specific shop diagnosis."
           : "No shop visit reported. Accuracy cannot be measured.",
-        confidence_was_correct: false,
-        symptom_category: "other",
-      };
+      );
     }
 
     // ── 5. Save accuracy record ────────────────────────────

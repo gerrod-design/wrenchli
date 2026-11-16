@@ -5,6 +5,15 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { corsHeaders, handleCorsOptions, getCorsHeaders } from "../_shared/cors.ts";
+// Brief 4 (2026-11-15): the shop-referral section of this
+// audit's output is computed by the shared counting-rules
+// module from current state. It sits beside the self-report
+// figures below; the two sources are never pooled.
+import {
+  computeShopReferralReadout,
+  type AccuracyGradeRow,
+  type ReferralRow,
+} from "../_shared/shop-referral-accuracy.ts";
 
 const ACCURACY_THRESHOLD = 0.60;
 const MIN_SAMPLE = 5;
@@ -91,19 +100,46 @@ Deno.serve(async (req) => {
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Query last 30 days of verified accuracy records
+    // Query last 30 days of verified accuracy records.
+    // Brief 4: this audit's breakdowns are the CONSUMER
+    // SELF-REPORT figures; shop grades are never pooled in.
     const { data: rows, error } = await supabase
       .from("diagnostic_accuracy")
       .select(
         "accuracy_score, match_label, predicted_confidence, predicted_urgency, confidence_was_correct, vehicle_make, symptom_category, predicted_top_cause",
       )
+      .eq("source", "consumer_self_report")
       .gte("computed_at", thirtyDaysAgo.toISOString())
       .neq("match_label", "unverified");
 
     if (error) throw error;
+
+    // ── SHOP-REFERRAL section (Brief 4) ──────────────────────
+    // Computed from current state (not the 30-day window): the
+    // counting rules re-derive the population at read time, so
+    // a disputed completion drops out of every count here.
+    const [{ data: shopGrades }, { data: shopReferrals }] = await Promise.all([
+      supabase
+        .from("diagnostic_accuracy")
+        .select(
+          "session_id, source, accuracy_score, match_label, match_explanation, predicted_top_cause",
+        )
+        .eq("source", "shop_referral"),
+      supabase
+        .from("shop_referrals")
+        .select(
+          "id, package_id, status, referral_kind, outcome_found, completion_confirmed_by, disputed_at",
+        )
+        .eq("referral_kind", "repair"),
+    ]);
+    const shopReferral = computeShopReferralReadout(
+      (shopGrades ?? []) as AccuracyGradeRow[],
+      (shopReferrals ?? []) as ReferralRow[],
+    );
+
     if (!rows || rows.length === 0) {
       return new Response(
-        JSON.stringify({ success: true, message: "No verified outcomes in last 30 days", rows_written: 0 }),
+        JSON.stringify({ success: true, message: "No verified outcomes in last 30 days", rows_written: 0, shop_referral: shopReferral }),
         { headers },
       );
     }
@@ -198,6 +234,7 @@ Deno.serve(async (req) => {
           vehicle_makes: computeCategoryMetrics(rows, (r) => r.vehicle_make).length,
           urgency_levels: computeCategoryMetrics(rows, (r) => r.predicted_urgency).length,
         },
+        shop_referral: shopReferral,
       }),
       { headers },
     );

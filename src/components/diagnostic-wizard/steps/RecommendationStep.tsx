@@ -171,6 +171,7 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
           up to 3 shops; the package goes to one shop at a time. */}
       <ShareWithShopButton
         pilot
+        sessionId={sessionId}
         diagnosisTitle={diagnosis.possible_causes[0]?.name ?? "Vehicle assessment"}
         diagnosisUrgency={diagnosis.urgency}
         diagnosisDetails={{
@@ -192,6 +193,7 @@ export default function RecommendationStep({ recommendation, diagnosis, vehicle,
       <ShareWithShopButton
         pilot
         mode="inspection"
+        sessionId={sessionId}
         diagnosisTitle={diagnosis.possible_causes[0]?.name ?? "Vehicle assessment"}
         diagnosisUrgency={diagnosis.urgency}
         diagnosisDetails={{
