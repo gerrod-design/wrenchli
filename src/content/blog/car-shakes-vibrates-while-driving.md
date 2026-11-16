@@ -1,7 +1,7 @@
 ---
 title: "Car Shakes or Vibrates While Driving — Causes, Costs, and What to Check First"
 date: "2026-04-12"
-figures_verified: "2026-11-09"
+figures_verified: "2026-11-16"
 excerpt: "A shaking car isn't just annoying — it's a warning. Here are the most common causes of vibration while driving, what repairs cost, and how to describe the problem to your mechanic."
 author: "Wrenchli Team"
 tags: ["vibration", "shaking", "tires", "alignment", "suspension"]
@@ -53,20 +53,20 @@ If the car vibrates while sitting still — at a stoplight or in park — the is
 
 **Vacuum leaks** — small cracks in rubber hoses or intake gaskets — cause the engine to run lean, producing a rough, unsteady idle.
 
-## What vibration repairs cost — example regional pricing (Michigan & Ohio)
+## What vibration repairs cost
 
-The range is wide because the causes are so varied:
+The range is wide because the causes are so varied. The ranges below span independent shops using quality aftermarket parts at the low end to dealership service departments using factory parts at the high end:
 
 - **Tire balance:** $40–$80 for all four tires
 - **Tire rotation and balance:** $60–$100
 - **Wheel alignment:** $80–$150
 - **Tire replacement (one tire):** $100–$250 depending on size and brand
-- **Brake rotor replacement (per axle):** $250–$600 parts and labor
+- **Brake rotor replacement (per axle):** $240–$560 parts and labor
 - **Tie rod end replacement:** $150–$400 per side
 - **Ball joint replacement:** $200–$500 per joint
 - **CV axle replacement:** $250–$600 per side
 - **Engine mount replacement:** $200–$600 per mount
-- **Spark plug replacement:** $100–$300 depending on engine type
+- **Spark plug replacement:** $155–$460 depending on engine type
 
 The most common scenario — unbalanced tires causing highway vibration — is a $40–$80 fix. But if you drive on unbalanced tires long enough, the uneven wear forces you into new tires at $400–$1,000 for a set. Early action saves money here, just like with brakes.
 

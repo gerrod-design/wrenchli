@@ -222,8 +222,7 @@ export default function ForDealers() {
               There is no Wrenchli software for your department to run and no
               integration to buy. Referrals arrive on a private link, and the
               outcome report is filed on the same link. The pilot is small and
-              every partner is approved individually, in Wrenchli's home
-              markets first.
+              every partner is approved individually.
             </p>
             <Button
               asChild

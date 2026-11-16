@@ -1,7 +1,7 @@
 ---
 title: "Car Won't Start, Clicking Noise — Causes, Costs, and What to Try First"
 date: "2026-04-12"
-figures_verified: "2026-11-09"
+figures_verified: "2026-11-16"
 excerpt: "You turn the key and hear rapid clicking but nothing happens. Here's what that clicking means, what to check before calling a tow truck, and what the repair will cost."
 author: "Wrenchli Team"
 tags: ["won't start", "clicking noise", "battery", "starter", "no crank"]
@@ -85,15 +85,15 @@ You can troubleshoot several of these causes yourself, right in your driveway or
 
 **Step 5: Check the key fob battery.** On push-button start vehicles, a dead key fob battery can prevent the car from recognizing the key. Most vehicles have a backup: hold the fob directly against the start button and press. Check your owner's manual for the specific procedure.
 
-## What no-start repairs cost — example regional pricing (Michigan & Ohio)
+## What no-start repairs cost
 
-Costs vary by cause, but here's what to expect:
+Costs vary by cause, but here's what to expect. The ranges below span independent shops using quality aftermarket parts at the low end to dealership service departments using factory parts at the high end:
 
-- **Battery replacement:** $120–$250 installed, depending on battery size and brand
-- **Battery terminal cleaning:** $20–$50 at a shop, or free if you do it yourself
-- **Starter motor replacement:** $300–$600 parts and labor, depending on vehicle
+- **Battery replacement:** $160–$350 installed, depending on battery size and brand
+- **Battery terminal cleaning:** $55–$165 at a shop, or free if you do it yourself
+- **Starter motor replacement:** $395–$840 parts and labor, depending on vehicle
 - **Starter solenoid replacement:** $150–$400 if separate from the starter
-- **Alternator replacement (if battery wasn't charging):** $400–$800
+- **Alternator replacement (if battery wasn't charging):** $445–$940
 - **Parasitic drain assessment:** $80–$150 for the assessment time, plus repair cost
 
 The battery-related fixes — replacement, terminal cleaning, or a jump plus recharge — are by far the most affordable. If a shop immediately quotes you a starter replacement without testing the battery first, push back and ask them to load-test the battery before proceeding.

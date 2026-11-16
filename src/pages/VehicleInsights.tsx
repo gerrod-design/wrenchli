@@ -386,9 +386,8 @@ export default function VehicleInsights() {
             </p>
           </SectionReveal>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 max-w-3xl mx-auto">
             {[
-              { emoji: "🔧", title: "Brake Pad Replacement", difficulty: "Easy", saves: "$100–$250", time: "1–2 hours" },
               { emoji: "💡", title: "Headlight Bulb Replacement", difficulty: "Easy", saves: "$50–$150", time: "15–30 min" },
               { emoji: "🔋", title: "Battery Replacement", difficulty: "Easy", saves: "$50–$100", time: "20–30 min" },
             ].map((card, i) => (
@@ -435,7 +434,7 @@ export default function VehicleInsights() {
                 </div>
                 <h2 className="font-heading text-2xl font-bold md:text-3xl">Using an OBD2 Scanner?</h2>
                 <p className="mt-3 text-primary-foreground/70 leading-relaxed">
-                  Wrenchli works with popular OBD2 scanners. Read your codes, enter them above, and get instant assessments with shop quotes.
+                  Wrenchli works with popular OBD2 scanners. Read your codes, enter them above, and get an instant assessment.
                 </p>
                 <Button variant="outline" className="mt-6 border-wrenchli-teal text-wrenchli-teal hover:bg-wrenchli-teal/10">
                   How to Read Your Codes →

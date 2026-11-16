@@ -22,8 +22,8 @@ const EXPLAINER_DATA: Record<string, ExplainerData> = {
     urgency: "soon",
     urgencyLabel: "Address within 1–2 weeks",
     causes: [
-      { name: "Worn Brake Pads", probability: 65, costRange: "$150–$350", description: "Friction material is gone — metal backing plate is grinding against the rotor." },
-      { name: "Damaged or Warped Rotors", probability: 25, costRange: "$250–$500", description: "Grooves, scoring, or heat warping from extended pad wear." },
+      { name: "Worn Brake Pads", probability: 65, costRange: "$155–$325", description: "Friction material is gone — metal backing plate is grinding against the rotor." },
+      { name: "Damaged or Warped Rotors", probability: 25, costRange: "$240–$560", description: "Grooves, scoring, or heat warping from extended pad wear." },
       { name: "Stuck Caliper or Debris", probability: 10, costRange: "$150–$900", description: "Caliper seized or road debris lodged between pad and rotor." },
     ],
   },
@@ -34,7 +34,7 @@ const EXPLAINER_DATA: Record<string, ExplainerData> = {
     urgencyLabel: "Plan a shop visit",
     causes: [
       { name: "Unbalanced or Worn Tires", probability: 50, costRange: "$20–$150", description: "Lost wheel weight, uneven tread wear, or tire defect causing high-speed wobble." },
-      { name: "Warped Brake Rotors", probability: 30, costRange: "$250–$500", description: "Pulsation felt in steering wheel or pedal when braking at speed." },
+      { name: "Warped Brake Rotors", probability: 30, costRange: "$240–$560", description: "Pulsation felt in steering wheel or pedal when braking at speed." },
       { name: "Worn Suspension Components", probability: 20, costRange: "$200–$1,500", description: "Ball joints, tie rods, or control arm bushings past service life." },
     ],
   },
@@ -44,8 +44,8 @@ const EXPLAINER_DATA: Record<string, ExplainerData> = {
     urgency: "immediate",
     urgencyLabel: "Needs attention now",
     causes: [
-      { name: "Weak or Dead Battery", probability: 70, costRange: "$100–$300", description: "Not enough amperage to engage the starter — rapid clicking is the giveaway." },
-      { name: "Failed Starter Motor", probability: 20, costRange: "$300–$700", description: "Single loud click then silence — solenoid fires but motor won't turn." },
+      { name: "Weak or Dead Battery", probability: 70, costRange: "$160–$350", description: "Not enough amperage to engage the starter — rapid clicking is the giveaway." },
+      { name: "Failed Starter Motor", probability: 20, costRange: "$395–$840", description: "Single loud click then silence — solenoid fires but motor won't turn." },
       { name: "Corroded Battery Connections", probability: 10, costRange: "$0–$50", description: "Buildup on terminals blocking current flow — often a free fix." },
     ],
   },

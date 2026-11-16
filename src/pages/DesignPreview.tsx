@@ -8,9 +8,9 @@ import Navbar from "@/components/Navbar";
 import heroShop from "@/assets/hero-shop.jpg";
 
 const mockCauses = [
-  { name: "Dead Battery", probability: 0.78, costLow: 150, costHigh: 350, difficulty: "easy" },
-  { name: "Alternator Failure", probability: 0.15, costLow: 400, costHigh: 800, difficulty: "professional_only" },
-  { name: "Starter Motor", probability: 0.04, costLow: 300, costHigh: 600, difficulty: "professional_only" },
+  { name: "Dead Battery", probability: 0.78, costLow: 160, costHigh: 350, difficulty: "easy" },
+  { name: "Alternator Failure", probability: 0.15, costLow: 445, costHigh: 940, difficulty: "professional_only" },
+  { name: "Starter Motor", probability: 0.04, costLow: 395, costHigh: 840, difficulty: "professional_only" },
 ];
 
 const difficultyColors: Record<string, string> = {

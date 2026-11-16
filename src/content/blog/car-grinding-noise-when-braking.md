@@ -1,7 +1,7 @@
 ---
 title: "Car Makes Grinding Noise When Braking — Causes, Costs, and What to Do Next"
 date: "2026-04-12"
-figures_verified: "2026-11-09"
+figures_verified: "2026-11-16"
 excerpt: "Grinding brakes mean something is wearing down — and ignoring it gets expensive fast. Here are the likely causes, what repairs cost, and when you need to act."
 author: "Wrenchli Team"
 tags: ["brakes", "grinding noise", "brake pads", "rotors", "car noise"]
@@ -43,17 +43,17 @@ Small rocks, road grit, or rust flakes can get lodged between the pad and rotor.
 
 Less common but worth mentioning: a failing wheel bearing can produce a grinding or humming noise that gets louder when braking. The difference is that bearing noise usually changes with vehicle speed, not just when you press the brake pedal.
 
-## What brake grinding repairs cost — example regional pricing (Michigan & Ohio)
+## What brake grinding repairs cost
 
-Costs depend on the root cause and how long you waited to address it:
+Costs depend on the root cause and how long you waited to address it. The ranges below span independent shops using quality aftermarket parts at the low end to dealership service departments using factory parts at the high end:
 
-- **Brake pad replacement (front or rear):** $150–$350 per axle, parts and labor
-- **Brake pad and rotor replacement:** $300–$700 per axle
-- **Caliper replacement:** $200–$450 per caliper, parts and labor
+- **Brake pad replacement (front or rear):** $155–$325 per axle, parts and labor
+- **Brake pad and rotor replacement:** $355–$745 per axle
+- **Caliper replacement:** per caliper, parts and labor; the price varies too much by vehicle to publish a responsible range, so ask your shop for the figure on yours
 - **Rotor resurfacing (if still within spec):** $50–$100 per rotor
-- **Wheel bearing replacement:** $250–$500 per wheel
+- **Wheel bearing replacement:** $275–$585 per wheel
 
-Here's the important math: replacing brake pads early costs $150–$350. Waiting until the pads destroy the rotors costs $300–$700. That's double the cost for the same axle — just because you waited a few weeks.
+Here's the important math: replacing brake pads early costs $155–$325. Waiting until the pads destroy the rotors costs $355–$745. That's double the cost for the same axle — just because you waited a few weeks.
 
 ## Is it safe to drive with grinding brakes
 
@@ -63,7 +63,7 @@ Grinding brakes mean your stopping distance is increasing. The friction material
 
 - **Damages the rotors further**, turning a pad-only repair into a pad-and-rotor replacement
 - **Reduces your braking effectiveness**, meaning you need more distance to stop
-- **Risks caliper damage** if the pads wear completely through, which adds another $200–$450 to the repair
+- **Risks caliper damage** if the pads wear completely through, which adds a caliper replacement to the repair bill
 
 If the grinding just started and is mild, you can safely drive to a shop — but don't put it off for days or weeks. If the grinding is severe, accompanied by vibration, pulling, or a burning smell, minimize driving immediately.
 
