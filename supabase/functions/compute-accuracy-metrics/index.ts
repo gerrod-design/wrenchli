@@ -178,7 +178,9 @@ function getPeriodStart(period: "daily" | "weekly" | "monthly", referenceDate: D
 // because an outcome was reported); hits counts scores
 // >= 0.75; hit_rate = hits / confirmed (null when nothing was
 // scored). The dimension (make / symptom category) rides in
-// cause_key; the overall row leaves cause_key null.
+// cause_key; cause_key is NOT NULL in production, so the
+// overall row carries cause_key 'overall' (the vera-outcomes
+// convention).
 const ROLLUP_LIMITATIONS =
   "Consumer self-report series (diagnostic_accuracy, source = consumer_self_report); rubric grades of owner-reported outcomes, not verified repairs. Hit = accuracy_score >= 0.75.";
 
@@ -193,7 +195,7 @@ function toRollupRow(
     metric_type: metricType,
     period,
     period_start: periodStartISO,
-    cause_key: causeKey,
+    cause_key: causeKey ?? "overall",
     predictions: metrics.outcomes_count,
     confirmed: metrics.outcomes_count,
     hits: metrics.hits,
