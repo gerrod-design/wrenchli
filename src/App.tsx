@@ -38,6 +38,8 @@ import VehicleRecord from "./pages/VehicleRecord";
 import VehicleBaseline from "./pages/VehicleBaseline";
 import Investors from "./pages/Investors";
 import AdminLogin from "./pages/AdminLogin";
+import ShopLogin from "./pages/ShopLogin";
+import ShopPortal from "./pages/ShopPortal";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminAudit from "./pages/AdminAudit";
 import AdminDigestSpec from "./pages/AdminDigestSpec";
@@ -76,9 +78,12 @@ function AnimatedRoutes() {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
+  const isShop =
+    location.pathname.startsWith("/shop-login") ||
+    location.pathname.startsWith("/shop-portal");
   const isDesignPreview = location.pathname === "/" || location.pathname.startsWith("/design-preview/");
 
-  if (isAdmin) {
+  if (isAdmin || isShop) {
     return (
       <Routes location={location}>
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -87,6 +92,8 @@ function AnimatedRoutes() {
         <Route path="/admin/digest-spec" element={<ProtectedRoute><AdminDigestSpec /></ProtectedRoute>} />
         <Route path="/admin/financing-simulation" element={<ProtectedRoute><FinancingSimulation /></ProtectedRoute>} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/shop-login" element={<ShopLogin />} />
+        <Route path="/shop-portal" element={<ShopPortal />} />
       </Routes>
     );
   }
@@ -147,10 +154,8 @@ function AnimatedRoutes() {
           <Route path="/find-nearby-shops" element={<FindNearbyShops />} />
           {/* Paused 2026-09-17: experimental agent booking flow with shop selection — not offered */}
           <Route path="/agent-diagnosis" element={<PreserveNavigate to="/" />} />
-          {/* Shop track paused 2026-09-17: onboarding/login/portal redirect to the paused notice */}
+          {/* Shop track: onboarding still routes to /for-shops; shop sign-in and the shop portal went live with the v1 shop-account slice (2026-11-17) and are routed in the standalone block above. */}
           <Route path="/for-shops/onboarding" element={<PreserveNavigate to="/for-shops" />} />
-          <Route path="/shop-login" element={<PreserveNavigate to="/for-shops" />} />
-          <Route path="/shop-portal" element={<PreserveNavigate to="/for-shops" />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/warranty-guide" element={<WarrantyGuide />} />
@@ -197,8 +202,11 @@ export function AppLayout({ ssr = false }: { ssr?: boolean }) {
   const isAdmin =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/reset-password");
+  const isShop =
+    location.pathname.startsWith("/shop-login") ||
+    location.pathname.startsWith("/shop-portal");
   const isDesignPreview = location.pathname === "/" || location.pathname.startsWith("/design-preview/");
-  const hideChrome = isAdmin || isDesignPreview;
+  const hideChrome = isAdmin || isShop || isDesignPreview;
 
   useEffect(() => {
     import("@/lib/analytics").then(({ trackPagePerformance }) => {
@@ -219,7 +227,7 @@ export function AppLayout({ ssr = false }: { ssr?: boolean }) {
           render time. The client app mounts all of it as before. */}
       {!hideChrome && !ssr && <MobileBottomBar />}
       {!hideChrome && !ssr && <BackToTop />}
-      {!isAdmin && !ssr && location.pathname !== "/for-shops" && location.pathname !== "/for-shops/talk" && <ChatBot />}
+      {!isAdmin && !isShop && !ssr && location.pathname !== "/for-shops" && location.pathname !== "/for-shops/talk" && <ChatBot />}
       {!hideChrome && !ssr && <CookieConsent />}
     </>
   );

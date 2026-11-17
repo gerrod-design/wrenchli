@@ -7,47 +7,26 @@ import { toast } from "sonner";
 import { Wrench, Mail, Lock, ArrowRight } from "lucide-react";
 import SEO from "@/components/SEO";
 
+// Shop sign-in (v1 shop-account slice, 2026-11-17). Shop accounts
+// are created by Wrenchli when a shop is approved for the pilot;
+// there is no public sign-up. A signed-in user with no shop
+// account linked is told plainly, in the portal.
 export default function ShopLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [shopName, setShopName] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin + "/shop-portal" },
-        });
-        if (error) throw error;
-        toast.success("Check your email to verify your account.");
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-
-        // Check if they have a shop account
-        const { data: shopAccount } = await supabase
-          .from("shop_accounts")
-          .select("id")
-          .eq("user_id", data.user.id)
-          .maybeSingle();
-
-        if (shopAccount) {
-          navigate("/shop-portal");
-        } else {
-          toast.info("No shop account found. Please contact us to set up your shop.");
-          navigate("/shop-portal");
-        }
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate("/shop-portal");
     } catch (e: any) {
-      toast.error(e.message || "Authentication failed");
+      toast.error(e.message || "Sign-in failed. Check your email and password and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +34,7 @@ export default function ShopLogin() {
 
   return (
     <>
-      <SEO title="Shop Portal Login" description="Sign in to your Wrenchli shop dashboard." path="/shop-login" />
+      <SEO title="Shop Sign In" description="Sign in to your Wrenchli shop page to see referrals sent to your shop." path="/shop-login" />
       <main className="min-h-screen flex items-center justify-center bg-primary px-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
@@ -63,25 +42,14 @@ export default function ShopLogin() {
               <Wrench className="h-7 w-7 text-accent-foreground" />
             </div>
             <h1 className="text-2xl font-heading font-bold text-primary-foreground">
-              Shop Portal
+              Shop Sign In
             </h1>
             <p className="text-sm text-primary-foreground/60 mt-1">
-              {isSignUp ? "Create your shop account" : "Sign in to your dashboard"}
+              See the referrals Wrenchli has sent your shop.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="bg-card rounded-2xl border border-border p-6 space-y-4 shadow-lg">
-            {isSignUp && (
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Shop Name</label>
-                <Input
-                  placeholder="Your shop name"
-                  value={shopName}
-                  onChange={(e) => setShopName(e.target.value)}
-                  required={isSignUp}
-                />
-              </div>
-            )}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Email</label>
               <div className="relative">
@@ -113,23 +81,19 @@ export default function ShopLogin() {
             </div>
 
             <Button type="submit" disabled={isLoading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold">
-              {isLoading ? "Loading..." : (
+              {isLoading ? "Signing in..." : (
                 <>
-                  {isSignUp ? "Create Account" : "Sign In"}
+                  Sign In
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
 
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm text-accent hover:underline"
-              >
-                {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
-              </button>
-            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Wrenchli sets up shop accounts when a shop joins the pilot.
+              If your shop is part of the pilot and you cannot sign in,{" "}
+              <Link to="/contact" className="text-accent hover:underline">contact us</Link>.
+            </p>
           </form>
 
           <p className="text-center text-xs text-primary-foreground/30 mt-6">
