@@ -43,6 +43,7 @@ interface PeriodMetrics {
   accuracy_rate: number;
   confidence_calibration: number | null;
   outcomes_count: number;
+  hits: number;
   exact_match_count: number;
   close_match_count: number;
   partial_match_count: number;
@@ -63,6 +64,7 @@ function computeMetrics(rows: AccuracyRow[]): PeriodMetrics {
       accuracy_rate: 0,
       confidence_calibration: null,
       outcomes_count: 0,
+      hits: 0,
       exact_match_count: 0,
       close_match_count: 0,
       partial_match_count: 0,
@@ -75,6 +77,10 @@ function computeMetrics(rows: AccuracyRow[]): PeriodMetrics {
 
   const accuracy_rate =
     scoredRows.reduce((sum, r) => sum + (r.accuracy_score ?? 0), 0) / outcomes_count;
+
+  // Hit = accuracy_score >= 0.75, the platform counting rule
+  // (see _shared/shop-referral-accuracy.ts).
+  const hits = scoredRows.filter((r) => (r.accuracy_score ?? 0) >= 0.75).length;
 
   const exact_match_count  = rows.filter((r) => r.match_label === "exact").length;
   const close_match_count  = rows.filter((r) => r.match_label === "close").length;
@@ -127,6 +133,7 @@ function computeMetrics(rows: AccuracyRow[]): PeriodMetrics {
       ? Math.round(confidence_calibration * 1000) / 1000
       : null,
     outcomes_count,
+    hits,
     exact_match_count,
     close_match_count,
     partial_match_count,
@@ -154,6 +161,52 @@ function getPeriodStart(period: "daily" | "weekly" | "monthly", referenceDate: D
   return d;
 }
 
+// ── Persistence mapping (2026-11-17 fix) ─────────────────────
+// accuracy_metrics in production carries the charter column set
+// (period, cause_key, predictions, confirmed, hits, hit_rate,
+// dataset_limitations, cleared_by_watchdog, computed_at,
+// metric_type, period_start, trend) and is append-only (the
+// vera_accuracy_metrics_no_mutation trigger rejects UPDATE and
+// DELETE). Rollups are therefore INSERTed in that shape, never
+// upserted; readers take the latest row by computed_at. The
+// previous payload (accuracy_rate, dimension_value,
+// outcomes_count, match counts, top/worst diagnoses) named
+// columns the production table does not have, so every run
+// with accuracy rows present failed with HTTP 500.
+// Mapping: predictions and confirmed are the scored outcome
+// count (every diagnostic_accuracy row graded here exists
+// because an outcome was reported); hits counts scores
+// >= 0.75; hit_rate = hits / confirmed (null when nothing was
+// scored). The dimension (make / symptom category) rides in
+// cause_key; the overall row leaves cause_key null.
+const ROLLUP_LIMITATIONS =
+  "Consumer self-report series (diagnostic_accuracy, source = consumer_self_report); rubric grades of owner-reported outcomes, not verified repairs. Hit = accuracy_score >= 0.75.";
+
+function toRollupRow(
+  metricType: "overall" | "by_make" | "by_symptom_category",
+  period: string,
+  periodStartISO: string,
+  causeKey: string | null,
+  metrics: PeriodMetrics,
+): Record<string, unknown> {
+  return {
+    metric_type: metricType,
+    period,
+    period_start: periodStartISO,
+    cause_key: causeKey,
+    predictions: metrics.outcomes_count,
+    confirmed: metrics.outcomes_count,
+    hits: metrics.hits,
+    hit_rate: metrics.outcomes_count > 0
+      ? Math.round((metrics.hits / metrics.outcomes_count) * 1000) / 1000
+      : null,
+    trend: metrics.trend,
+    dataset_limitations: ROLLUP_LIMITATIONS,
+    cleared_by_watchdog: false,
+    computed_at: new Date().toISOString(),
+  };
+}
+
 // ── Main Handler ─────────────────────────────────────────────
 
 serve(async (req) => {
@@ -172,7 +225,7 @@ serve(async (req) => {
       body.periods ?? ["daily", "weekly", "monthly"];
     const referenceDate = body.reference_date ? new Date(body.reference_date) : new Date();
 
-    const upsertRows: Record<string, unknown>[] = [];
+    const insertRows: Record<string, unknown>[] = [];
 
     for (const period of periods) {
       const periodStart = getPeriodStart(period, referenceDate);
@@ -197,14 +250,9 @@ serve(async (req) => {
 
       // ── OVERALL metric ───────────────────────────────────
       const overallMetrics = computeMetrics(rows);
-      upsertRows.push({
-        metric_type: "overall",
-        period,
-        period_start: periodStart.toISOString().split("T")[0],
-        dimension_value: null,
-        ...overallMetrics,
-        computed_at: new Date().toISOString(),
-      });
+      insertRows.push(
+        toRollupRow("overall", period, periodStart.toISOString().split("T")[0], null, overallMetrics),
+      );
 
       // ── BY MAKE metric ───────────────────────────────────
       const makeGroups = new Map<string, AccuracyRow[]>();
@@ -217,14 +265,9 @@ serve(async (req) => {
       for (const [make, makeRows] of makeGroups.entries()) {
         if (makeRows.length < 5) continue;
         const makeMetrics = computeMetrics(makeRows);
-        upsertRows.push({
-          metric_type: "by_make",
-          period,
-          period_start: periodStart.toISOString().split("T")[0],
-          dimension_value: make,
-          ...makeMetrics,
-          computed_at: new Date().toISOString(),
-        });
+        insertRows.push(
+          toRollupRow("by_make", period, periodStart.toISOString().split("T")[0], make, makeMetrics),
+        );
       }
 
       // ── BY SYMPTOM CATEGORY metric ───────────────────────
@@ -238,26 +281,19 @@ serve(async (req) => {
       for (const [category, catRows] of categoryGroups.entries()) {
         if (catRows.length < 5) continue;
         const catMetrics = computeMetrics(catRows);
-        upsertRows.push({
-          metric_type: "by_symptom_category",
-          period,
-          period_start: periodStart.toISOString().split("T")[0],
-          dimension_value: category,
-          ...catMetrics,
-          computed_at: new Date().toISOString(),
-        });
+        insertRows.push(
+          toRollupRow("by_symptom_category", period, periodStart.toISOString().split("T")[0], category, catMetrics),
+        );
       }
     }
 
-    // ── Upsert all computed rows ───────────────────────────
-    if (upsertRows.length > 0) {
-      const { error: upsertError } = await supabase
+    // ── Insert all computed rows (append-only table) ───────
+    if (insertRows.length > 0) {
+      const { error: insertError } = await supabase
         .from("accuracy_metrics")
-        .upsert(upsertRows, {
-          onConflict: "metric_type,period,period_start,dimension_value",
-        });
+        .insert(insertRows);
 
-      if (upsertError) throw upsertError;
+      if (insertError) throw insertError;
     }
 
     // ── SHOP-REFERRAL series (Brief 4, separate by source) ──
@@ -287,7 +323,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        rows_computed: upsertRows.length,
+        rows_computed: insertRows.length,
         periods_processed: periods,
         reference_date: referenceDate.toISOString(),
         shop_referral: shopReferral,

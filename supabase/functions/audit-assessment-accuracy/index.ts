@@ -18,6 +18,12 @@ import {
 const ACCURACY_THRESHOLD = 0.60;
 const MIN_SAMPLE = 5;
 
+// Persisted-rollup limitations note (accuracy_metrics rows are
+// written in the production column shape; see the mapping
+// comment in compute-accuracy-metrics).
+const AUDIT_LIMITATIONS =
+  "Consumer self-report breakdown (diagnostic_accuracy, source = consumer_self_report, last 30 days); rubric grades of owner-reported outcomes, not verified repairs. Hits = exact + close matches.";
+
 interface AccuracyRow {
   accuracy_score: number | null;
   match_label: string;
@@ -145,29 +151,45 @@ Deno.serve(async (req) => {
     }
 
     const today = now.toISOString().split("T")[0];
-    const upsertRows: Record<string, unknown>[] = [];
+    const insertRows: Record<string, unknown>[] = [];
     const pendingAlerts: { category: string; category_type: string; accuracy_rate: number; sample_size: number }[] = [];
 
-    // Helper to push metrics + collect potential alerts
+    // Helper to push metrics + collect potential alerts.
+    // 2026-11-17 vocabulary alignment: rows are written in the
+    // production accuracy_metrics column shape (append-only
+    // table; see compute-accuracy-metrics for the mapping), and
+    // metric_type must satisfy the validate_accuracy_metrics
+    // vocabulary ('overall', 'by_make', 'by_symptom_category').
+    // The symptom breakdown persists as 'by_symptom_category'
+    // and the make breakdown as 'by_make', with the dimension
+    // value in cause_key. The urgency breakdown has no
+    // vocabulary type, so it is computed and alerted on but NOT
+    // persisted (metricType null) rather than written under the
+    // old 'category_breakdown' type the trigger rejects.
     function processBreakdown(
       metrics: CategoryMetrics[],
-      dimPrefix: string,
+      metricType: "by_symptom_category" | "by_make" | null,
       categoryType: string,
     ) {
       for (const m of metrics) {
-        upsertRows.push({
-          metric_type: "category_breakdown",
-          period: "monthly",
-          period_start: today,
-          dimension_value: `${dimPrefix}:${m.category}`,
-          accuracy_rate: m.accuracy_rate,
-          outcomes_count: m.sample_size,
-          exact_match_count: m.exact_count,
-          close_match_count: m.close_count,
-          partial_match_count: m.partial_count,
-          miss_count: m.miss_count,
-          computed_at: now.toISOString(),
-        });
+        if (metricType !== null) {
+          const hits = m.exact_count + m.close_count;
+          insertRows.push({
+            metric_type: metricType,
+            period: "monthly",
+            period_start: today,
+            cause_key: m.category,
+            predictions: m.sample_size,
+            confirmed: m.sample_size,
+            hits,
+            hit_rate: m.sample_size > 0
+              ? Math.round((hits / m.sample_size) * 1000) / 1000
+              : null,
+            dataset_limitations: AUDIT_LIMITATIONS,
+            cleared_by_watchdog: false,
+            computed_at: now.toISOString(),
+          });
+        }
         if (m.accuracy_rate < ACCURACY_THRESHOLD && m.sample_size >= MIN_SAMPLE) {
           pendingAlerts.push({
             category: m.category,
@@ -179,16 +201,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    processBreakdown(computeCategoryMetrics(rows, (r) => r.symptom_category), "symptom", "symptom_category");
-    processBreakdown(computeCategoryMetrics(rows, (r) => r.vehicle_make), "make", "vehicle_make");
-    processBreakdown(computeCategoryMetrics(rows, (r) => r.predicted_urgency), "urgency", "urgency_level");
+    processBreakdown(computeCategoryMetrics(rows, (r) => r.symptom_category), "by_symptom_category", "symptom_category");
+    processBreakdown(computeCategoryMetrics(rows, (r) => r.vehicle_make), "by_make", "vehicle_make");
+    processBreakdown(computeCategoryMetrics(rows, (r) => r.predicted_urgency), null, "urgency_level");
 
-    // Upsert metrics
-    if (upsertRows.length > 0) {
-      const { error: upsertError } = await supabase
+    // Insert metrics (append-only table)
+    if (insertRows.length > 0) {
+      const { error: insertError } = await supabase
         .from("accuracy_metrics")
-        .upsert(upsertRows, { onConflict: "metric_type,period,period_start,dimension_value" });
-      if (upsertError) throw upsertError;
+        .insert(insertRows);
+      if (insertError) throw insertError;
     }
 
     // Deduplicate alerts — only insert if no unresolved alert exists for same category+type
@@ -226,7 +248,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        metrics_written: upsertRows.length,
+        metrics_written: insertRows.length,
         alerts_generated: alertsCreated,
         total_outcomes_analyzed: rows.length,
         breakdown: {
