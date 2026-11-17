@@ -26,6 +26,12 @@ const steps = [
 
 const terms = [
   "Free referrals until your shop completes its first five referred repairs. No exclusivity, no volume commitments.",
+  "Answer within one business day. Accept or decline each referral inside one business day; if the window passes, the customer is offered the next shop rather than left waiting. Declining costs nothing and carries no penalty.",
+  "The published range is the ceiling. For the agreed scope, your price stays within the Wrenchli range the customer saw. If the scope or the price has to change, the customer hears it before the additional work is done, and Wrenchli is notified the same day when a change takes the price above the range.",
+  "A written warranty is a condition of listing. Every listed shop declares a warranty of at least 12 months or 12,000 miles on its repairs, in writing.",
+  "Fees only on owner-confirmed completions. After the free first five, the founding rate is $50 per completed repair, capped at $299 a month, and a repair counts only when the car owner confirms it was done. Founding shops hold that rate in writing. The fee is never a percentage of the repair bill.",
+  "We never ask for your customer list. Not at listing, not ever after. Your customers remain yours.",
+  "Customer details only after you accept. Before acceptance, a referral describes the vehicle, the problem, and the area, not the person. The customer's name, email, and phone number are shared only after you accept the job.",
   "Outcome report within 7 days for each referral you accept.",
   "Either party can end participation at any time.",
 ];

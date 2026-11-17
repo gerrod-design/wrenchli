@@ -114,18 +114,18 @@ const sharedScreens = [
             <div className="grid grid-cols-2 gap-1.5">
               <div className="rounded bg-muted px-2 py-1">
                 <p className="text-[7px] text-muted-foreground">DIY</p>
-                <p className="text-[9px] font-bold text-foreground">$25–$60</p>
+                <p className="text-[9px] font-bold text-foreground">Shop required</p>
               </div>
               <div className="rounded bg-muted px-2 py-1">
                 <p className="text-[7px] text-muted-foreground">Professional</p>
-                <p className="text-[9px] font-bold text-foreground">$150–$350</p>
+                <p className="text-[9px] font-bold text-foreground">$155–$325</p>
               </div>
             </div>
           </div>
           <div className="mt-2 rounded bg-muted px-2 py-1.5">
             <p className="text-[8px] font-semibold text-foreground">Common Causes</p>
             <p className="text-[7px] text-muted-foreground">Worn pads, glazed rotors, debris</p>
-            <p className="text-[7px] text-wrenchli-green font-medium mt-0.5">DIY: 🟢 Easy</p>
+            <p className="text-[7px] text-wrenchli-green font-medium mt-0.5">Brakes: shop required</p>
           </div>
         </div>
       </div>
@@ -170,7 +170,7 @@ const diyScreens = [
         </div>
         <div className="flex-1 px-3 py-3 space-y-2">
           <p className="text-[8px] font-semibold text-muted-foreground">Tutorials for 2019 Toyota Camry:</p>
-          {["Brake Pad Replacement — Full Guide", "Front Brake Pad Swap — 15 min", "Camry Brake Job — Beginner"].map((t, i) => (
+          {["Cabin Air Filter — Full Guide", "Headlight Bulb Swap — 10 min", "Wiper Blades — Beginner"].map((t, i) => (
             <div key={i} className="flex items-center gap-2 rounded-lg border border-border bg-card p-2 shadow-sm">
               <div className="flex h-8 w-12 shrink-0 items-center justify-center rounded bg-muted">
                 <Play className="h-3 w-3 text-muted-foreground" />
@@ -195,8 +195,8 @@ const diyScreens = [
         </div>
         <div className="flex-1 px-3 py-3 space-y-2">
           {[
-            { name: "Ceramic Brake Pads (Front)", price: "$32.99", store: "Amazon" },
-            { name: "Brake Pad Set (Rear)", price: "$28.49", store: "O'Reilly" },
+            { name: "Cabin Air Filter", price: "$18.99", store: "Amazon" },
+            { name: "Headlight Bulb (Pair)", price: "$24.49", store: "O'Reilly" },
           ].map((part) => (
             <div key={part.name} className="rounded-lg border border-border bg-card p-2 shadow-sm">
               <div className="flex items-center justify-between">
@@ -208,11 +208,11 @@ const diyScreens = [
           ))}
           <div className="rounded bg-muted px-2 py-1.5">
             <p className="text-[8px] font-semibold text-foreground">🔧 Tools You'll Need</p>
-            <p className="text-[7px] text-muted-foreground">Jack, lug wrench, C-clamp</p>
+            <p className="text-[7px] text-muted-foreground">Screwdriver, gloves</p>
             <p className="text-[7px] text-wrenchli-teal mt-0.5">💡 Pro Tip: Auto parts stores offer free loaner tools</p>
           </div>
           <div className="rounded bg-accent px-2 py-1.5 text-center text-[8px] font-bold text-accent-foreground">
-            🛒 Add to Cart — $61.48
+            🛒 Add to Cart — $43.48
           </div>
         </div>
       </div>
@@ -239,7 +239,7 @@ const diyScreens = [
             </div>
             <div className="flex items-center gap-1 rounded bg-wrenchli-green/10 px-2 py-1">
               <CheckCircle className="h-3 w-3 text-wrenchli-green" />
-              <span className="text-[7px] font-medium text-wrenchli-green">Feb 8: Brake Pads — ✅ Fixed (DIY)</span>
+              <span className="text-[7px] font-medium text-wrenchli-green">Feb 8: Brake Pads — ✅ Fixed at a shop</span>
             </div>
           </div>
         </div>
@@ -355,7 +355,7 @@ const shopScreens = [
             <p className="text-[10px] font-bold text-foreground mb-1">Brake pads — likely cause</p>
             <div className="rounded bg-muted px-2 py-1 flex justify-between">
               <span className="text-[8px] text-muted-foreground">Typical shop range</span>
-              <span className="text-[8px] font-bold text-foreground">$150–$350</span>
+              <span className="text-[8px] font-bold text-foreground">$155–$325</span>
             </div>
             <div className="mt-1.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-center">
               <span className="text-[7px] font-bold text-amber-600">Urgency: Soon — fix promptly</span>
@@ -363,9 +363,9 @@ const shopScreens = [
           </div>
           <div className="rounded-lg border border-border bg-card p-2">
             <p className="text-[8px] font-bold text-foreground mb-1">
-              DIY or shop?
+              Shop required
             </p>
-            <p className="text-[7px] text-muted-foreground">Moderate difficulty — video guide available, or take the assessment to any qualified shop.</p>
+            <p className="text-[7px] text-muted-foreground">Brake work is safety-critical and not a do-it-yourself job. Take the assessment to any qualified shop.</p>
           </div>
           <div className="rounded bg-accent px-2 py-1.5 text-center text-[8px] font-bold text-accent-foreground">
             💾 Save to My Garage

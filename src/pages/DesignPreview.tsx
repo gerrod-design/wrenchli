@@ -289,7 +289,7 @@ export default function DesignPreview() {
                 {[
                   { label: "Vehicle", value: "2019 Honda Civic LX" },
                   { label: "Assessment", value: "Dead Battery (78% likely)" },
-                  { label: "Cost Range", value: "$150 – $350" },
+                  { label: "Cost Range", value: "$160 – $350" },
                   { label: "Customer Status", value: "Assessment complete" },
                 ].map((item) => (
                   <div key={item.label} className="rounded-lg p-3" style={{ background: "#F8F8F6", border: "1px solid #E0DDD8" }}>

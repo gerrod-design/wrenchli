@@ -19,7 +19,7 @@ export const symptomLibrary: SymptomEntry[] = [
     commonCauses: ["Worn brake pad friction material", "Glazed or contaminated brake rotors", "Dust or debris between pad and rotor", "Cheap or low-quality brake pads"],
     urgency: "medium",
     diyFeasibility: "moderate",
-    costRange: { diy: "$25–$60 per axle", professional: "$150–$350 per axle" },
+    costRange: { diy: "Shop required (brakes are not a DIY repair)", professional: "$155–$325 per axle" },
   },
   {
     keywords: ["check engine", "check engine light", "engine light", "cel", "mil", "malfunction indicator"],

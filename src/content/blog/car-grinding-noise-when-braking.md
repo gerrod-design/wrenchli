@@ -95,15 +95,11 @@ A shop that measures rather than guesses is a shop that gets it right the first 
 
 ## Can you replace brake pads yourself
 
-Brake pad replacement is one of the more accessible DIY repairs — if you have the right tools and some mechanical confidence. You'll need a jack, jack stands, a lug wrench, a C-clamp, and basic hand tools.
+No. Wrenchli does not treat brake work as a do-it-yourself repair, and neither should you. Brakes are the system that stops the car, and pad work done wrong can fail without warning. Doing it right also takes measurements most home toolboxes cannot make: pad thickness on all four wheels, rotor thickness and condition, and caliper function on both sides of the axle.
 
-**Difficulty level: Moderate.** Pad replacement alone is manageable for a first-timer with a good tutorial. Adding rotor replacement increases the complexity. Caliper work is best left to a shop unless you have experience.
+Have a shop do it. The professional ranges above are what the job costs done properly, and the five questions in the section before this one will help you confirm the shop measured before it recommended.
 
-**Time estimate:** 1–2 hours per axle for pad replacement. Add 30–60 minutes if replacing rotors.
-
-**Parts cost for DIY:** $30–$80 for a set of brake pads. $40–$120 per rotor. You'll save $100–$250 in labor per axle versus a shop.
-
-If you want to check whether a DIY approach makes sense for your specific vehicle, [run your symptoms through Wrenchli's free assessment](https://wrenchli.net). It takes two minutes and breaks down cost ranges for both DIY and shop repair options.
+If you want a clearer picture before the visit, [run your symptoms through Wrenchli's free assessment](https://wrenchli.net). It takes two minutes and lays out the likely causes and the shop cost range for each.
 
 ## The bottom line
 

@@ -34,7 +34,7 @@ const REPAIRS: Record<string, RepairData> = {
     title: "Check Engine Light Assessment",
     seoTitle: "Check Engine Light On? Free Assessment & Cost Estimates",
     seoDescription:
-      "Find out why your check engine light is on. Get a free AI assessment, repair cost estimates ($100–$1,500+), and compare local shop quotes instantly.",
+      "Find out why your check engine light is on. Get a free AI assessment and repair cost estimates ($100–$1,500+).",
     heroHeading: "Check Engine Light On?",
     heroSub: "Get a free assessment in 60 seconds — no mechanic visit needed.",
     costLow: 100,
@@ -81,20 +81,20 @@ const REPAIRS: Record<string, RepairData> = {
       },
       {
         q: "What is the most common check engine light cause?",
-        a: "The most common cause is a faulty oxygen (O2) sensor, which costs $150–$350 to replace. A loose gas cap is also very common and costs nothing to fix.",
+        a: "The most common cause is a faulty oxygen (O2) sensor, which costs $145–$405 to replace. A loose gas cap is also very common and costs nothing to fix.",
       },
     ],
   },
   "catalytic-converter-replacement": {
     slug: "catalytic-converter-replacement",
     title: "Catalytic Converter Replacement",
-    seoTitle: "Catalytic Converter Replacement Cost — $800–$2,500 Estimates",
+    seoTitle: "Catalytic Converter Replacement Cost — $645–$1,675 Estimates",
     seoDescription:
-      "How much does catalytic converter replacement cost? Get instant estimates for your specific vehicle, compare shop prices, and explore financing options.",
+      "How much does catalytic converter replacement cost? Get instant estimates for your specific vehicle and explore financing options.",
     heroHeading: "Catalytic Converter Replacement",
-    heroSub: "Compare shop prices for your exact vehicle — free and instant.",
-    costLow: 800,
-    costHigh: 2500,
+    heroSub: "Get an instant cost estimate for your exact vehicle — free.",
+    costLow: 645,
+    costHigh: 1675,
     timeEstimate: "2–4 hours at a shop",
     urgency: "high",
     urgencyLabel: "Required for emissions — fix soon",
@@ -142,13 +142,13 @@ const REPAIRS: Record<string, RepairData> = {
   "brake-pad-replacement": {
     slug: "brake-pad-replacement",
     title: "Brake Pad Replacement",
-    seoTitle: "Brake Pad Replacement Cost — $150–$400 Per Axle",
+    seoTitle: "Brake Pad Replacement Cost — $155–$325 Per Axle",
     seoDescription:
-      "How much does brake pad replacement cost? Get instant estimates, compare shop prices, or follow our DIY guide to save 50%. Free assessment.",
+      "How much does brake pad replacement cost? See the typical per-axle range and the warning signs, and get a free assessment. Brake work is a shop job.",
     heroHeading: "Brake Pads Worn Down?",
-    heroSub: "Get an instant cost estimate and decide: shop or DIY.",
-    costLow: 150,
-    costHigh: 400,
+    heroSub: "Get an instant cost estimate, then have a shop do this safety-critical job.",
+    costLow: 155,
+    costHigh: 325,
     timeEstimate: "1–2 hours per axle",
     urgency: "high",
     urgencyLabel: "Safety critical — don't delay",
@@ -172,11 +172,10 @@ const REPAIRS: Record<string, RepairData> = {
       "Low-quality brake pad material",
     ],
     diyFeasibility: (
-      <>Brake pad replacement is one of the most common DIY repairs. Follow our <Link to="/diy" className="text-primary underline hover:text-primary/80">step-by-step brake pad tutorial</Link> — with basic tools and 1–2 hours, most vehicle owners can save 50% or more.</>
+      <>Brake work is safety-critical, and Wrenchli treats it as a shop job, never a do-it-yourself repair. A shop measures pad and rotor thickness, checks caliper function on both sides of the axle, and confirms the repair before the car goes back on the road. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a shop near you</Link>.</>
     ),
     chatPrompt: "I need to replace my brake pads",
     relatedLinks: [
-      { label: "DIY brake pad tutorial", to: "/diy" },
       { label: "Find a shop near you", to: "/find-shops" },
       { label: "Explore financing options", to: "/financing-options" },
     ],
@@ -198,13 +197,13 @@ const REPAIRS: Record<string, RepairData> = {
   "oil-change": {
     slug: "oil-change",
     title: "Oil Change",
-    seoTitle: "Oil Change Cost — $30–$125 | DIY or Shop Estimates",
+    seoTitle: "Oil Change Cost — $75–$140 | DIY or Shop Estimates",
     seoDescription:
-      "How much does an oil change cost? Get instant estimates for conventional or synthetic oil, compare shop prices, or follow our DIY guide to save.",
+      "How much does an oil change cost? Get instant estimates for conventional or synthetic oil, or follow our DIY guide to save.",
     heroHeading: "Time for an Oil Change?",
-    heroSub: "Compare shop prices or do it yourself — we'll walk you through both.",
-    costLow: 30,
-    costHigh: 125,
+    heroSub: "Do it yourself or have a shop do it — we'll walk you through both.",
+    costLow: 75,
+    costHigh: 140,
     timeEstimate: "30–60 minutes",
     urgency: "medium",
     urgencyLabel: "Overdue oil damages your engine",
@@ -253,7 +252,7 @@ const REPAIRS: Record<string, RepairData> = {
     title: "Transmission Repair",
     seoTitle: "Transmission Repair Cost — $150–$5,000+ Estimates",
     seoDescription:
-      "How much does transmission repair cost? From fluid changes ($150) to full rebuilds ($3,000+). Get instant estimates for your vehicle and compare shop prices.",
+      "How much does transmission repair cost? From fluid service ($165–$345) to full rebuilds ($3,000+). Get instant estimates for your vehicle.",
     heroHeading: "Transmission Problems?",
     heroSub: "Get an instant cost estimate — from a fluid flush to a full rebuild.",
     costLow: 150,
@@ -263,7 +262,7 @@ const REPAIRS: Record<string, RepairData> = {
     urgencyLabel: "Driving risks further damage",
     description: [
       "The transmission is one of the most complex and expensive components in your vehicle. It transfers power from the engine to the wheels and allows you to shift between gears. When it fails, you may lose the ability to drive altogether.",
-      <>Transmission issues range from simple fixes like a fluid change ($150–$300) to major rebuilds ($2,500–$5,000+). Early assessment is critical — catching a problem early can save thousands. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a transmission specialist near you</Link> or explore <Link to="/financing-options" className="text-primary underline hover:text-primary/80">financing options</Link> for larger repairs.</>,
+      <>Transmission issues range from simple fixes like a fluid service ($165–$345) to major rebuilds ($2,500–$5,000+). Early assessment is critical — catching a problem early can save thousands. <Link to="/find-shops" className="text-primary underline hover:text-primary/80">Find a transmission specialist near you</Link> or explore <Link to="/financing-options" className="text-primary underline hover:text-primary/80">financing options</Link> for larger repairs.</>,
     ],
     symptoms: [
       "Slipping gears or delayed engagement",
@@ -308,13 +307,13 @@ const REPAIRS: Record<string, RepairData> = {
   "alternator-replacement": {
     slug: "alternator-replacement",
     title: "Alternator Replacement",
-    seoTitle: "Alternator Replacement Cost — $350–$900 Estimates",
+    seoTitle: "Alternator Replacement Cost — $445–$940 Estimates",
     seoDescription:
-      "How much does alternator replacement cost? Get instant estimates for your specific vehicle, compare shop prices, and learn if it's a DIY-friendly repair.",
+      "How much does alternator replacement cost? Get instant estimates for your specific vehicle and learn if it's a DIY-friendly repair.",
     heroHeading: "Alternator Going Out?",
     heroSub: "Get an instant cost estimate and find out if you can DIY it.",
-    costLow: 350,
-    costHigh: 900,
+    costLow: 445,
+    costHigh: 940,
     timeEstimate: "1–3 hours",
     urgency: "high",
     urgencyLabel: "Battery will die — fix soon",
@@ -543,7 +542,7 @@ export function RepairGuidesIndex() {
     <main className="pb-[60px] md:pb-0">
       <SEO
         title="Vehicle Repair Cost Guides — Free Estimates"
-        description="Browse common vehicle repair guides with instant cost estimates, DIY tips, and shop comparison. Check engine light, brake pads, catalytic converter, and more."
+        description="Browse common vehicle repair guides with instant cost estimates and DIY tips. Check engine light, brake pads, catalytic converter, and more."
         path="/repairs"
       />
       <Helmet>

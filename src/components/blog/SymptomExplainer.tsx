@@ -3,7 +3,7 @@ import { useState } from "react";
 interface Cause {
   name: string;
   probability: number;
-  costRange: string;
+  costRange?: string;
   description: string;
 }
 
@@ -24,7 +24,7 @@ const EXPLAINER_DATA: Record<string, ExplainerData> = {
     causes: [
       { name: "Worn Brake Pads", probability: 65, costRange: "$155–$325", description: "Friction material is gone — metal backing plate is grinding against the rotor." },
       { name: "Damaged or Warped Rotors", probability: 25, costRange: "$240–$560", description: "Grooves, scoring, or heat warping from extended pad wear." },
-      { name: "Stuck Caliper or Debris", probability: 10, costRange: "$150–$900", description: "Caliper seized or road debris lodged between pad and rotor." },
+      { name: "Stuck Caliper or Debris", probability: 10, description: "Caliper seized or road debris lodged between pad and rotor. Caliper pricing varies too much by vehicle to publish a responsible range, so no figure is shown for this cause." },
     ],
   },
   "car-shakes-vibrates-while-driving": {
@@ -46,7 +46,7 @@ const EXPLAINER_DATA: Record<string, ExplainerData> = {
     causes: [
       { name: "Weak or Dead Battery", probability: 70, costRange: "$160–$350", description: "Not enough amperage to engage the starter — rapid clicking is the giveaway." },
       { name: "Failed Starter Motor", probability: 20, costRange: "$395–$840", description: "Single loud click then silence — solenoid fires but motor won't turn." },
-      { name: "Corroded Battery Connections", probability: 10, costRange: "$0–$50", description: "Buildup on terminals blocking current flow — often a free fix." },
+      { name: "Corroded Battery Connections", probability: 10, costRange: "$55–$165", description: "Buildup on terminals blocking current flow; a shop cleans and services the connections." },
     ],
   },
 };
@@ -121,7 +121,9 @@ export default function SymptomExplainer({ slug }: { slug: string }) {
                     </span>
                     <div className="min-w-0">
                       <p className="font-semibold text-foreground truncate">{cause.name}</p>
-                      <p className="text-xs text-muted-foreground font-mono">{cause.costRange}</p>
+                      {cause.costRange && (
+                        <p className="text-xs text-muted-foreground font-mono">{cause.costRange}</p>
+                      )}
                     </div>
                   </div>
                   <svg
