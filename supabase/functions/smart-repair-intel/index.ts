@@ -2,7 +2,9 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCorsOptions } from "../_shared/cors.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+// Ship B (Max20 fit): mechanical enrichment routes to Haiku by default;
+// ANTHROPIC_MODEL still overrides per environment.
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-haiku-4-5";
 
 
 serve(async (req) => {

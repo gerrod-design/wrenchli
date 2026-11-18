@@ -4,7 +4,9 @@ import { checkRateLimit, getRateLimitIdentifier, getRateLimitHeaders, RATE_LIMIT
 import { mergeSecurityHeaders } from "../_shared/security-headers.ts";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+// Ship B (Max20 fit): mechanical catalog matching routes to Haiku by
+// default; ANTHROPIC_MODEL still overrides per environment.
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-haiku-4-5";
 
 serve(async (req) => {
   const origin = req.headers.get("origin");

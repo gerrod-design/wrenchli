@@ -42,7 +42,9 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anthropicKey = Deno.env.get("ANTHROPIC_API_KEY") ?? "";
-    const anthropicModel = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+    // Ship B (Max20 fit): mechanical internal tooling routes to Haiku by
+    // default; ANTHROPIC_MODEL still overrides per environment.
+    const anthropicModel = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-haiku-4-5";
     const githubToken = Deno.env.get("GITHUB_TOKEN") ?? "";
     const resendKey = Deno.env.get("RESEND_API_KEY") ?? "";
     const approvalSecret = Deno.env.get("APPROVAL_SECRET") ?? "";
