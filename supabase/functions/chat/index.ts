@@ -129,6 +129,10 @@ const tools = [
       },
       required: ["repair_keyword"],
     },
+    // Prompt caching (Ship A, Max20 fit): the tool set is static, so the last
+    // definition carries the cache breakpoint. 1h TTL matches the hourly
+    // safety-battery cadence; requires the extended-cache-ttl beta header.
+    cache_control: { type: "ephemeral", ttl: "1h" },
   },
 ];
 
@@ -887,7 +891,27 @@ Deno.serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
     const vehicleContextStr = buildVehicleContext(vehicleContext);
-    const systemContent = SYSTEM_PROMPT + vehicleContextStr + sessionContextStr;
+    // Prompt caching (Ship A, Max20 fit): the static SYSTEM_PROMPT is the
+    // first system block and carries the 1h cache breakpoint; the per-visitor
+    // vehicle/session context rides in a separate later block, uncached. The
+    // same block shape is sent on every call path (turn 1, turn 2, streaming
+    // fallback, guard regeneration) so the cached prefix is byte-identical.
+    const contextSuffix = vehicleContextStr + sessionContextStr;
+    const systemBlocks: Array<{
+      type: "text";
+      text: string;
+      cache_control?: { type: "ephemeral"; ttl: "1h" };
+    }> = [
+      { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral", ttl: "1h" } },
+    ];
+    if (contextSuffix) systemBlocks.push({ type: "text", text: contextSuffix });
+    const anthropicHeaders = {
+      "Content-Type": "application/json",
+      "x-api-key": ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+      // Required for the 1-hour cache TTL used above.
+      "anthropic-beta": "extended-cache-ttl-2025-04-11",
+    };
     const anthropicMessages = sessionStart
       ? [{ role: "user", content: SESSION_START_TURN }]
       : buildAnthropicMessages(messages);
@@ -908,15 +932,11 @@ Deno.serve(async (req) => {
       try {
         const resp = await fetch(ANTHROPIC_API_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-          },
+          headers: anthropicHeaders,
           body: JSON.stringify({
             model: MODEL,
             max_tokens: 2048,
-            system: systemContent + correction,
+            system: [...systemBlocks, { type: "text", text: correction }],
             messages: baseMessages,
           }),
           signal: regenController.signal,
@@ -942,15 +962,11 @@ Deno.serve(async (req) => {
     try {
       turn1Resp = await fetch(ANTHROPIC_API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-        },
+        headers: anthropicHeaders,
         body: JSON.stringify({
           model: MODEL,
           max_tokens: 2048,
-          system: systemContent,
+          system: systemBlocks,
           messages: anthropicMessages,
           tools,
         }),
@@ -965,15 +981,11 @@ Deno.serve(async (req) => {
       try {
         fallbackResp = await fetch(ANTHROPIC_API_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-          },
+          headers: anthropicHeaders,
           body: JSON.stringify({
             model: MODEL,
             max_tokens: 2048,
-            system: systemContent,
+            system: systemBlocks,
             messages: anthropicMessages,
             stream: true,
           }),
@@ -1093,15 +1105,11 @@ Deno.serve(async (req) => {
     try {
       turn2Resp = await fetch(ANTHROPIC_API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-        },
+        headers: anthropicHeaders,
         body: JSON.stringify({
           model: MODEL,
           max_tokens: 2048,
-          system: systemContent,
+          system: systemBlocks,
           messages: turn2Messages,
           stream: true,
         }),

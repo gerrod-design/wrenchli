@@ -49,7 +49,8 @@ serve(async (req) => {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1024,
-        system: `You are an automotive parts recommendation engine. Given a vehicle diagnosis and optional vehicle info, recommend 3 specific real products (parts, tools, or supplies) that would help a DIYer fix the issue. Use real brand names and realistic pricing. Each product should have an Amazon search query that would find a relevant product. Also estimate the DIY time range and approximate total parts cost.`,
+        // Prompt caching (Ship A, Max20 fit): static system + tool block.
+        system: [{ type: "text", text: `You are an automotive parts recommendation engine. Given a vehicle diagnosis and optional vehicle info, recommend 3 specific real products (parts, tools, or supplies) that would help a DIYer fix the issue. Use real brand names and realistic pricing. Each product should have an Amazon search query that would find a relevant product. Also estimate the DIY time range and approximate total parts cost.`, cache_control: { type: "ephemeral" } }],
         messages: [
           {
             role: "user",
@@ -85,6 +86,7 @@ serve(async (req) => {
               },
               required: ["products", "diy_time_range", "total_parts_range"],
             },
+            cache_control: { type: "ephemeral" },
           },
         ],
         tool_choice: { type: "tool", name: "provide_product_recommendations" },

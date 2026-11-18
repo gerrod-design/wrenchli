@@ -118,9 +118,16 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1024,
-        system: isGeneralEstimate
-          ? `You are Wrenchli's automotive repair cost estimator. No ZIP code or region was provided, so you must give a NATIONAL AVERAGE estimate only — do not invent or imply a specific metro area, region, or local pricing. Your estimates should reflect typical real-world nationwide pricing including parts and labor. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate. ARITHMETIC RULE: cost_low must equal the low end of parts_estimate plus the low end of labor_estimate; cost_high must equal the high ends added together. Double-check your addition before responding.`
-          : `You are Wrenchli's automotive repair cost estimator. You provide transparent, realistic repair cost estimates based on the assessment, vehicle, and customer's geographic area (ZIP code). Your estimates should reflect real-world pricing including parts and labor for that region. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate. ARITHMETIC RULE: cost_low must equal the low end of parts_estimate plus the low end of labor_estimate; cost_high must equal the high ends added together. Double-check your addition before responding.`,
+        // Prompt caching (Ship A, Max20 fit): both system variants are
+        // static strings; the chosen one is sent as a cached block, and the
+        // tool definition carries a cache breakpoint too.
+        system: [{
+          type: "text",
+          text: isGeneralEstimate
+            ? `You are Wrenchli's automotive repair cost estimator. No ZIP code or region was provided, so you must give a NATIONAL AVERAGE estimate only — do not invent or imply a specific metro area, region, or local pricing. Your estimates should reflect typical real-world nationwide pricing including parts and labor. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate. ARITHMETIC RULE: cost_low must equal the low end of parts_estimate plus the low end of labor_estimate; cost_high must equal the high ends added together. Double-check your addition before responding.`
+            : `You are Wrenchli's automotive repair cost estimator. You provide transparent, realistic repair cost estimates based on the assessment, vehicle, and customer's geographic area (ZIP code). Your estimates should reflect real-world pricing including parts and labor for that region. Be honest — both the customer and the repair shop will see this estimate. Always provide a range (low to high). Include a brief breakdown of what's included in the estimate. ARITHMETIC RULE: cost_low must equal the low end of parts_estimate plus the low end of labor_estimate; cost_high must equal the high ends added together. Double-check your addition before responding.`,
+          cache_control: { type: "ephemeral" },
+        }],
         messages: [{ role: "user", content: userPrompt }],
         tools: [
           {
@@ -141,6 +148,7 @@ Provide a realistic cost estimate for this repair in the metro area around ZIP c
               },
               required: ["metro_area", "cost_low", "cost_high", "parts_estimate", "labor_estimate", "labor_hours", "regional_notes", "what_to_expect", "warranty_note"],
             },
+            cache_control: { type: "ephemeral" },
           },
         ],
         tool_choice: { type: "tool", name: "provide_cost_estimate" },

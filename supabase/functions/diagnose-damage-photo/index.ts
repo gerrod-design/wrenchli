@@ -51,7 +51,10 @@ serve(async (req) => {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1500,
-        system: `You are an expert automotive damage assessment specialist. Analyze vehicle damage photos and provide a structured assessment.
+        // Prompt caching (Ship A, Max20 fit): fully static system prompt.
+        system: [{
+          type: "text",
+          text: `You are an expert automotive damage assessment specialist. Analyze vehicle damage photos and provide a structured assessment.
 
 Always respond with valid JSON in this exact format:
 {
@@ -76,6 +79,8 @@ Always respond with valid JSON in this exact format:
 }
 
 Be specific and helpful. Provide realistic cost estimates in USD. If you cannot identify damage or the image is unclear, say so honestly.`,
+          cache_control: { type: "ephemeral" },
+        }],
         messages: [
           {
             role: "user",

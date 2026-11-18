@@ -48,9 +48,7 @@ CRITICAL RULES:
 - Include realistic cost ranges based on the vehicle
 - Be honest about uncertainty - if confidence is below 70% on the primary, say so
 - Cross-reference with common issues for the specific make/model/year
-- NEVER use the words "diagnosis", "diagnose", or "diagnostic" in your output — always say "assessment" and "likely causes"
-
-Vehicle: ${vehicleStr || "Not specified"}`;
+- NEVER use the words "diagnosis", "diagnose", or "diagnostic" in your output — always say "assessment" and "likely causes"`;
 
     const response = await fetch(ANTHROPIC_API_URL, {
       method: "POST",
@@ -62,7 +60,13 @@ Vehicle: ${vehicleStr || "Not specified"}`;
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1500,
-        system: systemPrompt,
+        // Prompt caching (Ship A, Max20 fit): cache breakpoint on the static
+        // rules prefix; the per-request vehicle line rides in a second,
+        // uncached block (the two blocks concatenate to the old prompt).
+        system: [
+          { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+          { type: "text", text: `\n\nVehicle: ${vehicleStr || "Not specified"}` },
+        ],
         messages: [
           { role: "user", content: `My ${vehicleStr} is experiencing: ${symptoms}${zip_code ? `. Located in ZIP: ${zip_code}` : ""}` },
         ],
@@ -102,6 +106,7 @@ Vehicle: ${vehicleStr || "Not specified"}`;
             },
             required: ["primaryDiagnosis", "primaryConfidence", "rationale", "alternativeDiagnoses", "costEstimate", "recommendedAction", "urgency"],
           },
+          cache_control: { type: "ephemeral" },
         }],
         tool_choice: { type: "tool", name: "provide_diagnosis" },
       }),

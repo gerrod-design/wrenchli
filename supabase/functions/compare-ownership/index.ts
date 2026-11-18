@@ -101,6 +101,9 @@ Use the tool "compare_tco" to return structured results. Be realistic with estim
               },
               required: ["repair_option", "replace_option", "recommendation", "assumptions", "savings_amount", "better_option"],
             },
+            // Prompt caching (Ship A, Max20 fit): this function has no
+            // system prompt; the static tool schema carries the breakpoint.
+            cache_control: { type: "ephemeral" },
           },
         ],
         tool_choice: { type: "tool", name: "compare_tco" },

@@ -154,7 +154,8 @@ export async function scoreDiagnosisMatch(
     body: JSON.stringify({
       model: options.model ?? envGet("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6",
       max_tokens: 400,
-      system: MATCH_SYSTEM_PROMPT,
+      // Prompt caching (Ship A, Max20 fit): fully static system prompt.
+      system: [{ type: "text", text: MATCH_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: buildMatchPrompt(input) }],
     }),
   });

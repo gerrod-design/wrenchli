@@ -100,7 +100,8 @@ serve(async (req) => {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1024,
-        system: "You are Wrenchli's automotive repair cost estimator. Provide transparent, realistic repair cost estimates based on diagnosis, vehicle, and ZIP code region. Include parts, labor, and regional pricing. Always provide a range.",
+        // Prompt caching (Ship A, Max20 fit): static system + tool block.
+        system: [{ type: "text", text: "You are Wrenchli's automotive repair cost estimator. Provide transparent, realistic repair cost estimates based on diagnosis, vehicle, and ZIP code region. Include parts, labor, and regional pricing. Always provide a range.", cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: userPrompt }],
         tools: [{
           name: "provide_cost_estimate",
@@ -114,6 +115,7 @@ serve(async (req) => {
             },
             required: ["metro_area", "cost_low", "cost_high", "parts_estimate", "labor_estimate", "labor_hours", "regional_notes", "what_to_expect", "warranty_note"],
           },
+          cache_control: { type: "ephemeral" },
         }],
         tool_choice: { type: "tool", name: "provide_cost_estimate" },
       }),

@@ -42,7 +42,8 @@ Analyze this repair scenario and provide:
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1024,
-        system: systemPrompt,
+        // Prompt caching (Ship A, Max20 fit): static system + tool block.
+        system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: userPrompt }],
         tools: [
           {
@@ -71,6 +72,7 @@ Analyze this repair scenario and provide:
               },
               required: ["youtube_queries", "is_common_issue", "common_issue_reason", "diy_success_rate", "estimated_steps", "confidence_message"],
             },
+            cache_control: { type: "ephemeral" },
           },
         ],
         tool_choice: { type: "tool", name: "provide_repair_intel" },

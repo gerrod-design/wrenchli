@@ -190,7 +190,8 @@ Assess this vehicle issue and return the JSON schema.`.trim();
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 4000,
-        system: SYSTEM_PROMPT,
+        // Prompt caching (Ship A, Max20 fit): fully static system prompt.
+        system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: userMessage }],
       }),
     });
