@@ -21,11 +21,12 @@
 // - The handler must always return a Response. Pass-through is a
 //   Response carrying the x-middleware-next header (what next() from
 //   @vercel/functions returns); returning undefined is not valid.
-// - STEP 1 (canary): the matcher limits invocation to the probe path
-//   /__door-canary. STEP 2 widens the matcher to all paths and
-//   removes the probe branch. Do not widen without canary proof.
+// - Canary history: step 1 shipped with the matcher limited to a
+//   probe path (/__door-canary) which proved all four return
+//   primitives live while www stayed untouched; step 2 (this file)
+//   widened the matcher to all paths and removed the probe branch.
 
-export const config = { runtime: "nodejs", matcher: ["/__door-canary"] };
+export const config = { runtime: "nodejs", matcher: ["/(.*)"] };
 
 export type DoorAction =
   | { type: "next" }
@@ -116,18 +117,6 @@ function notFound(): Response {
 
 export default function middleware(request: Request): Response {
   const url = new URL(request.url);
-
-  // TEMPORARY canary branch (removed in step 2): proves each return
-  // primitive live without touching any real path.
-  if (url.pathname === "/__door-canary") {
-    const mode = url.searchParams.get("mode") ?? "rewrite";
-    if (mode === "next") return next();
-    if (mode === "redirect")
-      return Response.redirect(new URL("/for-shops", request.url), 302);
-    if (mode === "404") return notFound();
-    return rewrite(request, "/llms.txt");
-  }
-
   const action = doorAction(url.hostname, url.pathname);
   switch (action.type) {
     case "rewrite":
