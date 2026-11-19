@@ -132,44 +132,6 @@ for (const routePath of getPrerenderPaths()) {
   );
 }
 
-// Developer-door variants (segmentation Phase 1, 2026-11-19). The
-// developer door (developers.wrenchli.net) serves the Developers page
-// at its root and the GPT guide at /gpt-actions, with canonicals that
-// point at the door itself. One build serves every door, so the
-// prerender emits door variants of both pages alongside the standard
-// files: the same routes rendered with the door host set (see
-// src/lib/doorHost.ts), written under dist/door-developers/. The edge
-// middleware rewrites the door's / and /gpt-actions to these files;
-// the standard /developers files above are untouched and keep serving
-// on www exactly as before.
-{
-  const doorHost = "developers.wrenchli.net";
-  const doorPages = [
-    { renderUrl: "/", file: "door-developers/index.html", label: "developers door /" },
-    {
-      renderUrl: "/developers/gpt-actions",
-      file: "door-developers/gpt-actions/index.html",
-      label: "developers door /gpt-actions",
-    },
-  ];
-  for (const doorPage of doorPages) {
-    const { html, head } = render(doorPage.renderUrl === "/" ? "/" : doorPage.renderUrl, doorHost);
-    if (!html || html.length < 200) {
-      throw new Error(
-        `prerender: ${doorPage.label} rendered suspiciously little HTML (${html?.length ?? 0} bytes)`
-      );
-    }
-    let page = applyHead(template, head);
-    page = page.replace('<div id="root"></div>', `<div id="root">${html}</div>`);
-    const file = path.join(dist, doorPage.file);
-    fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(file, page, "utf-8");
-    console.log(
-      `[prerender] ${doorPage.label} -> ${doorPage.file} (${Buffer.byteLength(page, "utf8")} bytes)`
-    );
-  }
-}
-
 // Sitemap, generated from the same manifest (routes + blog content source).
 // Each URL's <lastmod> is that page's real last-changed date (front-door
 // fix 6): blog posts carry their content date, other routes use the

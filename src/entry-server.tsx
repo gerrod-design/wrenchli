@@ -19,25 +19,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LocationProvider } from "@/contexts/LocationContext";
 import { VoiceChatProvider } from "@/contexts/VoiceChatContext";
 import { AppLayout } from "./App";
-import { setSsrDoorHost } from "@/lib/doorHost";
 
-/**
- * Render one URL to static HTML. The optional doorHost is used only by
- * the prerender step's developer-door variants (segmentation Phase 1,
- * 2026-11-19): it makes the door's routes and canonicals resolve as
- * they will on developers.wrenchli.net. Standard renders pass nothing
- * and are unchanged.
- */
-export function render(url: string, doorHost?: string): { html: string; head: string } {
-  setSsrDoorHost(doorHost ?? null);
-  try {
-    return renderApp(url);
-  } finally {
-    setSsrDoorHost(null);
-  }
-}
-
-function renderApp(url: string): { html: string; head: string } {
+export function render(url: string): { html: string; head: string } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const helmetContext: any = {};
   const queryClient = new QueryClient();
