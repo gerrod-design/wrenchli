@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { isDevelopersDoor } from "@/lib/doorHost";
 
 interface SEOProps {
   title: string;
@@ -13,7 +14,21 @@ const SITE = "https://www.wrenchli.net";
 const DEFAULT_OG = `${SITE}/og-default.png`;
 
 export default function SEO({ title, description, path, ogImage, ogTitle, ogDescription }: SEOProps) {
-  const url = `${SITE}${path}`;
+  // Developer-door canonicals are self-referential (segmentation
+  // Phase 1, 2026-11-19): on developers.wrenchli.net the developer
+  // pages live at door-relative URLs (/ and /gpt-actions), so their
+  // canonical points at the door, not at the www page they moved from.
+  // Everywhere else the canonical is exactly what it has always been.
+  const doorPath =
+    path === "/developers"
+      ? "/"
+      : path.startsWith("/developers/")
+        ? path.slice("/developers".length)
+        : null;
+  const url =
+    isDevelopersDoor() && doorPath !== null
+      ? `https://developers.wrenchli.net${doorPath}`
+      : `${SITE}${path}`;
   // Some pages pass a title that already ends with the brand name;
   // appending the suffix again produced "| Wrenchli | Wrenchli"
   // (front-door fix 9).
