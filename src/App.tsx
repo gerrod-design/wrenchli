@@ -38,6 +38,7 @@ import VehicleRecord from "./pages/VehicleRecord";
 import VehicleBaseline from "./pages/VehicleBaseline";
 import Investors from "./pages/Investors";
 import AdminLogin from "./pages/AdminLogin";
+import { isDevelopersDoor } from "@/lib/doorHost";
 import ShopLogin from "./pages/ShopLogin";
 import ShopPortal from "./pages/ShopPortal";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -108,7 +109,11 @@ function AnimatedRoutes() {
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
         <Routes location={location}>
-          <Route path="/" element={<DesignPreview />} />
+          {/* Developer door (segmentation Phase 1, 2026-11-19): on
+              developers.wrenchli.net the root is the Developers page
+              at its door-relative URL; everywhere else the root is
+              the homepage, exactly as before. */}
+          <Route path="/" element={isDevelopersDoor() ? <Developers /> : <DesignPreview />} />
           <Route path="/home" element={<Home />} />
           <Route path="/owners" element={<Owners />} />
           <Route path="/shops" element={<Shops />} />
@@ -130,6 +135,9 @@ function AnimatedRoutes() {
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/developers" element={<Developers />} />
           <Route path="/developers/gpt-actions" element={<CustomGPTGuide />} />
+          {isDevelopersDoor() && (
+            <Route path="/gpt-actions" element={<CustomGPTGuide />} />
+          )}
           {/* Retired 2026-10-18 (audit R-19): the Michigan-only paid pilot page contradicted the live national free referral pilot — one offer only, at /for-shops */}
           <Route path="/pilot" element={<PreserveNavigate to="/for-shops" />} />
           <Route path="/find-shops" element={<FindShops />} />
@@ -205,7 +213,12 @@ export function AppLayout({ ssr = false }: { ssr?: boolean }) {
   const isShop =
     location.pathname.startsWith("/shop-login") ||
     location.pathname.startsWith("/shop-portal");
-  const isDesignPreview = location.pathname === "/" || location.pathname.startsWith("/design-preview/");
+  // On the developer door the root is the Developers page, which
+  // carries the standard chrome like its www page; it is not the
+  // design-preview homepage (segmentation Phase 1, 2026-11-19).
+  const isDesignPreview =
+    !isDevelopersDoor() &&
+    (location.pathname === "/" || location.pathname.startsWith("/design-preview/"));
   const hideChrome = isAdmin || isShop || isDesignPreview;
 
   useEffect(() => {
