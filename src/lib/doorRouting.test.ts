@@ -42,6 +42,14 @@ describe("doorAction: developers door", () => {
       type: "rewrite",
       to: "/door-developers/gpt-actions/index.html",
     });
+    expect(doorAction(DEV, "/price-check")).toEqual({
+      type: "rewrite",
+      to: "/door-developers/price-check/index.html",
+    });
+    expect(doorAction(DEV, "/code-lookup")).toEqual({
+      type: "rewrite",
+      to: "/door-developers/code-lookup/index.html",
+    });
   });
   it("canonicalizes the legacy /developers paths on this host", () => {
     expect(doorAction(DEV, "/developers")).toEqual({
@@ -52,6 +60,16 @@ describe("doorAction: developers door", () => {
     expect(doorAction(DEV, "/developers/gpt-actions")).toEqual({
       type: "redirect",
       to: "/gpt-actions",
+      status: 301,
+    });
+    expect(doorAction(DEV, "/developers/price-check")).toEqual({
+      type: "redirect",
+      to: "/price-check",
+      status: 301,
+    });
+    expect(doorAction(DEV, "/developers/code-lookup")).toEqual({
+      type: "redirect",
+      to: "/code-lookup",
       status: 301,
     });
   });

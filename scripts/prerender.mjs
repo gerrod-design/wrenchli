@@ -151,6 +151,16 @@ for (const routePath of getPrerenderPaths()) {
       file: "door-developers/gpt-actions/index.html",
       label: "developers door /gpt-actions",
     },
+    {
+      renderUrl: "/developers/price-check",
+      file: "door-developers/price-check/index.html",
+      label: "developers door /price-check",
+    },
+    {
+      renderUrl: "/developers/code-lookup",
+      file: "door-developers/code-lookup/index.html",
+      label: "developers door /code-lookup",
+    },
   ];
   for (const doorPage of doorPages) {
     const { html, head } = render(doorPage.renderUrl === "/" ? "/" : doorPage.renderUrl, doorHost);

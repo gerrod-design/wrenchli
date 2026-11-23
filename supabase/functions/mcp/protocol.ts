@@ -9,12 +9,33 @@
 // Protocol versions supported: 2025-03-26 (preferred) and 2024-11-05
 // (accepted in version negotiation for older clients).
 
+import {
+  decideToolAccess,
+  type CallerKind,
+  type CallerResolution,
+} from "./identity.ts";
+import {
+  buildDtcLookup,
+  buildPriceCheck,
+  DTC_TOOL,
+  DTC_TOOL_NAME,
+  PRICE_TOOL,
+  PRICE_TOOL_NAME,
+  validateDtcLookupArguments,
+  validatePriceCheckArguments,
+  type DtcLookupArguments,
+  type DtcLookupOutcome,
+  type PriceCheckArguments,
+  type PriceCheckOutcome,
+} from "./tools.ts";
+
 export const SUPPORTED_PROTOCOL_VERSIONS = ["2025-03-26", "2024-11-05"];
 export const LATEST_PROTOCOL_VERSION = SUPPORTED_PROTOCOL_VERSIONS[0];
 
-export const SERVER_INFO = { name: "wrenchli", version: "1.0.0" };
+export const SERVER_INFO = { name: "wrenchli", version: "1.1.0" };
 
 export const TOOL_NAME = "assess_vehicle_symptoms";
+export { DTC_TOOL_NAME, PRICE_TOOL_NAME };
 
 // The tool contract mirrors the public assessment API
 // (supabase/functions/api-assess -> _shared/api-diagnose-handler.ts):
@@ -31,7 +52,9 @@ export const ASSESS_TOOL = {
     "cost ranges, the recommended immediate action, and safety advice. This " +
     "is a preliminary informational assessment, not a diagnosis: it helps the " +
     "owner understand what is likely going on and what to discuss with a " +
-    "qualified technician. Always free; no account required.",
+    "qualified technician. Always free. A free Wrenchli API key identifies " +
+    "the calling agent (instant to request); keyless calls are answered " +
+    "during a transition window only.",
   inputSchema: {
     type: "object",
     properties: {
@@ -86,8 +109,41 @@ export interface DownstreamResult {
   body: unknown;
 }
 
+/** One answered tool call, as recorded by the identity layer's log. */
+export interface CallLogEntry {
+  keyId: string | null;
+  callerKind: CallerKind;
+  tool: string;
+  /** Input shape only: "year make model" class, never a consumer identity. */
+  vehicleClass: string | null;
+  repairId: string | null;
+  dtcCode: string | null;
+  /** True when a price figure was served; null where no figure applies. */
+  servedFigure: boolean | null;
+  rangeLowCents: number | null;
+  rangeHighCents: number | null;
+}
+
 export interface McpDeps {
   callAssess: (args: AssessArguments) => Promise<DownstreamResult>;
+  buildPriceCheck: (args: PriceCheckArguments) => PriceCheckOutcome;
+  buildDtcLookup: (args: DtcLookupArguments) => DtcLookupOutcome;
+  /** Resolve the request's credential to a caller (wiring layer, DB). */
+  resolveCaller: (credential: string | null) => Promise<CallerResolution>;
+  /** Usage counts for a keyed caller, measured by the wiring layer. */
+  getUsage: (keyId: string) => Promise<{
+    callsLastMinute: number;
+    distinctTargetsLastHour: number;
+  }>;
+  /** Record one answered call. Fire-and-forget at the wiring layer. */
+  logCall: (entry: CallLogEntry) => Promise<void>;
+  /** ISO timestamp the keyless transition window closes, or null. */
+  transitionEndsAt: string | null;
+}
+
+/** Per-request context the HTTP layer supplies (the caller's credential). */
+export interface McpRequestContext {
+  credential: string | null;
 }
 
 // JSON-RPC 2.0 error codes used by this endpoint.
@@ -211,31 +267,123 @@ function mapDownstreamToToolResult(downstream: DownstreamResult) {
   );
 }
 
+function toolResultFromOutcome(result: Record<string, unknown>) {
+  return {
+    content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+    structuredContent: result,
+    isError: false,
+  };
+}
+
 async function handleToolsCall(
   id: JsonRpcId,
   params: unknown,
   deps: McpDeps,
+  ctx: McpRequestContext,
 ) {
   if (!isObject(params) || typeof params.name !== "string") {
     return rpcError(id, ERR_INVALID_PARAMS, "tools/call requires a 'name' parameter.");
   }
-  if (params.name !== TOOL_NAME) {
-    return rpcError(id, ERR_INVALID_PARAMS, `Unknown tool: ${params.name}`);
-  }
-  const validated = validateAssessArguments(params.arguments);
-  if (!validated.ok) {
-    return rpcError(id, ERR_INVALID_PARAMS, `Invalid arguments for ${TOOL_NAME}: ${validated.message}`);
+  const toolName = params.name;
+  const isAssess = toolName === TOOL_NAME;
+  const isPrice = toolName === PRICE_TOOL_NAME;
+  const isDtc = toolName === DTC_TOOL_NAME;
+  if (!isAssess && !isPrice && !isDtc) {
+    return rpcError(id, ERR_INVALID_PARAMS, `Unknown tool: ${toolName}`);
   }
 
-  let downstream: DownstreamResult;
-  try {
-    downstream = await deps.callAssess(validated.value);
-  } catch {
-    return rpcResult(id, toolErrorResult(
-      "The assessment service is unavailable right now. Please try again later.",
-    ));
+  // Identity layer: every tool call is keyed, rate-limited, and
+  // attributable. The Decision 1 tools require a key from launch; the
+  // assessment tool answers keyless calls only inside the transition
+  // window, counted separately.
+  const caller = await deps.resolveCaller(ctx.credential);
+  const usage = caller.kind === "keyed"
+    ? await deps.getUsage(caller.keyId)
+    : { callsLastMinute: 0, distinctTargetsLastHour: 0 };
+  const access = decideToolAccess({
+    caller,
+    keyRequiredFromLaunch: !isAssess,
+    now: new Date(),
+    transitionEndsAt: deps.transitionEndsAt,
+    callsLastMinute: usage.callsLastMinute,
+    distinctTargetsLastHour: usage.distinctTargetsLastHour,
+    enumerationApplies: !isAssess,
+  });
+  if (!access.allowed) {
+    return rpcResult(id, toolErrorResult(access.message));
   }
-  return rpcResult(id, mapDownstreamToToolResult(downstream));
+  const callerKind = access.callerKind;
+  const keyId = caller.kind === "keyed" ? caller.keyId : null;
+
+  if (isAssess) {
+    const validated = validateAssessArguments(params.arguments);
+    if (!validated.ok) {
+      return rpcError(id, ERR_INVALID_PARAMS, `Invalid arguments for ${TOOL_NAME}: ${validated.message}`);
+    }
+    let downstream: DownstreamResult;
+    try {
+      downstream = await deps.callAssess(validated.value);
+    } catch {
+      return rpcResult(id, toolErrorResult(
+        "The assessment service is unavailable right now. Please try again later.",
+      ));
+    }
+    await deps.logCall({
+      keyId,
+      callerKind,
+      tool: TOOL_NAME,
+      vehicleClass:
+        `${validated.value.vehicle.year} ${validated.value.vehicle.make} ${validated.value.vehicle.model}`,
+      repairId: null,
+      dtcCode: null,
+      servedFigure: null,
+      rangeLowCents: null,
+      rangeHighCents: null,
+    });
+    return rpcResult(id, mapDownstreamToToolResult(downstream));
+  }
+
+  if (isPrice) {
+    const validated = validatePriceCheckArguments(params.arguments);
+    if (!validated.ok) {
+      return rpcError(id, ERR_INVALID_PARAMS, `Invalid arguments for ${PRICE_TOOL_NAME}: ${validated.message}`);
+    }
+    const outcome = deps.buildPriceCheck(validated.value);
+    await deps.logCall({
+      keyId,
+      callerKind,
+      tool: PRICE_TOOL_NAME,
+      vehicleClass: validated.value.vehicle
+        ? `${validated.value.vehicle.year} ${validated.value.vehicle.make} ${validated.value.vehicle.model}`
+        : null,
+      repairId: outcome.repairId,
+      dtcCode: null,
+      servedFigure: outcome.servedFigure,
+      rangeLowCents: outcome.rangeUsd ? Math.round(outcome.rangeUsd.low * 100) : null,
+      rangeHighCents: outcome.rangeUsd ? Math.round(outcome.rangeUsd.high * 100) : null,
+    });
+    return rpcResult(id, toolResultFromOutcome(outcome.result));
+  }
+
+  const validated = validateDtcLookupArguments(params.arguments);
+  if (!validated.ok) {
+    return rpcError(id, ERR_INVALID_PARAMS, `Invalid arguments for ${DTC_TOOL_NAME}: ${validated.message}`);
+  }
+  const outcome = deps.buildDtcLookup(validated.value);
+  await deps.logCall({
+    keyId,
+    callerKind,
+    tool: DTC_TOOL_NAME,
+    vehicleClass: validated.value.vehicle
+      ? `${validated.value.vehicle.year} ${validated.value.vehicle.make} ${validated.value.vehicle.model}`
+      : null,
+    repairId: outcome.repairId,
+    dtcCode: outcome.dtcCode,
+    servedFigure: outcome.servedFigure,
+    rangeLowCents: outcome.rangeUsd ? Math.round(outcome.rangeUsd.low * 100) : null,
+    rangeHighCents: outcome.rangeUsd ? Math.round(outcome.rangeUsd.high * 100) : null,
+  });
+  return rpcResult(id, toolResultFromOutcome(outcome.result));
 }
 
 // Process one parsed JSON-RPC message. Returns the response payload, or
@@ -243,6 +391,7 @@ async function handleToolsCall(
 export async function processMessage(
   message: unknown,
   deps: McpDeps,
+  ctx: McpRequestContext = { credential: null },
 ): Promise<unknown | null> {
   if (!isObject(message)) {
     return rpcError(null, ERR_INVALID_REQUEST, "Request must be a JSON-RPC 2.0 object.");
@@ -281,9 +430,9 @@ export async function processMessage(
     case "ping":
       return rpcResult(id, {});
     case "tools/list":
-      return rpcResult(id, { tools: [ASSESS_TOOL] });
+      return rpcResult(id, { tools: [ASSESS_TOOL, PRICE_TOOL, DTC_TOOL] });
     case "tools/call":
-      return handleToolsCall(id, msg.params, deps);
+      return handleToolsCall(id, msg.params, deps, ctx);
     default:
       return rpcError(id, ERR_METHOD_NOT_FOUND, `Method not found: ${msg.method}`);
   }

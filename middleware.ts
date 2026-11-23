@@ -74,6 +74,10 @@ function developersAction(pathname: string): DoorAction {
     return { type: "rewrite", to: "/door-developers/index.html" };
   if (pathname === "/gpt-actions")
     return { type: "rewrite", to: "/door-developers/gpt-actions/index.html" };
+  if (pathname === "/price-check")
+    return { type: "rewrite", to: "/door-developers/price-check/index.html" };
+  if (pathname === "/code-lookup")
+    return { type: "rewrite", to: "/door-developers/code-lookup/index.html" };
   return NEXT;
 }
 

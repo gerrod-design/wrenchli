@@ -5,10 +5,12 @@
 // import it directly with a mocked downstream. No request payloads are
 // logged here; only the protocol layer's responses leave this function.
 
+import { parseCredential } from "./identity.ts";
 import {
   ERR_INVALID_REQUEST,
   ERR_PARSE,
   type McpDeps,
+  type McpRequestContext,
   processMessage,
   rpcError,
 } from "./protocol.ts";
@@ -72,19 +74,23 @@ export function createMcpHandler(deps: McpDeps) {
       return jsonResponse(400, rpcError(null, ERR_PARSE, "Parse error: request body is not valid JSON."));
     }
 
+    // The caller's credential (identity layer) rides with every message
+    // in this request; the credential itself is never logged here.
+    const ctx: McpRequestContext = { credential: parseCredential(req.headers) };
+
     // A JSON-RPC batch (accepted for 2024-11-05-era clients) or a single
     // message. Notifications produce no response payload.
     if (Array.isArray(parsed)) {
       const responses: unknown[] = [];
       for (const message of parsed) {
-        const response = await processMessage(message, deps);
+        const response = await processMessage(message, deps, ctx);
         if (response !== null) responses.push(response);
       }
       if (responses.length === 0) return new Response(null, { status: 202 });
       return jsonResponse(200, responses);
     }
 
-    const response = await processMessage(parsed, deps);
+    const response = await processMessage(parsed, deps, ctx);
     if (response === null) return new Response(null, { status: 202 });
     return jsonResponse(200, response);
   };

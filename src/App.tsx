@@ -48,6 +48,8 @@ import FinancingSimulation from "./pages/FinancingSimulation";
 import NotificationSettings from "./pages/NotificationSettings";
 import Developers from "./pages/Developers";
 import CustomGPTGuide from "./pages/CustomGPTGuide";
+import McpPriceCheckTool from "./pages/McpPriceCheckTool";
+import McpCodeLookupTool from "./pages/McpCodeLookupTool";
 import FindShops from "./pages/FindShops";
 import Nominate from "./pages/Nominate";
 import DamageDiagnosis from "./pages/DamageDiagnosis";
@@ -135,8 +137,14 @@ function AnimatedRoutes() {
           <Route path="/settings/notifications" element={<NotificationSettings />} />
           <Route path="/developers" element={<Developers />} />
           <Route path="/developers/gpt-actions" element={<CustomGPTGuide />} />
+          <Route path="/developers/price-check" element={<McpPriceCheckTool />} />
+          <Route path="/developers/code-lookup" element={<McpCodeLookupTool />} />
           {isDevelopersDoor() && (
-            <Route path="/gpt-actions" element={<CustomGPTGuide />} />
+            <>
+              <Route path="/gpt-actions" element={<CustomGPTGuide />} />
+              <Route path="/price-check" element={<McpPriceCheckTool />} />
+              <Route path="/code-lookup" element={<McpCodeLookupTool />} />
+            </>
           )}
           {/* Retired 2026-10-18 (audit R-19): the Michigan-only paid pilot page contradicted the live national free referral pilot — one offer only, at /for-shops */}
           <Route path="/pilot" element={<PreserveNavigate to="/for-shops" />} />

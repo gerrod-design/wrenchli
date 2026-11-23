@@ -16,13 +16,15 @@ export {
   findRepairRate,
   rateFigures,
   formatMoneyRange,
+  isServableRate,
+  servableRates,
   REPAIR_RATES,
   RATE_SOURCE_ID,
   PRICE_STATUS_BOOK,
   PRICE_STATUS_NOT_IN_BOOK,
   NOT_IN_BOOK_MESSAGE,
 } from "../../supabase/functions/_shared/repair-rates";
-export type { PriceStatus } from "../../supabase/functions/_shared/repair-rates";
+export type { PriceStatus, RepairVerdict } from "../../supabase/functions/_shared/repair-rates";
 
 /** True only when a result was priced from the book. Absent signal = not priced. */
 export function isBookPriced(result: {

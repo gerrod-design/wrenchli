@@ -23,7 +23,7 @@ Wrenchli is not a licensed mechanic and does not provide professional diagnostic
 
 ## For AI agents
 
-- [MCP server](https://www.wrenchli.net/mcp): Wrenchli's Model Context Protocol endpoint (server name "wrenchli", version 1.0.0). It offers one tool, assess_vehicle_symptoms, which takes a vehicle's year, make, and model plus a list of symptoms and returns likely causes with probability scores, an urgency level, a fair cost range, and questions to ask a mechanic. Free, and no account is required.
+- [MCP server](https://www.wrenchli.net/mcp): Wrenchli's Model Context Protocol endpoint (server name "wrenchli", version 1.1.0). It offers three tools: assess_vehicle_symptoms (a vehicle's year, make, and model plus symptoms returns likely causes with probability scores, an urgency level, a fair cost range, and questions to ask a mechanic), check_repair_price (a repair name returns Wrenchli's published price range for it), and lookup_trouble_code (a trouble code such as P0420 returns what it means, its common causes, and its urgency). All three are free. A free API key identifies the calling agent: request one instantly at https://www.wrenchli.net/mcp-keys and send it as an Authorization: Bearer header. Prices served by these tools are only the ranges that pass Wrenchli's credibility grading (SOUND-graded price book entries); other repairs return a plain not-published-yet answer, never an invented figure.
 - [OpenAPI document](https://www.wrenchli.net/openapi.json): The canonical machine-readable description of the Wrenchli Assessment API (partner access, key-gated).
 - [Agent card](https://www.wrenchli.net/.well-known/agent-card.json): Wrenchli's agent card describing the service, its operator, and its assessment skill.
 

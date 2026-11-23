@@ -23,6 +23,8 @@ export const STATIC_PRERENDER_PATHS = [
   "/partners/journey",
   "/subprocessors",
   "/developers",
+  "/developers/price-check",
+  "/developers/code-lookup",
   "/diy",
   // /garage is the signed-in account home. Its SSR output is the real
   // signed-out state (a sign-in prompt describing the Garage), which is
@@ -66,6 +68,8 @@ export const SITEMAP_SOURCE_FILES: Record<string, string[]> = {
   "/partners/journey": ["src/pages/PartnersJourney.tsx"],
   "/subprocessors": ["src/pages/Subprocessors.tsx"],
   "/developers": ["src/pages/Developers.tsx"],
+  "/developers/price-check": ["src/pages/McpPriceCheckTool.tsx"],
+  "/developers/code-lookup": ["src/pages/McpCodeLookupTool.tsx"],
   "/diy": ["src/pages/DIYTutorials.tsx"],
   "/garage": ["src/pages/Garage.tsx"],
   "/terms": ["src/pages/Terms.tsx"],

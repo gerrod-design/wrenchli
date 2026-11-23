@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import { Copy, Check, Terminal, Code2, Zap, Shield, Key, ExternalLink, DollarSign, Wrench, MapPin, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -1015,6 +1016,37 @@ export default function Developers() {
                   </a>
                 </div>
               </div>
+            </div>
+
+            {/* MCP tools */}
+            <div className="rounded-xl border border-border bg-card p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Zap className="h-5 w-5 text-primary" />
+                </div>
+                <h2 className="text-xl font-semibold text-foreground">MCP Tools for AI Agents</h2>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                Wrenchli's MCP server at <code className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono">https://www.wrenchli.net/mcp</code> offers
+                three free tools to AI agents. A free API key identifies the caller: POST an agent
+                name and contact email to <code className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono">https://www.wrenchli.net/mcp-keys</code> and
+                the key comes back instantly. Prices served by these tools are only the ranges that
+                pass Wrenchli's credibility grading.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link to="/developers/price-check" className="font-medium text-primary hover:underline">check_repair_price</Link>
+                  <span className="text-muted-foreground"> — a repair name returns its published price range, with the basis inside the answer.</span>
+                </li>
+                <li>
+                  <Link to="/developers/code-lookup" className="font-medium text-primary hover:underline">lookup_trouble_code</Link>
+                  <span className="text-muted-foreground"> — a trouble code returns its plain-language meaning, common causes, and urgency.</span>
+                </li>
+                <li>
+                  <span className="font-medium text-foreground">assess_vehicle_symptoms</span>
+                  <span className="text-muted-foreground"> — symptoms return likely causes, an urgency level, and questions to ask a mechanic.</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

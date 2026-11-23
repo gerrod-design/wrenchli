@@ -60,8 +60,21 @@ export const INDEPENDENT_LABOR_RATE_PER_HOUR: [number, number] = [100, 132];
 /** Franchised-dealer labor corridor, USD/hour. Standing corridors, never blended. */
 export const DEALER_LABOR_RATE_PER_HOUR: [number, number] = [140, 200];
 
+/**
+ * Credibility grade of a book entry under the price-data credibility
+ * standard (grading record: price-book methodology + benchmark, cadence
+ * goal files; counts as graded 2026-11-16: SOUND 11, SUSPECT 18,
+ * UNSOUND 0, UNRESOLVED 1). Only SOUND entries may be newly published
+ * or served. The field is optional in the type so older construction
+ * sites keep compiling; a missing verdict is treated as NOT servable
+ * everywhere the gate is applied (fail closed).
+ */
+export type RepairVerdict = "SOUND" | "SUSPECT" | "UNSOUND" | "UNRESOLVED";
+
 export interface RepairRateEntry {
   id: string;
+  /** Credibility grade (see RepairVerdict). Absent = not servable. */
+  verdict?: RepairVerdict;
   label: string;
   /** Regexes tested in order against a repair/cause title; first entry with any match wins. */
   match: RegExp[];
@@ -111,6 +124,7 @@ export interface RateFigures {
 export const REPAIR_RATES: RepairRateEntry[] = [
   {
     id: "brake_pads_and_rotors",
+    verdict: "SUSPECT",
     label: "Brake Pads & Rotors Replacement",
     match: [/(?=.*\bpads?\b)(?=.*\b(?:rotors?|discs?)\b)/i],
     diyParts: [160, 420],
@@ -121,6 +135,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "brake_pads",
+    verdict: "SUSPECT",
     label: "Brake Pads Replacement",
     match: [/\bpads?\b/i],
     diyParts: [50, 130],
@@ -131,6 +146,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "brake_rotors",
+    verdict: "SUSPECT",
     label: "Brake Rotors Replacement",
     match: [/\brotors?\b/i, /\bdiscs?\b/i],
     diyParts: [110, 300],
@@ -141,6 +157,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "brake_caliper",
+    verdict: "UNRESOLVED",
     label: "Brake Caliper Replacement",
     match: [/\bcalipers?\b/i],
     diyParts: [90, 250],
@@ -151,6 +168,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "alternator",
+    verdict: "SOUND",
     label: "Alternator Replacement",
     match: [/\balternators?\b/i],
     diyParts: [250, 550],
@@ -161,6 +179,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "starter",
+    verdict: "SOUND",
     label: "Starter Motor Replacement",
     match: [/\bstarters?\b/i],
     diyParts: [200, 450],
@@ -171,6 +190,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "battery_terminals",
+    verdict: "SUSPECT",
     label: "Battery Terminals / Cables Service",
     match: [/battery terminals?/i, /battery cables?/i, /corroded terminals?/i, /terminal corrosion/i, /battery connection/i],
     diyParts: [15, 60],
@@ -181,6 +201,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "battery",
+    verdict: "SUSPECT",
     label: "Battery Replacement",
     match: [/batter/i],
     diyParts: [120, 260],
@@ -191,6 +212,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "spark_plugs",
+    verdict: "SOUND",
     label: "Spark Plugs Replacement",
     match: [/\bspark\s*plugs?\b/i],
     diyParts: [50, 200],
@@ -201,6 +223,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "ignition_coil",
+    verdict: "SUSPECT",
     label: "Ignition Coil Replacement",
     match: [/\bignition\s*coils?\b/i, /\bcoil\s*packs?\b/i, /\bcoils?\b/i],
     diyParts: [70, 250],
@@ -211,6 +234,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "oxygen_sensor",
+    verdict: "SOUND",
     label: "Oxygen (O2) Sensor Replacement",
     match: [/\boxygen\s*sensors?\b/i, /\bo2\s*sensors?\b/i, /\bo2\b/i],
     diyParts: [80, 250],
@@ -221,6 +245,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "catalytic_converter",
+    verdict: "SUSPECT",
     label: "Catalytic Converter Replacement",
     match: [/\bcatalytic\s*converters?\b/i, /\bcat\s*converter\b/i, /\bcatalytic\b/i],
     diyParts: [340, 387],
@@ -236,6 +261,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "water_pump",
+    verdict: "SUSPECT",
     label: "Water Pump Replacement",
     match: [/\bwater\s*pumps?\b/i],
     diyParts: [80, 250],
@@ -246,6 +272,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "thermostat",
+    verdict: "SOUND",
     label: "Thermostat Replacement",
     match: [/\bthermostats?\b/i],
     diyParts: [36, 62],
@@ -261,6 +288,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "serpentine_belt",
+    verdict: "SUSPECT",
     label: "Serpentine / Drive Belt Replacement",
     match: [/\bserpentine\s*belts?\b/i, /\bdrive\s*belts?\b/i],
     diyParts: [25, 70],
@@ -271,6 +299,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "wheel_bearing",
+    verdict: "SUSPECT",
     label: "Wheel Bearing / Hub Assembly Replacement",
     match: [/\bwheel\s*bearings?\b/i, /\bhub\s*assembl(?:y|ies)\b/i],
     diyParts: [120, 300],
@@ -281,6 +310,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "struts",
+    verdict: "SUSPECT",
     label: "Struts Replacement (pair)",
     match: [/\bstruts?\b/i],
     diyParts: [250, 600],
@@ -291,6 +321,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "shocks",
+    verdict: "SUSPECT",
     label: "Shock Absorbers Replacement (pair)",
     match: [/\bshocks?\b/i, /\bshock\s*absorbers?\b/i],
     diyParts: [150, 400],
@@ -301,6 +332,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "control_arm",
+    verdict: "SUSPECT",
     label: "Control Arm / Ball Joint Replacement",
     match: [/\bcontrol\s*arms?\b/i, /\bball\s*joints?\b/i],
     diyParts: [120, 300],
@@ -311,6 +343,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "fuel_pump",
+    verdict: "SOUND",
     label: "Fuel Pump Replacement",
     match: [/\bfuel\s*pumps?\b/i],
     diyParts: [187, 277],
@@ -326,6 +359,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "radiator",
+    verdict: "SUSPECT",
     label: "Radiator Replacement",
     match: [/\bradiator\b(?!\s*hose)/i],
     diyParts: [77, 211],
@@ -341,6 +375,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "ac_compressor",
+    verdict: "SOUND",
     label: "A/C Compressor Replacement",
     match: [
       /\ba\/?c\s*compressors?\b/i,
@@ -355,6 +390,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "timing_belt",
+    verdict: "SOUND",
     label: "Timing Belt Replacement",
     match: [/\btiming\s*belts?\b/i],
     diyParts: [150, 350],
@@ -365,6 +401,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "mass_airflow_sensor",
+    verdict: "SOUND",
     label: "Mass Airflow (MAF) Sensor Replacement",
     match: [/\bmass\s*air\s*flow\s*sensors?\b/i, /\bmaf\s*sensors?\b/i, /\bmaf\b/i],
     diyParts: [80, 250],
@@ -375,6 +412,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "transmission_fluid_service",
+    verdict: "SOUND",
     label: "Transmission Fluid / Filter Service",
     match: [/(?=.*\btransmission\b)(?=.*\b(?:fluid|filter|service)\b)/i],
     diyParts: [60, 150],
@@ -385,6 +423,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "engine_air_filter",
+    verdict: "SUSPECT",
     label: "Engine Air Filter Replacement",
     match: [/\bengine\s*air\s*filters?\b/i, /(?<!cabin\s)\bair\s*filters?\b/i],
     diyParts: [15, 45],
@@ -395,6 +434,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "cabin_air_filter",
+    verdict: "SOUND",
     label: "Cabin Air Filter Replacement",
     match: [/\bcabin\s*air\s*filters?\b/i, /\bcabin\s*filters?\b/i],
     diyParts: [15, 50],
@@ -405,6 +445,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "wiper_blades",
+    verdict: "SUSPECT",
     label: "Wiper Blades Replacement",
     match: [/\bwiper\s*blades?\b/i, /\bwindshield\s*wipers?\b/i],
     diyParts: [20, 60],
@@ -415,6 +456,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "headlight_bulb",
+    verdict: "SUSPECT",
     label: "Headlight Bulb Replacement",
     match: [/\bheadlights?\s*bulbs?\b/i, /\bheadlamps?\s*bulbs?\b/i, /\bbulbs?\b/i],
     diyParts: [15, 120],
@@ -425,6 +467,7 @@ export const REPAIR_RATES: RepairRateEntry[] = [
   },
   {
     id: "oil_change",
+    verdict: "SUSPECT",
     label: "Oil Change (Oil & Filter)",
     match: [/\boil\s*change\b/i, /\boil\s*&\s*filter\b/i, /\boil\s*and\s*filter\b/i],
     diyParts: [35, 75],
@@ -434,6 +477,21 @@ export const REPAIR_RATES: RepairRateEntry[] = [
     shopTime: "30–60 minutes",
   },
 ];
+
+/**
+ * The publication gate (Decision 1, absolute): an entry's figures may
+ * be served only when its recorded verdict is SOUND. The served set is
+ * read from this field at call time, so a re-grade widens or narrows
+ * coverage with no code change.
+ */
+export function isServableRate(entry: RepairRateEntry): boolean {
+  return entry.verdict === "SOUND";
+}
+
+/** Entries whose figures may be served today (verdict SOUND). */
+export function servableRates(): RepairRateEntry[] {
+  return REPAIR_RATES.filter(isServableRate);
+}
 
 export function findRepairRate(text: string): RepairRateEntry | null {
   if (!text || !text.trim()) {

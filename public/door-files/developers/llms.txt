@@ -13,7 +13,7 @@ This is the developer door of Wrenchli (Wrenchli, Inc., Detroit, Michigan). The 
 ## Endpoints
 
 - API base: https://aunrktvltmyrxtdygykt.supabase.co/functions/v1 — POST /api-assess (preferred) or /api-diagnose (original name, identical). Every call is authenticated with an API key (x-api-key header) and rate limited per key.
-- [MCP server](https://www.wrenchli.net/mcp): Wrenchli's Model Context Protocol endpoint (server name "wrenchli", version 1.0.0), served from the main site. It offers one tool, assess_vehicle_symptoms. Free, and no account is required.
+- [MCP server](https://www.wrenchli.net/mcp): Wrenchli's Model Context Protocol endpoint (server name "wrenchli", version 1.1.0), served from the main site. It offers three tools: assess_vehicle_symptoms, check_repair_price, and lookup_trouble_code. All are free; a free API key identifies the calling agent (request one instantly at https://www.wrenchli.net/mcp-keys). Prices served are only the ranges that pass Wrenchli's credibility grading (SOUND-graded price book entries).
 - [Agent card](https://www.wrenchli.net/.well-known/agent-card.json): Wrenchli's agent card describing the service, its operator, and its assessment skill.
 
 ## Notes
