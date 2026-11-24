@@ -197,6 +197,10 @@ export default function DesignPreview() {
                 ))}
               </div>
 
+              <p className="mt-3 text-xs" style={{ color: "#6B7280" }}>
+                Ranges span independent shops using quality aftermarket parts at the low end to dealership service departments using factory parts at the high end.
+              </p>
+
               {/* Mechanic questions */}
               <div className="mt-6 rounded-lg p-4" style={{ background: "#F8F8F6", border: "1px solid #E0DDD8" }}>
                 <div className="text-xs mb-3" style={{ fontFamily: MONO, color: "#E07B39" }}>QUESTIONS FOR YOUR MECHANIC</div>

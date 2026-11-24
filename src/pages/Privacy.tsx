@@ -46,7 +46,7 @@ export default function Privacy() {
                 <li><strong>Symptom descriptions you enter</strong> — transmitted to Anthropic (Claude API) for assessment generation.</li>
                 <li><strong>Audio or video recordings</strong> if you use the audio feature — transmitted to Google AI (Gemini), not stored by Wrenchli after analysis.</li>
                 <li><strong>Email address</strong> if you create an account.</li>
-                <li><strong>Payment information</strong> if you subscribe to Pro — processed by Stripe, never stored by Wrenchli.</li>
+                <li><strong>Payment information</strong> — processed by Stripe, never stored by Wrenchli.</li>
               </ul>
             </section>
 

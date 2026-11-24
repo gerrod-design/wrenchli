@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Key } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -130,10 +130,11 @@ const DTC_RESPONSE_PRICED = `{
 export default function McpCodeLookupTool() {
   return (
     <>
-      <Helmet>
-        <title>Trouble Code Lookup Tool — Wrenchli Developers</title>
-        <meta name="description" content="Reference for Wrenchli's lookup_trouble_code MCP tool: plain-language trouble code meanings, common causes, and urgency, with gated repair prices where the code maps to the price book." />
-      </Helmet>
+      <SEO
+        title="Trouble Code Lookup Tool — Wrenchli Developers"
+        description="Reference for Wrenchli's lookup_trouble_code MCP tool: plain-language trouble code meanings, common causes, and urgency, with gated repair prices where the code maps to the price book."
+        path="/developers/code-lookup"
+      />
 
       <main className="min-h-screen bg-background pt-24 pb-20">
         <div className="container max-w-3xl mx-auto px-4">

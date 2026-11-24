@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Key } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -114,10 +114,11 @@ const PRICE_NOT_PUBLISHED = `{
 export default function McpPriceCheckTool() {
   return (
     <>
-      <Helmet>
-        <title>Repair Price Check Tool — Wrenchli Developers</title>
-        <meta name="description" content="Reference for Wrenchli's check_repair_price MCP tool: published repair price ranges with their basis, served only when the range passes Wrenchli's credibility grading." />
-      </Helmet>
+      <SEO
+        title="Repair Price Check Tool — Wrenchli Developers"
+        description="Reference for Wrenchli's check_repair_price MCP tool: published repair price ranges with their basis, served only when the range passes Wrenchli's credibility grading."
+        path="/developers/price-check"
+      />
 
       <main className="min-h-screen bg-background pt-24 pb-20">
         <div className="container max-w-3xl mx-auto px-4">
