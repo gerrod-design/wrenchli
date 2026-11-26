@@ -3,7 +3,7 @@ title: "How Much Does a Timing Belt Replacement Cost?"
 date: "2026-11-26"
 figures_verified: "2026-11-09"
 excerpt: "Most owners pay $670 to $1,260 for a timing belt replacement, parts and labor together. Here's why the labor is most of the bill, and why this is the one job not to put off."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["timing belt", "replacement cost", "maintenance"]
 ---
 
@@ -43,3 +43,5 @@ Not sure where your car stands? If you do not know whether your engine has a bel
 ## About these figures
 
 They are Wrenchli editorial estimates for typical cars, built from typical parts prices and published labor times, and checked against more than one published estimator. The low end reflects an independent shop and the high end a dealer. They are a planning ballpark, not a quote. Your vehicle's price can land outside the range, and a shop can only price your car after a hands-on look.
+
+**Know before you owe.**

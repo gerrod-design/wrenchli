@@ -3,7 +3,7 @@ title: "Is It Safe to Drive With the Check Engine Light Flashing?"
 date: "2026-11-15"
 figures_verified: "2026-11-14"
 excerpt: "No. A flashing check engine light means the engine is misfiring right now, while you drive. Here is what a misfire does, what the common causes cost, and the steps to take."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["check engine light", "misfire", "spark plugs", "ignition coil", "catalytic converter"]
 ---
 

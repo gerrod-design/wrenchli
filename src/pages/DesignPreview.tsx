@@ -242,6 +242,20 @@ export default function DesignPreview() {
           </div>
         </section>
 
+        {/* Common problems — plain-language guides */}
+        <section className="px-6 py-12" style={{ background: "#F8F8F6" }}>
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="text-xs mb-3" style={{ fontFamily: MONO, color: "#E07B39" }}>COMMON PROBLEMS</div>
+            <p className="text-base leading-relaxed" style={{ color: "#4B5563" }}>
+              Start with the problem drivers ask about most:{" "}
+              <Link to="/blog/car-wont-start-clicking-noise" className="font-semibold underline" style={{ color: "#E07B39" }}>
+                car won't start, clicking noise
+              </Link>
+              . Our guide covers what the clicking means, what to check first, and what each fix costs.
+            </p>
+          </div>
+        </section>
+
         {/* ── For Shops Section ── */}
         <section id="for-shops" className="px-6 py-20" style={{ background: "#F8F8F6", borderTop: "1px solid #E0DDD8" }}>
           <div className="max-w-4xl mx-auto text-center">

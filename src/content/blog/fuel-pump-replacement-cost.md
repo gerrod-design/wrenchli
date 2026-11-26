@@ -3,7 +3,7 @@ title: "How Much Does It Cost to Replace a Fuel Pump?"
 date: "2026-11-15"
 figures_verified: "2026-11-14"
 excerpt: "Most owners pay $600 to $1,525 to replace a fuel pump, parts and labor together. Here's why the range is wide, the signs yours may be failing, and why the honest replacement is the full module."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["fuel pump", "replacement cost", "fuel system"]
 ---
 

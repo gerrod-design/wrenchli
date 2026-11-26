@@ -2,7 +2,7 @@
 title: "Does Wrenchli Guarantee the Price It Shows You?"
 date: "2026-11-15"
 excerpt: "No, and any service that promises you a guaranteed repair price before anyone has looked at your car is promising something it cannot know. Here is what the Wrenchli range is, and what actually holds it honest."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["repair prices", "price guarantee", "referrals", "how Wrenchli works"]
 ---
 

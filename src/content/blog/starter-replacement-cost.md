@@ -3,7 +3,7 @@ title: "How Much Does It Cost to Replace a Starter?"
 date: "2026-11-15"
 figures_verified: "2026-11-09"
 excerpt: "Most owners pay $395 to $840 to replace a starter, parts and labor together. Here's what drives the price, the signs yours is failing, and the test a shop should run before quoting you one."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["starter", "replacement cost", "battery", "starting system"]
 ---
 

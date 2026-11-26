@@ -1,9 +1,9 @@
 ---
-title: "Car Makes Grinding Noise When Braking — Causes, Costs, and What to Do Next"
+title: "Grinding Noise When Braking: Causes and What the Fix Costs"
 date: "2026-04-12"
 figures_verified: "2026-11-16"
-excerpt: "Grinding brakes mean something is wearing down — and ignoring it gets expensive fast. Here are the likely causes, what repairs cost, and when you need to act."
-author: "Wrenchli Team"
+excerpt: "Brakes grinding? The pads have usually worn to metal, and the rotors are next. Pads alone run $155 to $325; waiting until the rotors go takes it to $355 to $745."
+author: "Team Wrenchli"
 tags: ["brakes", "grinding noise", "brake pads", "rotors", "car noise"]
 ---
 
@@ -106,6 +106,8 @@ If you want a clearer picture before the visit, [run your symptoms through Wrenc
 Grinding brakes are not something to ignore. The noise is telling you that metal is wearing against metal, and every day you wait adds cost to the repair. In most cases, catching it early means a straightforward pad replacement. Waiting turns it into pads, rotors, and potentially calipers.
 
 Get the noise checked within a few days of noticing it. Ask the right questions. And if a shop quotes you a full brake job without measuring anything first, get a second opinion.
+
+**Know before you owe.**
 
 ---
 

@@ -65,7 +65,7 @@ export function getAllPosts(): BlogPost[] {
         title: meta.title || slug,
         date: meta.date || "",
         excerpt: meta.excerpt || "",
-        author: meta.author || "Wrenchli Team",
+        author: meta.author || "Team Wrenchli",
         tags: parseTags(meta.tags),
         figuresVerified: meta.figures_verified || undefined,
         content,

@@ -2,7 +2,7 @@
 title: "What Happens After You Send Your Problem to a Shop?"
 date: "2026-11-26"
 excerpt: "One shop at a time reviews your problem, and it answers within one business day. Here's the full sequence, from the moment you hit send to the confirmation after the work."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["referrals", "how Wrenchli works", "repair shops"]
 ---
 
@@ -25,3 +25,5 @@ Here is the sequence, step by step.
 What this process is not: it is not an auction, and your problem is not sold or sent to several shops at once to compete for you. It moves shop to shop, one at a time, in order, and each shop decides on the car and the problem before it knows who you are.
 
 If you want the likely causes and a fair range first, with no shop involved at all, start with the [free assessment](https://wrenchli.net). Sending anything to a shop is a separate step, and it is always yours to take or skip.
+
+**Know before you owe.**

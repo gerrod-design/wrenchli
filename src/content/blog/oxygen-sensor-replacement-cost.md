@@ -3,7 +3,7 @@ title: "How Much Does It Cost to Replace an Oxygen Sensor?"
 date: "2026-11-26"
 figures_verified: "2026-11-09"
 excerpt: "Most owners pay $145 to $405 to replace an oxygen sensor, parts and labor together. Here's why the part tier matters more than the labor, and the check to run before you pay."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["oxygen sensor", "replacement cost", "check engine light"]
 ---
 
@@ -38,3 +38,5 @@ Not sure whether your light points at a sensor or somewhere more expensive? Desc
 ## About these figures
 
 They are Wrenchli editorial estimates for typical cars, built from typical parts prices and published labor times, and checked against more than one published source. The low end reflects an independent shop using a quality aftermarket sensor and the high end a dealer using the factory sensor. They are a planning ballpark, not a quote. Your vehicle's price can land outside the range, and a shop can only price your car after a hands-on look.
+
+**Know before you owe.**

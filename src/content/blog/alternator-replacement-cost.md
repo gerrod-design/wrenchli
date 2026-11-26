@@ -3,7 +3,7 @@ title: "How Much Does It Cost to Replace an Alternator?"
 date: "2026-11-14"
 figures_verified: "2026-11-09"
 excerpt: "At an independent shop, most owners pay $445 to $940 for alternator replacement, parts and labor together. Here's what drives the price, the signs yours is failing, and the one check to run before you pay."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["alternator", "replacement cost", "charging system", "battery"]
 ---
 

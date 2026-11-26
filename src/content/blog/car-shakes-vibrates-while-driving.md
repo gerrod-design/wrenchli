@@ -1,11 +1,20 @@
 ---
-title: "Car Shakes or Vibrates While Driving — Causes, Costs, and What to Check First"
+title: "Why Is My Car Shaking? Causes, Costs and What to Check First"
 date: "2026-04-12"
 figures_verified: "2026-11-16"
-excerpt: "A shaking car isn't just annoying — it's a warning. Here are the most common causes of vibration while driving, what repairs cost, and how to describe the problem to your mechanic."
-author: "Wrenchli Team"
+excerpt: "Car shaking at highway speed, when braking, or at idle? When it happens points to the cause. Likely fixes and costs, from a $40 to $80 tire balance to rotors at $240 to $560."
+author: "Team Wrenchli"
 tags: ["vibration", "shaking", "tires", "alignment", "suspension"]
 ---
+
+When a car shakes, when it happens is the biggest clue to why. Shaking at highway speed usually points to the tires. Shaking when you brake usually points to the rotors. Shaking at idle usually points to the engine. Read the pattern first and you can walk into a shop already knowing the likely cause and what the fix should cost.
+
+## Key takeaways
+
+- Highway speed shaking points to tires and balance.
+- Shaking when braking points to rotors.
+- Shaking at idle points to the engine.
+- The most common fix is a tire balance, at $40 to $80.
 
 Your car used to ride smooth. Now it shakes — maybe at highway speed, maybe only when braking, maybe all the time. Whatever the pattern, something has changed, and ignoring it usually makes the problem worse.
 
@@ -17,7 +26,7 @@ Here's how to figure out what's going on before you visit a shop.
 
 The single most useful piece of information you can give your mechanic is *when* the vibration occurs. Different timing points to different systems.
 
-### Shaking at highway speed (55–70 mph)
+### Why does my car shake at highway speed?
 
 If your car rides fine around town but starts vibrating once you hit highway speed, the most common causes are tire-related:
 
@@ -27,7 +36,7 @@ If your car rides fine around town but starts vibrating once you hit highway spe
 
 **A bent wheel** from hitting a pothole or curb can cause vibration that's worst at specific speeds. Michigan roads are particularly hard on wheels — pothole damage is one of the most common causes of sudden-onset vibration in metro Detroit.
 
-### Shaking when braking
+### Why does my car shake when I brake?
 
 If the vibration only appears when you press the brake pedal — especially at highway speed — the cause is almost always in the braking system:
 
@@ -41,7 +50,7 @@ If the vibration is constant regardless of speed, the problem is likely structur
 
 **Worn tie rod ends or ball joints** allow play in the steering and suspension, creating a constant vibration or looseness in the steering wheel.
 
-**Damaged CV joints or axle shafts** on front-wheel-drive vehicles can cause vibration that worsens during turns. You might also hear a clicking sound when turning.
+**Damaged CV joints or axle shafts** on front-wheel-drive vehicles can cause vibration that worsens during turns. You might also hear a clicking sound when turning. That click comes from the joint itself. A [clicking noise when starting](https://www.wrenchli.net/blog/car-wont-start-clicking-noise) is a different problem, usually the battery or starter, and it has a different fix.
 
 **Engine or transmission mount failure** allows the drivetrain to move more than it should, transmitting vibrations directly into the cabin. This vibration is often worst at idle and improves slightly at speed.
 
@@ -120,6 +129,14 @@ If you want a quick read on what's most likely causing your vibration and whethe
 A shaking car is telling you something has changed. The fix might be as simple as a $40 tire balance or as involved as a suspension rebuild. The key is identifying *when* the vibration happens, because that points directly to the system involved.
 
 Don't ignore vibration that's getting worse. What starts as a tire balance issue becomes a tire replacement issue. What starts as a rotor problem becomes a rotor-and-caliper problem. Catching it early is always cheaper.
+
+## Related guides
+
+- [Car Won't Start, Clicking Noise: Causes and What It Costs](https://www.wrenchli.net/blog/car-wont-start-clicking-noise)
+- [Grinding Noise When Braking: Causes and What the Fix Costs](https://www.wrenchli.net/blog/car-grinding-noise-when-braking)
+- [P0420 Code: What It Means, Causes and Repair Costs](https://www.wrenchli.net/blog/check-engine-light-p0420)
+
+**Know before you owe.**
 
 ---
 

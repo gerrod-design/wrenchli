@@ -3,7 +3,7 @@ title: "How Much Does a Thermostat Replacement Cost?"
 date: "2026-11-26"
 figures_verified: "2026-11-14"
 excerpt: "Most owners pay $160 to $535 to replace a thermostat, parts and labor together. Here's why quotes vary so much, and the one question that explains most of the spread."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["thermostat", "replacement cost", "cooling system"]
 ---
 
@@ -30,3 +30,5 @@ Not sure whether your symptoms point at the thermostat or somewhere else? An ove
 ## About these figures
 
 The range runs from an independent shop using a quality aftermarket housing assembly (the low end) to a franchised dealer using the factory assembly at its list price (the high end), with labor at each channel's typical rates. The figures were rebuilt on November 14, 2026 from named parts sources (the assembly's street price at two major retailers and the genuine part's retail price) and checked against published labor times. They are a planning ballpark, not a quote, and your vehicle's price can land outside the range.
+
+**Know before you owe.**

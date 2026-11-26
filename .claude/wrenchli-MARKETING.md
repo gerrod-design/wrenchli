@@ -159,14 +159,14 @@ FRONTMATTER TEMPLATE:
 title: "[Primary Keyword] — [Causes/What It Means], [Costs], and [Action]"
 date: "YYYY-MM-DD"
 excerpt: "[Symptom restated] — [consequence of ignoring]. Here's/Here are [what the article delivers]."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"]
 ---
 ```
 - Title pattern: Primary keyword + em dash + 3-part promise (causes, costs, action)
 - Excerpt: 1–2 sentences, under 160 characters, includes primary keyword
 - Tags: 5 tags, mix of symptom terms and part names for discoverability
-- Author: Always "Wrenchli Team" (never a person's name)
+- Author: Always "Team Wrenchli" (never a person's name)
 
 COST SECTION FORMAT:
 - Use bulleted list, not a table

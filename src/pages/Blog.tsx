@@ -4,7 +4,14 @@ import { getAllPosts } from "@/lib/blog";
 import { CalendarDays, Clock, ArrowRight } from "lucide-react";
 
 export default function Blog() {
-  const posts = getAllPosts();
+  const allPosts = getAllPosts();
+  // The clicking-noise guide is the highest-impression page on the site
+  // (Search Console, last 90 days to 2026-11-23), so it is featured first
+  // in the list while that holds. The rest stay in date order.
+  const posts = [
+    ...allPosts.filter((p) => p.slug === "car-wont-start-clicking-noise"),
+    ...allPosts.filter((p) => p.slug !== "car-wont-start-clicking-noise"),
+  ];
 
   return (
     <main className="pb-[60px] md:pb-0">

@@ -3,7 +3,7 @@ title: "How Much Does It Cost to Replace an Air Conditioning Compressor?"
 date: "2026-11-26"
 figures_verified: "2026-11-09"
 excerpt: "Most owners pay $625 to $1,285 to replace an air conditioning compressor, parts and labor together. Here's what the range covers, what it leaves out, and the signs yours is failing."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["ac compressor", "air conditioning", "replacement cost"]
 ---
 
@@ -38,3 +38,5 @@ Not sure whether the problem is the compressor or something cheaper? Low refrige
 ## About these figures
 
 They are Wrenchli editorial estimates for typical cars, built from typical parts prices and published labor times, and checked against more than one published source. The low end reflects an independent shop and the high end a dealer. The range excludes refrigerant recharge and receiver-drier service, which are priced separately. They are a planning ballpark, not a quote. Your vehicle's price can land outside the range, and a shop can only price your car after a hands-on look.
+
+**Know before you owe.**

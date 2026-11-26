@@ -1,9 +1,9 @@
 ---
-title: "Check Engine Light P0420 — What It Means, What It Costs, and What to Ask Your Mechanic"
+title: "P0420 Code: What It Means, Causes and Repair Costs"
 date: "2026-04-05"
 figures_verified: "2026-11-14"
-excerpt: "P0420 is one of the most common check engine codes — and one of the most misassessed. Here's what it actually means and how to avoid overpaying for a fix you might not need."
-author: "Wrenchli Team"
+excerpt: "P0420 flags the catalyst system, not always a failed catalytic converter. Rule out an oxygen sensor at $150 to $350 before a converter at $645 to $1,675."
+author: "Team Wrenchli"
 tags: ["check engine light", "P0420", "catalytic converter", "diagnostics", "OBD-II"]
 ---
 
@@ -67,6 +67,8 @@ A mechanic who answers these questions clearly and without frustration is a mech
 P0420 is a starting point, not a verdict. Get a proper assessment before approving an expensive repair. If a shop quotes you a catalytic converter replacement as their first recommendation without ruling out the cheaper alternatives, get a second opinion.
 
 Not sure what you're dealing with? Run your symptoms through Wrenchli's free assessment before your shop visit — it takes two minutes and gives you the likely causes, cost ranges, and the right questions to ask.
+
+**Know before you owe.**
 
 ---
 

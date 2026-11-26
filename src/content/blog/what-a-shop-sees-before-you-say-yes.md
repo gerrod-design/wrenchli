@@ -2,7 +2,7 @@
 title: "What a Shop Sees Before You Say Yes"
 date: "2026-11-15"
 excerpt: "A shop does not get your name, your phone number, or your email address when it first looks at your problem. It sees the car and the problem. Your contact details are shared only after a shop accepts your job."
-author: "Wrenchli Team"
+author: "Team Wrenchli"
 tags: ["privacy", "referrals", "how Wrenchli works", "repair shops"]
 ---
 
