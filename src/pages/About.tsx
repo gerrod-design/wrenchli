@@ -57,6 +57,29 @@ export default function About() {
 
       
 
+      {/* Mobility for All */}
+      <section className="section-padding bg-background">
+        <div className="container-wrenchli max-w-3xl">
+          <SectionReveal>
+            <h2 className="font-heading text-2xl font-bold md:text-4xl">Mobility for All</h2>
+            <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
+              <p>
+                Wrenchli exists because owning a car is one of the largest ongoing financial decisions in a household, and most people face its hardest moments alone, under time pressure, across a counter from someone selling them something.
+              </p>
+              <p>
+                Mobility for All is our name for the whole of it: not just the repair in front of you, but whether the repair is worth it, how to pay for it, how to stay mobile while the car is down, what the car is worth, and what the next one will really cost. At every one of those moments, Wrenchli's job is the same: clear facts, the right questions, and the decision left where it belongs, with you.
+              </p>
+              <p>
+                It is not a promise to drivers only. A shop's mobility is its business staying full of prepared, fairly treated customers. A partner's mobility is the moment they serve, the ride, the loan, the inspection, where a person could otherwise be stranded. Wrenchli aims to be useful to all three, so the ecosystem works for them together.
+              </p>
+              <p>
+                We would rather be useful than loud. If people someday call that a way of life, that is theirs to name, not ours to claim.
+              </p>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
+
       {/* Mission & Vision */}
       <section className="section-padding bg-secondary">
         <div className="container-wrenchli">

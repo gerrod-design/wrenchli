@@ -223,6 +223,83 @@ export default function DesignPreview() {
           </div>
         </section>
 
+        {/* Mobility for All */}
+        <section className="px-6 py-16" style={{ background: "#FFFFFF", borderTop: "1px solid #E0DDD8" }}>
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center">
+              <div className="text-xs mb-3" style={{ fontFamily: MONO, color: "#E07B39" }}>MOBILITY FOR ALL</div>
+              <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "#1A1D27" }}>
+                Mobility for All means the whole life of owning a car
+              </h2>
+              <p className="mt-4 text-base leading-relaxed max-w-3xl mx-auto" style={{ color: "#4B5563" }}>
+                Wrenchli helps you understand the big decisions that come with owning a car, from the first strange noise to the day you buy the next one, so you can decide with clear facts instead of pressure.
+              </p>
+              <p className="mt-4 text-base leading-relaxed max-w-3xl mx-auto" style={{ color: "#4B5563" }}>
+                Owning a car is a series of moments. Wrenchli holds the whole map so you only have to carry the one you are in.
+              </p>
+            </div>
+
+            <ol className="mt-10 space-y-6 max-w-3xl mx-auto">
+              <li>
+                <p className="leading-relaxed" style={{ color: "#4B5563" }}>
+                  <strong style={{ color: "#1A1D27" }}>&ldquo;Something is wrong with my car.&rdquo;</strong>{" "}
+                  What it likely is, how urgent it is, what it should cost, and what to ask the mechanic.{" "}
+                  <em style={{ color: "#6B7280" }}>Available now: the free assessment.</em>
+                </p>
+              </li>
+              <li>
+                <p className="leading-relaxed" style={{ color: "#4B5563" }}>
+                  <strong style={{ color: "#1A1D27" }}>&ldquo;Is this repair worth it for this car?&rdquo;</strong>{" "}
+                  The repair cost set against what the car is worth, with the source and date shown, never a verdict.{" "}
+                  <em style={{ color: "#6B7280" }}>In the works.</em>
+                </p>
+              </li>
+              <li>
+                <p className="leading-relaxed" style={{ color: "#4B5563" }}>
+                  <strong style={{ color: "#1A1D27" }}>&ldquo;Fix it, or is it time for a different car?&rdquo;</strong>{" "}
+                  If you decide not to repair, your real options for this car and what each one pays.{" "}
+                  <em style={{ color: "#6B7280" }}>In the works.</em>
+                </p>
+              </li>
+              <li>
+                <p className="leading-relaxed" style={{ color: "#4B5563" }}>
+                  <strong style={{ color: "#1A1D27" }}>&ldquo;How will I pay for this?&rdquo;</strong>{" "}
+                  Cash, card, or a payment plan, and what each truly costs in full.{" "}
+                  <em style={{ color: "#6B7280" }}>
+                    The <Link to="/financing" className="underline">financing page</Link> is live; payment options are being built.
+                  </em>
+                </p>
+              </li>
+              <li>
+                <p className="leading-relaxed" style={{ color: "#4B5563" }}>
+                  <strong style={{ color: "#1A1D27" }}>&ldquo;How do I get around while my car is down?&rdquo;</strong>{" "}
+                  Rides, rentals, and transit matched to how long the car is out and what each costs.{" "}
+                  <em style={{ color: "#6B7280" }}>Available now, inside your assessment.</em>
+                </p>
+              </li>
+              <li>
+                <p className="leading-relaxed" style={{ color: "#4B5563" }}>
+                  <strong style={{ color: "#1A1D27" }}>&ldquo;What is my car worth, and where do I stand?&rdquo;</strong>{" "}
+                  Your car's value against what you owe, watched over time instead of discovered in a crisis.{" "}
+                  <em style={{ color: "#6B7280" }}>In the works, in My Garage.</em>
+                </p>
+              </li>
+              <li>
+                <p className="leading-relaxed" style={{ color: "#4B5563" }}>
+                  <strong style={{ color: "#1A1D27" }}>&ldquo;What will the next car really cost me?&rdquo;</strong>{" "}
+                  Insurance, fuel, upkeep, and lost value, not just the payment.{" "}
+                  <em style={{ color: "#6B7280" }}>In the works.</em>
+                </p>
+              </li>
+            </ol>
+
+            <p className="mt-10 text-center leading-relaxed" style={{ color: "#4B5563" }}>
+              Wherever you are on the list, start with the moment you are in.{" "}
+              <strong style={{ color: "#1A1D27" }}>Know before you owe.</strong>
+            </p>
+          </div>
+        </section>
+
         {/* Value props */}
         <section className="px-6 py-16" style={{ background: "#F0EFEC" }}>
           <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
