@@ -7,44 +7,44 @@ author: "Team Wrenchli"
 tags: ["check engine light", "P0420", "catalytic converter", "diagnostics", "OBD-II"]
 ---
 
-If your check engine light came on and an auto parts store scan returned a P0420 code, you're not alone. P0420 is consistently one of the top five most common OBD-II codes in the US — and it's also one of the most frequently misassessed.
+If your check engine light came on and an auto parts store scan returned a P0420 code, you're not alone. P0420 is consistently one of the top five most common OBD-II codes in the US, and it's also one of the most frequently misassessed.
 
 Here's what it actually means, what it actually costs, and the questions you should ask before approving any repair.
 
 ## What P0420 means in plain English
 
-P0420 stands for "Catalyst System Efficiency Below Threshold — Bank 1." In plain terms, your car's computer is detecting that the catalytic converter isn't cleaning exhaust gases as efficiently as it should be.
+P0420 stands for "Catalyst System Efficiency Below Threshold (Bank 1)." In plain terms, your car's computer is detecting that the catalytic converter isn't cleaning exhaust gases as efficiently as it should be.
 
-The catalytic converter is the component in your exhaust system that converts harmful pollutants into less harmful emissions. When it's working correctly, an oxygen sensor downstream of the converter should detect very little remaining pollutant activity. When the P0420 code fires, that downstream sensor is detecting more activity than expected — signaling the converter isn't doing its job efficiently enough.
+The catalytic converter is the component in your exhaust system that converts harmful pollutants into less harmful emissions. When it's working correctly, an oxygen sensor downstream of the converter should detect very little remaining pollutant activity. When the P0420 code fires, that downstream sensor is detecting more activity than expected, signaling the converter isn't doing its job efficiently enough.
 
 ## Why P0420 is frequently misassessed
 
-Here's the problem: P0420 points at a *system*, not a specific part. The code tells you the catalyst system is underperforming — it doesn't tell you *why*. The actual cause could be any of the following:
+Here's the problem: P0420 points at a *system*, not a specific part. The code tells you the catalyst system is underperforming. It doesn't tell you *why*. The actual cause could be any of the following:
 
 **A failing catalytic converter** is the most common cause and what most shops will quote you first. But before assuming that's the answer, consider these alternatives that are significantly cheaper to fix:
 
-**A faulty oxygen sensor** — either the upstream or downstream O2 sensor — can send incorrect readings that trigger P0420 even when the catalytic converter is perfectly functional. Replacing a sensor costs $150–$300 versus $645–$1,675 for a single converter unit — and a job that replaces both units, or fits a CARB-compliant unit, can price above that range.
+**A faulty oxygen sensor** (either the upstream or downstream O2 sensor) can send incorrect readings that trigger P0420 even when the catalytic converter is perfectly functional. Replacing a sensor costs $150–$300 versus $645–$1,675 for a single converter unit, and a job that replaces both units, or fits a CARB-compliant unit, can price above that range.
 
 **An exhaust leak** near the oxygen sensor can cause false readings. A mechanic with a smoke machine can rule this out in 15 minutes.
 
-**Engine misfires** — if your engine is misfiring, unburned fuel enters the exhaust and damages the catalytic converter over time. If misfires are the root cause, replacing the converter without fixing the misfire means the new converter will fail again.
+**Engine misfires**, if your engine is misfiring, unburned fuel enters the exhaust and damages the catalytic converter over time. If misfires are the root cause, replacing the converter without fixing the misfire means the new converter will fail again.
 
-**Oil burning** — if your engine burns oil, it coats the catalytic converter and reduces its efficiency. Again, replacing the converter without addressing the underlying oil issue is expensive and temporary.
+**Oil burning**, if your engine burns oil, it coats the catalytic converter and reduces its efficiency. Again, replacing the converter without addressing the underlying oil issue is expensive and temporary.
 
-## What it costs — example regional pricing (Michigan & Ohio)
+## What it costs, example regional pricing (Michigan & Ohio)
 
 Repair costs vary significantly depending on what's actually causing the code:
 
 - **Oxygen sensor replacement:** $150–$350 parts and labor
 - **Exhaust leak repair:** $100–$400 depending on location and severity
-- **Catalytic converter replacement:** $645–$1,675 for a single converter unit in Wrenchli's price book — the low end is an independent shop fitting a quality aftermarket part, the high end a franchised dealer fitting an OEM part. A job that replaces both converter units, or fits a CARB-compliant unit, prices above that range, and your vehicle make and model move the figure within it
+- **Catalytic converter replacement:** $645–$1,675 for a single converter unit in Wrenchli's price book, the low end is an independent shop fitting a quality aftermarket part, the high end a franchised dealer fitting an OEM part. A job that replaces both converter units, or fits a CARB-compliant unit, prices above that range, and your vehicle make and model move the figure within it
 - **Misfire assessment and repair:** $150–$600 depending on cause
 
 The most important thing to know: a shop that quotes you a catalytic converter replacement without first ruling out the cheaper causes is either cutting corners or not being thorough. A proper assessment takes time and equipment.
 
 ## Is it safe to drive with a P0420 code?
 
-Generally yes — P0420 does not typically indicate an immediate safety risk. Your vehicle will usually continue to run normally. However there are two things to watch:
+Generally yes, P0420 does not typically indicate an immediate safety risk. Your vehicle will usually continue to run normally. However there are two things to watch:
 
 If the check engine light is **flashing** rather than solid, that indicates an active misfire and you should not drive the vehicle until it is assessed. A solid check engine light with P0420 alone is typically driveable in the short term.
 
@@ -57,8 +57,8 @@ These questions separate thorough mechanics from those who default to the most e
 1. Have you checked the oxygen sensors and confirmed they're reading accurately before assessing the converter?
 2. Did you check for exhaust leaks near the sensors?
 3. Is there any evidence of engine misfires or oil burning that could be causing or contributing to this code?
-4. If you replace the catalytic converter, what warranty does it carry — and is it OEM or aftermarket?
-5. What happens if we replace the converter and the code comes back — what's the assessment plan from there?
+4. If you replace the catalytic converter, what warranty does it carry, and is it OEM or aftermarket?
+5. What happens if we replace the converter and the code comes back, what's the assessment plan from there?
 
 A mechanic who answers these questions clearly and without frustration is a mechanic worth trusting.
 
@@ -66,7 +66,7 @@ A mechanic who answers these questions clearly and without frustration is a mech
 
 P0420 is a starting point, not a verdict. Get a proper assessment before approving an expensive repair. If a shop quotes you a catalytic converter replacement as their first recommendation without ruling out the cheaper alternatives, get a second opinion.
 
-Not sure what you're dealing with? Run your symptoms through Wrenchli's free assessment before your shop visit — it takes two minutes and gives you the likely causes, cost ranges, and the right questions to ask.
+Not sure what you're dealing with? Run your symptoms through Wrenchli's free assessment before your shop visit, it takes two minutes and gives you the likely causes, cost ranges, and the right questions to ask.
 
 **Know before you owe.**
 

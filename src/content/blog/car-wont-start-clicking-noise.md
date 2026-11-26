@@ -13,7 +13,7 @@ Rapid clicking means the battery cannot deliver enough current to crank the engi
 
 Want the likely cause for your specific vehicle before you call anyone? [Run your symptoms through Wrenchli's free assessment](https://wrenchli.net), describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
 
-You turn the key or press the start button. Instead of the engine roaring to life, you hear a rapid clicking sound — or maybe one loud click — and nothing happens. You're stuck.
+You turn the key or press the start button. Instead of the engine roaring to life, you hear a rapid clicking sound (or maybe one loud click) and nothing happens. You're stuck.
 
 A car that clicks but won't start is one of the most common roadside problems. The good news: in the majority of cases, the fix is simple and inexpensive. The bad news: it always seems to happen when you're already late for something.
 
@@ -21,7 +21,7 @@ Here's what that clicking sound means, what you can check yourself before callin
 
 ## Why won't my car start but it clicks?
 
-The type of clicking narrows the cause immediately. Pay attention to whether you hear rapid clicking or a single click — they point to different problems.
+The type of clicking narrows the cause immediately. Pay attention to whether you hear rapid clicking or a single click. They point to different problems.
 
 | Click pattern | What it usually means | First check | Likely repair and cost |
 |---|---|---|---|
@@ -32,17 +32,17 @@ The type of clicking narrows the cause immediately. Pay attention to whether you
 
 ### Rapid clicking (click-click-click-click)
 
-Rapid clicking when you turn the key is the signature sound of a weak battery. Here's what's happening: your battery has enough voltage to engage the starter solenoid — which makes the clicking — but not enough amperage to actually turn the starter motor. The solenoid engages, senses there isn't enough power, releases, and tries again. That rapid cycle is the clicking you hear.
+Rapid clicking when you turn the key is the signature sound of a weak battery. Here's what's happening: your battery has enough voltage to engage the starter solenoid (which makes the clicking) but not enough amperage to actually turn the starter motor. The solenoid engages, senses there isn't enough power, releases, and tries again. That rapid cycle is the clicking you hear.
 
 This is the most common cause of a no-start with clicking, and it accounts for roughly 70% of these cases.
 
 ### Single loud click
 
-A single loud click followed by silence usually points to the starter motor or starter solenoid. The solenoid engages once with full force — producing the loud click — but the starter motor itself fails to turn. This can mean the starter motor has failed, or there's a poor electrical connection preventing full power from reaching the starter.
+A single loud click followed by silence usually points to the starter motor or starter solenoid. The solenoid engages once with full force (producing the loud click) but the starter motor itself fails to turn. This can mean the starter motor has failed, or there's a poor electrical connection preventing full power from reaching the starter.
 
 ### No click at all
 
-If you turn the key and hear absolutely nothing — no click, no dash lights, nothing — the battery is likely completely dead or there's a broken connection in the main electrical circuit. This is different from clicking and requires checking the battery terminals first.
+If you turn the key and hear absolutely nothing (no click, no dash lights, nothing), the battery is likely completely dead or there's a broken connection in the main electrical circuit. This is different from clicking and requires checking the battery terminals first.
 
 ## Most common causes, ranked by likelihood
 
@@ -60,7 +60,7 @@ Signs the battery is the problem:
 
 ### Corroded or loose battery terminals
 
-Even a good battery can't start your car if the connection between the battery and the cables is poor. Corrosion — that white or greenish crusty buildup on the battery posts — creates resistance that reduces the power reaching the starter.
+Even a good battery can't start your car if the connection between the battery and the cables is poor. Corrosion (that white or greenish crusty buildup on the battery posts) creates resistance that reduces the power reaching the starter.
 
 This is the most overlooked cause because it costs nothing to fix. A wire brush, a wrench, and 10 minutes can solve the problem entirely.
 
@@ -68,7 +68,7 @@ This is the most overlooked cause because it costs nothing to fix. A wire brush,
 
 The starter motor is an electric motor that physically cranks the engine. Like any electric motor, it eventually wears out. A failing starter often gives warning signs before it fails completely:
 
-- Intermittent starting problems — works sometimes, doesn't work other times
+- Intermittent starting problems, works sometimes, doesn't work other times
 - A grinding noise when starting (worn starter gear)
 - A single loud click without cranking
 
@@ -104,7 +104,7 @@ Safety points: keep cables clear of fans, belts, and anything that moves when th
 
 **Step 3: Inspect the battery terminals.** Pop the hood and look at the battery posts. If you see white, green, or blue crusty buildup, that's corrosion. If you can wiggle the cable clamps by hand, they're too loose. Tighten or clean them and try again.
 
-**Step 4: Listen carefully to the starter.** If you hear a single loud click, try tapping the starter motor lightly with a wrench or hammer while someone turns the key. If it starts, the starter is failing and needs replacement — but this can buy you one more trip to a shop.
+**Step 4: Listen carefully to the starter.** If you hear a single loud click, try tapping the starter motor lightly with a wrench or hammer while someone turns the key. If it starts, the starter is failing and needs replacement, but this can buy you one more trip to a shop.
 
 **Step 5: Check the key fob battery.** On push-button start vehicles, a dead key fob battery can prevent the car from recognizing the key. Most vehicles have a backup: hold the fob directly against the start button and press. Check your owner's manual for the specific procedure.
 
@@ -129,7 +129,7 @@ Costs vary by cause, but here's what to expect. The ranges below span independen
 - **Alternator replacement (if battery wasn't charging):** $445–$940
 - **Parasitic drain assessment:** $80–$150 for the assessment time, plus repair cost
 
-The battery-related fixes — replacement, terminal cleaning, or a jump plus recharge — are by far the most affordable. If a shop immediately quotes you a starter replacement without testing the battery first, push back and ask them to load-test the battery before proceeding.
+The battery-related fixes (replacement, terminal cleaning, or a jump plus recharge) are by far the most affordable. If a shop immediately quotes you a starter replacement without testing the battery first, push back and ask them to load-test the battery before proceeding.
 
 ## Car won't start but the lights come on and it clicks: what then?
 
@@ -146,7 +146,7 @@ This is the most important distinction because the cost difference is significan
 - You hear a single loud click
 - Dash lights are bright and strong
 - Jump starting doesn't help
-- The problem is intermittent — works sometimes, fails other times
+- The problem is intermittent, works sometimes, fails other times
 - You hear grinding when it does start
 
 **It could be either if:**
@@ -160,11 +160,11 @@ A shop with a proper battery load tester can tell you definitively in 5 minutes 
 
 1. Did you load-test the battery before assessing anything else?
 2. What are the battery's cold cranking amps versus the spec for this vehicle?
-3. If the starter needs replacement, is the replacement part new or remanufactured — and what warranty does it carry?
+3. If the starter needs replacement, is the replacement part new or remanufactured, and what warranty does it carry?
 4. Did you check the charging system to make sure the alternator is keeping the battery charged?
 5. Is there any sign of a parasitic drain that could kill the new battery?
 
-A mechanic who tests the battery first and checks the charging system after the repair is someone who wants to fix the problem permanently — not just for today.
+A mechanic who tests the battery first and checks the charging system after the repair is someone who wants to fix the problem permanently, not just for today.
 
 ## Can you fix a no-start yourself
 
@@ -172,17 +172,17 @@ Many no-start causes are very DIY-friendly:
 
 **Easy DIY:** Jump starting (with cables or a portable jump box), cleaning battery terminals, checking and tightening cable connections, replacing a key fob battery.
 
-**Moderate DIY:** Replacing the battery itself is straightforward on most vehicles — unbolt the hold-down bracket, disconnect terminals (negative first), swap the battery, reconnect (positive first). Takes 15–30 minutes.
+**Moderate DIY:** Replacing the battery itself is straightforward on most vehicles. Unbolt the hold-down bracket, disconnect terminals (negative first), swap the battery, reconnect (positive first). Takes 15–30 minutes.
 
 **Moderate-to-hard DIY:** Starter replacement varies dramatically by vehicle. On some trucks, the starter is easily accessible from underneath. On others, it's buried under the intake manifold. Check a tutorial for your specific vehicle before committing.
 
 **Shop required:** Parasitic drain assessment requires a multimeter and patience. Alternator testing requires a voltmeter at minimum. Both are doable at home but time-consuming.
 
-Want to know the most likely cause for your specific vehicle? [Run your symptoms through Wrenchli's free assessment](https://wrenchli.net) — describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
+Want to know the most likely cause for your specific vehicle? [Run your symptoms through Wrenchli's free assessment](https://wrenchli.net), describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
 
 ## The bottom line
 
-A clicking noise with no start is frustrating, but it's usually fixable and often inexpensive. Start with the battery — it's the cause roughly 70% of the time. Check the terminals, try a jump, and go from there. If that doesn't work, the starter is the next most likely culprit.
+A clicking noise with no start is frustrating, but it's usually fixable and often inexpensive. Start with the battery. It's the cause roughly 70% of the time. Check the terminals, try a jump, and go from there. If that doesn't work, the starter is the next most likely culprit.
 
 Whatever the cause, don't let a shop skip the battery test and jump straight to an expensive starter quote. Test the cheap things first.
 
