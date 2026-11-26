@@ -242,7 +242,7 @@ export default function DesignPreview() {
           </div>
         </section>
 
-        {/* Common problems — plain-language guides */}
+        {/* Common problems, plain-language guides */}
         <section className="px-6 py-12" style={{ background: "#F8F8F6" }}>
           <div className="max-w-5xl mx-auto text-center">
             <div className="text-xs mb-3" style={{ fontFamily: MONO, color: "#E07B39" }}>COMMON PROBLEMS</div>

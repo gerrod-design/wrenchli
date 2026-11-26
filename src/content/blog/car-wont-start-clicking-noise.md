@@ -11,7 +11,7 @@ tags: ["won't start", "clicking noise", "battery", "starter", "no crank"]
 
 Rapid clicking means the battery cannot deliver enough current to crank the engine. One loud click points at the starter motor or its connections. A jump start is the fastest way to tell them apart: if the car starts on a jump, the battery is the problem; if it still clicks, look at the connections and then the starter.
 
-Want the likely cause for your specific vehicle before you call anyone? [Run your symptoms through Wrenchli's free assessment](https://wrenchli.net) — describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
+Want the likely cause for your specific vehicle before you call anyone? [Run your symptoms through Wrenchli's free assessment](https://wrenchli.net), describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
 
 You turn the key or press the start button. Instead of the engine roaring to life, you hear a rapid clicking sound — or maybe one loud click — and nothing happens. You're stuck.
 
@@ -95,12 +95,12 @@ You can troubleshoot several of these causes yourself, right in your driveway or
 1. Park the two cars nose to nose, close enough for the cables to reach, with both engines off and both keys out.
 2. Connect the red clamp to the dead battery's positive (+) terminal, then the other red clamp to the good battery's positive (+) terminal.
 3. Connect the black clamp to the good battery's negative (-) terminal.
-4. Connect the other black clamp to an unpainted metal surface on the dead car's engine, away from the battery. Never connect it to the dead battery's negative terminal — the small spark that can happen on the final connection should happen away from the battery, where gases can build up.
+4. Connect the other black clamp to an unpainted metal surface on the dead car's engine, away from the battery. Never connect it to the dead battery's negative terminal. The small spark that can happen on the final connection should happen away from the battery, where gases can build up.
 5. Start the good car and let it run for a few minutes. Then try starting the dead car.
 6. Once it starts, remove the cables in the reverse order you attached them, and keep the clamps from touching each other or anything metal while they are still connected at the other end.
 7. Drive the car for at least 20 to 30 minutes so the alternator can recharge the battery, and have the battery tested soon after. A battery that needed a jump once often needs one again.
 
-Safety points: keep cables clear of fans, belts, and anything that moves when the engine starts. If the dead battery is cracked, swollen, or leaking, do not jump it — have the car towed instead. If the car still clicks with a good jump source connected, stop and read the next section before trying again.
+Safety points: keep cables clear of fans, belts, and anything that moves when the engine starts. If the dead battery is cracked, swollen, or leaking, do not jump it, have the car towed instead. If the car still clicks with a good jump source connected, stop and read the next section before trying again.
 
 **Step 3: Inspect the battery terminals.** Pop the hood and look at the battery posts. If you see white, green, or blue crusty buildup, that's corrosion. If you can wiggle the cable clamps by hand, they're too loose. Tighten or clean them and try again.
 
@@ -110,7 +110,7 @@ Safety points: keep cables clear of fans, belts, and anything that moves when th
 
 ## Still clicks after a jump start
 
-If a jump start from a healthy car changes nothing — the same clicking, the same no start — the battery is probably not the whole story. Work through the connections first, then the starter.
+If a jump start from a healthy car changes nothing (the same clicking, the same no start), the battery is probably not the whole story. Work through the connections first, then the starter.
 
 **Check the connections again, including the ground cable.** A jump start delivers power through the same cables and terminals as the battery, so a bad connection defeats both. The clamps should be tight enough that you cannot twist them by hand, and free of the white or green crust that blocks current. Follow the thick black ground cable from the battery to where it bolts to the engine or the body. If that bolt is loose, rusted, or oily, the starter cannot draw the current it needs, no matter how strong the battery is. A frayed or heat-damaged cable end does the same thing.
 
