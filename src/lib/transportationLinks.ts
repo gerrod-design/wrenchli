@@ -160,10 +160,14 @@ export function transitDirectionsUrl(destination?: string | null): string {
 }
 
 /** SMART's own Trip Planner on smartbus.org, linked unprefilled:
- *  whether the planner accepts prefilled origin/destination
- *  parameters is unverified (Brief 1 research 2026-11-09). The URL
- *  itself was verified live on smartbus.org at build time. */
-export const SMART_TRIP_PLANNER_URL = "https://www.smartbus.org/Services/Trip-Planner";
+ *  verified live 2026-11-27 that the planner does not accept
+ *  prefilled origin/destination URL parameters (its own completed
+ *  search leaves the URL bare; four candidate parameter patterns
+ *  all loaded a blank form). The previous URL
+ *  (/Services/Trip-Planner) now redirects to a SMART Basics
+ *  landing page; /Schedules/Trip-Planner is the actual planner,
+ *  verified live on smartbus.org 2026-11-27. */
+export const SMART_TRIP_PLANNER_URL = "https://www.smartbus.org/Schedules/Trip-Planner";
 
 /** Avis (traditional rental). Prefill parameters are unverified,
  *  so V1 links to Avis's booking home, verified live at build
