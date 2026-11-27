@@ -127,9 +127,11 @@ export default function FindShops() {
         availability: p.availability as Shop["availability"],
       }));
 
-      // Merge in hand-verified Detroit Spotlight shops. They live in a
-      // separate table that the find-shops function doesn't read, so a ZIP
-      // search would otherwise never surface them.
+      // Merge in Detroit Spotlight shops. They live in a separate table
+      // that the find-shops function doesn't read, so a ZIP search would
+      // otherwise never surface them. These are independent listings
+      // carried from public records: they are not Wrenchli partners and
+      // have not been verified by Wrenchli.
       let merged: Shop[] = providers;
       try {
         const city = (data.city || "").trim();
@@ -157,7 +159,7 @@ export default function FindShops() {
               price_tier: "mid" as Shop["price_tier"],
               response_time: "",
               availability: "within_week" as Shop["availability"],
-              wrenchli_verified: true,
+              wrenchli_verified: false,
               quote_url: s.website_url ?? "",
               is_partnered: false,
             }));
@@ -213,8 +215,11 @@ export default function FindShops() {
               <h1 className="font-heading text-3xl md:text-5xl font-bold mb-4">
                 Find Auto Repair Shops Near You
               </h1>
-              <p className="text-lg text-primary-foreground/80 mb-8">
-                Search by ZIP code to discover verified repair shops near you. Compare ratings, prices, and availability.
+              <p className="text-lg text-primary-foreground/80 mb-4">
+                Search by ZIP code to find auto repair shops near you. Shops that have joined Wrenchli as partners are marked as partners; every other listing is an independent shop shown for reference only.
+              </p>
+              <p className="text-sm text-primary-foreground/60 mb-8">
+                Independent listings are not Wrenchli partners, have not been verified by Wrenchli, and Wrenchli has no business relationship with them.
               </p>
               {/* Search Bar */}
               <div className="flex flex-col gap-3 max-w-lg mx-auto">
@@ -317,7 +322,7 @@ export default function FindShops() {
                     Enter your ZIP code above to see auto repair shops in your area. Shops marked as partners have joined Wrenchli's referral pilot; other listings are reference-only.
                   </p>
                   <div className="grid gap-3 text-sm text-muted-foreground">
-                    {["Verified shop ratings and reviews", "Transparent pricing tiers", "Quick response times"].map((t) => (
+                    {["Public ratings and reviews where available", "Transparent pricing tiers", "Quick response times"].map((t) => (
                       <div key={t} className="flex items-center gap-2 justify-center">
                         <div className="h-1.5 w-1.5 rounded-full bg-accent" />
                         <span>{t}</span>

@@ -130,7 +130,7 @@ export default function ShopCard({ shop, onSchedule, capabilities }: ShopCardPro
         <div className="flex items-center gap-2 mb-3 pb-2 border-b border-muted-foreground/15">
           <Mail className="h-4 w-4 text-muted-foreground" />
           <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Coming Soon to Wrenchli
+            Independent listing — not a Wrenchli partner yet
           </span>
         </div>
       )}
