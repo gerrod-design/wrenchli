@@ -99,7 +99,7 @@ No. Wrenchli does not treat brake work as a do-it-yourself repair, and neither s
 
 Have a shop do it. The professional ranges above are what the job costs done properly, and the five questions in the section before this one will help you confirm the shop measured before it recommended.
 
-If you want a clearer picture before the visit, [run your symptoms through Wrenchli's free assessment](https://wrenchli.net). It takes two minutes and lays out the likely causes and the shop cost range for each.
+If you want a clearer picture before the visit, [run your symptoms through Wrenchli's free assessment](https://www.wrenchli.net). It takes two minutes and lays out the likely causes and the shop cost range for each.
 
 ## The bottom line
 

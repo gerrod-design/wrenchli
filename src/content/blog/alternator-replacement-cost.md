@@ -35,7 +35,7 @@ Briefly, and only to get help. Once the alternator stops charging, the engine ru
 
 A worn out battery and a failing alternator can look almost identical from the driver's seat, and replacing the wrong one wastes real money. Have the charging system checked first so the repair matches the actual failure.
 
-Not sure which one you are dealing with? [Describe what your car is doing in the free Wrenchli assessment](https://wrenchli.net) and get an honest read before you talk to a shop. If your car clicks but will not start, [our guide to that problem](https://www.wrenchli.net/blog/car-wont-start-clicking-noise) covers the other likely causes.
+Not sure which one you are dealing with? [Describe what your car is doing in the free Wrenchli assessment](https://www.wrenchli.net) and get an honest read before you talk to a shop. If your car clicks but will not start, [our guide to that problem](https://www.wrenchli.net/blog/car-wont-start-clicking-noise) covers the other likely causes.
 
 ## About these figures
 

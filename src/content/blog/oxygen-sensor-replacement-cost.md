@@ -33,7 +33,7 @@ One caution before you pay for a sensor: a sensor code does not always mean a de
 
 Usually, for a short while. The car protects itself by running a default fuel mixture, which costs you fuel economy and, over time, extra strain on the catalytic converter. Treat it as a schedule-soon item, not a same-day emergency and not a ignore-it item. If the car is also running roughly or stalling, that changes the answer: have it looked at promptly.
 
-Not sure whether your light points at a sensor or somewhere more expensive? Describe the symptoms, and any code you have, in the [free Wrenchli assessment](https://wrenchli.net) before you talk to a shop.
+Not sure whether your light points at a sensor or somewhere more expensive? Describe the symptoms, and any code you have, in the [free Wrenchli assessment](https://www.wrenchli.net) before you talk to a shop.
 
 ## About these figures
 

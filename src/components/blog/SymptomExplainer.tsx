@@ -156,7 +156,7 @@ export default function SymptomExplainer({ slug }: { slug: string }) {
         {/* Footer */}
         <p className="text-xs text-muted-foreground italic border-t border-border pt-4">
           Probabilities based on common symptom-to-repair data. Your specific vehicle may vary.{" "}
-          <a href="https://wrenchli.net" className="text-[#E07B39] hover:underline font-medium">
+          <a href="https://www.wrenchli.net" className="text-[#E07B39] hover:underline font-medium">
             Run a free assessment →
           </a>
         </p>

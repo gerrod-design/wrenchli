@@ -113,11 +113,14 @@ export function getPrerenderPaths(): string[] {
   ];
 }
 
-/** Every URL in the generated sitemap: the public prerendered routes. */
+/**
+ * Every URL in the generated sitemap: the public prerendered routes.
+ * Redirect routes are prerendered (so no-JS fetchers land on the real
+ * destination content) but deliberately NOT listed here: a redirect
+ * route's canonical is its destination, and a sitemap must list only
+ * canonical URLs (outside-in OI-011 — /for-shops/onboarding was listed
+ * while canonicalizing to /for-shops, which is already listed).
+ */
 export function getSitemapPaths(): string[] {
-  return [
-    ...STATIC_PRERENDER_PATHS,
-    ...blogPrerenderPaths(),
-    ...Object.keys(REDIRECT_PRERENDER_PATHS),
-  ];
+  return [...STATIC_PRERENDER_PATHS, ...blogPrerenderPaths()];
 }

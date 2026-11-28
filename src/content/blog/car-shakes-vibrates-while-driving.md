@@ -122,7 +122,7 @@ Some causes are very DIY-friendly. Others are not.
 
 **Shop required:** Tire balancing requires a balancing machine. Wheel alignment requires specialized equipment. Suspension component replacement often requires a press or spring compressor.
 
-If you want a quick read on what's most likely causing your vibration and whether a DIY approach makes sense for your vehicle, [run your symptoms through Wrenchli's free assessment](https://wrenchli.net). Two minutes, no login required, and you'll see the likely causes ranked by probability with cost estimates for each.
+If you want a quick read on what's most likely causing your vibration and whether a DIY approach makes sense for your vehicle, [run your symptoms through Wrenchli's free assessment](https://www.wrenchli.net). Two minutes, no login required, and you'll see the likely causes ranked by probability with cost estimates for each.
 
 ## The bottom line
 

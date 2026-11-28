@@ -86,7 +86,7 @@ export default function BlogPost() {
               Wrenchli's AI assesses your symptoms for free — and where a participating shop has joined our referral pilot, you can share your assessment with them.
             </p>
             <Button asChild className="mt-4 bg-accent hover:bg-accent/90 text-white">
-              <a href="https://wrenchli.net" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.wrenchli.net" target="_blank" rel="noopener noreferrer">
                 Get your free symptom assessment <ArrowRight className="ml-1 h-4 w-4" />
               </a>
             </Button>

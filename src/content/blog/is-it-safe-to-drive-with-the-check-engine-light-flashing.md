@@ -31,7 +31,7 @@ That unburned fuel burns inside the catalytic converter instead, overheating it.
 2. Drive gently and directly to a shop, or park somewhere safe and arrange help.
 3. If the car shakes hard, loses power badly, starts overheating, or stalls, stop driving it. At that point, continuing risks the engine itself, not just the converter.
 
-If the light comes back on after a repair, or you want an honest read before you talk to a shop, describe what the car is doing in the free [Wrenchli assessment](https://wrenchli.net). If a code reader has already given you a code, our guide to [code P0420](https://www.wrenchli.net/blog/check-engine-light-p0420) explains one of the codes a damaged converter produces.
+If the light comes back on after a repair, or you want an honest read before you talk to a shop, describe what the car is doing in the free [Wrenchli assessment](https://www.wrenchli.net). If a code reader has already given you a code, our guide to [code P0420](https://www.wrenchli.net/blog/check-engine-light-p0420) explains one of the codes a damaged converter produces.
 
 ## About these figures
 

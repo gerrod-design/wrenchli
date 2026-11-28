@@ -133,19 +133,29 @@ function article(post: BlogPost) {
     headline: post.title,
     description: post.excerpt,
     datePublished: post.date,
+    // The article's own modification date (outside-in OI-012): its
+    // recorded `updated` frontmatter date when one exists, otherwise its
+    // publication date. This field once carried the figures-verification
+    // date instead, which made articles published after a verification
+    // round claim a modification date before their publication date.
+    // The two dates are now kept separate: this one is the article's
+    // edit history, and the figures date lives in isBasedOn below.
+    dateModified:
+      post.updatedDate && post.updatedDate > post.date ? post.updatedDate : post.date,
     // Price provenance (outside-in OI-004; price credibility rule): when a
     // post's figures_verified frontmatter date is set, the cost figures in
     // the article come from Wrenchli's shared repair-rate table (the same
     // table the assessment API names as wrenchli_editorial_rate_table_v1),
-    // and the date is when those figures were last verified under the
-    // price-data credibility methodology. No date, no provenance claim.
+    // and the isBasedOn date is when those figures were last verified
+    // under the price-data credibility methodology. No date, no
+    // provenance claim.
     ...(post.figuresVerified
       ? {
-          dateModified: post.figuresVerified,
           isBasedOn: {
             "@type": "CreativeWork",
             name: "Wrenchli shared repair-rate table",
             identifier: "wrenchli_editorial_rate_table_v1",
+            dateModified: post.figuresVerified,
           },
         }
       : {}),

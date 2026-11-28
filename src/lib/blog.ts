@@ -12,6 +12,11 @@ export interface BlogPost {
   /** Date the article's cost figures were last verified against the
    *  shared repair-rate table (frontmatter: figures_verified). */
   figuresVerified?: string;
+  /** Date the article itself was last edited, when a later edit is
+   *  recorded (frontmatter: updated). Distinct from figuresVerified:
+   *  one is the article's edit history, the other is when its cost
+   *  figures were last verified (outside-in OI-012). */
+  updatedDate?: string;
 }
 
 function parseFrontmatter(raw: string): { meta: Record<string, string>; content: string } {
@@ -68,6 +73,7 @@ export function getAllPosts(): BlogPost[] {
         author: meta.author || "Team Wrenchli",
         tags: parseTags(meta.tags),
         figuresVerified: meta.figures_verified || undefined,
+        updatedDate: meta.updated || undefined,
         content,
         readingTime: estimateReadingTime(content),
       };

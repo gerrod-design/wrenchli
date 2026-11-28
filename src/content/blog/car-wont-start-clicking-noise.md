@@ -11,7 +11,7 @@ tags: ["won't start", "clicking noise", "battery", "starter", "no crank"]
 
 Rapid clicking means the battery cannot deliver enough current to crank the engine. One loud click points at the starter motor or its connections. A jump start is the fastest way to tell them apart: if the car starts on a jump, the battery is the problem; if it still clicks, look at the connections and then the starter.
 
-Want the likely cause for your specific vehicle before you call anyone? [Run your symptoms through Wrenchli's free assessment](https://wrenchli.net), describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
+Want the likely cause for your specific vehicle before you call anyone? [Run your symptoms through Wrenchli's free assessment](https://www.wrenchli.net), describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
 
 You turn the key or press the start button. Instead of the engine roaring to life, you hear a rapid clicking sound (or maybe one loud click) and nothing happens. You're stuck.
 
@@ -178,7 +178,7 @@ Many no-start causes are very DIY-friendly:
 
 **Shop required:** Parasitic drain assessment requires a multimeter and patience. Alternator testing requires a voltmeter at minimum. Both are doable at home but time-consuming.
 
-Want to know the most likely cause for your specific vehicle? [Run your symptoms through Wrenchli's free assessment](https://wrenchli.net), describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
+Want to know the most likely cause for your specific vehicle? [Run your symptoms through Wrenchli's free assessment](https://www.wrenchli.net), describe what you hear, and you'll get the probable causes, cost ranges, and whether it's a repair you can handle yourself.
 
 ## The bottom line
 

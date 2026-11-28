@@ -393,7 +393,7 @@ export default function RepairGuide() {
     "@type": "Service",
     name: repair.title,
     description: repair.seoDescription,
-    provider: { "@type": "Organization", name: "Wrenchli", url: "https://wrenchli.net" },
+    provider: { "@type": "Organization", name: "Wrenchli", url: "https://www.wrenchli.net" },
     areaServed: { "@type": "Country", name: "United States" },
     offers: {
       "@type": "AggregateOffer",
@@ -555,7 +555,7 @@ export function RepairGuidesIndex() {
               "@type": "ListItem",
               position: i + 1,
               name: g.title,
-              url: `https://wrenchli.net/repairs/${g.slug}`,
+              url: `https://www.wrenchli.net/repairs/${g.slug}`,
             })),
           })}
         </script>

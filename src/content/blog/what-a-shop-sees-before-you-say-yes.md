@@ -20,4 +20,4 @@ Inspections work the same way, one step stricter. Before an inspector accepts a 
 
 Two things Wrenchli never does with your information. It never sells your personal data or your car's data. And it never asks a shop for its customer list, so the road does not run the other way either.
 
-If you want to see the likely causes and a fair range before deciding whether any shop should see your problem at all, start with the [free assessment](https://wrenchli.net). Sending anything to a shop is a separate step, and it is always yours to take or skip.
+If you want to see the likely causes and a fair range before deciding whether any shop should see your problem at all, start with the [free assessment](https://www.wrenchli.net). Sending anything to a shop is a separate step, and it is always yours to take or skip.

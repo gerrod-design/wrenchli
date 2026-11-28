@@ -25,7 +25,7 @@ On most modern cars, the part a shop replaces is not a bare thermostat. It is th
 
 The part itself runs $60 to $120 at an independent shop and $137 at a dealer, and the labor runs 1 to 2 hours. Access is the other variable: on some engines the housing sits right on top, and on others it hides behind other components that have to come off first.
 
-Not sure whether your symptoms point at the thermostat or somewhere else? An overheating engine can also mean a failing water pump, a low coolant level from a leak, or a fan problem, and the prices differ. Describe what the car is doing in the [free Wrenchli assessment](https://wrenchli.net) before you talk to a shop, and take the likely causes with you.
+Not sure whether your symptoms point at the thermostat or somewhere else? An overheating engine can also mean a failing water pump, a low coolant level from a leak, or a fan problem, and the prices differ. Describe what the car is doing in the [free Wrenchli assessment](https://www.wrenchli.net) before you talk to a shop, and take the likely causes with you.
 
 ## About these figures
 

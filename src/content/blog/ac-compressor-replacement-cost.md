@@ -33,7 +33,7 @@ A weak compressor is mostly a comfort problem, with one exception: your defroste
 
 One thing this job is not: a do-it-yourself project for most owners. The refrigerant circuit is a sealed, pressurized system, and refrigerant handling is shop work with proper recovery equipment. Wrenchli does not publish home-repair guidance for refrigerant systems.
 
-Not sure whether the problem is the compressor or something cheaper? Low refrigerant from a leak, a failed clutch relay, and a dying compressor can all present as warm air, and the prices are very different. Describe what the car is doing in the [free Wrenchli assessment](https://wrenchli.net) before you talk to a shop.
+Not sure whether the problem is the compressor or something cheaper? Low refrigerant from a leak, a failed clutch relay, and a dying compressor can all present as warm air, and the prices are very different. Describe what the car is doing in the [free Wrenchli assessment](https://www.wrenchli.net) before you talk to a shop.
 
 ## About these figures
 

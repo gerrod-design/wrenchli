@@ -33,7 +33,7 @@ A weakening pump rarely strands you without warning signs first, but it does str
 
 One thing this job is not: a do-it-yourself project for most owners. The pump lives in the fuel system, and fuel system work is shop work. Wrenchli does not publish home-repair guidance for fuel systems, and this is one of the repairs where the professional's lift, tools, and fire precautions are the point.
 
-Not sure whether your symptoms point at the pump or somewhere cheaper? Describe what the car is doing in the [free Wrenchli assessment](https://wrenchli.net) before you talk to a shop. A weak battery, a clogged fuel filter, and a failing pump can feel similar from the driver's seat, and the prices are very different.
+Not sure whether your symptoms point at the pump or somewhere cheaper? Describe what the car is doing in the [free Wrenchli assessment](https://www.wrenchli.net) before you talk to a shop. A weak battery, a clogged fuel filter, and a failing pump can feel similar from the driver's seat, and the prices are very different.
 
 ## About these figures
 

@@ -33,7 +33,7 @@ Before you pay for a starter, rule out the battery. A weak battery and a dying s
 
 A failing starter is not a safety problem while the car runs. It is a stranding problem: every start is a coin flip, and the failure does not care whether you are at home or two states away. Once starts become unreliable, schedule the repair on your terms instead of the starter's.
 
-Not sure which part you are dealing with? Describe the symptoms in the [free Wrenchli assessment](https://wrenchli.net) and get the likely causes ranked before you talk to a shop.
+Not sure which part you are dealing with? Describe the symptoms in the [free Wrenchli assessment](https://www.wrenchli.net) and get the likely causes ranked before you talk to a shop.
 
 ## About these figures
 

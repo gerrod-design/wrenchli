@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-const SITE = "https://wrenchli.net";
+const SITE = "https://www.wrenchli.net";
 
 /** Organization + WebSite + Service structured data for the homepage */
 export function HomeJsonLd() {

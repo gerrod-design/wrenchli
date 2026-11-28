@@ -208,10 +208,10 @@ const warrantyJsonLd = {
   description:
     "Compare factory warranty coverage for all major car brands. See bumper-to-bumper, powertrain, and corrosion terms side by side.",
   author: { "@type": "Organization", name: "Wrenchli" },
-  publisher: { "@type": "Organization", name: "Wrenchli", url: "https://wrenchli.net" },
+  publisher: { "@type": "Organization", name: "Wrenchli", url: "https://www.wrenchli.net" },
   datePublished: "2026-04-10",
   dateModified: "2026-04-10",
-  mainEntityOfPage: "https://wrenchli.net/warranty-guide",
+  mainEntityOfPage: "https://www.wrenchli.net/warranty-guide",
 };
 
 export default function WarrantyGuide() {

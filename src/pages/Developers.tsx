@@ -424,7 +424,7 @@ const estimateSampleResponse = `{
   "warranty_note": "Most shops offer 12-month/12,000-mile warranty on brake work"
 }`;
 
-function CodeBlock({ code, language }: { code: string; language: string }) {
+function CodeBlock({ code, language, label }: { code: string; language: string; label: string }) {
   const [copied, setCopied] = useState(false);
 
   const copy = () => {
@@ -441,6 +441,7 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
           variant="ghost"
           size="sm"
           onClick={copy}
+          aria-label={copied ? `Copied ${label}` : `Copy ${label}`}
           className="h-7 px-2 text-xs text-muted-foreground hover:text-white"
         >
           {copied ? <Check className="h-3.5 w-3.5 mr-1" /> : <Copy className="h-3.5 w-3.5 mr-1" />}
@@ -513,7 +514,7 @@ export default function Developers() {
               The symptom assessment endpoint is documented as a machine-readable OpenAPI 3
               document at{" "}
               <a href="/openapi.json" className="font-medium text-primary hover:underline">
-                wrenchli.net/openapi.json
+                www.wrenchli.net/openapi.json
               </a>
               . Send a vehicle and the symptoms its owner describes; you get back a preliminary
               symptom assessment — probable issue, urgency, an estimated cost range, and
@@ -637,20 +638,20 @@ export default function Developers() {
                   <TabsTrigger value="javascript">JavaScript</TabsTrigger>
                 </TabsList>
                 <TabsContent value="curl">
-                  <CodeBlock code={curlExample} language="bash" />
+                  <CodeBlock code={curlExample} language="bash" label="code-lookup cURL example" />
                 </TabsContent>
                 <TabsContent value="python">
-                  <CodeBlock code={pythonExample} language="python" />
+                  <CodeBlock code={pythonExample} language="python" label="code-lookup Python example" />
                 </TabsContent>
                 <TabsContent value="javascript">
-                  <CodeBlock code={jsExample} language="javascript" />
+                  <CodeBlock code={jsExample} language="javascript" label="code-lookup JavaScript example" />
                 </TabsContent>
               </Tabs>
             </SectionCard>
 
             {/* Sample Response */}
             <SectionCard icon={Terminal} title="Sample Response">
-              <CodeBlock code={sampleResponse} language="json" />
+              <CodeBlock code={sampleResponse} language="json" label="code-lookup sample response" />
             </SectionCard>
 
             {/* Estimate Repair Endpoint */}
@@ -712,11 +713,11 @@ export default function Developers() {
 
               <h3 className="font-semibold text-foreground mb-2">Example Request</h3>
               <div className="mb-6">
-                <CodeBlock code={estimateCurlExample} language="bash" />
+                <CodeBlock code={estimateCurlExample} language="bash" label="repair cost estimate cURL example" />
               </div>
 
               <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
-              <CodeBlock code={estimateSampleResponse} language="json" />
+              <CodeBlock code={estimateSampleResponse} language="json" label="repair cost estimate sample response" />
             </SectionCard>
 
             {/* Vehicle Value Endpoint */}
@@ -780,18 +781,18 @@ export default function Developers() {
                   <TabsTrigger value="javascript">JavaScript</TabsTrigger>
                 </TabsList>
                 <TabsContent value="curl">
-                  <CodeBlock code={valueCurlExample} language="bash" />
+                  <CodeBlock code={valueCurlExample} language="bash" label="vehicle value cURL example" />
                 </TabsContent>
                 <TabsContent value="python">
-                  <CodeBlock code={valuePythonExample} language="python" />
+                  <CodeBlock code={valuePythonExample} language="python" label="vehicle value Python example" />
                 </TabsContent>
                 <TabsContent value="javascript">
-                  <CodeBlock code={valueJsExample} language="javascript" />
+                  <CodeBlock code={valueJsExample} language="javascript" label="vehicle value JavaScript example" />
                 </TabsContent>
               </Tabs>
 
               <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
-              <CodeBlock code={valueSampleResponse} language="json" />
+              <CodeBlock code={valueSampleResponse} language="json" label="vehicle value sample response" />
 
               <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 p-4 text-sm text-muted-foreground">
                 <strong className="text-foreground">💡 Tip:</strong> Omit <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">repair_cost</code> to get a pure valuation without the repair-vs-replace analysis. The <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">trade_vs_repair</code> field will be absent from the response.
@@ -858,18 +859,18 @@ export default function Developers() {
                   <TabsTrigger value="javascript">JavaScript</TabsTrigger>
                 </TabsList>
                 <TabsContent value="curl">
-                  <CodeBlock code={maintCurlExample} language="bash" />
+                  <CodeBlock code={maintCurlExample} language="bash" label="maintenance schedule cURL example" />
                 </TabsContent>
                 <TabsContent value="python">
-                  <CodeBlock code={maintPythonExample} language="python" />
+                  <CodeBlock code={maintPythonExample} language="python" label="maintenance schedule Python example" />
                 </TabsContent>
                 <TabsContent value="javascript">
-                  <CodeBlock code={maintJsExample} language="javascript" />
+                  <CodeBlock code={maintJsExample} language="javascript" label="maintenance schedule JavaScript example" />
                 </TabsContent>
               </Tabs>
 
               <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
-              <CodeBlock code={maintSampleResponse} language="json" />
+              <CodeBlock code={maintSampleResponse} language="json" label="maintenance schedule sample response" />
 
               <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 p-4 text-sm text-muted-foreground">
                 <strong className="text-foreground">💡 Tip:</strong> Omit <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">last_services</code> to get the full schedule with all items calculated from 0 miles. The <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">priority</code> field uses: <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">overdue</code>, <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">urgent</code> (≤1,000 mi), <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">soon</code> (≤3,000 mi), <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">upcoming</code>.
@@ -936,18 +937,18 @@ export default function Developers() {
                   <TabsTrigger value="javascript">JavaScript</TabsTrigger>
                 </TabsList>
                 <TabsContent value="curl">
-                  <CodeBlock code={providersCurlExample} language="bash" />
+                  <CodeBlock code={providersCurlExample} language="bash" label="service provider search cURL example" />
                 </TabsContent>
                 <TabsContent value="python">
-                  <CodeBlock code={providersPythonExample} language="python" />
+                  <CodeBlock code={providersPythonExample} language="python" label="service provider search Python example" />
                 </TabsContent>
                 <TabsContent value="javascript">
-                  <CodeBlock code={providersJsExample} language="javascript" />
+                  <CodeBlock code={providersJsExample} language="javascript" label="service provider search JavaScript example" />
                 </TabsContent>
               </Tabs>
 
               <h3 className="font-semibold text-foreground mb-2">Sample Response</h3>
-              <CodeBlock code={providersSampleResponse} language="json" />
+              <CodeBlock code={providersSampleResponse} language="json" label="service provider search sample response" />
 
               <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 p-4 text-sm text-muted-foreground">
                 <strong className="text-foreground">💡 Tip:</strong> Pass <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">vehicle_make=BMW</code> to automatically prioritize European/luxury specialists. Use <code className="px-1 py-0.5 rounded bg-muted text-xs font-mono">price_range=budget</code> to find the most affordable options.

@@ -11,9 +11,9 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://wrenchli.net/openapi.json"
+    "url": "https://www.wrenchli.net/openapi.json"
   },
-  "logo_url": "https://wrenchli.net/favicon.ico",
+  "logo_url": "https://www.wrenchli.net/favicon.ico",
   "contact_email": "gerrod@wrenchli.net",
-  "legal_info_url": "https://wrenchli.net/about"
+  "legal_info_url": "https://www.wrenchli.net/about"
 }
